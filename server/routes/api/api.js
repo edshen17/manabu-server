@@ -102,7 +102,6 @@ router.post('/glogin', (req, res, next) => {
           const newUser = new User({
             name: body.name,
             email: body.email,
-            profileImage: body.picture,
           });
 
           newUser.save((err, user) => {

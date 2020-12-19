@@ -18,13 +18,21 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  authorizedTeacher: {
-    type: Boolean,
-    required: false,
+  profileBio: {
+    type: String,
+    default: '',
   },
-  isAdmin: {
-    type: Boolean,
-    required: false,
+  dateRegistered: {
+    type: Date,
+    default: Date.now,
+  },
+  learnedLanguages: {
+    type: Array,
+    default: [],
+  },
+  learningLanguages: {
+    type: Array,
+    default: [],
   },
 });
 

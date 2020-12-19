@@ -1,3 +1,4 @@
+const dotenv = require('dotenv').config();
 module.exports = {
-    secret: "manabu-super-secret-key"
+    secret: process.env.JWT_SECRET
 };

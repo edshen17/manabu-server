@@ -1,4 +1,5 @@
+const dotenv = require('dotenv').config();
 module.exports = {
-    MongoURI: 'mongodb+srv://manabu:SXI4Dsap2dYffLP4@manabu.ovz1o.mongodb.net/users?retryWrites=true&w=majority',
+    MongoURI: `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/users?retryWrites=true&w=majority`,
 };
   
