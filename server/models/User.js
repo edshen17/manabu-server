@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: false,
+    required: true,
   },
   email: {
     type: String,
@@ -14,10 +14,17 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  roles: { type: Array, default: [] },
-  isAuthorized: {
+  profileImage: {
+    type: String,
+    default: '',
+  },
+  authorizedTeacher: {
     type: Boolean,
-    default: false,
+    required: false,
+  },
+  isAdmin: {
+    type: Boolean,
+    required: false,
   },
 });
 

@@ -4,14 +4,26 @@ const User = require('../../models/User');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config')
 const VerifyToken = require('./VerifyToken');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.G_CLIENTID);
 
 // Connect to Mongodb
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('connected to MongoDB'))
   .catch(err => console.log(err));
+
+// return a valid jwt
+function returnToken(res, user) {
+  const token = jwt.sign({ id: user._id }, config.secret, {
+    expiresIn: 86400 // expires in 24 hours
+  });  
+  res.status(200).send({ auth: true, token: token });
+}
+
 
 // Get User
 // Making a user in the db
@@ -21,7 +33,6 @@ router.post('/register', (req, res) => {
     email,
     password,
   } = req.body;
-  const roles = [req.query.role];
 
   User.findOne({
     email,
@@ -35,21 +46,13 @@ router.post('/register', (req, res) => {
           name,
           email,
           password: bcrypt.hashSync(req.body.password, 10),
-          roles,
-          isAuthorized: false,
         });
 
-        if (newUser.roles[0] === 'student') { // change student isAuthorized to true. Default value is false for teachers
-          newUser.isAuthorized = true;
-        }
         
         newUser.save((err, user) => {
           if (err) res.json(err).status(500) 
           else { 
-            const token = jwt.sign({ id: user._id }, config.secret, {
-              expiresIn: 86400 // expires in 24 hours
-            });
-            res.status(200).send({ auth: true, token: token });
+            returnToken(res, user);
           }
         });
       }
@@ -73,6 +76,51 @@ router.get('/me', VerifyToken, function(req, res, next) {
   });
 });
 
+router.post('/glogin', (req, res, next) => {
+  const { idToken } = req.body
+ 
+  async function verify() {
+    const ticket = await client.verifyIdToken({
+        idToken: idToken,
+        audience: process.env.G_CLIENTID,
+    });
+    const payload = ticket.getPayload();
+    const userid = payload['sub'];
+  }
+  verify().then(() => {
+    // token is verified
+    const parts = idToken.split('.');
+    const bodyBuf = Buffer.from(parts[1], 'base64');
+    const body = JSON.parse(bodyBuf.toString());
+    
+    User.findOne({
+      email: body.email,
+    })
+      .then((user) => {
+        if (!user) {
+          // user does not exist, create a user from google info
+          const newUser = new User({
+            name: body.name,
+            email: body.email,
+            profileImage: body.picture,
+          });
+
+          newUser.save((err, user) => {
+            if (err) res.json(err).status(500) 
+            else { 
+              returnToken(res, user);
+            }
+          });
+        } else { // user already in db
+          returnToken(res, user);
+        }
+      })
+  }).catch((err) => {
+    res.status(401).json(err);
+  });
+
+});
+
 // enable router to use middleware
 router.use(function (user, req, res, next) {
   res.status(200).send(user);
@@ -89,20 +137,11 @@ router.post('/login', function(req, res) {
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
     
-    const token = jwt.sign({ id: user._id }, config.secret, {
-      expiresIn: 86400 // expires in 24 hours
-    });
-    
-    res.status(200).send({ auth: true, token: token });
+    returnToken(res, user);
   });
   
 });
 
-router.get('/', function(req, res) {
-
- res.status(200).json('hi')
-  
-});
 
 
 module.exports = router;
