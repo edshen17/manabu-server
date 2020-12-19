@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('../../models/User');
+const Teacher = require('../../models/Teacher');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -32,26 +33,36 @@ router.post('/register', (req, res) => {
     name,
     email,
     password,
+    isTeacherApp
   } = req.body;
 
   User.findOne({
     email,
   })
     .then((user) => {
-      if (user) {
+      if (user && !isTeacherApp) {
         // user exists
-        res.status(500).json({msg: 'A user with that email already exists',});
-      } else {
+        res.status(500).json({msg: 'An account with that email already exists.',});
+      } else if (user && isTeacherApp) { // user exists and is registering for teacher account (linking accounts)
+        res.status(500).json({msg: 'You seem to already have an user account. Log in using the link below to connect that account with your teacher one.'})
+      }
+    
+      else { // no user, so create a new one
         const newUser = new User({
-          name,
+          name: name,
           email,
-          password: bcrypt.hashSync(req.body.password, 10),
+          password: bcrypt.hashSync(password, 10),
         });
-
-        
+      
         newUser.save((err, user) => {
           if (err) res.json(err).status(500) 
           else { 
+            if (isTeacherApp) { // if it's a teacher application, link it with the user
+              const newTeacher = new Teacher({
+                userId: user._id,
+              });
+              newTeacher.save().catch((err) => res.json(err).status(500));
+            }
             returnToken(res, user);
           }
         });
@@ -70,7 +81,8 @@ router.get('/me', VerifyToken, function(req, res, next) {
 });
 
 router.post('/glogin', (req, res, next) => {
-  const { idToken } = req.body
+  const { idToken, isTeacherApp } = req.body
+  console.log(isTeacherApp)
  
   async function verify() {
     const ticket = await client.verifyIdToken({
@@ -100,10 +112,26 @@ router.post('/glogin', (req, res, next) => {
           newUser.save((err, user) => {
             if (err) res.json(err).status(500) 
             else { 
+              if (isTeacherApp) { // if it's a teacher application, link it with the user
+              const newTeacher = new Teacher({
+                userId: user._id,
+              });
+              newTeacher.save().catch((err) => res.json(err).status(500));
+            }
               returnToken(res, user);
             }
           });
         } else { // user already in db
+          if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
+            Teacher.findOne({userId: user._id}, (err, teacher) => {
+              if (!teacher) {
+                const newTeacher = new Teacher({
+                  userId: user._id,
+                });
+                newTeacher.save().catch((err) => res.json(err).status(500));
+              }
+            });
+          }
           returnToken(res, user);
         }
       })
@@ -128,8 +156,19 @@ router.post('/login', function(req, res) {
     
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+
+    else {
+      returnToken(res, user);
+
+    const isTeacherApp = req.body.isTeacherApp;
+    if (isTeacherApp) {
+      const newTeacher = new Teacher({
+        userId: user._id,
+      });
+      newTeacher.save().catch((err) => res.json(err).status(500));
+      }
+    }
     
-    returnToken(res, user);
   });
   
 });
