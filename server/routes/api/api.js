@@ -42,9 +42,9 @@ router.post('/register', (req, res) => {
     .then((user) => {
       if (user && !isTeacherApp) {
         // user exists
-        res.status(500).json({msg: 'An account with that email already exists.',});
+        return res.status(500).send('An account with that email already exists.');
       } else if (user && isTeacherApp) { // user exists and is registering for teacher account (linking accounts)
-        res.status(500).json({msg: 'You seem to already have an user account. Log in using the link below to connect that account with your teacher one.'})
+        return res.status(500).send('You seem to already have an user account. Log in using the link below to connect that account with your teacher one.');
       }
     
       else { // no user, so create a new one
@@ -73,8 +73,8 @@ router.post('/register', (req, res) => {
 // route to get access to user's own information
 router.get('/me', VerifyToken, function(req, res, next) {
   User.findById(req.userId, { password: 0 }, function (err, user) {
-    if (err) return res.status(500).send("There was a problem finding the user.");
-    if (!user) return res.status(404).send("No user found.");
+    if (err) res.status(500).send("There was a problem finding the user.");
+    if (!user) res.status(404).send("No user found.");
     
     next(user);
   });
@@ -142,7 +142,16 @@ router.post('/glogin', (req, res, next) => {
 
 // enable router to use middleware
 router.use(function (user, req, res, next) {
-  res.status(200).send(user);
+  // create a clone of the user object so we can add our own fields
+  Teacher.findOne({userId: user._id}).exec((err, teacher) => {
+    const userClone = Object.assign({}, user);
+
+    if (teacher && !teacher.isApproved) {
+      userClone._doc['teacherAppPending'] = true;
+      console.log(userClone._doc)
+    }
+    res.status(200).send(userClone._doc);
+  })
 });
 
 // POST login
@@ -150,21 +159,19 @@ router.use(function (user, req, res, next) {
 router.post('/login', function(req, res) {
 
   User.findOne({ email: req.body.email }, function (err, user) {
-    if (err) return res.status(500).send('Error on the server.');
-    if (!user) return res.status(404).send('No user found.');
-    
+    if (err) return res.status(500).send('There was an error processing your request.');
+    if (!user) return res.status(404).send('An accoutn with that username was not found.');
+    if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-    if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+    if (!passwordIsValid) res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
 
     else {
-      returnToken(res, user);
-
     const isTeacherApp = req.body.isTeacherApp;
     if (isTeacherApp) {
       const newTeacher = new Teacher({
         userId: user._id,
       });
-      newTeacher.save().catch((err) => res.json(err).status(500));
+      newTeacher.save().then(() => { returnToken(res, user) }).catch((err) => res.status(500).send(err));
       }
     }
     
