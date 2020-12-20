@@ -19,7 +19,7 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // return a valid jwt
 function returnToken(res, user) {
-  const token = jwt.sign({ id: user._id }, config.secret, {
+  const token = jwt.sign({ id: user._id, role: user.role }, config.secret, {
     expiresIn: 86400 // expires in 24 hours
   });  
   res.status(200).send({ auth: true, token: token });
@@ -82,7 +82,6 @@ router.get('/me', VerifyToken, function(req, res, next) {
 
 router.post('/glogin', (req, res, next) => {
   const { idToken, isTeacherApp } = req.body
-  console.log(isTeacherApp)
  
   async function verify() {
     const ticket = await client.verifyIdToken({
