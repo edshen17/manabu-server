@@ -2,7 +2,7 @@ const axios = require('axios')
 
 // ensure server has access to updated roles
 async function verifyRole(req, res, next) {
-  const token = req.headers['x-access-token'];
+  const token = req.headers['x-access-token'] || req.body.token;
   const resObj = await axios.get('http://localhost:5000/api/me', { headers: {
         'x-access-token': token,
         'Accept' : 'application/json',
