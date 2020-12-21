@@ -172,6 +172,8 @@ router.post('/login', function(req, res) {
         userId: user._id,
       });
       newTeacher.save().then(() => { returnToken(res, user) }).catch((err) => { return res.status(500).send(err) });
+      } else {
+        returnToken(res, user);
       }
     }
     
