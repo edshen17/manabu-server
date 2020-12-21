@@ -34,6 +34,14 @@ const UserSchema = new mongoose.Schema({
     type: Array,
     default: [],
   },
+  region: {
+    type: String,
+    default: '',
+  },
+  timezone: {
+    type: String,
+    default: '',
+  },
   role: {
     type: String,
     default: 'user',

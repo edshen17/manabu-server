@@ -9,11 +9,12 @@ const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config')
 const VerifyToken = require('./VerifyToken');
+const VerifyRole = require('./VerifyRole');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.G_CLIENTID);
 
 // Connect to Mongodb
-mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
   .then(() => console.log('connected to MongoDB'))
   .catch(err => console.log(err));
 
@@ -22,7 +23,7 @@ function returnToken(res, user) {
   const token = jwt.sign({ id: user._id, role: user.role }, config.secret, {
     expiresIn: 86400 // expires in 24 hours
   });  
-  res.status(200).send({ auth: true, token: token });
+  return res.status(200).send({ auth: true, token: token });
 }
 
 
@@ -55,13 +56,13 @@ router.post('/register', (req, res) => {
         });
       
         newUser.save((err, user) => {
-          if (err) res.json(err).status(500) 
+          if (err) return res.json(err).status(500) 
           else { 
             if (isTeacherApp) { // if it's a teacher application, link it with the user
               const newTeacher = new Teacher({
                 userId: user._id,
               });
-              newTeacher.save().catch((err) => res.json(err).status(500));
+              newTeacher.save().catch((err) => { return res.status(500).send(err) });
             }
             returnToken(res, user);
           }
@@ -73,8 +74,8 @@ router.post('/register', (req, res) => {
 // route to get access to user's own information
 router.get('/me', VerifyToken, function(req, res, next) {
   User.findById(req.userId, { password: 0 }, function (err, user) {
-    if (err) res.status(500).send("There was a problem finding the user.");
-    if (!user) res.status(404).send("No user found.");
+    if (err) return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
     
     next(user);
   });
@@ -109,13 +110,13 @@ router.post('/glogin', (req, res, next) => {
           });
 
           newUser.save((err, user) => {
-            if (err) res.json(err).status(500) 
+            if (err) return res.json(err).status(500) 
             else { 
               if (isTeacherApp) { // if it's a teacher application, link it with the user
               const newTeacher = new Teacher({
                 userId: user._id,
               });
-              newTeacher.save().catch((err) => res.json(err).status(500));
+              newTeacher.save().catch((err) => { return res.status(500).send(err) });
             }
               returnToken(res, user);
             }
@@ -127,7 +128,7 @@ router.post('/glogin', (req, res, next) => {
                 const newTeacher = new Teacher({
                   userId: user._id,
                 });
-                newTeacher.save().catch((err) => res.json(err).status(500));
+                newTeacher.save().catch((err) => { return res.status(500).send(err) });
               }
             });
           }
@@ -135,7 +136,7 @@ router.post('/glogin', (req, res, next) => {
         }
       })
   }).catch((err) => {
-    res.status(401).json(err);
+    return res.status(401).json(err);
   });
 
 });
@@ -148,9 +149,8 @@ router.use(function (user, req, res, next) {
 
     if (teacher && !teacher.isApproved) {
       userClone._doc['teacherAppPending'] = true;
-      console.log(userClone._doc)
     }
-    res.status(200).send(userClone._doc);
+    return res.status(200).send(userClone._doc);
   })
 });
 
@@ -163,7 +163,7 @@ router.post('/login', function(req, res) {
     if (!user) return res.status(404).send('An account with that username was not found.');
     if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-    if (!passwordIsValid) res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
+    if (!passwordIsValid) return res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
 
     else {
     const isTeacherApp = req.body.isTeacherApp;
@@ -171,11 +171,26 @@ router.post('/login', function(req, res) {
       const newTeacher = new Teacher({
         userId: user._id,
       });
-      newTeacher.save().then(() => { returnToken(res, user) }).catch((err) => res.status(500).send(err));
+      newTeacher.save().then(() => { returnToken(res, user) }).catch((err) => { return res.status(500).send(err) });
       }
     }
     
   });
+  
+});
+
+// PUT /students/:username/
+// Route for editing a user's profile information
+router.put('/user/:uId/updateProfile', VerifyToken, VerifyRole, (req, res, next) => {
+  if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
+    User.findOneAndUpdate({ _id: req.params.uId }, req.body)
+    .exec((err, user) => {
+      if (err) return next(err);
+      return res.status(200).json(user);
+    });
+  } else {
+    return res.status(401).send('You cannot modify this profile.')
+  }
   
 });
 
