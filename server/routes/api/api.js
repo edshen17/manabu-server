@@ -160,7 +160,7 @@ router.post('/login', function(req, res) {
 
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) return res.status(500).send('There was an error processing your request.');
-    if (!user) return res.status(404).send('An accoutn with that username was not found.');
+    if (!user) return res.status(404).send('An account with that username was not found.');
     if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
