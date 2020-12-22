@@ -1,21 +1,20 @@
 const axios = require('axios')
 
-// ensure server has access to updated roles
-async function verifyRole(req, res, next) {
-  const token = req.headers['x-access-token'] || req.body.token;
-  const resObj = await axios.get('http://localhost:5000/api/me', { headers: {
-        'x-access-token': token,
-        'Accept' : 'application/json',
-        'Content-Type': 'application/json'
-      } 
-    }).catch((err) => console.log(err));
+// ensure server has access to updated roles (prevent stale tokens).
+function verifyRole(req, res, next) {
+  axios.get('http://localhost:5000/api').then((res) => {
+  console.log(res);
+}).catch((err) => {console.log(err)})
+  // const resObj = await axios.get('http://localhost:5000/api/me', { headers: {
+  //       'X-Requested-With': 'XMLHttpRequest'
+  //     } 
+  //   }).then((res) => {
+  //     console.log(res.data);
+  //     req.role = res.data.role;
+  //   }).catch((err) => {});
 
-    req.role = resObj.data.role;
+    
     next();
 }
-
-
-
-
 
 module.exports = verifyRole;

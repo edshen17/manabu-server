@@ -1,25 +1,33 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Middleware
 
 app.use(bodyParser.json());
-app.use(cors());
+// app.use(cors());
 app.use(express.static('public'))
+app.use(cookieParser());
+
+// app.use(cors({
+//     credentials: true
+// }));
+
+const corsConfig = {
+    origin: true,
+    credentials: true,
+  };
+  
+  app.use(cors(corsConfig));
+  app.options('*', cors(corsConfig));
 
 const api = require('./routes/api/api');
 
 app.use('/api/', api);
-
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "YOUR-DOMAIN.TLD"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-});
-
+app.set('trust proxy', 1)
 
 const port = process.env.PORT || 5000;
 

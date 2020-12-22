@@ -22,7 +22,12 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindA
 function returnToken(res, user) {
   const token = jwt.sign({ id: user._id, role: user.role }, config.secret, {
     expiresIn: 86400 // expires in 24 hours
-  });  
+  });
+
+  const tokenArr = token.split('.')
+
+  res.cookie('hp', `${tokenArr[0]}.${tokenArr[1]}`, { maxAge: 30 * 60 * 1000, httpOnly: true })
+  res.cookie('sig', `.${tokenArr[2]}`, { maxAge: 24 * 60 * 60 * 1000, httpOnly: false })
   return res.status(200).send({ auth: true, token: token });
 }
 
@@ -71,12 +76,12 @@ router.post('/register', (req, res) => {
     });
 });
 
+
 // route to get access to user's own information
 router.get('/me', VerifyToken, function(req, res, next) {
   User.findById(req.userId, { password: 0 }, function (err, user) {
-    if (err) return res.status(500).send("There was a problem finding the user.");
-    if (!user) return res.status(404).send("No user found.");
-    
+    if (err) res.status(500).send("There was a problem finding the user.");
+    if (!user) res.status(404).send("No user found.");
     next(user);
   });
 });
@@ -157,10 +162,9 @@ router.use(function (user, req, res, next) {
 // POST login
 // logging users in 
 router.post('/login', function(req, res) {
-
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) return res.status(500).send('There was an error processing your request.');
-    if (!user) return res.status(404).send('An account with that username was not found.');
+    if (!user) return res.status(404).send('An account with that email was not found.');
     if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
     const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
     if (!passwordIsValid) return res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
@@ -172,18 +176,18 @@ router.post('/login', function(req, res) {
         userId: user._id,
       });
       newTeacher.save().then(() => { returnToken(res, user) }).catch((err) => { return res.status(500).send(err) });
+      returnToken(res, user);
       } else {
         returnToken(res, user);
       }
     }
-    
   });
   
 });
 
 // PUT /students/:username/
 // Route for editing a user's profile information
-router.put('/user/:uId/updateProfile', VerifyToken, VerifyRole, (req, res, next) => {
+router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
   if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
     User.findOneAndUpdate({ _id: req.params.uId }, req.body)
     .exec((err, user) => {
@@ -193,7 +197,6 @@ router.put('/user/:uId/updateProfile', VerifyToken, VerifyRole, (req, res, next)
   } else {
     return res.status(401).send('You cannot modify this profile.')
   }
-  
 });
 
 
