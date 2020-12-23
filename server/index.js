@@ -2,27 +2,19 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-
 const app = express();
 
-// Middleware
+const corsConfig = {
+  origin: true,
+  credentials: true,
+};
 
+// Middleware
 app.use(bodyParser.json());
-// app.use(cors());
 app.use(express.static('public'))
 app.use(cookieParser());
-
-// app.use(cors({
-//     credentials: true
-// }));
-
-const corsConfig = {
-    origin: true,
-    credentials: true,
-  };
-  
-  app.use(cors(corsConfig));
-  app.options('*', cors(corsConfig));
+app.use(cors(corsConfig));
+app.options('*', cors(corsConfig));
 
 const api = require('./routes/api/api');
 

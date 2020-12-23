@@ -9,7 +9,6 @@ const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config')
 const VerifyToken = require('./VerifyToken');
-const VerifyRole = require('./VerifyRole');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.G_CLIENTID);
 
@@ -21,17 +20,14 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindA
 // return a valid jwt
 function returnToken(res, user) {
   const token = jwt.sign({ id: user._id, role: user.role }, config.secret, {
-    expiresIn: 86400 // expires in 24 hours
+    expiresIn: 86400 * 2 // expires in 2 days
   });
 
   const tokenArr = token.split('.')
-
-  res.cookie('hp', `${tokenArr[0]}.${tokenArr[1]}`, { maxAge: 30 * 60 * 1000, httpOnly: true })
-  res.cookie('sig', `.${tokenArr[2]}`, { maxAge: 24 * 60 * 60 * 1000, httpOnly: false })
+  res.cookie('hp', `${tokenArr[0]}.${tokenArr[1]}`, { maxAge: 2* 24* 60 * 60 * 1000, httpOnly: true })
+  res.cookie('sig', `.${tokenArr[2]}`, { maxAge: 2* 24* 60 * 60 * 1000, httpOnly: false })
   return res.status(200).send({ auth: true, token: token });
 }
-
-
 // Get User
 // Making a user in the db
 router.post('/register', (req, res) => {
@@ -162,6 +158,7 @@ router.use(function (user, req, res, next) {
 // POST login
 // logging users in 
 router.post('/login', function(req, res) {
+
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) return res.status(500).send('There was an error processing your request.');
     if (!user) return res.status(404).send('An account with that email was not found.');
@@ -175,11 +172,9 @@ router.post('/login', function(req, res) {
       const newTeacher = new Teacher({
         userId: user._id,
       });
-      newTeacher.save().then(() => { returnToken(res, user) }).catch((err) => { return res.status(500).send(err) });
-      returnToken(res, user);
-      } else {
-        returnToken(res, user);
+      newTeacher.save().catch((err) => { return res.status(500).send(err) });
       }
+      returnToken(res, user);
     }
   });
   

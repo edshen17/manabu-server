@@ -26,11 +26,11 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  learnedLanguages: {
+  fluentLanguages: {
     type: Array,
     default: [],
   },
-  learningLanguages: {
+  nonFluentLanguages: {
     type: Array,
     default: [],
   },
@@ -41,6 +41,10 @@ const UserSchema = new mongoose.Schema({
   timezone: {
     type: String,
     default: '',
+  },
+  lastOnline: {
+    type: Date,
+    required: false,
   },
   role: {
     type: String,

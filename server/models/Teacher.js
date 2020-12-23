@@ -18,13 +18,9 @@ const TeacherSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
   },
-  teachingLanguages: {
-    type: Array,
-    default: ["jp"],
-  },
-  lessonInLanguages: {
-    type: Array,
-    default: ["jp", "en"],
+  introductionVideo: {
+    type: String,
+    default: '',
   },
   lessonsTypes: {
       type: Array, // array of lesson ids
