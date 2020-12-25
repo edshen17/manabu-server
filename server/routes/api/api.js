@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const User = require('../../models/User');
 const Teacher = require('../../models/Teacher');
+const AvailableTime = require('../../models/AvailableTime');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -174,7 +175,8 @@ router.post('/login', function(req, res) {
       });
       newTeacher.save().catch((err) => { return res.status(500).send(err) });
       }
-      returnToken(res, user);
+    returnToken(res, user);
+    
     }
   });
   
@@ -194,6 +196,32 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
   }
 });
 
+router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
+  // if (req.role == 'admin' || req.role =='teacher') {
+  //   console.log('hi')
+  // }
+  const newAvail = new AvailableTime({
+    createdBy: req.body.createdBy,
+    from: req.body.from,
+    to: req.body.to,
+  })
 
+  newAvail.save().catch((err) => { return res.status(500).send(err) });
+  return res.status(200).json(newAvail);
+});
+
+router.get('/schedule/:uId/availableTime', (req, res, next) => {
+  AvailableTime.find({createdBy: req.params.uId}).then((availTime) => {
+    if (!availTime) return res.status(404).send('no user')
+    return res.status(200).json(availTime)
+  })
+})
+
+router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
+  AvailableTime.deleteOne(req.body, (err) => {
+    if (err) return res.status(500).send(err);
+    return res.status(200).send('success');
+  })
+})
 
 module.exports = router;
