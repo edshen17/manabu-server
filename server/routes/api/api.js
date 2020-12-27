@@ -218,7 +218,7 @@ router.get('/schedule/:uId/availableTime', (req, res, next) => {
 })
 
 router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
-  AvailableTime.deleteOne(req.body, (err) => {
+  AvailableTime.deleteOne(req.body.deleteObj, (err) => {
     if (err) return res.status(500).send(err);
     return res.status(200).send('success');
   })
