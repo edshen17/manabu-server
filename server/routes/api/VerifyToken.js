@@ -9,6 +9,7 @@ function verifyToken(req, res, next) {
       // if everything good, save to request for use in other routes  
       req.userId = decoded.id;
       req.role = decoded.role;
+      // res.cookie('hp', req.cookies.hp, { expires: new Date(Date.now() + 30 * 60 * 1000), httpOnly: true }) // extend hp cookie life by 30m
     });
   }
 

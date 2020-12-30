@@ -21,7 +21,7 @@ mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindA
 // return a valid jwt
 function returnToken(res, user) {
   const token = jwt.sign({ id: user._id, role: user.role }, config.secret, {
-    expiresIn: 86400 * 2 // expires in 2 days
+    expiresIn: 86400 * 7 // expires in 7 days
   });
 
   const tokenArr = token.split('.')
@@ -197,9 +197,6 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
 });
 
 router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
-  // if (req.role == 'admin' || req.role =='teacher') {
-  //   console.log('hi')
-  // }
   const newAvail = new AvailableTime({
     createdBy: req.body.createdBy,
     from: req.body.from,
@@ -210,8 +207,8 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
   return res.status(200).json(newAvail);
 });
 
-router.get('/schedule/:uId/availableTime', (req, res, next) => {
-  AvailableTime.find({createdBy: req.params.uId}).then((availTime) => {
+router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, next) => {
+  AvailableTime.find({createdBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((availTime) => {
     if (!availTime) return res.status(404).send('no user')
     return res.status(200).json(availTime)
   })
