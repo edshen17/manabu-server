@@ -10,7 +10,7 @@ const AppointmentSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId, 
         required: true 
     },
-    packageId: { // user id (student/teacher)
+    packageId: { // package id. no package id means teacher to admin reservation
         type: Schema.Types.ObjectId, 
         required: false,
     },
