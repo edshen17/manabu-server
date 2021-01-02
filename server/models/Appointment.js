@@ -5,15 +5,15 @@ const AppointmentSchema = new mongoose.Schema({
   createdBy: { // user id (admin/teacher)
       type: Schema.Types.ObjectId, 
       required: true 
-    },
-    reservedBy: { // user id (student/teacher)
-        type: Schema.Types.ObjectId, 
-        required: true 
-    },
-    packageId: { // package id. no package id means teacher to admin reservation
-        type: Schema.Types.ObjectId, 
-        required: false,
-    },
+  },
+  reservedBy: { // user id (student/teacher)
+      type: Schema.Types.ObjectId, 
+      required: true 
+  },
+  packageId: { // package id. no package id means teacher to admin reservation
+      type: Schema.Types.ObjectId, 
+      required: false,
+  },
   from: { // iso format of date (start time)
     type: String,
     required: true,
