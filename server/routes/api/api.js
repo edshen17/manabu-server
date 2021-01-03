@@ -225,10 +225,13 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken
 })
 
 router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
-  AvailableTime.deleteOne(req.body.deleteObj, (err) => {
-    if (err) return res.status(500).send(err);
-    return res.status(200).send('success');
-  });
+  AvailableTime.find(req.body.deleteObj).then((availableTime) => {
+    if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
+    AvailableTime.deleteOne(req.body.deleteObj, (err) => {
+      if (err) return res.status(500).send(err);
+      return res.status(200).send('success');
+    });
+  })
 });
 
 // create appointment
@@ -265,5 +268,16 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay', VerifyToken, 
     return res.status(200).json(appointment);
   })
 })
+
+router.delete('/schedule/appointment', VerifyToken, (req, res, next) => {
+  Appointment.find(req.body.deleteObj).then((appointment) => {
+    if (appointment.length == 0) return res.status(404).send('no appointment found to be deleted');
+    Appointment.deleteOne(req.body.deleteObj, (err) => {
+      if (err) return res.status(500).send(err);
+      return res.status(200).send('success');
+    });
+  })
+  
+});
 
 module.exports = router;
