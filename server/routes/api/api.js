@@ -200,7 +200,7 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
 router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
 
   const newAvailableTime = {
-    createdBy: req.body.createdBy,
+    hostedBy: req.body.hostedBy,
     from: req.body.from,
     to: req.body.to,
   }
@@ -218,7 +218,7 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
 });
 
 router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
-  AvailableTime.find({createdBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((availTime) => {
+  AvailableTime.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((availTime) => {
     if (!availTime) return res.status(404).send('no available time')
     return res.status(200).json(availTime)
   })
@@ -237,7 +237,7 @@ router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
 // create appointment
 router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
   const newAppointment = {
-    createdBy: req.body.createdBy,
+    hostedBy: req.body.hostedBy,
     reservedBy: req.body.reservedBy,
     from: req.body.from,
     to: req.body.to,
@@ -247,7 +247,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
     newAppointment.packageId = req.body.packageId;
   };
 
-  // if (req.body.createdBy == req.body.reservedBy) return res.status(500).send('Appointment cannot be made by the same user')
+  // if (req.body.hostedBy == req.body.reservedBy) return res.status(500).send('Appointment cannot be made by the same user')
 
   Appointment.findOne(newAppointment)
     .then((appointment) => {
@@ -263,7 +263,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 
 // get appointment details for the teacher/admin
 router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
-  Appointment.find({createdBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((appointment) => {
+  Appointment.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((appointment) => {
     if (!appointment) return res.status(404).send('no appointment found');
     return res.status(200).json(appointment);
   })

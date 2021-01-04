@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const AvailableTimeSchema = new mongoose.Schema({
-  createdBy: { // user id (admin/teacher)
+  hostedBy: { // user id (admin/teacher)
       type: Schema.Types.ObjectId, 
       required: true 
     },
