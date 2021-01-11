@@ -224,13 +224,21 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken
 })
 
 router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
-  AvailableTime.find(req.body.deleteObj).then((availableTime) => {
-    if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
-    AvailableTime.deleteOne(req.body.deleteObj, (err) => {
-      if (err) return res.status(500).send(err);
-      return res.status(200).send('success');
-    });
-  })
+  Appointment.find({hostedBy: req.body.deleteObj.hostedBy, 
+    from: {$gt: req.body.deleteObj.from}, to: {$lt: req.body.deleteObj.to} })
+    .then((appointments) => {
+      if (appointments.length > 0) {
+        return res.status(500).send('Cannot delete timeslot with lessons')
+      } else {
+        AvailableTime.find(req.body.deleteObj).then((availableTime) => {
+          if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
+          AvailableTime.deleteOne(req.body.deleteObj, (err) => {
+            if (err) return res.status(500).send(err);
+            return res.status(200).send('success');
+          });
+        })
+      }
+    })
 });
 
 // create appointment
