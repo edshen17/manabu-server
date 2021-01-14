@@ -78,8 +78,18 @@ router.post('/register', (req, res) => {
 // route to get access to user's own information
 router.get('/me', VerifyToken, function(req, res, next) {
   User.findById(req.userId, { password: 0 }, function (err, user) {
-    if (err) res.status(500).send("There was a problem finding the user.");
-    if (!user) res.status(404).send("No user found.");
+    if (err) return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
+    next(user);
+  });
+});
+
+
+// route to get access to user's public information
+router.get('/user/:uId', VerifyToken, function(req, res, next) {
+  User.findById(req.params.uId, { email: 0, password: 0 }, function (err, user) {
+    if (err) return res.status(500).send("There was a problem finding the user.");
+    if (!user) return res.status(404).send("No user found.");
     next(user);
   });
 });
@@ -268,15 +278,15 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 
 // get appointment details for the user
 router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
-  Appointment.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((appointment) => {
-    if (!appointment) return res.status(404).send('no appointment found');
-    return res.status(200).json(appointment);
+  Appointment.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((appointments) => {
+    if (!appointments) return res.status(404).send('no appointments found');
+    return res.status(200).json(appointments);
   })
 })
 
 // Route for editing/confirming an appointment
 router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-  Appointment.findOneAndUpdate({ _id: req.params.aId }, {status: req.body.status})
+  Appointment.findOneAndUpdate({ _id: req.params.aId }, req.body)
     .exec((err, appointment) => {
       if (err) return next(err);
       return res.status(200).json(appointment);
