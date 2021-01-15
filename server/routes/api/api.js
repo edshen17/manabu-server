@@ -255,7 +255,6 @@ router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
 router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
   const newAppointment = {
     hostedBy: req.body.hostedBy,
-    reservedBy: req.body.reservedBy,
     from: req.body.from,
     to: req.body.to,
   }
@@ -266,11 +265,12 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 
   Appointment.findOne(newAppointment)
     .then((appointment) => {
-      if (appointment) {
+      if (appointment && appointment.cancellationReason != 'student cancel' && appointment.cancellationReason != 'student issue') {
         return res.status(500).send('Appointment already exists');
       }
       else {
-        new Appointment(newAppointment).save().catch((err) => { return res.status(500).send(err) });
+        newAppointment.reservedBy = req.body.reservedBy,
+        new Appointment(newAppointment).save().catch((err) => { return res.status(500).send(err); console.log(err) });
         return res.status(200).json(newAppointment);
       }
     })
