@@ -220,8 +220,9 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
         return res.status(500).send('Available time already exists');
       }
       else {
-        new AvailableTime(newAvailableTime).save().catch((err) => { return res.status(500).send(err) });
-        return res.status(200).json(newAvailableTime);
+        new AvailableTime(newAvailableTime).save().then((availTime) => {
+          return res.status(200).json(availTime);
+        }).catch((err) => { return res.status(500).send(err) });
       }
     })  
 });
@@ -270,8 +271,10 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
       }
       else {
         newAppointment.reservedBy = req.body.reservedBy,
-        new Appointment(newAppointment).save().catch((err) => { return res.status(500).send(err); console.log(err) });
-        return res.status(200).json(newAppointment);
+        new Appointment(newAppointment).save().then((appointment) => {
+          return res.status(200).json(appointment);
+        }).catch((err) => { return res.status(500).send(err) });
+        
       }
     })
 });
