@@ -289,7 +289,7 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay', VerifyToken, 
 
 // Route for editing/confirming an appointment
 router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-  Appointment.findOneAndUpdate({ _id: req.params.aId }, req.body)
+  Appointment.findOneAndUpdate({ _id: req.params.aId }, req.body, {new: true})
     .exec((err, appointment) => {
       if (err) return next(err);
       return res.status(200).json(appointment);
