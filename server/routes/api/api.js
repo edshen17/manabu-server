@@ -228,9 +228,10 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
 });
 
 router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
-  AvailableTime.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((availTime) => {
-    if (!availTime) return res.status(404).send('no available time')
-    return res.status(200).json(availTime)
+  AvailableTime.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).sort({ from: 1 }).exec((err, availTime) => {
+    if (err) return res.status(500).send('internal server error');
+    if (!availTime) return res.status(404).send('no available time');
+    return res.status(200).json(availTime);
   })
 })
 
@@ -280,8 +281,16 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 });
 
 // get appointment details for the user
-router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
-  Appointment.find({hostedBy: req.params.uId, from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }).then((appointments) => {
+// startWeekDay/endWeekDay are ISO strings
+router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken, (req, res, next) => {
+  const searchQuery = {from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }
+  if (req.query.isHost == 'false') {
+    searchQuery.reservedBy = req.params.uId;
+  } else {
+    searchQuery.hostedBy = req.params.uId; 
+  }
+  Appointment.find(searchQuery).sort({ from: 1 }).exec((err, appointments) => {
+    if (err) return res.status(500).send('internal server error');
     if (!appointments) return res.status(404).send('no appointments found');
     return res.status(200).json(appointments);
   })
