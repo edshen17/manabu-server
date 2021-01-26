@@ -7,6 +7,9 @@ const app = express();
 const corsConfig = {
   origin: true,
   credentials: true,
+  "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+  "preflightContinue": false,
+  "optionsSuccessStatus": 204
 };
 
 // Middleware
