@@ -95,7 +95,7 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
 });
 
 router.post('/glogin', (req, res, next) => {
-  const { idToken, isTeacherApp } = req.body
+  const { idToken, isTeacherApp } = req.body;
  
   async function verify() {
     const ticket = await client.verifyIdToken({
@@ -120,6 +120,7 @@ router.post('/glogin', (req, res, next) => {
           const newUser = new User({
             name: body.name,
             email: body.email,
+            profileImage: body.picture,
           });
 
           newUser.save((err, user) => {
@@ -195,15 +196,17 @@ router.post('/login', function(req, res) {
 
 // Route for editing a user's profile information
 router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
-  if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
-    User.findOneAndUpdate({ _id: req.params.uId }, req.body)
+  User.findOneAndUpdate({ _id: req.params.uId }, req.body)
     .exec((err, user) => {
       if (err) return next(err);
       return res.status(200).json(user);
     });
-  } else {
-    return res.status(401).send('You cannot modify this profile.')
-  }
+
+  // if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
+    
+  // } else {
+  //   return res.status(401).send('You cannot modify this profile.')
+  // }
 });
 
 router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
