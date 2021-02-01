@@ -6,21 +6,17 @@ const TeacherSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, 
       required: true 
     },
-  teacherBio: {
-    type: String,
-    default: '',
-  },
   dateApproved: {
     type: Date,
     required: false,
   },
-  isApproved: {
-      type: Boolean,
-      default: false,
-  },
   introductionVideo: {
     type: String,
     default: '',
+  },
+  isApproved: {
+    type: Boolean,
+    default: false,
   },
   lessonsTypes: {
       type: Array, // array of lesson ids

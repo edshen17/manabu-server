@@ -196,17 +196,28 @@ router.post('/login', function(req, res) {
 
 // Route for editing a user's profile information
 router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
-  User.findOneAndUpdate({ _id: req.params.uId }, req.body)
+  if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
+    User.findOneAndUpdate({ _id: req.params.uId }, req.body)
     .exec((err, user) => {
       if (err) return next(err);
       return res.status(200).json(user);
     });
+  } else {
+    return res.status(401).send('You cannot modify this profile.')
+  }
+});
 
-  // if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
-    
-  // } else {
-  //   return res.status(401).send('You cannot modify this profile.')
-  // }
+// Route for editing a teacher's profile information
+router.put('/teacher/:uId/updateProfile', VerifyToken, (req, res, next) => {
+  if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body._id && !req.body.userId))) {
+    Teacher.findOneAndUpdate({ userId: req.params.uId }, req.body)
+    .exec((err, teacher) => {
+      if (err) return next(err);
+      return res.status(200).json(teacher);
+    });
+  } else {
+    return res.status(401).send('You cannot modify this profile.')
+  }
 });
 
 router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
