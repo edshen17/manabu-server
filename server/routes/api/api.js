@@ -4,6 +4,8 @@ const User = require('../../models/User');
 const Teacher = require('../../models/Teacher');
 const AvailableTime = require('../../models/AvailableTime');
 const Appointment = require('../../models/Appointment');
+const Package = require('../../models/Package');
+const PackageTransaction = require('../../models/PackageTransaction');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -13,6 +15,7 @@ const config = require('../../../config/auth.config')
 const VerifyToken = require('./VerifyToken');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.G_CLIENTID);
+const dayjs = require('dayjs')
 
 // Connect to Mongodb
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
@@ -30,6 +33,7 @@ function returnToken(res, user) {
   res.cookie('sig', `.${tokenArr[2]}`, { maxAge: 2* 24* 60 * 60 * 1000, httpOnly: false })
   return res.status(200).send({ auth: true, token: token });
 }
+
 // Get User
 // Making a user in the db
 router.post('/register', (req, res) => {
@@ -320,14 +324,49 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
 });
 
 router.delete('/schedule/appointment', VerifyToken, (req, res, next) => {
-  Appointment.find(req.body.deleteObj).then((appointment) => {
-    if (appointment.length == 0) return res.status(404).send('no appointment found to be deleted');
+  Appointment.find(req.body.deleteObj).then((appointments) => {
+    if (appointments.length == 0) return res.status(404).send('no appointment found to be deleted');
     Appointment.deleteOne(req.body.deleteObj, (err) => {
       if (err) return res.status(500).send(err);
       return res.status(200).send('success');
     });
-  })
-  
+  });
 });
+
+// POST route to create package
+router.post('/transaction/createPackage', VerifyToken, (req, res, next) => {
+  Teacher.findById(req.body.teacherId, (err, teacher) => {
+    if (err) return next(err);
+    if (teacher && req.role == 'teacher' && req.body.teacherId == req.userId || req.role== 'admin') {
+      const newPackage = new Package(req.body)
+      newPackage.save((err, package) => {
+        if (err) return next(err);
+        return res.status(200).json(package)
+      })
+    }
+  });
+});
+
+// create package transaction
+router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, next) => {
+  const newPackageTransaction = new PackageTransaction(req.body);
+  PackageTransaction.find({
+    hostedBy: req.body.hostedBy,
+    packageId: req.body.packageId,
+    reservedBy: req.body.reservedBy,
+    transactionDate: {$gte: dayjs().subtract(29, 'days').toDate()}, 
+  }).then((transactions) => {
+    if (transactions.length > 0) { // transaction already exists
+      return res.status(200).send(transactions[0]);
+    } else {
+      newPackageTransaction.save((err, packageTrans) => {
+        if (err) return next(err);
+        return res.status(200).json(packageTrans)
+      })
+    }
+  })
+});
+
+
 
 module.exports = router;

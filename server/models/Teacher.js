@@ -18,10 +18,6 @@ const TeacherSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  lessonsTypes: {
-      type: Array, // array of lesson ids
-      default: [],
-  },
   teacherType: { // professional or tutor
       type: String,
       default: '',
