@@ -18,11 +18,15 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  reservationLength: {
+    type: Number,
+    required: true,
+  },
   terminationDate: {
     type: Date,
     required: true,
   },
-  remainingLessons: {
+  remainingAppointments: {
     type: Number,
     required: true,
   },

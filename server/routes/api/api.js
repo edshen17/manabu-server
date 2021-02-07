@@ -11,11 +11,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
-const config = require('../../../config/auth.config')
+const config = require('../../../config/auth.config');
 const VerifyToken = require('./VerifyToken');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.G_CLIENTID);
-const dayjs = require('dayjs')
+const dayjs = require('dayjs');
 
 // Connect to Mongodb
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
@@ -130,7 +130,7 @@ router.post('/glogin', (req, res, next) => {
           newUser.save((err, user) => {
             if (err) return res.json(err).status(500) 
             else { 
-              if (isTeacherApp) { // if it's a teacher application, link it with the user
+              if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
               const newTeacher = new Teacher({
                 userId: user._id,
               });
@@ -279,21 +279,18 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
     to: req.body.to,
   }
 
-  if (req.body.packageId) {
-    newAppointment.packageId = req.body.packageId;
-  };
-
   Appointment.findOne(newAppointment)
     .then((appointment) => {
       if (appointment && appointment.cancellationReason != 'student cancel' && appointment.cancellationReason != 'student issue') {
         return res.status(500).send('Appointment already exists');
       }
       else {
-        newAppointment.reservedBy = req.body.reservedBy,
-        new Appointment(newAppointment).save().then((appointment) => {
-          return res.status(200).json(appointment);
-        }).catch((err) => { return res.status(500).send(err) });
-        
+        newAppointment.reservedBy = req.body.reservedBy;
+        if (req.userId == req.body.reservedBy || req.role == 'admin') {
+          new Appointment(newAppointment).save().then((appointment) => {
+            return res.status(200).json(appointment);
+          }).catch((err) => { return res.status(500).send(err) });
+        }
       }
     })
 });
@@ -301,13 +298,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 // get appointment details for the user
 // startWeekDay/endWeekDay are ISO strings
 router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken, (req, res, next) => {
-  const searchQuery = {from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay} }
-  if (req.query.isHost == 'false') {
-    searchQuery.reservedBy = req.params.uId;
-  } else {
-    searchQuery.hostedBy = req.params.uId; 
-  }
-  Appointment.find(searchQuery).sort({ from: 1 }).exec((err, appointments) => {
+  Appointment.find({from: {$gt: req.params.startWeekDay}, to: {$lt: req.params.endWeekDay}, $or: [{reservedBy: req.params.uId}, {hostedBy: req.params.uId}] }).sort({ from: 1 }).exec((err, appointments) => {
     if (err) return res.status(500).send('internal server error');
     if (!appointments) return res.status(404).send('no appointments found');
     return res.status(200).json(appointments);
@@ -343,12 +334,24 @@ router.post('/transaction/createPackage', VerifyToken, (req, res, next) => {
         if (err) return next(err);
         return res.status(200).json(package)
       })
+    } else {
+      return res.status(500).send('error')
     }
+  });
+});
+
+// GET route for package details
+router.get('/transaction/package/:pId', VerifyToken, (req, res, next) => {
+  Package.findById(req.params.pId, (err, package) => {
+    if (err) return next(err);
+    if (!package) return res.status(404).send('a package with that id was not found');
+    return res.status(200).json(package)
   });
 });
 
 // create package transaction
 router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, next) => {
+  // TO DO: check hostedby or reservedby = req.userId
   const newPackageTransaction = new PackageTransaction(req.body);
   PackageTransaction.find({
     hostedBy: req.body.hostedBy,
@@ -365,6 +368,31 @@ router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, nex
       })
     }
   })
+});
+
+router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
+  PackageTransaction.findById(req.params.tId, (err, transaction) => {
+    if (err) return next(err);
+    if (!transaction) return res.status(404).send('a transaction with that id was not found');
+    return res.status(200).json(transaction)
+  });
+});
+
+// Route for editing a package transaction
+router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
+  PackageTransaction.findById(req.params.tId, (err, transaction) => {
+    if (err) return next(err);
+    if (!transaction) return res.status(404).send('a transaction with that id was not found');
+    if (req.role == 'admin' || (req.userId == transaction.reservedBy || req.userId == transaction.hostedBy)) {
+      PackageTransaction.findOneAndUpdate({ _id: req.params.tId }, req.body)
+      .exec((err, transaction) => {
+        if (err) return next(err);
+        return res.status(200).json(transaction);
+      });
+    } else {
+      return res.status(401).send('You cannot modify this transaction.')
+    }
+  });
 });
 
 
