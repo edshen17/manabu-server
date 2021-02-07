@@ -10,9 +10,9 @@ const AppointmentSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, 
       required: true 
   },
-   transactionId: { // transaction id
+  packageTransactionId: { // transaction id
       type: Schema.Types.ObjectId, 
-      required: false,
+      required: true,
   },
   from: { // iso format of date (start time)
     type: String,

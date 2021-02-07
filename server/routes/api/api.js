@@ -273,11 +273,7 @@ router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
 
 // create appointment
 router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
-  const newAppointment = {
-    hostedBy: req.body.hostedBy,
-    from: req.body.from,
-    to: req.body.to,
-  }
+  const newAppointment = req.body;
 
   Appointment.findOne(newAppointment)
     .then((appointment) => {
