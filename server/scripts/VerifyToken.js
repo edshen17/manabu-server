@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require('../../../config/auth.config');
+const config = require('../../config/auth.config');
 
 function verifyToken(req, res, next) {
   if (req.headers['x-requested-with'] && req.cookies.hp && req.cookies.sig) { //req contains the header (prevent csrf attacks) and is from client

@@ -12,10 +12,13 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config');
-const VerifyToken = require('./VerifyToken');
+const VerifyToken = require('../../scripts/VerifyToken');
+const scheduler = require('../../scripts/scheduler/schedule');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.G_CLIENTID);
 const dayjs = require('dayjs');
+
+scheduler();
 
 // Connect to Mongodb
 mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
