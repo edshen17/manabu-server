@@ -6,14 +6,14 @@ const PackageTransactionSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, 
       required: true 
     },
-    packageId: { 
-        type: Schema.Types.ObjectId, 
-        required: true 
-      },
-      reservedBy: { 
-        type: Schema.Types.ObjectId, 
-        required: true 
-      },
+  packageId: { 
+      type: Schema.Types.ObjectId, 
+      required: true 
+    },
+    reservedBy: { 
+      type: Schema.Types.ObjectId, 
+      required: true 
+    },
   transactionDate: {
     type: Date,
     default: Date.now,
@@ -26,6 +26,10 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  isTerminated: {
+    type: Boolean,
+    default: false,
+  },
   remainingAppointments: {
     type: Number,
     required: true,
@@ -33,6 +37,10 @@ const PackageTransactionSchema = new mongoose.Schema({
   remainingReschedules: {
     type: Number,
     required: true,
+  },
+  minuteBank: {
+    type: Number,
+    default: 0,
   },
 });
 

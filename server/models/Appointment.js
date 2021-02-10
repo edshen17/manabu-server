@@ -22,6 +22,10 @@ const AppointmentSchema = new mongoose.Schema({
       type: String,
       required: true,
   },
+  isPast: {
+    type: Boolean,
+    default: false,
+  },
   status: { // status of lesson (completed, reserved, pending, cancelled)
       type: String,
       default: 'pending'
