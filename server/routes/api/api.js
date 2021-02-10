@@ -6,6 +6,7 @@ const AvailableTime = require('../../models/AvailableTime');
 const Appointment = require('../../models/Appointment');
 const Package = require('../../models/Package');
 const PackageTransaction = require('../../models/PackageTransaction');
+const MinuteBank = require('../../models/MinuteBank');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -350,20 +351,36 @@ router.get('/transaction/package/:pId', VerifyToken, (req, res, next) => {
 
 // create package transaction
 router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, next) => {
-  // TO DO: check hostedby or reservedby = req.userId
+  // TO DO: check hostedby or reservedby = req.userId so only those related to transaction can create
   const newPackageTransaction = new PackageTransaction(req.body);
+  function createPackageTransaction() {
+    newPackageTransaction.save((err, packageTrans) => {
+      if (err) return next(err);
+      return res.status(200).json(packageTrans)
+    })
+  }
   PackageTransaction.find({
     hostedBy: req.body.hostedBy,
     packageId: req.body.packageId,
     reservedBy: req.body.reservedBy,
-    transactionDate: {$gte: dayjs().subtract(29, 'days').toDate()}, 
+    transactionDate: {$gte: dayjs().subtract(29, 'days').toDate()}, // no package transaction within the last month
   }).then((transactions) => {
     if (transactions.length > 0) { // transaction already exists
       return res.status(200).send(transactions[0]);
     } else {
-      newPackageTransaction.save((err, packageTrans) => {
-        if (err) return next(err);
-        return res.status(200).json(packageTrans)
+      MinuteBank.findOne({hostedBy: req.body.hostedBy, reservedBy: req.body.reservedBy,}).then((minutebank) => {
+        if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
+          const newMinuteBank = new MinuteBank({hostedBy: req.body.hostedBy, reservedBy: req.body.reservedBy})
+          newMinuteBank.save((err, minutebank) => {
+            if (err) return next(err);
+            else {
+              createPackageTransaction();
+            }
+          })
+        } else {
+          createPackageTransaction();
+        }
+        
       })
     }
   })

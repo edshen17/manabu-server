@@ -38,10 +38,6 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  minuteBank: {
-    type: Number,
-    default: 0,
-  },
 });
 
 

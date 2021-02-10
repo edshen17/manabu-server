@@ -18,9 +18,10 @@ const TeacherSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  teacherType: { // professional or tutor
+  teacherType: {
       type: String,
       default: '',
+      enum: ['licensed', 'unlicensed']
   },
 });
 

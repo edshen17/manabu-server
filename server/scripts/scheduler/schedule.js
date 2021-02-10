@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
+const MinuteBank = require('../../models/MinuteBank');
 const Appointment = require('../../models/Appointment');
-const AvailableTime = require('../../models/AvailableTime');
 const PackageTransaction = require('../../models/PackageTransaction');
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 
@@ -19,9 +19,18 @@ function endAppointments() {
             PackageTransaction.findById(appointments[i].packageTransactionId, (err, packageTransaction) => {
                 if (err) console.log(err);
                 else if (packageTransaction) {
-                    PackageTransaction.findOneAndUpdate({ _id: packageTransaction._id }, 
-                        { isTerminated: true, minuteBank: packageTransaction.minuteBank + 5,
-                            remainingAppointments: packageTransaction.remainingAppointments + 1  }).catch((err) => {console.log(err)})
+                    if (appointments[i].status == 'confirmed') {
+                        const participants = {reservedBy: appointments[i].reservedBy, hostedBy: appointments[i].hostedBy}
+                        MinuteBank.findOne(participants).then((searchBank) => {
+                            if (searchBank) {
+                                MinuteBank.findOneAndUpdate(participants, { minuteBank: searchBank.minuteBank + 5 }).then(() => {
+                                    PackageTransaction.findOneAndUpdate({ _id: packageTransaction._id }, 
+                                        { isTerminated: true, 
+                                            remainingAppointments: packageTransaction.remainingAppointments + 1  }).catch((err) => {console.log(err)})
+                                }).catch((err) => {console.log(err)})
+                            }
+                        }).catch((err) => {console.log(err)})   
+                    }
                 }
             })
 
@@ -36,7 +45,7 @@ function endAppointments() {
 
 async function scheduler() {
     while(true) {  // check forever
-        await sleep(60 * 1000); // check appointments every minute
+        await sleep(1000); // check appointments every minute
         terminatePackageTransactions(); 
         endAppointments()
       }

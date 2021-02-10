@@ -24,7 +24,8 @@ const PackageSchema = new mongoose.Schema({
   },
   packageType: {
     type: String,
-    required: true, // to do: make enum
+    required: true,
+    enum: ['a', 'b', 'internal']
   },
 });
 
