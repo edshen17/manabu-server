@@ -394,6 +394,14 @@ router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
   });
 });
 
+router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
+  MinuteBank.findOne({hostedBy: req.params.hostedBy, reservedBy: req.params.reservedBy }, (err, minuteBank) => {
+    if (err) return next(err);
+    if (!minuteBank) return res.status(404).send('404');
+    return res.status(200).json(minuteBank)
+  });
+});
+
 // Route for editing a package transaction
 router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
   PackageTransaction.findById(req.params.tId, (err, transaction) => {

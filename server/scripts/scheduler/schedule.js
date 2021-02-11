@@ -19,15 +19,24 @@ function endAppointments() {
             PackageTransaction.findById(appointments[i].packageTransactionId, (err, packageTransaction) => {
                 if (err) console.log(err);
                 else if (packageTransaction) {
-                    if (appointments[i].status == 'confirmed') {
+                    if (appointments[i].status == 'confirmed' || appointments[i].status == 'pending') {
                         const participants = {reservedBy: appointments[i].reservedBy, hostedBy: appointments[i].hostedBy}
                         MinuteBank.findOne(participants).then((searchBank) => {
                             if (searchBank) {
-                                MinuteBank.findOneAndUpdate(participants, { minuteBank: searchBank.minuteBank + 5 }).then(() => {
-                                    PackageTransaction.findOneAndUpdate({ _id: packageTransaction._id }, 
-                                        { isTerminated: true, 
-                                            remainingAppointments: packageTransaction.remainingAppointments + 1  }).catch((err) => {console.log(err)})
-                                }).catch((err) => {console.log(err)})
+                                const updatePackageTransaction = { isTerminated: true, };
+                                const updateMinuteBank = { minuteBank: searchBank.minuteBank + 5 }
+                                if (appointments[i].status == 'confirmed') { // add to minute bank only if confirmed
+                                    if (Math.floor((searchBank.minuteBank + 5) / packageTransaction.reservationLength) == 1) {
+                                        updatePackageTransaction.remainingAppointments = packageTransaction.remainingAppointments + 1;
+                                        updateMinuteBank.minuteBank = 0;
+                                    }
+                                    MinuteBank.findOneAndUpdate(participants, updateMinuteBank).catch((err) => {console.log(err)})
+                                } else if (appointments[i].status == 'pending') { // give reservedBy a lesson back
+                                    updatePackageTransaction.remainingAppointments = packageTransaction.remainingAppointments + 1;
+                                }
+
+                                PackageTransaction.findOneAndUpdate({ _id: packageTransaction._id }, 
+                                    updatePackageTransaction).catch((err) => {console.log(err)})
                             }
                         }).catch((err) => {console.log(err)})   
                     }
@@ -45,7 +54,7 @@ function endAppointments() {
 
 async function scheduler() {
     while(true) {  // check forever
-        await sleep(1000); // check appointments every minute
+        await sleep(1000); // check appointments every minute TODO
         terminatePackageTransactions(); 
         endAppointments()
       }

@@ -26,9 +26,10 @@ const AppointmentSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  status: { // status of lesson (completed, reserved, pending, cancelled)
+  status: { // status of lesson (confirmed, pending, cancelled)
       type: String,
-      default: 'pending'
+      default: 'pending',
+      enum: ['confirmed', 'pending', 'cancelled']
   },
   cancellationReason: {
     type: String,
