@@ -68,12 +68,12 @@ router.post('/register', (req, res) => {
       
         newUser.save((err, user) => {
           if (err) return res.json(err).status(500) 
-          else { 
+          else {
             if (isTeacherApp) { // if it's a teacher application, link it with the user
               const newTeacher = new Teacher({
                 userId: user._id,
               });
-              newTeacher.save().catch((err) => { return res.status(500).send(err) });
+              newTeacher.save().catch((err) => { console.log(err) });
             }
             returnToken(res, user);
           }
@@ -150,7 +150,7 @@ router.post('/glogin', (req, res, next) => {
                 const newTeacher = new Teacher({
                   userId: user._id,
                 });
-                newTeacher.save().catch((err) => { return res.status(500).send(err) });
+                newTeacher.save().catch((err) => { console.log(err) });
               }
             });
           }
@@ -165,10 +165,10 @@ router.post('/glogin', (req, res, next) => {
 
 // enable router to use middleware
 router.use(function (user, req, res, next) {
+  
   // create a clone of the user object so we can add our own fields
   Teacher.findOne({userId: user._id}).exec((err, teacher) => {
     const userClone = Object.assign({}, user);
-
     if (teacher && !teacher.isApproved) {
       userClone._doc['teacherAppPending'] = true;
     }
@@ -193,7 +193,7 @@ router.post('/login', function(req, res) {
       const newTeacher = new Teacher({
         userId: user._id,
       });
-      newTeacher.save().catch((err) => { return res.status(500).send(err) });
+      newTeacher.save().catch((err) => { console.log(err) });
       }
     returnToken(res, user);
     

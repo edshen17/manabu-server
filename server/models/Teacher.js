@@ -20,8 +20,12 @@ const TeacherSchema = new mongoose.Schema({
   },
   teacherType: {
       type: String,
-      default: '',
+      default: 'unlicensed',
       enum: ['licensed', 'unlicensed']
+  },
+  licensePath: {
+    type: String,
+    default: '',
   },
 });
 
