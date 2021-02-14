@@ -54,7 +54,7 @@ function endAppointments() {
 
 async function scheduler() {
     while(true) {  // check forever
-        await sleep(1000); // check appointments every minute TODO
+        await sleep(60 * 1000); // check appointments every minute TODO
         terminatePackageTransactions(); 
         endAppointments()
       }
