@@ -72,7 +72,8 @@ router.post('/register', (req, res) => {
     User.findOne({
             email,
         })
-        .then((user) => {
+        .lean()
+        .exec((user) => {
             if (user && !isTeacherApp) {
                 // user exists
                 return res.status(500).send('An account with that email already exists.');
@@ -108,7 +109,7 @@ router.post('/register', (req, res) => {
 router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'),  function(req, res, next) {
     User.findById(req.userId, {
         password: 0
-    }, function(err, user) {
+    }).lean().exec(function(err, user) {
         if (err) return res.status(500).send("There was a problem finding the user.");
         if (!user) return res.status(404).send("No user found.");
         next(user);
@@ -121,7 +122,7 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
     User.findById(req.params.uId, {
         email: 0,
         password: 0
-    }, function(err, user) {
+    }).lean().exec(function(err, user) {
         if (err) return res.status(500).send("There was a problem finding the user.");
         if (!user) return res.status(404).send("No user found.");
         next(user);
@@ -151,7 +152,8 @@ router.post('/glogin', (req, res, next) => {
         User.findOne({
                 email: body.email,
             })
-            .then((user) => {
+            .lean()
+            .exec((user) => {
                 if (!user) {
                     // user does not exist, create a user from google info
                     const newUser = new User({
@@ -178,7 +180,10 @@ router.post('/glogin', (req, res, next) => {
                     if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
                         Teacher.findOne({
                             userId: user._id
-                        }, (err, teacher) => {
+                        })
+                        .lean()
+                        .exec((err, teacher) => {
+                            if (err) next(err)
                             if (!teacher) {
                                 const newTeacher = new Teacher({
                                     userId: user._id,
@@ -200,23 +205,16 @@ router.post('/glogin', (req, res, next) => {
 
 // enable router to use middleware
 router.use(function(user, req, res, next) {
-    // create a clone of the user object so we can add our own fields
     Teacher.findOne({
         userId: user._id
     }).lean().exec((err, teacher) => {
         if (err) return res.status(500).send('Error');
-        const userClone = Object.assign({}, user);
-        if (teacher && !teacher.isApproved) {
-            let teacherData = teacher;
-            if (req.role) {
-                console.log(typeof teacher)
-                const permissions = roles.can(req.role).readAny('teacherProfile')
-                teacherData = permissions.filter(teacherData)
-            }
-            userClone._doc['teacherAppPending'] = true;
-            userClone._doc['teacherData'] = teacherData;
+        if (teacher) {
+            const permissions = roles.can(req.role).readAny('teacherProfile')
+            user.teacherAppPending = !teacher.isApproved;
+            user.teacherData = permissions.filter(teacher);
         }
-        return res.status(200).send(userClone._doc);
+        return res.status(200).json(user);
     })
 });
 
@@ -226,7 +224,9 @@ router.post('/login', function(req, res) {
 
     User.findOne({
         email: req.body.email
-    }, function(err, user) {
+    })
+    .lean()
+    .exec(function(err, user) {
         if (err) return res.status(500).send('There was an error processing your request.');
         if (!user) return res.status(404).send('An account with that email was not found.');
         if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
@@ -256,6 +256,7 @@ router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess
         User.findOneAndUpdate({
                 _id: req.params.uId
             }, req.body)
+            .lean()
             .exec((err, user) => {
                 if (err) return next(err);
                 return res.status(200).json(user);
@@ -272,6 +273,7 @@ router.put('/teacher/:uId/updateProfile', VerifyToken, accessController.grantAcc
         Teacher.findOneAndUpdate({
                 userId: req.params.uId
             }, req.body)
+            .lean()
             .exec((err, teacher) => {
                 if (err) return next(err);
                 return res.status(200).json(permissions.filter(teacher));
@@ -290,7 +292,8 @@ router.post('/schedule/availableTime', VerifyToken, accessController.grantAccess
         }
     
         AvailableTime.findOne(newAvailableTime)
-            .then((availableTime) => {
+            .lean()
+            .exec((availableTime) => {
                 if (availableTime) {
                     return res.status(500).send('Available time already exists');
                 } else {
@@ -319,7 +322,8 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken
         }
     }).sort({
         from: 1
-    }).exec((err, availTime) => {
+    }).lean()
+    .exec((err, availTime) => {
         if (err) return res.status(500).send('internal server error');
         if (!availTime) return res.status(404).send('no available time');
         return res.status(200).json(availTime);
@@ -337,8 +341,9 @@ router.delete('/schedule/availableTime', VerifyToken, accessController.grantAcce
                 $lt: req.body.deleteObj.to
             }
         })
-        .then((appointments) => {
-            if (appointments.length > 0) {
+        .lean()
+        .exec((appointments) => {
+            if (appointments && appointments.length > 0) {
                 return res.status(500).send('Cannot delete timeslot with lessons')
             } else {
                 AvailableTime.find(req.body.deleteObj).then((availableTime) => {
@@ -363,7 +368,8 @@ router.post('/schedule/appointment', VerifyToken, accessController.grantAccess('
     const newAppointment = req.body;
 
     Appointment.findOne(newAppointment)
-        .then((appointment) => {
+        .lean()
+        .exec((appointment) => {
             if (appointment) {
                 return res.status(500).send('Appointment already exists');
             } else {
@@ -396,7 +402,9 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
         }]
     }).sort({
         from: 1
-    }).exec((err, appointments) => {
+    })
+    .lean()
+    .exec((err, appointments) => {
         if (err) return res.status(500).send('internal server error');
         if (!appointments) return res.status(404).send('no appointments found');
         return res.status(200).json(appointments);
@@ -410,25 +418,18 @@ router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAcce
         }, req.body, {
             new: true
         })
+        .lean()
         .exec((err, appointment) => {
             if (err) return next(err);
             return res.status(200).json(appointment);
         });
 });
 
-// router.delete('/schedule/appointment', VerifyToken, (req, res, next) => {
-//     Appointment.find(req.body.deleteObj).then((appointments) => {
-//         if (appointments.length == 0) return res.status(404).send('no appointment found to be deleted');
-//         Appointment.deleteOne(req.body.deleteObj, (err) => {
-//             if (err) return res.status(500).send(err);
-//             return res.status(200).send('success');
-//         });
-//     });
-// });
-
 // POST route to create package
 router.post('/transaction/createPackage', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
-    Teacher.findById(req.body.teacherId, (err, teacher) => {
+    Teacher.findById(req.body.teacherId)
+    .lean()
+    .exec((err, teacher) => {
         if (err) return next(err);
         if (teacher && req.body.teacherId == req.userId) {
             const newPackage = new Package(req.body)
@@ -444,11 +445,13 @@ router.post('/transaction/createPackage', VerifyToken, accessController.grantAcc
 
 // GET route for package details
 router.get('/transaction/package/:pId', VerifyToken, (req, res, next) => {
-    Package.findById(req.params.pId, (err, package) => {
-        if (err) return next(err);
-        if (!package) return res.status(404).send('a package with that id was not found');
-        return res.status(200).json(package)
-    });
+    Package.findById(req.params.pId)
+        .lean()
+        .exec((err, package) => {
+            if (err) return next(err);
+            if (!package) return res.status(404).send('a package with that id was not found');
+            return res.status(200).json(package)
+        });
 });
 
 // create package transaction
@@ -469,14 +472,18 @@ router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, nex
         transactionDate: {
             $gte: dayjs().subtract(29, 'days').toDate()
         }, // no package transaction within the last month
-    }).then((transactions) => {
-        if (transactions.length > 0) { // transaction already exists
+    })
+    .lean()
+    .exec((transactions) => {
+        if (transactions && transactions.length > 0) { // transaction already exists
             return res.status(200).send(transactions[0]);
         } else {
             MinuteBank.findOne({
                 hostedBy: req.body.hostedBy,
                 reservedBy: req.body.reservedBy,
-            }).then((minutebank) => {
+            })
+            .lean()
+            .exec((minutebank) => {
                 if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
                     const newMinuteBank = new MinuteBank({
                         hostedBy: req.body.hostedBy,
@@ -498,18 +505,21 @@ router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, nex
 });
 
 router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
-    PackageTransaction.findById(req.params.tId, (err, transaction) => {
-        if (err) return next(err);
-        if (!transaction) return res.status(404).send('a transaction with that id was not found');
-        return res.status(200).json(transaction)
-    });
+    PackageTransaction.findById(req.params.tId)
+        .lean()
+        .exec((err, transaction) => {
+            if (err) return next(err);
+            if (!transaction) return res.status(404).send('a transaction with that id was not found');
+            return res.status(200).json(transaction)
+        });
 });
 
 router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
     MinuteBank.findOne({
         hostedBy: req.params.hostedBy,
         reservedBy: req.params.reservedBy
-    }, (err, minuteBank) => {
+    }).lean()
+    .exec((err, minuteBank) => {
         if (err) return next(err);
         if (!minuteBank) return res.status(404).send('404');
         return res.status(200).json(minuteBank)
@@ -518,7 +528,9 @@ router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, r
 
 // Route for editing a package transaction
 router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
-    PackageTransaction.findById(req.params.tId, (err, transaction) => {
+    PackageTransaction.findById(req.params.tId)
+    .lean()
+    .exec((err, transaction) => {
         if (err) return next(err);
         if (!transaction) return res.status(404).send('a transaction with that id was not found');
         if (req.role == 'admin' || (req.userId == transaction.reservedBy || req.userId == transaction.hostedBy)) {

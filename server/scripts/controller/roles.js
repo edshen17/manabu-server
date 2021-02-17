@@ -9,7 +9,7 @@ ac.grant('user')
     .deleteOwn('availableTime')
     .readAny('availableTime')
     .updateOwn('availableTime')
-    .readAny('teacherProfile', ['*', '!licensePath']) // pending teacher
+    .readAny('teacherProfile', ['*', '!licensePath', '!_id']) // pending teacher
     .createOwn('appointment')
     .updateOwn('appointment')
     .readAny('appointment')
@@ -24,7 +24,7 @@ ac.grant('user')
 ac.grant('teacher')
     .extend('user')
     .updateOwn('teacherProfile')
-    .readOwn('teacherProfile', ['*'])
+    .readOwn('teacherProfile', ['*', '!_id'])
 
 ac.grant('admin')
  .extend('user')
