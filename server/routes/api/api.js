@@ -246,14 +246,14 @@ router.post('/login', function(req, res, next) {
 
 // Route for editing a user's profile information
 router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess('updateOwn', 'userProfile'), (req, res, next) => {
-    if ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered)) {
+    if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
         User.findOneAndUpdate({
                 _id: req.params.uId
             }, req.body)
             .lean()
             .then((user) => {
                 return res.status(200).json(user);
-            }).catch((err) => handleErrors(err, req, res, next));
+            }).catch((err) => {handleErrors(err, req, res, next); console.log('catch')});
     } else {
         return res.status(401).send('You cannot modify this profile.')
     }
@@ -261,15 +261,15 @@ router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess
 
 // Route for editing a teacher's profile information
 router.put('/teacher/:uId/updateProfile', VerifyToken, accessController.grantAccess('updateOwn', 'teacherProfile'), (req, res, next) => {
-    if ((req.userId == req.params.uId) && (!req.body._id && !req.body.userId)) {
-        const permissions = accessController.grantAccess('updateOwn', 'teacherProfile');
+    if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body._id && !req.body.userId))) {
+        const permissions = roles.can(req.role).updateOwn('teacherProfile')
         Teacher.findOneAndUpdate({
                 userId: req.params.uId
             }, req.body)
             .lean()
             .then((teacher) => {
                 return res.status(200).json(permissions.filter(teacher));
-            }).catch((err) => handleErrors(err, req, res, next));
+            }).catch((err) => {handleErrors(err, req, res, next); console.log(err)});
     } else {
         return res.status(401).send('You cannot modify this profile.')
     }
