@@ -106,7 +106,7 @@ router.post('/register', (req, res, next) => {
 
 
 // route to get access to user's own information
-router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'),  function(req, res, next) {
+router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
     User.findById(req.userId, {
         password: 0
     }).lean().then(function(user) {
@@ -176,19 +176,19 @@ router.post('/glogin', (req, res, next) => {
                 } else { // user already in db
                     if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
                         Teacher.findOne({
-                            userId: user._id
-                        })
-                        .lean()
-                        .then((teacher) => {
-                            if (!teacher) {
-                                const newTeacher = new Teacher({
-                                    userId: user._id,
-                                });
-                                newTeacher.save().catch((err) => {
-                                    console.log(err)
-                                });
-                            }
-                        }).catch((err) => handleErrors(err, req, res, next));
+                                userId: user._id
+                            })
+                            .lean()
+                            .then((teacher) => {
+                                if (!teacher) {
+                                    const newTeacher = new Teacher({
+                                        userId: user._id,
+                                    });
+                                    newTeacher.save().catch((err) => {
+                                        console.log(err)
+                                    });
+                                }
+                            }).catch((err) => handleErrors(err, req, res, next));
                     }
                     returnToken(res, user);
                 }
@@ -205,6 +205,7 @@ router.use(function(user, req, res, next) {
         userId: user._id
     }).lean().then((teacher) => {
         if (teacher) {
+            if (!req.role) req.role = 'user';
             const permissions = roles.can(req.role).readAny('teacherProfile')
             user.teacherAppPending = !teacher.isApproved;
             user.teacherData = permissions.filter(teacher);
@@ -218,29 +219,29 @@ router.use(function(user, req, res, next) {
 router.post('/login', function(req, res, next) {
 
     User.findOne({
-        email: req.body.email
-    })
-    .lean()
-    .then(function(user) {
-        if (!user) return res.status(404).send('An account with that email was not found.');
-        if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
-        const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-        if (!passwordIsValid) return res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
+            email: req.body.email
+        })
+        .lean()
+        .then(function(user) {
+            if (!user) return res.status(404).send('An account with that email was not found.');
+            if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
+            const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+            if (!passwordIsValid) return res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
 
-        else {
-            const isTeacherApp = req.body.isTeacherApp;
-            if (isTeacherApp) {
-                const newTeacher = new Teacher({
-                    userId: user._id,
-                });
-                newTeacher.save().catch((err) => {
-                    console.log(err)
-                });
+            else {
+                const isTeacherApp = req.body.isTeacherApp;
+                if (isTeacherApp) {
+                    const newTeacher = new Teacher({
+                        userId: user._id,
+                    });
+                    newTeacher.save().catch((err) => {
+                        console.log(err)
+                    });
+                }
+                returnToken(res, user);
+
             }
-            returnToken(res, user);
-
-        }
-    }).catch((err) => handleErrors(err, req, res, next));
+        }).catch((err) => handleErrors(err, req, res, next));
 
 });
 
@@ -253,7 +254,9 @@ router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess
             .lean()
             .then((user) => {
                 return res.status(200).json(user);
-            }).catch((err) => {handleErrors(err, req, res, next); console.log('catch')});
+            }).catch((err) => {
+                handleErrors(err, req, res, next);
+            });
     } else {
         return res.status(401).send('You cannot modify this profile.')
     }
@@ -269,7 +272,9 @@ router.put('/teacher/:uId/updateProfile', VerifyToken, accessController.grantAcc
             .lean()
             .then((teacher) => {
                 return res.status(200).json(permissions.filter(teacher));
-            }).catch((err) => {handleErrors(err, req, res, next); console.log(err)});
+            }).catch((err) => {
+                handleErrors(err, req, res, next);
+            });
     } else {
         return res.status(401).send('You cannot modify this profile.')
     }
@@ -282,7 +287,7 @@ router.post('/schedule/availableTime', VerifyToken, accessController.grantAccess
             from: req.body.from,
             to: req.body.to,
         }
-    
+
         AvailableTime.findOne(newAvailableTime)
             .lean()
             .then((availableTime) => {
@@ -305,53 +310,53 @@ router.post('/schedule/availableTime', VerifyToken, accessController.grantAccess
 
 router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
     AvailableTime.find({
-        hostedBy: req.params.uId,
-        from: {
-            $gt: req.params.startWeekDay
-        },
-        to: {
-            $lt: req.params.endWeekDay
-        }
-    }).sort({
-        from: 1
-    }).lean()
-    .then((availTime) => {
-        if (!availTime) return res.status(404).send('no available time');
-        return res.status(200).json(availTime);
-    }).catch((err) => handleErrors(err, req, res, next))
+            hostedBy: req.params.uId,
+            from: {
+                $gt: req.params.startWeekDay
+            },
+            to: {
+                $lt: req.params.endWeekDay
+            }
+        }).sort({
+            from: 1
+        }).lean()
+        .then((availTime) => {
+            if (!availTime) return res.status(404).send('no available time');
+            return res.status(200).json(availTime);
+        }).catch((err) => handleErrors(err, req, res, next))
 })
 
 router.delete('/schedule/availableTime', VerifyToken, accessController.grantAccess('deleteOwn', 'availableTime'), (req, res, next) => {
     if (req.userId == req.body.deleteObj.hostedBy) {
         Appointment.find({
-            hostedBy: req.body.deleteObj.hostedBy,
-            from: {
-                $gt: req.body.deleteObj.from
-            },
-            to: {
-                $lt: req.body.deleteObj.to
-            }
-        })
-        .lean()
-        .then((appointments) => {
-            if (appointments && appointments.length > 0) {
-                return res.status(500).send('Cannot delete timeslot with lessons')
-            } else {
-                AvailableTime.find(req.body.deleteObj).then((availableTime) => {
-                    if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
-                    AvailableTime.deleteOne(req.body.deleteObj, (err) => {
-                        if (err) return res.status(500).send(err);
-                        return res.status(200).send('success');
-                    });
-                })
-            }
-        }).catch((err) => handleErrors(err, req, res, next))
+                hostedBy: req.body.deleteObj.hostedBy,
+                from: {
+                    $gt: req.body.deleteObj.from
+                },
+                to: {
+                    $lt: req.body.deleteObj.to
+                }
+            })
+            .lean()
+            .then((appointments) => {
+                if (appointments && appointments.length > 0) {
+                    return res.status(500).send('Cannot delete timeslot with lessons')
+                } else {
+                    AvailableTime.find(req.body.deleteObj).then((availableTime) => {
+                        if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
+                        AvailableTime.deleteOne(req.body.deleteObj, (err) => {
+                            if (err) return res.status(500).send(err);
+                            return res.status(200).send('success');
+                        });
+                    })
+                }
+            }).catch((err) => handleErrors(err, req, res, next))
     } else {
         return res.status(401).json({
             error: "You don't have enough permission to perform this action"
         });
     }
-    
+
 });
 
 // create appointment
@@ -380,29 +385,29 @@ router.post('/schedule/appointment', VerifyToken, accessController.grantAccess('
 // startWeekDay/endWeekDay are ISO strings
 router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken, (req, res, next) => {
     Appointment.find({
-        from: {
-            $gt: req.params.startWeekDay
-        },
-        to: {
-            $lt: req.params.endWeekDay
-        },
-        $or: [{
-            reservedBy: req.params.uId
-        }, {
-            hostedBy: req.params.uId
-        }]
-    }).sort({
-        from: 1
-    })
-    .lean()
-    .then((appointments) => {
-        if (!appointments) return res.status(404).send('no appointments found');
-        return res.status(200).json(appointments);
-    }).catch((err) => handleErrors(err, req, res, next))
+            from: {
+                $gt: req.params.startWeekDay
+            },
+            to: {
+                $lt: req.params.endWeekDay
+            },
+            $or: [{
+                reservedBy: req.params.uId
+            }, {
+                hostedBy: req.params.uId
+            }]
+        }).sort({
+            from: 1
+        })
+        .lean()
+        .then((appointments) => {
+            if (!appointments) return res.status(404).send('no appointments found');
+            return res.status(200).json(appointments);
+        }).catch((err) => handleErrors(err, req, res, next))
 })
 
 // Route for editing/confirming an appointment
-router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAccess('updateOwn', 'appointment'),  (req, res, next) => {
+router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAccess('updateOwn', 'appointment'), (req, res, next) => {
     Appointment.findOneAndUpdate({
             _id: req.params.aId
         }, req.body, {
@@ -417,18 +422,18 @@ router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAcce
 // POST route to create package
 router.post('/transaction/createPackage', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
     Teacher.findById(req.body.teacherId)
-    .lean()
-    .then((teacher) => {
-        if (teacher && req.body.teacherId == req.userId) {
-            const newPackage = new Package(req.body)
-            newPackage.save((err, package) => {
-                if (err) return handleErrors(err, req, res, next);
-                return res.status(200).json(package)
-            })
-        } else {
-            return res.status(500).send('error')
-        }
-    }).catch((err) => handleErrors(err, req, res, next));
+        .lean()
+        .then((teacher) => {
+            if (teacher && req.body.teacherId == req.userId) {
+                const newPackage = new Package(req.body)
+                newPackage.save((err, package) => {
+                    if (err) return handleErrors(err, req, res, next);
+                    return res.status(200).json(package)
+                })
+            } else {
+                return res.status(500).send('error')
+            }
+        }).catch((err) => handleErrors(err, req, res, next));
 });
 
 // GET route for package details
@@ -453,42 +458,42 @@ router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, nex
         })
     }
     PackageTransaction.find({
-        hostedBy: req.body.hostedBy,
-        packageId: req.body.packageId,
-        reservedBy: req.body.reservedBy,
-        transactionDate: {
-            $gte: dayjs().subtract(29, 'days').toDate()
-        }, // no package transaction within the last month
-    })
-    .lean()
-    .then((transactions) => {
-        if (transactions && transactions.length > 0) { // transaction already exists
-            return res.status(200).send(transactions[0]);
-        } else {
-            MinuteBank.findOne({
-                hostedBy: req.body.hostedBy,
-                reservedBy: req.body.reservedBy,
-            })
-            .lean()
-            .then((minutebank) => {
-                if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
-                    const newMinuteBank = new MinuteBank({
+            hostedBy: req.body.hostedBy,
+            packageId: req.body.packageId,
+            reservedBy: req.body.reservedBy,
+            transactionDate: {
+                $gte: dayjs().subtract(29, 'days').toDate()
+            }, // no package transaction within the last month
+        })
+        .lean()
+        .then((transactions) => {
+            if (transactions && transactions.length > 0) { // transaction already exists
+                return res.status(200).send(transactions[0]);
+            } else {
+                MinuteBank.findOne({
                         hostedBy: req.body.hostedBy,
-                        reservedBy: req.body.reservedBy
+                        reservedBy: req.body.reservedBy,
                     })
-                    newMinuteBank.save((err, minutebank) => {
-                        if (err) return handleErrors(err, req, res, next);
-                        else {
+                    .lean()
+                    .then((minutebank) => {
+                        if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
+                            const newMinuteBank = new MinuteBank({
+                                hostedBy: req.body.hostedBy,
+                                reservedBy: req.body.reservedBy
+                            })
+                            newMinuteBank.save((err, minutebank) => {
+                                if (err) return handleErrors(err, req, res, next);
+                                else {
+                                    createPackageTransaction();
+                                }
+                            })
+                        } else {
                             createPackageTransaction();
                         }
-                    })
-                } else {
-                    createPackageTransaction();
-                }
 
-            }).catch((err) => handleErrors(err, req, res, next))
-        }
-    }).catch((err) => handleErrors(err, req, res, next))
+                    }).catch((err) => handleErrors(err, req, res, next))
+            }
+        }).catch((err) => handleErrors(err, req, res, next))
 });
 
 router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
@@ -502,34 +507,32 @@ router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
 
 router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
     MinuteBank.findOne({
-        hostedBy: req.params.hostedBy,
-        reservedBy: req.params.reservedBy
-    }).lean()
-    .then((minuteBank) => {
-        if (!minuteBank) return res.status(404).send('404');
-        return res.status(200).json(minuteBank)
-    }).catch((err) => handleErrors(err, req, res, next));
+            hostedBy: req.params.hostedBy,
+            reservedBy: req.params.reservedBy
+        }).lean()
+        .then((minuteBank) => {
+            if (!minuteBank) return res.status(404).send('404');
+            return res.status(200).json(minuteBank)
+        }).catch((err) => handleErrors(err, req, res, next));
 });
 
 // Route for editing a package transaction
 router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.tId)
-    .lean()
-    .then((transaction) => {
-        if (!transaction) return res.status(404).send('a transaction with that id was not found');
-        if (req.role == 'admin' || (req.userId == transaction.reservedBy || req.userId == transaction.hostedBy)) {
-            PackageTransaction.findOneAndUpdate({
-                    _id: req.params.tId
-                }, req.body)
-                .then((transaction) => {
-                    return res.status(200).json(transaction);
-                }).catch((err) => handleErrors(err, req, res, next));
-        } else {
-            return res.status(401).send('You cannot modify this transaction.')
-        }
-    }).catch((err) => handleErrors(err, req, res, next));
+        .lean()
+        .then((transaction) => {
+            if (!transaction) return res.status(404).send('a transaction with that id was not found');
+            if (req.role == 'admin' || (req.userId == transaction.reservedBy || req.userId == transaction.hostedBy)) {
+                PackageTransaction.findOneAndUpdate({
+                        _id: req.params.tId
+                    }, req.body)
+                    .then((transaction) => {
+                        return res.status(200).json(transaction);
+                    }).catch((err) => handleErrors(err, req, res, next));
+            } else {
+                return res.status(401).send('You cannot modify this transaction.')
+            }
+        }).catch((err) => handleErrors(err, req, res, next));
 });
-
-// router.use(handleErrors);
 
 module.exports = router;

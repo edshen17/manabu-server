@@ -44,7 +44,7 @@ const UserSchema = new mongoose.Schema({
   },
   lastOnline: {
     type: Date,
-    required: false,
+    default: Date.now,
   },
   role: {
     type: String,

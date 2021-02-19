@@ -10,6 +10,7 @@ ac.grant('user')
     .readAny('availableTime')
     .updateOwn('availableTime')
     .readAny('teacherProfile', ['*', '!licensePath', '!_id']) // pending teacher
+    .updateOwn('teacherProfile')
     .createOwn('appointment')
     .updateOwn('appointment')
     .readAny('appointment')
