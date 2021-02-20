@@ -51,6 +51,14 @@ const UserSchema = new mongoose.Schema({
     default: 'user',
     enum: ["user", "teacher", "admin"]
    },
+   settings: {
+     type: Object,
+     default: {},
+   },
+   membership: {
+     type: Array,
+     default: []
+   }
 });
 
 

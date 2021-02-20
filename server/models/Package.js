@@ -16,16 +16,16 @@ const PackageSchema = new mongoose.Schema({
   },
   packageDesc: {
     type: String,
-    required: true,
+    required: false,
   },
   packageName: {
     type: String,
-    required: true,
+    required: false,
   },
   packageType: {
     type: String,
     required: true,
-    enum: ['a', 'b', 'internal']
+    enum: ['a', 'b', 'casual', 'internal']
   },
 });
 

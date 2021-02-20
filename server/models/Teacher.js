@@ -27,6 +27,13 @@ const TeacherSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  hourlyRate: {
+    type: Object,
+    default: {
+      amount: 20,
+      currency: 'SGD'
+    },
+  },
 });
 
 
