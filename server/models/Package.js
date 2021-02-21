@@ -6,8 +6,8 @@ const PackageSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, 
       required: true 
     },
-  price: {
-    type: Number,
+  priceDetails: {
+    type: Object,
     required: true,
   },
   lessonAmount: {
@@ -22,10 +22,14 @@ const PackageSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  isOffering: {
+    type: Boolean,
+    default: true,
+  },
   packageType: {
     type: String,
     required: true,
-    enum: ['a', 'b', 'casual', 'internal']
+    enum: ['vigorous', 'moderate', 'light', 'internal']
   },
 });
 

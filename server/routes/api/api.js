@@ -10,6 +10,7 @@ const MinuteBank = require('../../models/MinuteBank');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const axios = require('axios')
 const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config');
@@ -18,6 +19,8 @@ const scheduler = require('../../scripts/scheduler/schedule');
 const accessController = require('../../scripts/controller/accessController');
 const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
+const fx = require('money');
+
 const {
     OAuth2Client
 } = require('google-auth-library');
@@ -419,16 +422,107 @@ router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAcce
         }).catch((err) => handleErrors(err, req, res, next));
 });
 
-// POST route to create package
-router.post('/transaction/createPackage', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
-    Teacher.findById(req.body.teacherId)
+// POST route to create/edit package(s)
+router.post('/transaction/package', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
+    const {
+        teacherId,
+        price,
+        currency,
+        teacherPackages
+    } = req.body;
+    const savePackage = (teacherId, priceDetails, lessonAmount, packageType) => {
+        const newPackage = new Package({
+            teacherId,
+            priceDetails,
+            lessonAmount,
+            packageType,
+        })
+        newPackage.save().catch((err) => {
+            console.log(err);
+        })
+    }
+    Teacher.find({
+            userId: teacherId
+        })
         .lean()
         .then((teacher) => {
-            if (teacher && req.body.teacherId == req.userId) {
-                const newPackage = new Package(req.body)
-                newPackage.save((err, package) => {
-                    if (err) return handleErrors(err, req, res, next);
-                    return res.status(200).json(package)
+            if (teacher && (teacherId == req.userId || req.role == 'admin')) {
+                axios.get(`https://openexchangerates.org/api/latest.json?app_id=${process.env.OPEN_EXCHANGE_RATE_API_KEY}`).then((res) => {
+                    if (res.status == 200) {
+                        fx.rates = res.data.rates;
+                        fx.base = currency;
+                        const packageAmntObj = {
+                            vigorous: 21,
+                            moderate: 12,
+                            light: 5,
+                        }
+                        const currencies = ['USD', 'JPY', 'SGD'].filter((item) => item != currency) // get the exchange rates of the other currencies
+                        Package.find({
+                            teacherId: teacherId
+                        }).lean().then((pkgs) => {
+                            const rates = []
+                            for (let i = 0; i < currencies.length; i++) { // loop to get other currencies for exchange rates
+                                rates.push({
+                                    toCurrency: currencies[i],
+                                    exchangeRate: fx.rates[currencies[i]] / fx.rates[fx.base]
+                                })
+                            }
+
+                            if (pkgs.length > 0) {
+                                // teacherPackages is the new one
+                                const toUpdateOffering = pkgs.filter((pkg) => {
+                                    return teacherPackages.includes(pkg.packageType)
+                                })
+                                const toRemoveOffering = pkgs.filter((pkg) => {
+                                    return !teacherPackages.includes(pkg.packageType)
+                                })
+                                toUpdateOffering.forEach((offering) => {
+                                    Package.findOneAndUpdate({
+                                        _id: offering._id
+                                    }, {
+                                        priceDetails: {
+                                            rates,
+                                            currency,
+                                            price: (Math.round((price * packageAmntObj[offering.packageType]) * 2) / 2).toFixed(1)
+                                        },
+                                        isOffering: true,
+                                    }).catch((err) => handleErrors(err, req, res, next))
+                                })
+                                toRemoveOffering.forEach((offering) => {
+                                    Package.findOneAndUpdate({
+                                        _id: offering._id
+                                    }, {
+                                        isOffering: false,
+                                    }).catch((err) => handleErrors(err, req, res, next))
+                                })
+
+                                if (toRemoveOffering == 0) { // no packages to remove, meaning teacher is offering a new package
+                                    // teacher package does not include packageType in toUpdateOffering
+                                    const toCreateTypes = teacherPackages.filter((pkgType) => {
+                                        return toUpdateOffering.findIndex((offering) => {
+                                            return offering.packageType == pkgType
+                                        }) == -1
+                                    })
+                                    toCreateTypes.forEach((type) => {
+                                        savePackage(teacherId, {
+                                            rates,
+                                            currency,
+                                            price: (Math.round((price * packageAmntObj[type]) * 2) / 2).toFixed(1)
+                                        }, packageAmntObj[type], type)
+                                    })
+                                }
+                            } else {
+                                for (let i = 0; i < teacherPackages.length; i++) { //loop through packages
+                                    const packageType = teacherPackages[i];
+                                    savePackage(teacherId, {
+                                        rates,
+                                        currency,
+                                        price: (Math.round((price * packageAmntObj[packageType]) * 2) / 2).toFixed(1)
+                                    }, packageAmntObj[packageType], packageType)
+                                }
+                            }
+                        })
+                    }
                 })
             } else {
                 return res.status(500).send('error')
@@ -447,7 +541,7 @@ router.get('/transaction/package/:pId', VerifyToken, (req, res, next) => {
 });
 
 // create package transaction
-router.post('/transaction/createPackageTransaction', VerifyToken, (req, res, next) => {
+router.post('/transaction/packageTransaction', VerifyToken, (req, res, next) => {
     // TO DO: check hostedby or reservedby = req.userId so only those related to transaction can create
     const newPackageTransaction = new PackageTransaction(req.body);
 
