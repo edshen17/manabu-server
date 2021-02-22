@@ -111,6 +111,7 @@ router.post('/register', (req, res, next) => {
 // route to get access to user's own information
 router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
     User.findById(req.userId, {
+        email: 0,
         password: 0
     }).lean().then(function(user) {
         if (!user) return res.status(404).send("No user found.");
@@ -204,16 +205,22 @@ router.post('/glogin', (req, res, next) => {
 
 // enable router to use middleware
 router.use(function(user, req, res, next) {
+    if (!req.role) req.role = 'user';
+
     Teacher.findOne({
         userId: user._id
     }).lean().then((teacher) => {
         if (teacher) {
-            if (!req.role) req.role = 'user';
-            const permissions = roles.can(req.role).readAny('teacherProfile')
-            user.teacherAppPending = !teacher.isApproved;
-            user.teacherData = permissions.filter(teacher);
+            Package.find({teacherId: user._id }).then((packages) => {
+                const permissions = roles.can(req.role).readAny('teacherProfile')
+                user.teacherAppPending = !teacher.isApproved;
+                user.teacherData = permissions.filter(teacher);
+                user.teacherData.packages = packages
+                return res.status(200).json(user);
+            })
+        } else {
+            return res.status(200).json(user);
         }
-        return res.status(200).json(user);
     }).catch((err) => handleErrors(err, req, res, next))
 });
 
@@ -447,83 +454,72 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
         .lean()
         .then((teacher) => {
             if (teacher && (teacherId == req.userId || req.role == 'admin')) {
-                axios.get(`https://openexchangerates.org/api/latest.json?app_id=${process.env.OPEN_EXCHANGE_RATE_API_KEY}`).then((res) => {
-                    if (res.status == 200) {
-                        fx.rates = res.data.rates;
-                        fx.base = currency;
-                        const packageAmntObj = {
-                            vigorous: 21,
-                            moderate: 12,
-                            light: 5,
-                        }
-                        const currencies = ['USD', 'JPY', 'SGD'].filter((item) => item != currency) // get the exchange rates of the other currencies
-                        Package.find({
-                            teacherId: teacherId
-                        }).lean().then((pkgs) => {
-                            const rates = []
-                            for (let i = 0; i < currencies.length; i++) { // loop to get other currencies for exchange rates
-                                rates.push({
-                                    toCurrency: currencies[i],
-                                    exchangeRate: fx.rates[currencies[i]] / fx.rates[fx.base]
-                                })
-                            }
+                Teacher.findOneAndUpdate({ userId: teacherId }, { hourlyRate: {
+                    amount: price,
+                    currency,
+                }, offeringTypes: teacherPackages}).lean().catch((err) => {
+                    console.log(err);
+                })
 
-                            if (pkgs.length > 0) {
-                                // teacherPackages is the new one
-                                const toUpdateOffering = pkgs.filter((pkg) => {
-                                    return teacherPackages.includes(pkg.packageType)
-                                })
-                                const toRemoveOffering = pkgs.filter((pkg) => {
-                                    return !teacherPackages.includes(pkg.packageType)
-                                })
-                                toUpdateOffering.forEach((offering) => {
-                                    Package.findOneAndUpdate({
-                                        _id: offering._id
-                                    }, {
-                                        priceDetails: {
-                                            rates,
-                                            currency,
-                                            price: (Math.round((price * packageAmntObj[offering.packageType]) * 2) / 2).toFixed(1)
-                                        },
-                                        isOffering: true,
-                                    }).catch((err) => handleErrors(err, req, res, next))
-                                })
-                                toRemoveOffering.forEach((offering) => {
-                                    Package.findOneAndUpdate({
-                                        _id: offering._id
-                                    }, {
-                                        isOffering: false,
-                                    }).catch((err) => handleErrors(err, req, res, next))
-                                })
-
-                                if (toRemoveOffering == 0) { // no packages to remove, meaning teacher is offering a new package
-                                    // teacher package does not include packageType in toUpdateOffering
-                                    const toCreateTypes = teacherPackages.filter((pkgType) => {
-                                        return toUpdateOffering.findIndex((offering) => {
-                                            return offering.packageType == pkgType
-                                        }) == -1
-                                    })
-                                    toCreateTypes.forEach((type) => {
-                                        savePackage(teacherId, {
-                                            rates,
-                                            currency,
-                                            price: (Math.round((price * packageAmntObj[type]) * 2) / 2).toFixed(1)
-                                        }, packageAmntObj[type], type)
-                                    })
-                                }
-                            } else {
-                                for (let i = 0; i < teacherPackages.length; i++) { //loop through packages
-                                    const packageType = teacherPackages[i];
-                                    savePackage(teacherId, {
-                                        rates,
-                                        currency,
-                                        price: (Math.round((price * packageAmntObj[packageType]) * 2) / 2).toFixed(1)
-                                    }, packageAmntObj[packageType], packageType)
-                                }
-                            }
+                const packageAmntObj = {
+                    vigorous: 21,
+                    moderate: 12,
+                    light: 5,
+                }
+                Package.find({
+                    teacherId: teacherId
+                }).lean().then((pkgs) => {
+                    if (pkgs.length > 0) {
+                        const toUpdateOffering = pkgs.filter((pkg) => {
+                            return teacherPackages.includes(pkg.packageType)
                         })
+                        const toRemoveOffering = pkgs.filter((pkg) => {
+                            return !teacherPackages.includes(pkg.packageType)
+                        })
+                        toUpdateOffering.forEach((offering) => {
+                            Package.findOneAndUpdate({
+                                _id: offering._id
+                            }, {
+                                priceDetails: {
+                                    currency,
+                                    price: (Math.round((price * packageAmntObj[offering.packageType]) * 2) / 2).toFixed(1)
+                                },
+                                isOffering: true,
+                            }).catch((err) => handleErrors(err, req, res, next))
+                        })
+                        toRemoveOffering.forEach((offering) => {
+                            Package.findOneAndUpdate({
+                                _id: offering._id
+                            }, {
+                                isOffering: false,
+                            }).catch((err) => handleErrors(err, req, res, next))
+                        })
+
+                        if (toRemoveOffering == 0) { // no packages to remove, meaning teacher is offering a new package
+                            // teacher package does not include packageType in toUpdateOffering
+                            const toCreateTypes = teacherPackages.filter((pkgType) => {
+                                return toUpdateOffering.findIndex((offering) => {
+                                    return offering.packageType == pkgType
+                                }) == -1
+                            })
+                            toCreateTypes.forEach((type) => {
+                                savePackage(teacherId, {
+                                    currency,
+                                    price: (Math.round((price * packageAmntObj[type]) * 2) / 2).toFixed(1)
+                                }, packageAmntObj[type], type)
+                            })
+                        }
+                    } else {
+                        for (let i = 0; i < teacherPackages.length; i++) { //loop through packages
+                            const packageType = teacherPackages[i];
+                            savePackage(teacherId, {
+                                currency,
+                                price: (Math.round((price * packageAmntObj[packageType]) * 2) / 2).toFixed(1)
+                            }, packageAmntObj[packageType], packageType)
+                        }
                     }
                 })
+                return res.status(200).send('success');
             } else {
                 return res.status(500).send('error')
             }
