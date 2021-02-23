@@ -586,6 +586,7 @@ router.post('/transaction/packageTransaction', VerifyToken, (req, res, next) => 
         }).catch((err) => handleErrors(err, req, res, next))
 });
 
+//TODO TO DO only those related can get
 router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.tId)
         .lean()
@@ -594,7 +595,7 @@ router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
             return res.status(200).json(transaction)
         }).catch((err) => handleErrors(err, req, res, next));
 });
-
+//TODO TO DO only those related can get
 router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
     MinuteBank.findOne({
             hostedBy: req.params.hostedBy,
