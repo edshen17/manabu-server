@@ -4,7 +4,6 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const app = express();
 const compression = require('compression')
-const http = require('http');
 
 const corsConfig = {
   origin: true,
@@ -37,18 +36,14 @@ if (process.env.NODE_ENV == 'production') {
   app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
   app.use(function(req, res, next) {
-    if (req.headers["x-forwarded-proto"] === "https"){
+    if (req.secure){
         return next();
     }
     res.redirect("https://" + req.headers.host + req.url);
-    next();
   });
 }
 
 const port = process.env.PORT || 5000;
 
-// app.listen(port, () => console.log(`Server running on port ${port}`));
-http.createServer(app).listen(port, function() {
-  console.log('Express server listening on port ' + app.get('port'));
-});
+app.listen(port, () => console.log(`Server running on port ${port}`));
 
