@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const app = express();
 const compression = require('compression')
+const http = require('http');
 
 const corsConfig = {
   origin: true,
@@ -46,5 +47,8 @@ if (process.env.NODE_ENV == 'production') {
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+// app.listen(port, () => console.log(`Server running on port ${port}`));
+http.createServer(app).listen(port, function() {
+  console.log('Express server listening on port ' + app.get('port'));
+});
 
