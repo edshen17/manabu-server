@@ -16,7 +16,6 @@ const corsConfig = {
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static('public'))
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
@@ -30,19 +29,20 @@ app.use('/api/', api);
 
 
 if (process.env.NODE_ENV == 'production') {
+  if (req.header('x-forwarded-proto') !== 'https') {
+    res.redirect(`https://${req.header('host')}${req.url}`)
+  } else {
+    next();
+  }
+
   // static folder
   app.use(express.static(__dirname + '/public/'));
 
   // handle spa
-  app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
-
-  app.use(function(req, res, next) {
-    if (req.secure){
-        return next();
-    }
-    res.redirect("https://" + req.headers.host + req.url);
-  });
+  app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));  
 }
+
+app.use(express.static('public'))
 
 const port = process.env.PORT || 5000;
 
