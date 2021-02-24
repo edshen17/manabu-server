@@ -36,7 +36,7 @@ if (process.env.NODE_ENV == 'production') {
   app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
   app.use(function(req, res, next) {
-    if (req.secure){
+    if (req.headers["x-forwarded-proto"] === "https"){
         return next();
     }
     res.redirect("https://" + req.headers.host + req.url);
