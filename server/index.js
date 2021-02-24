@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const app = express();
+const compression = require('compression')
 
 const corsConfig = {
   origin: true,
@@ -18,6 +19,14 @@ app.use(express.static('public'))
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
+app.use(function(req, res, next) {
+  if (req.secure){
+      return next();
+  }
+  res.redirect("https://" + req.headers.host + req.url);
+});
+
+app.use(compression());
 
 const api = require('./routes/api/api');
 
