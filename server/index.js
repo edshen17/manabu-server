@@ -19,12 +19,7 @@ app.use(express.static('public'))
 app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
-app.use(function(req, res, next) {
-  if (req.secure){
-      return next();
-  }
-  res.redirect("https://" + req.headers.host + req.url);
-});
+
 
 app.use(compression());
 
@@ -39,6 +34,13 @@ if (process.env.NODE_ENV == 'production') {
 
   // handle spa
   app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
+
+  app.use(function(req, res, next) {
+    if (req.secure){
+        return next();
+    }
+    res.redirect("https://" + req.headers.host + req.url);
+  });
 }
 
 const port = process.env.PORT || 5000;
