@@ -53,7 +53,9 @@ const UserSchema = new mongoose.Schema({
    },
    settings: {
      type: Object,
-     default: {},
+     default: {
+       currency: 'SGD'
+     },
    },
    membership: {
      type: Array,
