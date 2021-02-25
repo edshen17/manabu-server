@@ -338,29 +338,13 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken
 
 router.delete('/schedule/availableTime', VerifyToken, accessController.grantAccess('deleteOwn', 'availableTime'), (req, res, next) => {
     if (req.userId == req.body.deleteObj.hostedBy) {
-        Appointment.find({
-                hostedBy: req.body.deleteObj.hostedBy,
-                from: {
-                    $gt: req.body.deleteObj.from
-                },
-                to: {
-                    $lt: req.body.deleteObj.to
-                }
-            })
-            .lean()
-            .then((appointments) => {
-                if (appointments && appointments.length > 0) {
-                    return res.status(500).send('Cannot delete timeslot with lessons')
-                } else {
-                    AvailableTime.find(req.body.deleteObj).then((availableTime) => {
-                        if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
-                        AvailableTime.deleteOne(req.body.deleteObj, (err) => {
-                            if (err) return res.status(500).send(err);
-                            return res.status(200).send('success');
-                        });
-                    })
-                }
-            }).catch((err) => handleErrors(err, req, res, next))
+        AvailableTime.find(req.body.deleteObj).then((availableTime) => {
+            if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
+            AvailableTime.deleteOne(req.body.deleteObj, (err) => {
+                if (err) return res.status(500).send(err);
+                return res.status(200).send('success');
+            });
+        }).catch((err) => handleErrors(err, req, res, next))
     } else {
         return res.status(401).json({
             error: "You don't have enough permission to perform this action"
