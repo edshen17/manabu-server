@@ -6,7 +6,7 @@ const app = express();
 const compression = require('compression')
 const http = require('http');
 const Ddos = require('ddos')
-const ddos = new Ddos({burst:10, limit:15})
+const ddos = new Ddos({burst:50, limit:50})
 const helmet = require("helmet");
 
 const corsConfig = {
