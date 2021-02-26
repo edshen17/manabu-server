@@ -5,6 +5,9 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const compression = require('compression')
 const http = require('http');
+const Ddos = require('ddos')
+const ddos = new Ddos({burst:10, limit:15})
+const helmet = require("helmet");
 
 const corsConfig = {
   origin: true,
@@ -20,6 +23,8 @@ app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
 app.enable('trust proxy');
+app.use(helmet());
+app.use(ddos.express);
 
 app.use(compression());
 
