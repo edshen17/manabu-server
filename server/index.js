@@ -23,7 +23,11 @@ app.use(cookieParser());
 app.use(cors(corsConfig));
 app.options('*', cors(corsConfig));
 app.enable('trust proxy');
-// app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 app.use(ddos.express);
 
 app.use(compression());
