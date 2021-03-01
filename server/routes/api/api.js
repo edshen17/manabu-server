@@ -16,11 +16,12 @@ const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config');
 const VerifyToken = require('../../scripts/VerifyToken');
 const scheduler = require('../../scripts/scheduler/schedule');
+const fetchExchangeRate = require('../../scripts/scheduler/exchangeRateFetcher').fetchExchangeRate;
 const accessController = require('../../scripts/controller/accessController');
 const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const fx = require('money');
-
+let exchangeRate;
 const {
     OAuth2Client
 } = require('google-auth-library');
@@ -28,6 +29,13 @@ const client = new OAuth2Client(process.env.G_CLIENTID);
 const dayjs = require('dayjs');
 
 scheduler();
+const exchangeRateScheduler = async () => {
+    if (!exchangeRate) exchangeRate = await fetchExchangeRate();
+    setInterval(async () => {
+        exchangeRate = await fetchExchangeRate();
+    }, 60 * 60 * 24 * 1000);
+}
+exchangeRateScheduler()
 
 // Connect to Mongodb
 mongoose.connect(db, {
@@ -203,27 +211,6 @@ router.post('/glogin', (req, res, next) => {
 
 });
 
-// enable router to use middleware
-router.use(function(user, req, res, next) {
-    if (!req.role) req.role = 'user';
-
-    Teacher.findOne({
-        userId: user._id
-    }).lean().then((teacher) => {
-        if (teacher) {
-            Package.find({teacherId: user._id }).then((packages) => {
-                const permissions = roles.can(req.role).readAny('teacherProfile')
-                user.teacherAppPending = !teacher.isApproved;
-                user.teacherData = permissions.filter(teacher);
-                user.teacherData.packages = packages
-                return res.status(200).json(user);
-            })
-        } else {
-            return res.status(200).json(user);
-        }
-    }).catch((err) => handleErrors(err, req, res, next))
-});
-
 // POST login
 // logging users in 
 router.post('/login', function(req, res, next) {
@@ -260,10 +247,12 @@ router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess
     if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
         User.findOneAndUpdate({
                 _id: req.params.uId
-            }, req.body)
+            }, req.body, {
+                returnOriginal: false
+            })
             .lean()
             .then((user) => {
-                return res.status(200).json(user);
+                next(user)
             }).catch((err) => {
                 handleErrors(err, req, res, next);
             });
@@ -278,7 +267,9 @@ router.put('/teacher/:uId/updateProfile', VerifyToken, accessController.grantAcc
         const permissions = roles.can(req.role).updateOwn('teacherProfile')
         Teacher.findOneAndUpdate({
                 userId: req.params.uId
-            }, req.body)
+            }, req.body, {
+                returnOriginal: false
+            })
             .lean()
             .then((teacher) => {
                 return res.status(200).json(permissions.filter(teacher));
@@ -405,7 +396,7 @@ router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAcce
     Appointment.findOneAndUpdate({
             _id: req.params.aId
         }, req.body, {
-            new: true
+            returnOriginal: false
         })
         .lean()
         .then((appointment) => {
@@ -438,10 +429,17 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
         .lean()
         .then((teacher) => {
             if (teacher && (teacherId == req.userId || req.role == 'admin')) {
-                Teacher.findOneAndUpdate({ userId: teacherId }, { hourlyRate: {
-                    amount: price,
-                    currency,
-                }, offeringTypes: teacherPackages}).lean().catch((err) => {
+                Teacher.findOneAndUpdate({
+                    userId: teacherId
+                }, {
+                    hourlyRate: {
+                        amount: price,
+                        currency,
+                    },
+                    offeringTypes: teacherPackages
+                }, {
+                    returnOriginal: false
+                }).lean().catch((err) => {
                     console.log(err);
                 })
 
@@ -469,6 +467,8 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                     price: (Math.round((price * packageAmntObj[offering.packageType]) * 2) / 2).toFixed(1)
                                 },
                                 isOffering: true,
+                            }, {
+                                returnOriginal: false
                             }).catch((err) => handleErrors(err, req, res, next))
                         })
                         toRemoveOffering.forEach((offering) => {
@@ -476,6 +476,8 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 _id: offering._id
                             }, {
                                 isOffering: false,
+                            }, {
+                                returnOriginal: false
                             }).catch((err) => handleErrors(err, req, res, next))
                         })
 
@@ -511,11 +513,14 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
 });
 
 // GET route for package details
-router.get('/transaction/package/:pId', VerifyToken, (req, res, next) => {
-    Package.findById(req.params.pId)
-        .lean()
+router.get('/transaction/package/:teacherId', VerifyToken, (req, res, next) => {
+    Package.find({
+            teacherId: req.params.teacherId
+        })
+        .lean().sort([
+            ['lessonAmount', 1]
+        ])
         .then((package) => {
-            if (!package) return res.status(404).send('a package with that id was not found');
             return res.status(200).json(package)
         }).catch((err) => handleErrors(err, req, res, next));
 });
@@ -600,7 +605,9 @@ router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
             if (req.role == 'admin' || (req.userId == transaction.reservedBy || req.userId == transaction.hostedBy)) {
                 PackageTransaction.findOneAndUpdate({
                         _id: req.params.tId
-                    }, req.body)
+                    }, req.body, {
+                        returnOriginal: false
+                    })
                     .then((transaction) => {
                         return res.status(200).json(transaction);
                     }).catch((err) => handleErrors(err, req, res, next));
@@ -608,6 +615,34 @@ router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
                 return res.status(401).send('You cannot modify this transaction.')
             }
         }).catch((err) => handleErrors(err, req, res, next));
+});
+
+// Route for fetching exchange rate information
+router.get('/utils/exchangeRate', VerifyToken, (req, res, next) => {
+    return res.status(200).send(exchangeRate);
+});
+
+// enable router to use middleware
+router.use(function(user, req, res, next) {
+    if (!req.role) req.role = 'user';
+
+    Teacher.findOne({
+        userId: user._id
+    }).lean().then((teacher) => {
+        if (teacher) {
+            Package.find({
+                teacherId: user._id
+            }).then((packages) => {
+                const permissions = roles.can(req.role).readAny('teacherProfile')
+                user.teacherAppPending = !teacher.isApproved;
+                user.teacherData = permissions.filter(teacher);
+                user.teacherData.packages = packages
+                return res.status(200).json(user);
+            })
+        } else {
+            return res.status(200).json(user);
+        }
+    }).catch((err) => handleErrors(err, req, res, next))
 });
 
 module.exports = router;
