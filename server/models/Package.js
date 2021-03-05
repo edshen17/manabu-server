@@ -31,6 +31,10 @@ const PackageSchema = new mongoose.Schema({
     required: true,
     enum: ['vigorous', 'moderate', 'light', 'internal']
   },
+  packageDurations: {
+    type: Array,
+    required: true,
+  },
 });
 
 

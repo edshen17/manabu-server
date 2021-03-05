@@ -29,6 +29,7 @@ const client = new OAuth2Client(process.env.G_CLIENTID);
 const dayjs = require('dayjs');
 
 scheduler();
+
 const exchangeRateScheduler = async () => {
     if (!exchangeRate) exchangeRate = await fetchExchangeRate();
     setInterval(async () => {
@@ -410,19 +411,33 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
         teacherId,
         price,
         currency,
-        teacherPackages
+        teacherPackages,
+        packageDurations,
     } = req.body;
-    const savePackage = (teacherId, priceDetails, lessonAmount, packageType) => {
+
+    // save package function
+    const savePackage = (teacherId, priceDetails, lessonAmount, packageType, packageDurations) => {
         const newPackage = new Package({
             teacherId,
             priceDetails,
             lessonAmount,
             packageType,
+            packageDurations,
         })
+
         newPackage.save().catch((err) => {
             console.log(err);
         })
     }
+
+    // take the durations from client (eg ['light-30']) and transform it to [30]
+    const processDurations = (packageType, durations) => {
+        const toUpdateDuration = durations.filter((pkg) => { return pkg.includes(packageType) }).map((durations) => {
+            return durations.split('-')
+        }).flat().filter((durations) => { return !durations.includes(packageType)}).map(duration=> +duration);
+        return toUpdateDuration;
+    }
+
     Teacher.find({
             userId: teacherId
         })
@@ -458,7 +473,11 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                         const toRemoveOffering = pkgs.filter((pkg) => {
                             return !teacherPackages.includes(pkg.packageType)
                         })
+
                         toUpdateOffering.forEach((offering) => {
+                            // returns array of duration lengths (eg. [30, 60, 90])
+                            const toUpdateDurations = processDurations(offering.packageType, packageDurations)
+        
                             Package.findOneAndUpdate({
                                 _id: offering._id
                             }, {
@@ -467,6 +486,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                     price: (Math.round((price * packageAmntObj[offering.packageType]) * 2) / 2).toFixed(1)
                                 },
                                 isOffering: true,
+                                packageDurations: toUpdateDurations,
                             }, {
                                 returnOriginal: false
                             }).catch((err) => handleErrors(err, req, res, next))
@@ -482,26 +502,27 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                         })
 
                         if (toRemoveOffering == 0) { // no packages to remove, meaning teacher is offering a new package
-                            // teacher package does not include packageType in toUpdateOffering
                             const toCreateTypes = teacherPackages.filter((pkgType) => {
                                 return toUpdateOffering.findIndex((offering) => {
                                     return offering.packageType == pkgType
                                 }) == -1
                             })
                             toCreateTypes.forEach((type) => {
+                                const durations = processDurations(type, packageDurations)
                                 savePackage(teacherId, {
                                     currency,
                                     price: (Math.round((price * packageAmntObj[type]) * 2) / 2).toFixed(1)
-                                }, packageAmntObj[type], type)
+                                }, packageAmntObj[type], type, durations)
                             })
                         }
                     } else {
                         for (let i = 0; i < teacherPackages.length; i++) { //loop through packages
                             const packageType = teacherPackages[i];
+                            const durations = processDurations(packageType, packageDurations)
                             savePackage(teacherId, {
                                 currency,
                                 price: (Math.round((price * packageAmntObj[packageType]) * 2) / 2).toFixed(1)
-                            }, packageAmntObj[packageType], packageType)
+                            }, packageAmntObj[packageType], packageType, durations)
                         }
                     }
                 })
