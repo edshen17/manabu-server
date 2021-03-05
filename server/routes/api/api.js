@@ -135,7 +135,10 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
         email: 0,
         password: 0
     }).lean().then(function(user) {
-        if (!user) return res.status(404).send("No user found.");
+        if (!user) {
+            console.log('here')
+            return res.status(404).send("No user found.");
+        }
         return next(user);
     }).catch((err) => handleErrors(err, req, res, next));
 });
@@ -646,7 +649,6 @@ router.get('/utils/exchangeRate', VerifyToken, (req, res, next) => {
 // enable router to use middleware
 router.use(function(user, req, res, next) {
     if (!req.role) req.role = 'user';
-
     Teacher.findOne({
         userId: user._id
     }).lean().then((teacher) => {
@@ -657,13 +659,13 @@ router.use(function(user, req, res, next) {
                 const permissions = roles.can(req.role).readAny('teacherProfile')
                 user.teacherAppPending = !teacher.isApproved;
                 user.teacherData = permissions.filter(teacher);
-                user.teacherData.packages = packages
+                user.teacherData.packages = packages;
                 return res.status(200).json(user);
             })
         } else {
             return res.status(200).json(user);
         }
-    }).catch((err) => handleErrors(err, req, res, next))
+    }).catch((err) => { console.log(err); handleErrors(err, req, res, next) })
 });
 
 module.exports = router;
