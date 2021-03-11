@@ -276,6 +276,7 @@ router.put('/teacher/:uId/updateProfile', VerifyToken, accessController.grantAcc
             })
             .lean()
             .then((teacher) => {
+                teacher.userId = teacher.userId.toString()
                 return res.status(200).json(permissions.filter(teacher));
             }).catch((err) => {
                 handleErrors(err, req, res, next);
@@ -652,13 +653,24 @@ router.use(function(user, req, res, next) {
     Teacher.findOne({
         userId: user._id
     }).lean().then((teacher) => {
+        // need to toString ids so accesscontrol filters correctly
+        user._id = user._id.toString()
+        teacher.userId = teacher.userId.toString()
+        const teacherFilter = roles.can(req.role).readAny('teacherProfile')
+        const selfFilter = roles.can(req.role).readOwn('userProfile')
+        const userFilter = roles.can(req.role).readAny('userProfile')
+
+        if (req.userId == user._id) { // if self, include settings
+            user = selfFilter.filter(user)
+        } else {
+            user = userFilter.filter(user)
+        }
         if (teacher) {
             Package.find({
                 teacherId: user._id
-            }).then((packages) => {
-                const permissions = roles.can(req.role).readAny('teacherProfile')
+            }).lean().then((packages) => {   
                 user.teacherAppPending = !teacher.isApproved;
-                user.teacherData = permissions.filter(teacher);
+                user.teacherData = teacherFilter.filter(teacher);
                 user.teacherData.packages = packages;
                 return res.status(200).json(user);
             })

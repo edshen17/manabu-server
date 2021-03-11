@@ -3,7 +3,8 @@ const ac = new AccessControl();
  
 exports.roles = (function() {
 ac.grant('user')
-    .readAny('userProfile', ['*', '!password'])
+    .readAny('userProfile', ['*', '!password', '!settings'])
+    .readOwn('userProfile', ['*', '!password'])
     .updateOwn('userProfile')
     .createOwn('availableTime')
     .deleteOwn('availableTime')
