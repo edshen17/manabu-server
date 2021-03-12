@@ -136,7 +136,6 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
         password: 0
     }).lean().then(function(user) {
         if (!user) {
-            console.log('here')
             return res.status(404).send("No user found.");
         }
         return next(user);
@@ -334,12 +333,12 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken
 
 router.delete('/schedule/availableTime', VerifyToken, accessController.grantAccess('deleteOwn', 'availableTime'), (req, res, next) => {
     if (req.userId == req.body.deleteObj.hostedBy) {
-        AvailableTime.find(req.body.deleteObj).then((availableTime) => {
-            if (availableTime.length == 0) return res.status(404).send('no available time found to be deleted');
-            AvailableTime.deleteOne(req.body.deleteObj, (err) => {
-                if (err) return res.status(500).send(err);
+        AvailableTime.findByIdAndDelete(req.body.deleteObj.appointmentId).then((availableTime) => {
+            if (availableTime) {
                 return res.status(200).send('success');
-            });
+            } else {
+                return res.status(404).send('no available time found to be deleted');
+            }
         }).catch((err) => handleErrors(err, req, res, next))
     } else {
         return res.status(401).json({
@@ -655,7 +654,6 @@ router.use(function(user, req, res, next) {
     }).lean().then((teacher) => {
         // need to toString ids so accesscontrol filters correctly
         user._id = user._id.toString()
-        teacher.userId = teacher.userId.toString()
         const teacherFilter = roles.can(req.role).readAny('teacherProfile')
         const selfFilter = roles.can(req.role).readOwn('userProfile')
         const userFilter = roles.can(req.role).readAny('userProfile')
@@ -666,6 +664,8 @@ router.use(function(user, req, res, next) {
             user = userFilter.filter(user)
         }
         if (teacher) {
+            teacher.userId = teacher.userId.toString()
+
             Package.find({
                 teacherId: user._id
             }).lean().then((packages) => {   

@@ -10,6 +10,10 @@ const TeacherSchema = new mongoose.Schema({
     type: Date,
     required: false,
   },
+  teachingLanguages: {
+    type: Array,
+    default: [],
+  },
   introductionVideo: {
     type: String,
     default: '',

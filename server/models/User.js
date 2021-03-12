@@ -26,11 +26,7 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  fluentLanguages: {
-    type: Array,
-    default: [],
-  },
-  nonFluentLanguages: {
+  languages: {
     type: Array,
     default: [],
   },
