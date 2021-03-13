@@ -11,10 +11,10 @@ const PackageTransactionSchema = new mongoose.Schema({
       type: Schema.Types.ObjectId, 
       required: true 
     },
-    reservedBy: { 
-      type: Schema.Types.ObjectId, 
-      required: true 
-    },
+  reservedBy: { 
+    type: Schema.Types.ObjectId, 
+    required: true 
+  },
   transactionDate: {
     type: Date,
     default: Date.now,
@@ -23,8 +23,8 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  transactionPrice: {
-    type: Number,
+  priceDetails: {
+    type: Object,
     required: false,
   },
   terminationDate: {
@@ -43,6 +43,10 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  lessonLanguage: {
+    type: String,
+    required: true,
+  }
 });
 
 PackageTransactionSchema.pre('save', async function() { 
