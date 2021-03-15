@@ -20,6 +20,7 @@ const fetchExchangeRate = require('../../scripts/scheduler/exchangeRateFetcher')
 const accessController = require('../../scripts/controller/accessController');
 const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
+const verifyTransactionData = require('../../scripts/verifyTransactionData');
 const fx = require('money');
 let exchangeRate;
 const {
@@ -27,6 +28,12 @@ const {
 } = require('google-auth-library');
 const client = new OAuth2Client(process.env.G_CLIENTID);
 const dayjs = require('dayjs');
+const paypal = require('paypal-rest-sdk');
+paypal.configure({
+    'mode': 'sandbox', //sandbox or live
+    'client_id': 'AREj6Q7nYtjH61bzVVlRdlhJ60n1j_VpkLEsKN450WcHATfLIpjuAFos4_75fTYYehQhLgv0lC_qGyqP',
+    'client_secret': 'EBrZ8Kk449KcqA5iL4CwkFLSpnIy2oLqgZT5q8aI7kA4Qp7vyTagaqP4u0GKhvRVZWRJtlXjMhsDR2oc'
+  });
 
 scheduler();
 
@@ -412,7 +419,7 @@ router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAcce
 router.post('/transaction/package', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
     const {
         teacherId,
-        price,
+        hourlyPrice,
         currency,
         teacherPackages,
         packageDurations,
@@ -451,7 +458,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                     userId: teacherId
                 }, {
                     hourlyRate: {
-                        amount: price,
+                        amount: hourlyPrice,
                         currency,
                     },
                     offeringTypes: teacherPackages
@@ -486,7 +493,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                             }, {
                                 priceDetails: {
                                     currency,
-                                    price: (Math.round((price * packageAmntObj[offering.packageType]) * 2) / 2).toFixed(1)
+                                    hourlyPrice: (Math.round(hourlyPrice).toFixed(1))
                                 },
                                 isOffering: true,
                                 packageDurations: toUpdateDurations,
@@ -514,7 +521,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 const durations = processDurations(type, packageDurations)
                                 savePackage(teacherId, {
                                     currency,
-                                    price: (Math.round((price * packageAmntObj[type]) * 2) / 2).toFixed(1)
+                                    hourlyPrice: (Math.round(hourlyPrice).toFixed(1))
                                 }, packageAmntObj[type], type, durations)
                             })
                         }
@@ -524,7 +531,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                             const durations = processDurations(packageType, packageDurations)
                             savePackage(teacherId, {
                                 currency,
-                                price: (Math.round((price * packageAmntObj[packageType]) * 2) / 2).toFixed(1)
+                                hourlyPrice: (Math.round(hourlyPrice).toFixed(1))
                             }, packageAmntObj[packageType], packageType, durations)
                         }
                     }
@@ -647,46 +654,13 @@ router.get('/utils/exchangeRate', VerifyToken, (req, res, next) => {
 });
 
 // Route for validating transaction information
-router.get('/utils/verifyTransactionData', VerifyToken, (req, res, next) => {
-    if (!req.role) req.role = 'user';
-    const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId } = req.query
-    Teacher.findOne({
-        userId: hostedBy,
-    }).lean().then((teacher) => {
-        if (!teacher) return res.status(404).send('no teacher found')
-        else {
-            User.findById(hostedBy).lean().then((teacherUser) => {
-                User.findById(reservedBy).lean().then((user) => {
-                    if (!user) return res.status(404).send('no user found')
-                    else {
-                        Package.findById(selectedPackageId).lean().then((pkg) => {
-                            if (!pkg) return res.status(404).send('no user found')
-                            else {
-                                const { packageType, packageDurations } = pkg
-                                const subscriptionRes = ['yes', 'no']
-                                if (packageType == selectedPlan && packageDurations.includes(parseInt(selectedDuration)) && subscriptionRes.includes(selectedSubscription)) {
-                                    const teacherFilter = roles.can(req.role).readAny('teacherProfile')
-                                    teacher.userId = teacher.userId.toString()
-                                    const teacherData = teacherFilter.filter(teacher);
-                                    teacherData.profileImage = teacherUser.profileImage;
-                                    teacherData.name = teacherUser.name
-                                    return res.status(200).json({
-                                        teacherData,
-                                        reservedBy: user._id,
-                                        selectedPlan,
-                                        selectedDuration,
-                                        selectedSubscription,
-                                        selectedPackageId,
-                                    })
-                                } else {
-                                    return res.status(500).send('invalid transaction')
-                                }
-                            }
-                        })
-                    }
-                })
-            })
-        }
+router.get('/utils/verifyTransactionData', VerifyToken, async (req, res, next) => {
+    verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
+      if (transactionData.status == 200) {
+        return res.status(200).json(transactionData)
+        } else {
+            return res.status(500).send('invalid transaction')
+        }  
     })
 });
 
@@ -723,5 +697,84 @@ router.use(function(user, req, res, next) {
         }
     }).catch((err) => { console.log(err); handleErrors(err, req, res, next) })
 });
+
+router.post('/pay', VerifyToken, (req, res) => {
+    // handle paypal
+    verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
+        if (transactionData.status == 200) {
+            const {teacherData, reservedBy, selectedPlan, selectedSubscription, selectedDuration, pkg, exchangeRate} = transactionData
+            
+            // use fx to make this usd/sgd...
+            const transactionPrice = pkg.priceDetails.hourlyPrice * (parseInt(selectedDuration)/60) * pkg.lessonAmount
+            const create_payment_json = {
+                "intent": "sale",
+                "payer": {
+                    "payment_method": "paypal"
+                },
+                "redirect_urls": {
+                    "return_url": "http://localhost:5000/api/success",
+                    "cancel_url": "http://localhost:5000/api/cancel"
+                },
+                "transactions": [{
+                    "item_list": {
+                        "items": [{
+                            "name": `${selectedPlan} - ${teacherData.name}`,
+                            "sku": `${pkg._id}`,
+                            "price": `${transactionPrice}`,
+                            "currency": pkg.priceDetails.currency,
+                            "quantity": 1
+                        }]
+                    },
+                    "amount": {
+                        "currency": pkg.priceDetails.currency,
+                        "total": `${transactionPrice}`
+                    },
+                    "description": "Teacher plan"
+                }]
+            };
+            
+            paypal.payment.create(create_payment_json, function (error, payment) {
+              if (error) {
+                  throw error;
+              } else {
+                  for(let i = 0;i < payment.links.length;i++){
+                    if(payment.links[i].rel === 'approval_url'){
+                      return res.status(200).json({redirectLink: payment.links[i].href});
+                    }
+                  }
+              }
+            });    
+          } else {
+              return res.status(500).send('invalid transaction')
+          }  
+      })
+  });
+  
+  router.get('/success', (req, res) => {
+    const payerId = req.query.PayerID;
+    const paymentId = req.query.paymentId;
+  
+    const execute_payment_json = {
+      "payer_id": payerId,
+      "transactions": [{
+          "amount": {
+              "currency": "USD",
+              "total": "25.00"
+          }
+      }]
+    };
+  
+    paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
+      if (error) {
+          console.log(error.response);
+          throw error;
+      } else {
+          console.log(JSON.stringify(payment));
+          res.send('Success');
+      }
+  });
+  });
+  
+  router.get('/cancel', (req, res) => res.send('Cancelled'));
 
 module.exports = router;
