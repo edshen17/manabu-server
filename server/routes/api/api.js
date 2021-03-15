@@ -646,6 +646,50 @@ router.get('/utils/exchangeRate', VerifyToken, (req, res, next) => {
     return res.status(200).send(exchangeRate);
 });
 
+// Route for validating transaction information
+router.get('/utils/verifyTransactionData', VerifyToken, (req, res, next) => {
+    if (!req.role) req.role = 'user';
+    const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId } = req.query
+    Teacher.findOne({
+        userId: hostedBy,
+    }).lean().then((teacher) => {
+        if (!teacher) return res.status(404).send('no teacher found')
+        else {
+            User.findById(hostedBy).lean().then((teacherUser) => {
+                User.findById(reservedBy).lean().then((user) => {
+                    if (!user) return res.status(404).send('no user found')
+                    else {
+                        Package.findById(selectedPackageId).lean().then((pkg) => {
+                            if (!pkg) return res.status(404).send('no user found')
+                            else {
+                                const { packageType, packageDurations } = pkg
+                                const subscriptionRes = ['yes', 'no']
+                                if (packageType == selectedPlan && packageDurations.includes(parseInt(selectedDuration)) && subscriptionRes.includes(selectedSubscription)) {
+                                    const teacherFilter = roles.can(req.role).readAny('teacherProfile')
+                                    teacher.userId = teacher.userId.toString()
+                                    const teacherData = teacherFilter.filter(teacher);
+                                    teacherData.profileImage = teacherUser.profileImage;
+                                    teacherData.name = teacherUser.name
+                                    return res.status(200).json({
+                                        teacherData,
+                                        reservedBy: user._id,
+                                        selectedPlan,
+                                        selectedDuration,
+                                        selectedSubscription,
+                                        selectedPackageId,
+                                    })
+                                } else {
+                                    return res.status(500).send('invalid transaction')
+                                }
+                            }
+                        })
+                    }
+                })
+            })
+        }
+    })
+});
+
 // enable router to use middleware
 router.use(function(user, req, res, next) {
     if (!req.role) req.role = 'user';
