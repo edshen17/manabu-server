@@ -2,12 +2,13 @@ const User = require('../models/User');
 const Teacher = require('../models/Teacher');
 const Package = require('../models/Package');
 const roles = require('./controller/roles').roles;
-
+const fx = require('money');
 // verify transaction data from client
 const verifyTransactionData = async (req, res, exchangeRate) => {
     if (!req.role) req.role = 'user';
     if (Object.keys(req.query).length === 0) req.query = req.body; // if using the paypal route/no query but data on body
-    const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId } = req.query
+    fx.rates = exchangeRate;
+    const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId, selectedLanguage } = req.query
     const teacher = await Teacher.findOne({
         userId: hostedBy,
     }).lean();
@@ -38,13 +39,15 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
 
             else {
                 const { packageType, packageDurations } = pkg
-                const subscriptionRes = ['yes', 'no']
-                if (packageType == selectedPlan && packageDurations.includes(parseInt(selectedDuration)) && subscriptionRes.includes(selectedSubscription)) {
+                const subscriptionRes = ['yes', 'no'];
+                const isTeachingLanguage = teacher.teachingLanguages.findIndex((lang) => { return lang.language == selectedLanguage }) != -1;
+                if (packageType == selectedPlan && packageDurations.includes(parseInt(selectedDuration)) && subscriptionRes.includes(selectedSubscription) && isTeachingLanguage) {
                     const teacherFilter = roles.can(req.role).readAny('teacherProfile')
                     teacher.userId = teacher.userId.toString()
                     const teacherData = teacherFilter.filter(teacher);
                     teacherData.profileImage = teacherUser.profileImage;
                     teacherData.name = teacherUser.name
+                    const transactionPrice = fx.convert(pkg.priceDetails.hourlyPrice * (parseInt(selectedDuration)/60) * pkg.lessonAmount, {from: pkg.priceDetails.currency, to: 'USD'})
                     return {
                         status: 200,
                         teacherData,
@@ -52,8 +55,10 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
                         selectedPlan,
                         selectedDuration,
                         selectedSubscription,
+                        selectedLanguage,
                         pkg,
                         exchangeRate,
+                        transactionPrice,
                     }
                 } else {
                     return {

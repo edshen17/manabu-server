@@ -23,7 +23,7 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  priceDetails: {
+  transactionDetails: {
     type: Object,
     required: false,
   },
@@ -41,18 +41,27 @@ const PackageTransactionSchema = new mongoose.Schema({
   },
   remainingReschedules: {
     type: Number,
-    required: true,
+    required: false,
+    default: 5,
   },
   lessonLanguage: {
     type: String,
     required: true,
-  }
+  },
+  isSubscription: {
+    type: Boolean,
+    required: true,
+  },
+  methodData: {
+    type: Object,
+    required: false,
+  },
 });
 
-PackageTransactionSchema.pre('save', async function() { 
-  const package = await Package.findById(this.packageId);
-  this.set({ transactionPrice: package.price });
- });
+// PackageTransactionSchema.pre('save', async function() { 
+//   const package = await Package.findById(this.packageId);
+//   this.set({ transactionPrice: package.price });
+//  });
 
 
 const PackageTransaction = mongoose.model('PackageTransaction', PackageTransactionSchema);

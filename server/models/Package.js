@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const PackageSchema = new mongoose.Schema({
-  teacherId: { 
+  hostedBy: { 
       type: Schema.Types.ObjectId, 
       required: true 
     },
