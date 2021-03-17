@@ -8,7 +8,7 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
     if (!req.role) req.role = 'user';
     if (Object.keys(req.query).length === 0) req.query = req.body; // if using the paypal route/no query but data on body
     fx.rates = exchangeRate;
-    const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId, selectedLanguage } = req.query
+    const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId, selectedLanguage, selectedMethod } = req.query
     const teacher = await Teacher.findOne({
         userId: hostedBy,
     }).lean();
@@ -47,7 +47,21 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
                     const teacherData = teacherFilter.filter(teacher);
                     teacherData.profileImage = teacherUser.profileImage;
                     teacherData.name = teacherUser.name
-                    const transactionPrice = fx.convert(pkg.priceDetails.hourlyPrice * (parseInt(selectedDuration)/60) * pkg.lessonAmount, {from: pkg.priceDetails.currency, to: 'USD'})
+                    let transactionPrice;
+                    let subTotal;
+                    const paymentMethods = {
+                        'PayPal': .045,
+                        'Credit / Debit Card': 0,
+                    }
+
+                    if (selectedMethod) { // payment check
+                        subTotal = fx.convert(pkg.priceDetails.hourlyPrice * (parseInt(selectedDuration)/60) * pkg.lessonAmount, {from: pkg.priceDetails.currency, to: 'SGD'})
+                        transactionPrice = fx.convert((pkg.priceDetails.hourlyPrice * (parseInt(selectedDuration)/60) * pkg.lessonAmount) * (1 + paymentMethods[selectedMethod]), {from: pkg.priceDetails.currency, to: 'SGD'})
+                    } else { // pre payment
+                        transactionPrice = fx.convert(pkg.priceDetails.hourlyPrice * (parseInt(selectedDuration)/60) * pkg.lessonAmount, {from: pkg.priceDetails.currency, to: 'SGD'})
+                        subTotal = transactionPrice;
+
+                    }
                     return {
                         status: 200,
                         teacherData,
@@ -59,6 +73,8 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
                         pkg,
                         exchangeRate,
                         transactionPrice,
+                        selectedMethod,
+                        subTotal,
                     }
                 } else {
                     return {

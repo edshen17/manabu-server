@@ -719,50 +719,209 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                 pkg,
                 exchangeRate,
                 selectedLanguage,
-                transactionPrice
+                transactionPrice,
+                selectedMethod,
             } = transactionData
             fx.rates = exchangeRate;
-            const create_payment_json = {
-                "intent": "sale",
-                "payer": {
-                    "payment_method": "paypal"
-                },
-                "redirect_urls": {
-                    "return_url": `http://localhost:5000/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}`,
-                    "cancel_url": "http://localhost:5000/api/cancel"
-                },
-                "transactions": [{
-                    "item_list": {
-                        "items": [{
-                            "name": `${selectedPlan} plan @ ${selectedDuration} minutes by ${teacherData.name}:${teacherData.userId}`,
-                            "sku": `${pkg._id}`,
-                            "price": `${transactionPrice.toFixed(2)}`,
-                            "currency": 'USD',
-                            "quantity": 1
-                        }]
+            if (selectedSubscription != 'yes') { //not subscription
+                const create_payment_json = {
+                    "intent": "sale",
+                    "payer": {
+                        "payment_method": "paypal"
                     },
-                    "amount": {
-                        "currency": 'USD',
-                        "total": `${transactionPrice.toFixed(2)}`
+                    "redirect_urls": {
+                        "return_url": `http://localhost:5000/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
+                        "cancel_url": "http://localhost:5000/api/cancel"
                     },
-                    "description": `${selectedPlan} plan @ ${selectedDuration} minutes by ${teacherData.name}:${teacherData.userId}`
-                }]
-            };
+                    "transactions": [{
+                        "item_list": {
+                            "items": [{
+                                "name": `${selectedPlan} plan @ ${selectedDuration} minutes by ${teacherData.name}:${teacherData.userId}`,
+                                "sku": `${pkg._id}`,
+                                "price": `${transactionPrice.toFixed(2)}`,
+                                "currency": 'SGD',
+                                "quantity": 1
+                            }]
+                        },
+                        "amount": {
+                            "currency": 'SGD',
+                            "total": `${transactionPrice.toFixed(2)}`
+                        },
+                        "description": `${selectedPlan} plan @ ${selectedDuration} minutes by ${teacherData.name}:${teacherData.userId}`
+                    }]
+                };
 
-            paypal.payment.create(create_payment_json, function(err, payment) {
-                if (err) {
-                    console.log(err)
-                    handleErrors(err, req, res, next)
-                } else {
-                    for (let i = 0; i < payment.links.length; i++) {
-                        if (payment.links[i].rel === 'approval_url') {
-                            return res.status(200).json({
-                                redirectLink: payment.links[i].href
-                            });
+                paypal.payment.create(create_payment_json, function(err, payment) {
+                    if (err) {
+                        handleErrors(err, req, res, next)
+                    } else {
+                        for (let i = 0; i < payment.links.length; i++) {
+                            if (payment.links[i].rel === 'approval_url') {
+                                return res.status(200).json({
+                                    redirectLink: payment.links[i].href
+                                });
+                            }
                         }
                     }
-                }
-            });
+                });
+            } 
+//             else { //subscription
+            
+//                 var d = new Date(Date.now() + 1*60*1000);
+//     d.setSeconds(d.getSeconds() + 4);
+//     var isDate = d.toISOString();
+//     var isoDate = isDate.slice(0, 19) + 'Z';
+
+//     var billingPlanAttributes = {
+//         "description": "Clearly Next Subscription.",
+//         "merchant_preferences": {
+//             "auto_bill_amount": "yes",
+//             "cancel_url": "http://localhost:5000/api/cancel",
+//             "initial_fail_amount_action": "continue",
+//             "max_fail_attempts": "2",
+//             "return_url": "http://localhost:5000/api/processSubscription",
+//             "setup_fee": {
+//                 "currency": "USD",
+//                 "value": "25"
+//             }
+//         },
+//         "name": "Testing1-Regular1",
+//         "payment_definitions": [
+//             {
+//                 "amount": {
+//                     "currency": "USD",
+//                     "value": "100"
+//                 },
+//                 "charge_models": [
+//                     {
+//                         "amount": {
+//                             "currency": "USD",
+//                             "value": "10.60"
+//                         },
+//                         "type": "SHIPPING"
+//                     },
+//                     {
+//                         "amount": {
+//                             "currency": "USD",
+//                             "value": "20"
+//                         },
+//                         "type": "TAX"
+//                     }
+//                 ],
+//                 "cycles": "0",
+//                 "frequency": "MONTH",
+//                 "frequency_interval": "1",
+//                 "name": "Regular 1",
+//                 "type": "REGULAR"
+//             },
+//             {
+//                 "amount": {
+//                     "currency": "USD",
+//                     "value": "20"
+//                 },
+//                 "charge_models": [
+//                     {
+//                         "amount": {
+//                             "currency": "USD",
+//                             "value": "10.60"
+//                         },
+//                         "type": "SHIPPING"
+//                     },
+//                     {
+//                         "amount": {
+//                             "currency": "USD",
+//                             "value": "20"
+//                         },
+//                         "type": "TAX"
+//                     }
+//                 ],
+//                 "cycles": "4",
+//                 "frequency": "MONTH",
+//                 "frequency_interval": "1",
+//                 "name": "Trial 1",
+//                 "type": "TRIAL"
+//             }
+//         ],
+//         "type": "INFINITE"
+//     };
+
+//     var billingPlanUpdateAttributes = [
+//         {
+//             "op": "replace",
+//             "path": "/",
+//             "value": {
+//                 "state": "ACTIVE"
+//             }
+//         }
+//     ];
+
+//     var billingAgreementAttributes = {
+//         "name": "Fast Speed Agreement",
+//         "description": "Agreement for Fast Speed Plan",
+//         "start_date": isoDate,
+//         "plan": {
+//             "id": "P-0NJ10521L3680291SOAQIVTQ"
+//         },
+//         "payer": {
+//             "payment_method": "paypal"
+//         },
+//         "shipping_address": {
+//             "line1": "StayBr111idge Suites",
+//             "line2": "Cro12ok Street",
+//             "city": "San Jose",
+//             "state": "CA",
+//             "postal_code": "95112",
+//             "country_code": "US"
+//         }
+//     };
+
+// // Create the billing plan
+//     paypal.billingPlan.create(billingPlanAttributes, function (error, billingPlan) {
+//         if (error) {
+//             console.log(error);
+//             throw error;
+//         } else {
+//             console.log("Create Billing Plan Response");
+//             console.log(billingPlan);
+
+//             // Activate the plan by changing status to Active
+//             paypal.billingPlan.update(billingPlan.id, billingPlanUpdateAttributes, function (error, response) {
+//                 if (error) {
+//                     console.log(error);
+//                     throw error;
+//                 } else {
+//                     console.log("Billing Plan state changed to " + billingPlan.state);
+//                     billingAgreementAttributes.plan.id = billingPlan.id;
+
+//                     // Use activated billing plan to create agreement
+//                     paypal.billingAgreement.create(billingAgreementAttributes, function (error, billingAgreement) {
+//                         if (error) {
+//                             console.log(error);
+//                             throw error;
+//                         } else {
+//                             console.log("Create Billing Agreement Response");
+//                             //console.log(billingAgreement);
+//                             for (var index = 0; index < billingAgreement.links.length; index++) {
+//                                 if (billingAgreement.links[index].rel === 'approval_url') {
+//                                     var approval_url = billingAgreement.links[index].href;
+//                                     console.log("For approving subscription via Paypal, first redirect user to");
+//                                     console.log(approval_url);
+//                                     res.redirect(approval_url);
+
+//                                     // console.log("Payment token is");
+//                                     // console.log(url.parse(approval_url, true).query.token);
+//                                     // See billing_agreements/execute.js to see example for executing agreement
+//                                     // after you have payment token
+//                                 }
+//                             }
+//                         }
+//                     });
+//                 }
+//             });
+//         }
+//     });
+                  
+//             }
         } else {
             return res.status(500).send('invalid transaction')
         }
@@ -775,7 +934,6 @@ router.get('/success', (req, res, next) => {
     const paymentId = req.query.paymentId;
     verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
         if (transactionData.status == 200) {
-
             const {
                 teacherData,
                 reservedBy,
@@ -785,21 +943,23 @@ router.get('/success', (req, res, next) => {
                 selectedLanguage,
                 pkg,
                 exchangeRate,
-                transactionPrice
+                transactionPrice,
+                subTotal,
             } = transactionData
+            console.log(transactionPrice)
             const execute_payment_json = {
                 "payer_id": payerId,
                 "transactions": [{
                     "amount": {
-                        "total": transactionData.transactionPrice.toFixed(2),
-                        "currency": 'USD',
+                        "total": transactionPrice.toFixed(2),
+                        "currency": 'SGD',
                     }
                 }]
             };
 
             paypal.payment.execute(paymentId, execute_payment_json, function(error, payment) {
                 if (error) {
-                    handleErrors(err, req, res, next)
+                    handleErrors(error, req, res, next)
                 } else {
                     const newPackageTransaction = new PackageTransaction({
                         hostedBy: teacherData.userId,
@@ -807,7 +967,8 @@ router.get('/success', (req, res, next) => {
                         reservedBy,
                         reservationLength: selectedDuration,
                         transactionDetails: {
-                            currency: payment.transactions[0].amount.currency,
+                            currency: payment.transactions[0].amount.currency.toFixed(2),
+                            subTotal,
                             total: payment.transactions[0].amount.total,
                         },
                         terminationDate: dayjs().add(1, 'month').toDate(),
@@ -866,5 +1027,20 @@ router.get('/success', (req, res, next) => {
 });
 
 router.get('/cancel', (req, res) => res.redirect('http://localhost:8080/payment'));
+
+// Route for validating transaction information
+// router.get('/processSubscription', VerifyToken, async (req, res, next) => {
+//     var token = req.query.token;
+//     console.log(token,'tokentoken');
+//     paypal.billingAgreement.execute(token, {}, function (error, billingAgreement) {
+//         if (error) {
+//             console.error(error);
+//             throw error;
+//         } else {
+//             console.log(JSON.stringify(billingAgreement));
+//             res.send({message:'Billing Agreement Created Successfully',data:JSON.stringify(billingAgreement)});
+//         }
+//     });
+// });
 
 module.exports = router;
