@@ -56,6 +56,7 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Object,
     required: false,
   },
+  packageData: { type: Package, required: true },
 });
 
 // PackageTransactionSchema.pre('save', async function() { 
