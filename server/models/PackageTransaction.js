@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Package = require('./Package');
+const Package = require('./Package').Package;
 
 const PackageTransactionSchema = new mongoose.Schema({
   hostedBy: { 
@@ -56,13 +56,13 @@ const PackageTransactionSchema = new mongoose.Schema({
     type: Object,
     required: false,
   },
-  packageData: { type: Package, required: true },
+  packageData: { type: Object, required: false },
 });
 
-// PackageTransactionSchema.pre('save', async function() { 
-//   const package = await Package.findById(this.packageId);
-//   this.set({ transactionPrice: package.price });
-//  });
+PackageTransactionSchema.pre('save', async function() { 
+  const package = await Package.findById(this.packageId, { packageDurations: 0, hostedBy: 0, _id: 0, priceDetails: 0, isOffering: 0, }).lean();
+  this.set({ packageData: package });
+ });
 
 
 const PackageTransaction = mongoose.model('PackageTransaction', PackageTransactionSchema);

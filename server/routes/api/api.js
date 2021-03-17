@@ -821,7 +821,6 @@ router.get('/success', (req, res, next) => {
                             method: 'PayPal',
                             paymentId: payment.id,
                         },
-                        packageData: pkg,
                     })
                     PackageTransaction.findOne({
                         methodData: {
