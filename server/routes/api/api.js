@@ -864,7 +864,7 @@ router.get('/success', (req, res, next) => {
                                             if (err) return handleErrors(err, req, res, next);
                                             else {
                                                 newPackageTransaction.save().then((newTrans) => {
-                                                    return res.redirect(`http://localhost:8080/calendar/${newTrans.hostedBy}/${newTrans._id}`)
+                                                    return res.redirect(`http://manabu.sg/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                                 }).catch((err) => {
                                                     return handleErrors(err, req, res, next)
                                                 });
@@ -872,7 +872,7 @@ router.get('/success', (req, res, next) => {
                                         })
                                     } else {
                                         newPackageTransaction.save().then((newTrans) => {
-                                            return res.redirect(`http://localhost:8080/calendar/${newTrans.hostedBy}/${newTrans._id}`)
+                                            return res.redirect(`http://manabu.sg/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                         }).catch((err) => {
                                             return handleErrors(err, req, res, next)
                                         });
@@ -889,7 +889,7 @@ router.get('/success', (req, res, next) => {
     })
 });
 
-router.get('/cancel', (req, res) => res.redirect('http://localhost:8080/payment'));
+router.get('/cancel', (req, res) => res.redirect('http://manabu.sg/payment'));
 
 // Route for validating transaction information
 // router.get('/processSubscription', VerifyToken, async (req, res, next) => {
