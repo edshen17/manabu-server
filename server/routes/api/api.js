@@ -751,8 +751,8 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                         "payment_method": "paypal"
                     },
                     "redirect_urls": {
-                        "return_url": `http://localhost:5000/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
-                        "cancel_url": "http://localhost:5000/api/cancel"
+                        "return_url": `http://manabu.sg/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
+                        "cancel_url": "http://manabu.sg/api/cancel"
                     },
                     "transactions": [{
                         "item_list": {
