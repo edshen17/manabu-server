@@ -635,7 +635,6 @@ router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, 
     })
     .lean()
     .then((transactions) => {
-        if (transactions.length == 0) return res.status(404).send('no transactions found');
         return res.status(200).json(transactions);
     }).catch((err) => handleErrors(err, req, res, next))
 });
