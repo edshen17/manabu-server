@@ -611,14 +611,36 @@ router.post('/transaction/packageTransaction', VerifyToken, (req, res, next) => 
 });
 
 //TODO TO DO only those related can get
-router.get('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
-    PackageTransaction.findById(req.params.tId)
+router.get('/transaction/packageTransaction/:transactionId', VerifyToken, (req, res, next) => {
+    PackageTransaction.findById(req.params.transactionId)
         .lean()
         .then((transaction) => {
             if (!transaction) return res.status(404).send('a transaction with that id was not found');
             return res.status(200).json(transaction)
         }).catch((err) => handleErrors(err, req, res, next));
 });
+
+//get all transactions by a user
+// todo only does related can access
+router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, next) => {
+    PackageTransaction.find({
+        isTerminated: false,
+        $or: [{
+            reservedBy: req.params.uId
+        }, {
+            hostedBy: req.params.uId
+        }]
+    }, { methodData: 0, }).sort({
+        transactionDate: 1
+    })
+    .lean()
+    .then((transactions) => {
+        if (transactions.length == 0) return res.status(404).send('no transactions found');
+        return res.status(200).json(transactions);
+    }).catch((err) => handleErrors(err, req, res, next))
+});
+
+
 //TODO TO DO only those related can get
 router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
     MinuteBank.findOne({

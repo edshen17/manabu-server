@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Package = require('./Package').Package;
+const User = require('./User');
 
 const PackageTransactionSchema = new mongoose.Schema({
   hostedBy: { 
@@ -57,11 +58,24 @@ const PackageTransactionSchema = new mongoose.Schema({
     required: false,
   },
   packageData: { type: Object, required: false },
+  hostedByData: { type: Object, required: false },
+  reservedByData: { type: Object, required: false },
 });
 
 PackageTransactionSchema.pre('save', async function() { 
-  const package = await Package.findById(this.packageId, { packageDurations: 0, hostedBy: 0, _id: 0, priceDetails: 0, isOffering: 0, }).lean();
-  this.set({ packageData: package });
+  const options = {
+    email: 0,
+    password: 0,
+    settings: 0,
+    profileBio: 0,
+    _id: 0,
+    lastOnline: 0,
+    dateRegistered: 0,
+  }
+  const hostedByData = await User.findById(this.hostedBy, options).lean();
+  const reservedByData = await User.findById(this.reservedBy, options).lean();
+  const packageData = await Package.findById(this.packageId, { packageDurations: 0, hostedBy: 0, _id: 0, priceDetails: 0, isOffering: 0, }).lean();
+  this.set({ hostedByData, reservedByData, packageData, });
  });
 
 
