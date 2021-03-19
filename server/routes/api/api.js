@@ -196,7 +196,7 @@ router.post('/glogin', (req, res, next) => {
                                     userId: user._id,
                                 });
                                 newTeacher.save().catch((err) => {
-                                    return res.status(500).send(err)
+                                    console.log(err);
                                 });
                             }
                             returnToken(res, user);
@@ -409,6 +409,7 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
 })
 
 // Route for editing/confirming an appointment
+// todo only self can do this
 router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAccess('updateOwn', 'appointment'), (req, res, next) => {
     Appointment.findOneAndUpdate({
             _id: req.params.aId
@@ -422,6 +423,7 @@ router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAcce
 });
 
 // POST route to create/edit package(s)
+// to do update so just PUT
 router.post('/transaction/package', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
     const {
         hostedBy,
