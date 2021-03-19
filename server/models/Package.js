@@ -29,7 +29,7 @@ const PackageSchema = new mongoose.Schema({
   packageType: {
     type: String,
     required: true,
-    enum: ['vigorous', 'moderate', 'light', 'internal']
+    enum: ['mainichi', 'moderate', 'light', 'internal']
   },
   packageDurations: {
     type: Array,

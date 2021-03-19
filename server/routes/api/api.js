@@ -30,7 +30,7 @@ const client = new OAuth2Client(process.env.G_CLIENTID);
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
 paypal.configure({
-    'mode': 'sandbox', //sandbox or live
+    'mode': 'sandbox', //sandbox or live, change to use process env
     'client_id': 'AREj6Q7nYtjH61bzVVlRdlhJ60n1j_VpkLEsKN450WcHATfLIpjuAFos4_75fTYYehQhLgv0lC_qGyqP',
     'client_secret': 'EBrZ8Kk449KcqA5iL4CwkFLSpnIy2oLqgZT5q8aI7kA4Qp7vyTagaqP4u0GKhvRVZWRJtlXjMhsDR2oc'
 });
@@ -142,8 +142,6 @@ router.get('/myTeachers', VerifyToken, accessController.grantAccess('readOwn', '
         return res.status(200).json(minuteBanks);
     }).catch((err) => handleErrors(err, req, res, next));
 });
-
-
 
 // route to get access to user's public information
 router.get('/user/:uId', VerifyToken, function(req, res, next) {
@@ -568,56 +566,6 @@ router.get('/transaction/package/:hostedBy', VerifyToken, (req, res, next) => {
         }).catch((err) => handleErrors(err, req, res, next));
 });
 
-// create package transaction
-router.post('/transaction/packageTransaction', VerifyToken, (req, res, next) => {
-    // TO DO: check hostedby or reservedby = req.userId so only those related to transaction can create & filter sensitive data
-    const newPackageTransaction = new PackageTransaction(req.body);
-
-    function createPackageTransaction() {
-        newPackageTransaction.save((err, packageTrans) => {
-            if (err) return handleErrors(err, req, res, next);
-            return res.status(200).json(packageTrans)
-        })
-    }
-    PackageTransaction.find({
-            hostedBy: req.body.hostedBy,
-            packageId: req.body.packageId,
-            reservedBy: req.body.reservedBy,
-            transactionDate: {
-                $gte: dayjs().subtract(29, 'days').toDate()
-            }, // no package transaction within the last month
-        })
-        .lean()
-        .then((transactions) => {
-            if (transactions && transactions.length > 0) { // transaction already exists
-                return res.status(200).send(transactions[0]);
-            } else {
-                MinuteBank.findOne({
-                        hostedBy: req.body.hostedBy,
-                        reservedBy: req.body.reservedBy,
-                    })
-                    .lean()
-                    .then((minutebank) => {
-                        if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
-                            const newMinuteBank = new MinuteBank({
-                                hostedBy: req.body.hostedBy,
-                                reservedBy: req.body.reservedBy
-                            })
-                            newMinuteBank.save((err, minutebank) => {
-                                if (err) return handleErrors(err, req, res, next);
-                                else {
-                                    createPackageTransaction();
-                                }
-                            })
-                        } else {
-                            createPackageTransaction();
-                        }
-
-                    }).catch((err) => handleErrors(err, req, res, next))
-            }
-        }).catch((err) => handleErrors(err, req, res, next))
-});
-
 //TODO TO DO only those related can get
 router.get('/transaction/packageTransaction/:transactionId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.transactionId)
@@ -703,7 +651,7 @@ router.use(function(user, req, res, next) {
     Teacher.findOne({
         userId: user._id
     }).lean().then((teacher) => {
-        // need to toString ids so accesscontrol filters correctly
+        // need to toString ids so accesscontrol filters correctly (refactor to just use filter on mongoose)
         user._id = user._id.toString()
         const teacherFilter = roles.can(req.role).readAny('teacherProfile')
         const selfFilter = roles.can(req.role).readOwn('userProfile')
@@ -800,7 +748,7 @@ router.post('/pay', VerifyToken, (req, res, next) => {
     })
 });
 
-// TODO REFACTOR minutebank
+// on paypal success
 router.get('/success', (req, res, next) => {
     const payerId = req.query.PayerID;
     const paymentId = req.query.paymentId;
@@ -809,7 +757,7 @@ router.get('/success', (req, res, next) => {
     verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
         if (transactionData.status == 200) {
             const {
-                teacherData,
+                teacherUserData,
                 reservedBy,
                 selectedDuration,
                 selectedSubscription,
@@ -817,6 +765,7 @@ router.get('/success', (req, res, next) => {
                 pkg,
                 transactionPrice,
                 subTotal,
+                userData,
             } = transactionData
             const execute_payment_json = {
                 "payer_id": payerId,
@@ -833,7 +782,7 @@ router.get('/success', (req, res, next) => {
                     handleErrors(error, req, res, next)
                 } else {
                     const newPackageTransaction = new PackageTransaction({
-                        hostedBy: teacherData.userId,
+                        hostedBy: teacherUserData._id,
                         packageId: pkg._id,
                         reservedBy,
                         reservationLength: selectedDuration,
@@ -850,6 +799,9 @@ router.get('/success', (req, res, next) => {
                             method: 'PayPal',
                             paymentId: payment.id,
                         },
+                        hostedByData: teacherUserData,
+                        reservedByData: userData,
+                        packageData: pkg,
                     })
                     PackageTransaction.findOne({
                         methodData: {
@@ -862,11 +814,13 @@ router.get('/success', (req, res, next) => {
                                     reservedBy: newPackageTransaction.reservedBy,
                                 })
                                 .lean()
-                                .then((minutebank) => {
+                                .then(async (minutebank) => {
                                     if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
                                         const newMinuteBank = new MinuteBank({
                                             hostedBy: newPackageTransaction.hostedBy,
                                             reservedBy: newPackageTransaction.reservedBy,
+                                            hostedByData: teacherUserData,
+                                            reservedByData: userData,
                                         })
                                         newMinuteBank.save((err, minutebank) => {
                                             if (err) return handleErrors(err, req, res, next);
@@ -899,11 +853,15 @@ router.get('/success', (req, res, next) => {
 
 // route to redirect paypal
 router.get('/calendar/:hostedBy/:tId', (req, res) => {
-    res.redirect(`http://localhost:8080/calendar/${req.params.hostedBy}/${req.params.tId}`)
+    const hostUrl = req.protocol + '://' + `localhost:8080`;
+    res.redirect(`${hostUrl}/calendar/${req.params.hostedBy}/${req.params.tId}`)
 });
 
 
-router.get('/cancel', (req, res) => res.redirect('http://localhost:8080/payment'));
+router.get('/cancel', (req, res) => {
+    const hostUrl = req.protocol + '://' + `localhost:8080`;
+    res.redirect(`${hostUrl}/payment`)
+});
 
 // Route for validating transaction information
 // router.get('/processSubscription', VerifyToken, async (req, res, next) => {

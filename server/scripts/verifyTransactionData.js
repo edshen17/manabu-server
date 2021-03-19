@@ -9,19 +9,27 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
     if (Object.keys(req.query).length === 0) req.query = req.body; // if using the paypal route/no query but data on body
     fx.rates = exchangeRate;
     const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId, selectedLanguage, selectedMethod } = req.query
-    const teacher = await Teacher.findOne({
+    const teacherData = await Teacher.findOne({
         userId: hostedBy,
-    }).lean();
+    }, { _id: 0, licensePath: 0, }).lean();
 
-    if (!teacher) {
+    if (!teacherData) {
         return {
             status: 404,
             message: 'no teacher'
         }
     }
     else {
-        const teacherUser = await User.findById(hostedBy).lean();
-        const user =  await User.findById(reservedBy).lean();
+        const options = {
+            password: 0,
+            settings: 0,
+            profileBio: 0,
+            lastOnline: 0,
+            dateRegistered: 0,
+          }
+
+        const teacherUserData = await User.findById(hostedBy, options).lean().catch((err) => {err});
+        const user =  await User.findById(reservedBy, options).lean().catch((err) => {err});
         if (!user) {
             return {
                 status: 404,
@@ -40,13 +48,8 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
             else {
                 const { packageType, packageDurations } = pkg
                 const subscriptionRes = ['yes', 'no'];
-                const isTeachingLanguage = teacher.teachingLanguages.findIndex((lang) => { return lang.language == selectedLanguage }) != -1;
+                const isTeachingLanguage = teacherData.teachingLanguages.findIndex((lang) => { return lang.language == selectedLanguage }) != -1;
                 if (packageType == selectedPlan && packageDurations.includes(parseInt(selectedDuration)) && subscriptionRes.includes(selectedSubscription) && isTeachingLanguage) {
-                    const teacherFilter = roles.can(req.role).readAny('teacherProfile')
-                    teacher.userId = teacher.userId.toString()
-                    const teacherData = teacherFilter.filter(teacher);
-                    teacherData.profileImage = teacherUser.profileImage;
-                    teacherData.name = teacherUser.name
                     let transactionPrice;
                     let subTotal;
                     const paymentMethods = {
@@ -65,7 +68,7 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
                     return {
                         status: 200,
                         teacherData,
-                        reservedBy: user._id,
+                        reservedBy,
                         selectedPlan,
                         selectedDuration,
                         selectedSubscription,
@@ -75,6 +78,8 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
                         transactionPrice,
                         selectedMethod,
                         subTotal,
+                        teacherUserData,
+                        userData: user,
                     }
                 } else {
                     return {
