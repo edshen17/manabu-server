@@ -45,6 +45,13 @@ const exchangeRateScheduler = async () => {
 }
 exchangeRateScheduler()
 
+let hostUrl = 'http://localhost:5000';
+
+if (process.env.NODE_ENV == 'production') {
+    hostUrl = `https://manabu.sg`;
+}
+
+
 // Connect to Mongodb
 mongoose.connect(db, {
         useNewUrlParser: true,
@@ -685,7 +692,6 @@ router.use(function(user, req, res, next) {
 });
 
 router.post('/pay', VerifyToken, (req, res, next) => {
-    const hostUrl = req.protocol + '://' + req.get('host');
     // handle paypal
     verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
         if (transactionData.status == 200) {
@@ -754,7 +760,6 @@ router.post('/pay', VerifyToken, (req, res, next) => {
 router.get('/success', (req, res, next) => {
     const payerId = req.query.PayerID;
     const paymentId = req.query.paymentId;
-    const hostUrl = req.protocol + '://' + req.get('host');
 
     verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
         if (transactionData.status == 200) {
@@ -855,14 +860,20 @@ router.get('/success', (req, res, next) => {
 
 // route to redirect paypal
 router.get('/calendar/:hostedBy/:tId', (req, res) => {
-    const hostUrl = req.protocol + '://' + `localhost:8080`;
-    res.redirect(`${hostUrl}/calendar/${req.params.hostedBy}/${req.params.tId}`)
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
+    res.redirect(`${host}/calendar/${req.params.hostedBy}/${req.params.tId}`)
 });
 
 
 router.get('/cancel', (req, res) => {
-    const hostUrl = req.protocol + '://' + `localhost:8080`;
-    res.redirect(`${hostUrl}/payment`)
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
+    res.redirect(`${host}/payment`)
 });
 
 // Route for validating transaction information
