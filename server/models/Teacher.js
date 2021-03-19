@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const dotenv = require('dotenv').config();
+const dayjs = require('dayjs');
+const MinuteBank = require('./MinuteBank');
+const PackageTransaction = require('./PackageTransaction');
 
 const TeacherSchema = new mongoose.Schema({
   userId: { 
@@ -38,6 +42,38 @@ const TeacherSchema = new mongoose.Schema({
       currency: 'SGD'
     },
   },
+});
+
+TeacherSchema.pre('save', async function() { 
+  const newPackageTransaction = new PackageTransaction({
+    hostedBy: process.env.MANABU_ADMIN_ID,
+    packageId: process.env.MANABU_ADMIN_PKG_ID,
+    reservedBy: this.userId,
+    reservationLength: 60,
+    transactionDetails: {
+        currency: 'SGD',
+        subTotal: "0",
+        total: "0",
+    },
+    terminationDate: dayjs().add(1, 'month').toDate(),
+    remainingAppointments: 1,
+    lessonLanguage: 'ja',
+    isSubscription: false,
+    methodData: {},
+  })
+
+  const newMinuteBank = new MinuteBank({
+    hostedBy: process.env.MANABU_ADMIN_ID,
+    reservedBy: this.userId,
+  })
+
+  newMinuteBank.save((err, minutebank) => {
+    if (!err) {
+      newPackageTransaction.save().catch((err) => { console.log(err) });
+    } else {
+      console.log(err);
+    }
+});
 });
 
 

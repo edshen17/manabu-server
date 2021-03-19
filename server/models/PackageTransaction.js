@@ -72,9 +72,12 @@ PackageTransactionSchema.pre('save', async function() {
     lastOnline: 0,
     dateRegistered: 0,
   }
-  const hostedByData = await User.findById(this.hostedBy, options).lean();
-  const reservedByData = await User.findById(this.reservedBy, options).lean();
-  const packageData = await Package.findById(this.packageId, { packageDurations: 0, hostedBy: 0, _id: 0, priceDetails: 0, isOffering: 0, }).lean();
+  const hostedByData = await User.findById(this.hostedBy, options).lean().catch((err) => {});
+  const reservedByData = await User.findById(this.reservedBy, options).lean().catch((err) => {});
+  const packageData = await Package.findById(this.packageId, { packageDurations: 0, hostedBy: 0, _id: 0, priceDetails: 0, isOffering: 0, }).lean().catch((err) => {});;
+  if (!hostedByData.membership.includes('manabu-member')) {
+    User.updateOne({ _id: this.hostedBy }, { $push: { membership: 'manabu-member' } }).catch((err) => {});;
+  }
   this.set({ hostedByData, reservedByData, packageData, });
  });
 

@@ -42,7 +42,7 @@ const AppointmentSchema = new mongoose.Schema({
 });
 
 AppointmentSchema.pre('save', async function() { 
-  const packageTransactionData = await PackageTransaction.findById(this.packageTransactionId, { methodData: 0, remainingReschedules: 0, hostedBy: 0, packageId: 0, reservedBy: 0, remainingAppointments: 0, }).lean();
+  const packageTransactionData = await PackageTransaction.findById(this.packageTransactionId, { methodData: 0, remainingReschedules: 0, hostedBy: 0, packageId: 0, reservedBy: 0, remainingAppointments: 0, }).lean().catch((err) => {});;
   this.set({ packageTransactionData });
  });
 

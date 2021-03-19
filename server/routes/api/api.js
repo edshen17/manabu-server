@@ -126,6 +126,7 @@ router.post('/register', (req, res, next) => {
 
 // route to get access to user's own information
 router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
+
     User.findById(req.userId, {
         email: 0,
         password: 0
@@ -134,6 +135,14 @@ router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProf
         next(user);
     }).catch((err) => handleErrors(err, req, res, next));
 });
+
+// route to get access to user's teachers
+router.get('/myTeachers', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
+    MinuteBank.find({ reservedBy: req.userId }).lean().then((minuteBanks) => {
+        return res.status(200).json(minuteBanks);
+    }).catch((err) => handleErrors(err, req, res, next));
+});
+
 
 
 // route to get access to user's public information
@@ -249,7 +258,6 @@ router.post('/login', function(req, res, next) {
 
             }
         }).catch((err) => handleErrors(err, req, res, next));
-
 });
 
 // Route for editing a user's profile information
@@ -473,7 +481,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                 })
 
                 const packageAmntObj = {
-                    vigorous: 21,
+                    mainichi: 22,
                     moderate: 12,
                     light: 5,
                 }
@@ -727,7 +735,7 @@ router.use(function(user, req, res, next) {
 });
 
 router.post('/pay', VerifyToken, (req, res, next) => {
-
+    const hostUrl = req.protocol + '://' + req.get('host');
     // handle paypal
     verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
         if (transactionData.status == 200) {
@@ -751,8 +759,8 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                         "payment_method": "paypal"
                     },
                     "redirect_urls": {
-                        "return_url": `http://manabu.sg/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
-                        "cancel_url": "http://manabu.sg/api/cancel"
+                        "return_url": `${hostUrl}/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
+                        "cancel_url": `${hostUrl}/api/cancel`
                     },
                     "transactions": [{
                         "item_list": {
@@ -796,17 +804,17 @@ router.post('/pay', VerifyToken, (req, res, next) => {
 router.get('/success', (req, res, next) => {
     const payerId = req.query.PayerID;
     const paymentId = req.query.paymentId;
+    const hostUrl = req.protocol + '://' + req.get('host');
+
     verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
         if (transactionData.status == 200) {
             const {
                 teacherData,
                 reservedBy,
-                selectedPlan,
                 selectedDuration,
                 selectedSubscription,
                 selectedLanguage,
                 pkg,
-                exchangeRate,
                 transactionPrice,
                 subTotal,
             } = transactionData
@@ -864,7 +872,7 @@ router.get('/success', (req, res, next) => {
                                             if (err) return handleErrors(err, req, res, next);
                                             else {
                                                 newPackageTransaction.save().then((newTrans) => {
-                                                    return res.redirect(`http://manabu.sg/calendar/${newTrans.hostedBy}/${newTrans._id}`)
+                                                    return res.redirect(`${hostUrl}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                                 }).catch((err) => {
                                                     return handleErrors(err, req, res, next)
                                                 });
@@ -872,7 +880,7 @@ router.get('/success', (req, res, next) => {
                                         })
                                     } else {
                                         newPackageTransaction.save().then((newTrans) => {
-                                            return res.redirect(`http://manabu.sg/calendar/${newTrans.hostedBy}/${newTrans._id}`)
+                                            return res.redirect(`${hostUrl}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                         }).catch((err) => {
                                             return handleErrors(err, req, res, next)
                                         });
@@ -889,7 +897,13 @@ router.get('/success', (req, res, next) => {
     })
 });
 
-router.get('/cancel', (req, res) => res.redirect('http://manabu.sg/payment'));
+// route to redirect paypal
+router.get('/calendar/:hostedBy/:tId', (req, res) => {
+    res.redirect(`http://localhost:8080/calendar/${req.params.hostedBy}/${req.params.tId}`)
+});
+
+
+router.get('/cancel', (req, res) => res.redirect('http://localhost:8080/payment'));
 
 // Route for validating transaction information
 // router.get('/processSubscription', VerifyToken, async (req, res, next) => {
