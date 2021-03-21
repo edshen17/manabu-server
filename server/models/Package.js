@@ -35,6 +35,11 @@ const PackageSchema = new mongoose.Schema({
     type: Array,
     required: true,
   },
+  tags: {
+    type: Array,
+    default: [],
+    required: false,
+  },
 });
 
 

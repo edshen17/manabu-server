@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const PackageTransaction = require('./PackageTransaction');
+const User = require('./User');
 const AppointmentSchema = new mongoose.Schema({
   hostedBy: { // user id (admin/teacher)
       type: Schema.Types.ObjectId, 
@@ -39,12 +40,29 @@ const AppointmentSchema = new mongoose.Schema({
     type: Object,
     required: false,
   },
+  locationData: {
+    type: Object,
+    default: {},
+  },
 });
 
 AppointmentSchema.pre('save', async function() { 
   const packageTransactionData = await PackageTransaction.findById(this.packageTransactionId, { methodData: 0, remainingReschedules: 0, hostedBy: 0, packageId: 0, reservedBy: 0, remainingAppointments: 0, }).lean().catch((err) => {});;
-  this.set({ packageTransactionData });
- });
+  const hostedByData = await User.findById(this.hostedBy).lean().catch((err) => {});
+  const reservedByData = await User.findById(this.reservedBy).lean().catch((err) => {});
+  const digitalLocation = hostedByData.commMethods.filter((method) => { return method.method == reservedByData.commMethods[0].method })
+  let locationData = {}
+  if (digitalLocation.length > 0) {
+    locationData = {
+      method: digitalLocation[0].method,
+      hostedByMethodId: digitalLocation[0].id,
+      reservedByMethodId: reservedByData.commMethods[0].id,
+      online: true,
+    }
+  }
+  
+  this.set({ packageTransactionData, locationData });
+ })
 
 
 const Appointment = mongoose.model('Appointment', AppointmentSchema);

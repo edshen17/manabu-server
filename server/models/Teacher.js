@@ -79,7 +79,7 @@ TeacherSchema.pre('save', async function() {
 
   if (this.teachingLanguages.length == 0) {
     const user = await User.findById(this.userId).lean().catch((err) => {});
-    const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' })
+    const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
     this.set({ teachingLanguages });
   }
 
