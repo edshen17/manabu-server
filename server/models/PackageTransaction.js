@@ -83,13 +83,6 @@ PackageTransactionSchema.pre('save', async function() {
  
 });
 
-// PackageTransactionSchema.pre('save', async function() { 
-//   if (!this.hostedByData.membership.includes('manabu-member')) {
-//     User.updateOne({ _id: this.hostedBy }, { $push: { membership: 'manabu-member' } }).catch((err) => {});;
-//   }
-//   this.set({ hostedByData, reservedByData, packageData, });
-//  });
-
 
 const PackageTransaction = mongoose.model('PackageTransaction', PackageTransactionSchema);
 module.exports = PackageTransaction;

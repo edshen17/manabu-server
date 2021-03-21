@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const dotenv = require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const cryptoRandomString = require('crypto-random-string');
+const sendVerificationEmail = require('../scripts/controller/sendVerificationEmail');
+const randToken = cryptoRandomString({length: 15});
+const verificationToken = jwt.sign({ randToken: randToken }, process.env.JWT_SECRET);
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -60,8 +66,21 @@ const UserSchema = new mongoose.Schema({
    commMethods: {
     type: Array,
     default: []
-  }
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    default: verificationToken,
+  },
 });
+
+UserSchema.pre('save', function() { 
+  sendVerificationEmail(this.email, this.verificationToken);
+});
+
 
 
 const User = mongoose.model('User', UserSchema);

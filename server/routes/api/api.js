@@ -21,6 +21,7 @@ const accessController = require('../../scripts/controller/accessController');
 const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
+
 const fx = require('money');
 let exchangeRate;
 const {
@@ -162,6 +163,26 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
         return next(user);
     }).catch((err) => handleErrors(err, req, res, next));
 });
+
+// route to get access to user's public information
+router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
+    
+    User.findOne({ verificationToken: req.params.verificationToken }).then(async function(user) {
+        if (user) {
+            user.emailVerified = true;
+            await user.save().catch((err) => { console.log(err) });
+            
+            return res.status(200).redirect(`${host}/dashboard`)
+        } else {
+            return res.status(404).send('no user found');
+        }
+    }).catch((err) => handleErrors(err, req, res, next));
+});
+
 
 router.post('/glogin', (req, res, next) => {
     const {
@@ -806,9 +827,6 @@ router.get('/success', (req, res, next) => {
                             method: 'PayPal',
                             paymentId: payment.id,
                         },
-                        hostedByData: teacherUserData,
-                        reservedByData: userData,
-                        packageData: pkg,
                     })
                     PackageTransaction.findOne({
                         methodData: {
