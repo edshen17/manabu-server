@@ -45,7 +45,8 @@ function endAppointments() {
                                                 isTerminated: true,
                                             };
                                             const updateMinuteBank = {
-                                                minuteBank: searchBank.minuteBank + 5
+                                                minuteBank: searchBank.minuteBank + 5,
+                                                lastUpdated: new Date(),
                                             }
                                             if (appointments[i].status == 'confirmed') { // add to minute bank only if confirmed
                                                 if (Math.floor((searchBank.minuteBank + 5) / packageTransaction.reservationLength) == 1) {

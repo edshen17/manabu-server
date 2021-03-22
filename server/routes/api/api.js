@@ -57,7 +57,8 @@ if (process.env.NODE_ENV == 'production') {
 mongoose.connect(db, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useFindAndModify: false
+        useFindAndModify: false,
+        ignoreUndefined: true,
     })
     .then(() => console.log('connected to MongoDB'))
     .catch(err => console.log(err));
@@ -134,13 +135,16 @@ router.post('/register', (req, res, next) => {
 
 // route to get access to user's own information
 router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
-
     User.findById(req.userId, {
         email: 0,
         password: 0
     }).lean().then(function(user) {
         if (!user) return res.status(404).send("No user found.");
         next(user);
+        User.findOneAndUpdate({ // update online
+            _id: req.params.uId
+        }, { lastOnline: new Date() }).catch((err) => { console.log(err) });
+          
     }).catch((err) => handleErrors(err, req, res, next));
 });
 
@@ -303,6 +307,83 @@ router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess
     } else {
         return res.status(401).send('You cannot modify this profile.')
     }
+});
+
+
+// route for finding/filtering teachers
+router.get('/teachers', (req, res, next) => {
+    let { 
+        dateApproved, hourlyRate, teacherType, alsoSpeaks, teachingLanguages, page
+    } = req.query;
+
+    const query = {
+        dateApproved, hourlyRate, teacherType, alsoSpeaks,
+    }
+
+    const paginationOptions = {
+        page: page || 1,
+        limit: 50,
+        sort: { dateApproved: -1 },
+        populate: 'User',
+      };
+    
+    try {
+        if (teachingLanguages) {
+            query.teachingLanguages =  JSON.parse(teachingLanguages)
+        }
+        if (alsoSpeaks) query.alsoSpeaks =  JSON.parse(alsoSpeaks)
+        if (teacherType) query.teacherType = JSON.parse(teacherType)
+        if (!dateApproved) {
+            const startDate = dayjs().subtract(7, 'days').toDate()
+            const endDate = dayjs().add(2, 'months').toDate()
+            query.dateApproved = { $gte: startDate, $lte: endDate }
+        }
+        Teacher.aggregate([ {
+            $match: { 
+                'teacherType': { 
+                  $in: query.teacherType
+                },
+                // 'teachingLanguages.language': { 
+                //     $in: ['en', 'jp']
+                //   },
+                // 'alsoSpeaks.language': { 
+                //     $in: ['en', 'zh', 'kr', 'jp']
+                //   },
+                  dateApproved: query.dateApproved
+
+              }
+        },
+            { 
+              $lookup: 
+              { 
+                from: "users",
+                localField: "userId", 
+                foreignField: "_id", 
+                as: "userData" 
+              } 
+            }, 
+            {
+              $project: 
+              {
+                'userData.settings': 0,
+                'userData.emailVerified': 0,
+                'userData.verificationToken': 0,
+                'userData.email': 0,
+              } 
+            } 
+            ]).exec(function(err, t) {
+                // console.log(t)
+            return res.status(200).json(t)
+            // students contain WorksnapsTimeEntries
+        });
+
+        // Teacher.paginate(query, paginationOptions).then((docs) => {
+        //     return res.status(200).json(docs.docs)
+        // })
+    } catch (err) {
+        console.log(err)
+    }
+  
 });
 
 // Route for editing a teacher's profile information

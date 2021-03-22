@@ -20,7 +20,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
     
       // send mail with defined transport object
       let info = await transporter.sendMail({
-        from: 'support@manabu.sg', // sender address
+        from: 'Manabu Support <support@manabu.sg>', // sender address
         to: email, // list of receivers
         subject: "Please confirm your email", // Subject line
         html: `Click <a href="${host}/api/user/verify/${verificationToken}">here</a> to verify your email.`,

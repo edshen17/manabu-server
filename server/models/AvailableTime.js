@@ -27,6 +27,9 @@ AvailableTimeSchema.pre('save', async function() {
     _id: 0,
     lastOnline: 0,
     dateRegistered: 0,
+    commMethods: 0,
+    emailVerified: 0,
+    verificationToken: 0,
   }
   const hostedByData = this.hostedByData || await User.findById(this.hostedBy, options).lean().catch((err) => {});
   

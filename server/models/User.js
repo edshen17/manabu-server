@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  languages: {
+  languages: { // all languages user knows
     type: Array,
     default: [],
   },

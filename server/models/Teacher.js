@@ -6,17 +6,27 @@ const MinuteBank = require('./MinuteBank');
 const PackageTransaction = require('./PackageTransaction');
 const User = require('./User');
 const Package = require('./Package').Package;
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const TeacherSchema = new mongoose.Schema({
   userId: { 
       type: Schema.Types.ObjectId, 
+      ref: "User",
       required: true 
+    },
+    name: {
+      type: String,
+      required: false,
     },
   dateApproved: {
     type: Date,
     required: false,
   },
-  teachingLanguages: {
+  teachingLanguages: { // subset of language array from user schema
+    type: Array,
+    default: [],
+  },
+  alsoSpeaks: {
     type: Array,
     default: [],
   },
@@ -40,9 +50,17 @@ const TeacherSchema = new mongoose.Schema({
   hourlyRate: {
     type: Object,
     default: {
-      amount: 30,
+      amount: '30',
       currency: 'SGD'
     },
+  },
+  lessonCount: {
+    type: Number,
+    default: 0,
+  },
+  studentCount: {
+    type: Number,
+    default: 0,
   },
 });
 
@@ -80,7 +98,9 @@ TeacherSchema.pre('save', async function() {
   if (this.teachingLanguages.length == 0) {
     const user = await User.findById(this.userId).lean().catch((err) => {});
     const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
-    this.set({ teachingLanguages });
+    const alsoSpeaks = user.languages.filter((lang) => { return lang.level != 'C2' });
+    const name = user.name;
+    this.set({ teachingLanguages, alsoSpeaks, name });
   }
 
   const defaultPackageDurations = [30, 60];
@@ -98,10 +118,9 @@ TeacherSchema.pre('save', async function() {
       newPackage.save().catch((err) => { console.log(err) })
 
   })
-
-
-
 });
+
+TeacherSchema.plugin(mongoosePaginate);
 
 
 const Teacher = mongoose.model('Teacher', TeacherSchema);
