@@ -113,7 +113,7 @@ TeacherSchema.pre('save', async function() {
 
   const user = await User.findById(this.userId).lean().catch((err) => {});
   const name = user.name;
-  this.set({ teachingLanguages, alsoSpeaks, name });
+  this.set({ name });
   
 });
 
