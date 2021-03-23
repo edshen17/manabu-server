@@ -30,13 +30,6 @@ const {
     OAuth2Client
 } = require('google-auth-library');
 
-const oauth2Client = new google.auth.OAuth2(
-    process.env.G_CLIENTID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    'http://localhost:5000/api/auth/google'
-);
-const client = new OAuth2Client(process.env.G_CLIENTID);
-
 const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
@@ -63,6 +56,13 @@ if (process.env.NODE_ENV == 'production') {
     hostUrl = `https://manabu.sg`;
 }
 
+const oauth2Client = new google.auth.OAuth2(
+    process.env.G_CLIENTID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    `${hostUrl}/api/auth/google`
+);
+const client = new OAuth2Client(process.env.G_CLIENTID);
+
 
 // Connect to Mongodb
 mongoose.connect(db, {
@@ -74,8 +74,7 @@ mongoose.connect(db, {
     .then(() => console.log('connected to MongoDB'))
     .catch(err => console.log(err));
 
-// return a valid jwt
-function returnToken(res, user) {
+const storeTokenCookie = (res, user) => {
     const token = jwt.sign({
         id: user._id,
         role: user.role
@@ -92,6 +91,11 @@ function returnToken(res, user) {
         maxAge: 2 * 24 * 60 * 60 * 1000,
         httpOnly: false
     })
+}
+
+// return a valid jwt
+function returnToken(res, user) {
+    storeTokenCookie(res, user)
     return res.status(200).send({
         auth: true,
         token: token
@@ -230,10 +234,14 @@ router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, ne
 // route for google logins
 router.get('/auth/google', async (req, res, next) => {
     const code = req.query.code;
-    console.log(req.query);
+    const isTeacherApp = req.query.state == 'true';
     const {
         tokens
     } = await oauth2Client.getToken(code)
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
 
     oauth2Client.setCredentials({
         access_token: tokens.access_token
@@ -247,7 +255,57 @@ router.get('/auth/google', async (req, res, next) => {
             if (err) {
                 handleErrors(err, req, res, next)
             } else {
-                res.status(200).send(gRes.data);
+                const { email, name, picture } = gRes.data
+                User.findOne({
+                    email,
+                })
+                .lean()
+                .then((user) => {
+                    if (!user) {
+                        // user does not exist, create a user from google info
+                        const newUser = new User({
+                            name,
+                            email,
+                            profileImage: picture,
+                        });
+    
+                        newUser.save((err, user) => {
+                            if (err) return res.json(err).status(500)
+                            else {
+                                if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
+                                    const newTeacher = new Teacher({
+                                        userId: user._id,
+                                    });
+                                    newTeacher.save().catch((err) => {
+                                        console.log(err);
+                                    });
+                                }
+                                storeTokenCookie(res, user)
+                                return res.status(200).redirect(`${host}/dashboard`)
+                            }
+                        });
+                    } else { // user already in db
+                        if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
+                            Teacher.findOne({
+                                    userId: user._id
+                                })
+                                .lean()
+                                .then((teacher) => {
+                                    if (!teacher) {
+                                        const newTeacher = new Teacher({
+                                            userId: user._id,
+                                        });
+                                        newTeacher.save().catch((err) => {
+                                            console.log(err)
+                                        });
+                                    }
+                                }).catch((err) => handleErrors(err, req, res, next));
+                        }
+                        storeTokenCookie(res, user)
+                        return res.status(200).redirect(`${host}/dashboard`)
+                    }
+                })
+                // res.status(200).send(gRes.data);
             }
         });
 })
