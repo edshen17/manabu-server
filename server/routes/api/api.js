@@ -59,7 +59,7 @@ if (process.env.NODE_ENV == 'production') {
 const oauth2Client = new google.auth.OAuth2(
     process.env.G_CLIENTID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${hostUrl}/api/auth/google`
+    `https://manabu.sg/api/auth/google`
 );
 const client = new OAuth2Client(process.env.G_CLIENTID);
 
