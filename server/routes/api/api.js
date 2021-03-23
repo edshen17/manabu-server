@@ -192,8 +192,8 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
 // route to get access to user's public information
 router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
     let host = hostUrl;
-    if (process.env.NODE_ENV != 'production') {
-        host = 'http://localhost:8080'
+    if (process.env.NODE_ENV == 'production') {
+        host = 'http://manabu.sg'
     }
 
     User.findOne({
@@ -239,8 +239,8 @@ router.get('/auth/google', async (req, res, next) => {
         tokens
     } = await oauth2Client.getToken(code)
     let host = hostUrl;
-    if (process.env.NODE_ENV != 'production') {
-        host = 'http://localhost:8080'
+    if (process.env.NODE_ENV == 'production') {
+        host = 'http://manabu.sg'
     }
 
     oauth2Client.setCredentials({
