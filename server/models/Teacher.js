@@ -87,32 +87,34 @@ TeacherSchema.pre('save', async function() {
     reservedBy: this.userId,
   })
 
-  newMinuteBank.save().then(() => {
-    newPackageTransaction.save().then(async () => {
-      if (this.teachingLanguages.length == 0) {
-        const user = await User.findById(this.userId).lean().catch((err) => {});
-        const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
-        const alsoSpeaks = user.languages.filter((lang) => { return lang.level != 'C2' });
-        const name = user.name;
-        this.set({ teachingLanguages, alsoSpeaks, name });
-      }
-    
-      const defaultPackageDurations = [30, 60];
-      const defaultPackageTypes = [{ type: 'mainichi', lessonAmount: 22, }, { type: 'moderate', lessonAmount: 12, }, { type: 'light', lessonAmount: 5, }];
-      const defaultPriceDetails = {
-        currency: 'SGD',
-        hourlyPrice: '30.00'
-      }
-    
-      defaultPackageTypes.forEach((pkg) => {
-        const newPackage = new Package({ isOffering: true, packageDurations: defaultPackageDurations, 
-          hostedBy: this.userId, priceDetails: defaultPriceDetails, lessonAmount: pkg.lessonAmount, 
-          packageType: pkg.type })
-    
-          newPackage.save().catch((err) => { console.log(err) })
-      })
-    }).catch((err) => { console.log(err) });
-  }).catch((err) => { console.log(err) });
+  newMinuteBank.save((err, minutebank) => {
+    if (!err) {
+      newPackageTransaction.save().catch((err) => { console.log(err) });
+    } else {
+      console.log(err);
+    }
+});
+
+  const defaultPackageDurations = [30, 60];
+  const defaultPackageTypes = [{ type: 'mainichi', lessonAmount: 22, }, { type: 'moderate', lessonAmount: 12, }, { type: 'light', lessonAmount: 5, }];
+  const defaultPriceDetails = {
+    currency: 'SGD',
+    hourlyPrice: '30.00'
+  }
+
+  defaultPackageTypes.forEach((pkg) => {
+    const newPackage = new Package({ isOffering: true, packageDurations: defaultPackageDurations, 
+      hostedBy: this.userId, priceDetails: defaultPriceDetails, lessonAmount: pkg.lessonAmount, 
+      packageType: pkg.type })
+
+      newPackage.save().catch((err) => { console.log(err) })
+
+  })
+
+  const user = await User.findById(this.userId).lean().catch((err) => {});
+  const name = user.name;
+  this.set({ teachingLanguages, alsoSpeaks, name });
+  
 });
 
 TeacherSchema.plugin(mongoosePaginate);

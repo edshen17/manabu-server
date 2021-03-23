@@ -11,7 +11,7 @@ const router = express.Router();
 const querystring = require('querystring')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios')
+const axios = require('axios');
 const dotenv = require('dotenv').config();
 const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config');
@@ -59,7 +59,7 @@ if (process.env.NODE_ENV == 'production') {
 const oauth2Client = new google.auth.OAuth2(
     process.env.G_CLIENTID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `https://manabu.sg/api/auth/google`
+    `${hostUrl}/api/auth/google`
 );
 const client = new OAuth2Client(process.env.G_CLIENTID);
 
@@ -91,11 +91,12 @@ const storeTokenCookie = (res, user) => {
         maxAge: 2 * 24 * 60 * 60 * 1000,
         httpOnly: false
     })
+    return token;
 }
 
 // return a valid jwt
 function returnToken(res, user) {
-    storeTokenCookie(res, user)
+    let token = storeTokenCookie(res, user)
     return res.status(200).send({
         auth: true,
         token: token
@@ -192,8 +193,8 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
 // route to get access to user's public information
 router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
     let host = hostUrl;
-    if (process.env.NODE_ENV == 'production') {
-        host = 'http://manabu.sg'
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
     }
 
     User.findOne({
@@ -239,8 +240,8 @@ router.get('/auth/google', async (req, res, next) => {
         tokens
     } = await oauth2Client.getToken(code)
     let host = hostUrl;
-    if (process.env.NODE_ENV == 'production') {
-        host = 'http://manabu.sg'
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
     }
 
     oauth2Client.setCredentials({
@@ -255,56 +256,60 @@ router.get('/auth/google', async (req, res, next) => {
             if (err) {
                 handleErrors(err, req, res, next)
             } else {
-                const { email, name, picture } = gRes.data
-                User.findOne({
+                const {
                     email,
-                })
-                .lean()
-                .then((user) => {
-                    if (!user) {
-                        // user does not exist, create a user from google info
-                        const newUser = new User({
-                            name,
-                            email,
-                            profileImage: picture,
-                        });
-    
-                        newUser.save((err, user) => {
-                            if (err) return res.json(err).status(500)
-                            else {
-                                if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
-                                    const newTeacher = new Teacher({
-                                        userId: user._id,
-                                    });
-                                    newTeacher.save().catch((err) => {
-                                        console.log(err);
-                                    });
-                                }
-                                storeTokenCookie(res, user)
-                                return res.status(200).redirect(`http://manabu.sg/dashboard`)
-                            }
-                        });
-                    } else { // user already in db
-                        if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
-                            Teacher.findOne({
-                                    userId: user._id
-                                })
-                                .lean()
-                                .then((teacher) => {
-                                    if (!teacher) {
+                    name,
+                    picture
+                } = gRes.data
+                User.findOne({
+                        email,
+                    })
+                    .lean()
+                    .then((user) => {
+                        if (!user) {
+                            // user does not exist, create a user from google info
+                            const newUser = new User({
+                                name,
+                                email,
+                                profileImage: picture,
+                            });
+
+                            newUser.save((err, user) => {
+                                if (err) return res.json(err).status(500)
+                                else {
+                                    if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
                                         const newTeacher = new Teacher({
                                             userId: user._id,
                                         });
                                         newTeacher.save().catch((err) => {
-                                            console.log(err)
+                                            console.log(err);
                                         });
                                     }
-                                }).catch((err) => handleErrors(err, req, res, next));
+                                    storeTokenCookie(res, user)
+                                    return res.status(200).redirect(`${host}/dashboard`)
+                                }
+                            });
+                        } else { // user already in db
+                            if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
+                                Teacher.findOne({
+                                        userId: user._id
+                                    })
+                                    .lean()
+                                    .then((teacher) => {
+                                        if (!teacher) {
+                                            const newTeacher = new Teacher({
+                                                userId: user._id,
+                                            });
+                                            newTeacher.save().catch((err) => {
+                                                console.log(err)
+                                            });
+                                        }
+                                    }).catch((err) => handleErrors(err, req, res, next));
+                            }
+                            storeTokenCookie(res, user)
+                            return res.status(200).redirect(`${host}/dashboard`)
                         }
-                        storeTokenCookie(res, user)
-                        return res.status(200).redirect(`http://manabu.sg/dashboard`)
-                    }
-                })
+                    })
                 // res.status(200).send(gRes.data);
             }
         });
@@ -479,13 +484,13 @@ router.get('/teachers', (req, res, next) => {
                     'teacherType': {
                         $in: query.teacherType
                     },
-                    // 'teachingLanguages.language': { 
-                    //     $in: ['en', 'jp']
-                    //   },
+                    'teachingLanguages.language': {
+                        $in: ['en', 'ja']
+                    },
                     // 'alsoSpeaks.language': { 
-                    //     $in: ['en', 'zh', 'kr', 'jp']
+                    //     $in: ['en', 'zh', 'kr', 'ja']
                     //   },
-                    dateApproved: query.dateApproved
+                    // dateApproved: query.dateApproved
 
                 }
             },
