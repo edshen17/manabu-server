@@ -213,23 +213,23 @@ router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, ne
 });
 
 
-// // Getting login URL
-// router.get("/auth/google/url", (req, res) => {
-//     // generate a url that asks permissions for Blogger and Google Calendar scopes
-//     const scopes = [
-//         "https://www.googleapis.com/auth/userinfo.profile",
-//         "https://www.googleapis.com/auth/userinfo.email",
-//     ];
+// Getting login URL
+router.get("/auth/google/url", (req, res) => {
+    // generate a url that asks permissions for Blogger and Google Calendar scopes
+    const scopes = [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+    ];
 
-//     const url = oauth2Client.generateAuthUrl({
-//         // 'online' (default) or 'offline' (gets refresh_token)
-//         access_type: 'offline',
-//         state: '',
-//         // If you only need one scope you can pass it as a string
-//         scope: scopes
-//     });
-//     return res.send(url);
-// });
+    const url = oauth2Client.generateAuthUrl({
+        // 'online' (default) or 'offline' (gets refresh_token)
+        access_type: 'offline',
+        state: '',
+        // If you only need one scope you can pass it as a string
+        scope: scopes
+    });
+    return res.send(url);
+});
 
 // route for google logins
 router.get('/auth/google', async (req, res, next) => {
