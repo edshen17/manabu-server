@@ -281,7 +281,7 @@ router.get('/auth/google', async (req, res, next) => {
                                     });
                                 }
                                 storeTokenCookie(res, user)
-                                return res.status(200).redirect(`${host}/dashboard`)
+                                return res.status(200).redirect(`http://manabu.sg/dashboard`)
                             }
                         });
                     } else { // user already in db
@@ -302,7 +302,7 @@ router.get('/auth/google', async (req, res, next) => {
                                 }).catch((err) => handleErrors(err, req, res, next));
                         }
                         storeTokenCookie(res, user)
-                        return res.status(200).redirect(`${host}/dashboard`)
+                        return res.status(200).redirect(`http://manabu.sg/dashboard`)
                     }
                 })
                 // res.status(200).send(gRes.data);
