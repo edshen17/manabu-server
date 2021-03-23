@@ -8,6 +8,7 @@ const Package = require('../../models/Package').Package;
 const PackageTransaction = require('../../models/PackageTransaction');
 const MinuteBank = require('../../models/MinuteBank');
 const router = express.Router();
+const querystring = require('querystring')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios')
@@ -22,12 +23,22 @@ const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
 
-const fx = require('money');
-let exchangeRate;
+const {
+    google
+} = require('googleapis');
 const {
     OAuth2Client
 } = require('google-auth-library');
+
+const oauth2Client = new google.auth.OAuth2(
+    process.env.G_CLIENTID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    'http://localhost:5000/api/auth/google'
+);
 const client = new OAuth2Client(process.env.G_CLIENTID);
+
+const fx = require('money');
+let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
 paypal.configure({
@@ -143,14 +154,20 @@ router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProf
         next(user);
         User.findOneAndUpdate({ // update online
             _id: req.params.uId
-        }, { lastOnline: new Date() }).catch((err) => { console.log(err) });
-          
+        }, {
+            lastOnline: new Date()
+        }).catch((err) => {
+            console.log(err)
+        });
+
     }).catch((err) => handleErrors(err, req, res, next));
 });
 
 // route to get access to user's teachers
 router.get('/myTeachers', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
-    MinuteBank.find({ reservedBy: req.userId }).lean().then((minuteBanks) => {
+    MinuteBank.find({
+        reservedBy: req.userId
+    }).lean().then((minuteBanks) => {
         return res.status(200).json(minuteBanks);
     }).catch((err) => handleErrors(err, req, res, next));
 });
@@ -174,18 +191,66 @@ router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, ne
     if (process.env.NODE_ENV != 'production') {
         host = 'http://localhost:8080'
     }
-    
-    User.findOne({ verificationToken: req.params.verificationToken }).then(async function(user) {
+
+    User.findOne({
+        verificationToken: req.params.verificationToken
+    }).then(async function(user) {
         if (user) {
             user.emailVerified = true;
-            await user.save().catch((err) => { console.log(err) });
-            
+            await user.save().catch((err) => {
+                console.log(err)
+            });
+
             return res.status(200).redirect(`${host}/dashboard`)
         } else {
             return res.status(404).send('no user found');
         }
     }).catch((err) => handleErrors(err, req, res, next));
 });
+
+
+// // Getting login URL
+// router.get("/auth/google/url", (req, res) => {
+//     // generate a url that asks permissions for Blogger and Google Calendar scopes
+//     const scopes = [
+//         "https://www.googleapis.com/auth/userinfo.profile",
+//         "https://www.googleapis.com/auth/userinfo.email",
+//     ];
+
+//     const url = oauth2Client.generateAuthUrl({
+//         // 'online' (default) or 'offline' (gets refresh_token)
+//         access_type: 'offline',
+//         state: '',
+//         // If you only need one scope you can pass it as a string
+//         scope: scopes
+//     });
+//     return res.send(url);
+// });
+
+// route for google logins
+router.get('/auth/google', async (req, res, next) => {
+    const code = req.query.code;
+    console.log(req.query);
+    const {
+        tokens
+    } = await oauth2Client.getToken(code)
+
+    oauth2Client.setCredentials({
+        access_token: tokens.access_token
+    });
+    var oauth2 = google.oauth2({
+        auth: oauth2Client,
+        version: 'v2'
+    });
+    oauth2.userinfo.get(
+        function(err, gRes) {
+            if (err) {
+                handleErrors(err, req, res, next)
+            } else {
+                res.status(200).send(gRes.data);
+            }
+        });
+})
 
 
 router.post('/glogin', (req, res, next) => {
@@ -312,67 +377,78 @@ router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess
 
 // route for finding/filtering teachers
 router.get('/teachers', (req, res, next) => {
-    let { 
-        dateApproved, hourlyRate, teacherType, alsoSpeaks, teachingLanguages, page
+    let {
+        dateApproved,
+        hourlyRate,
+        teacherType,
+        alsoSpeaks,
+        teachingLanguages,
+        page
     } = req.query;
 
     const query = {
-        dateApproved, hourlyRate, teacherType, alsoSpeaks,
+        dateApproved,
+        hourlyRate,
+        teacherType,
+        alsoSpeaks,
     }
 
     const paginationOptions = {
         page: page || 1,
         limit: 50,
-        sort: { dateApproved: -1 },
+        sort: {
+            dateApproved: -1
+        },
         populate: 'User',
-      };
-    
+    };
+
     try {
         if (teachingLanguages) {
-            query.teachingLanguages =  JSON.parse(teachingLanguages)
+            query.teachingLanguages = JSON.parse(teachingLanguages)
         }
-        if (alsoSpeaks) query.alsoSpeaks =  JSON.parse(alsoSpeaks)
+        if (alsoSpeaks) query.alsoSpeaks = JSON.parse(alsoSpeaks)
         if (teacherType) query.teacherType = JSON.parse(teacherType)
         if (!dateApproved) {
             const startDate = dayjs().subtract(7, 'days').toDate()
             const endDate = dayjs().add(2, 'months').toDate()
-            query.dateApproved = { $gte: startDate, $lte: endDate }
+            query.dateApproved = {
+                $gte: startDate,
+                $lte: endDate
+            }
         }
-        Teacher.aggregate([ {
-            $match: { 
-                'teacherType': { 
-                  $in: query.teacherType
-                },
-                // 'teachingLanguages.language': { 
-                //     $in: ['en', 'jp']
-                //   },
-                // 'alsoSpeaks.language': { 
-                //     $in: ['en', 'zh', 'kr', 'jp']
-                //   },
-                  dateApproved: query.dateApproved
+        Teacher.aggregate([{
+                $match: {
+                    'teacherType': {
+                        $in: query.teacherType
+                    },
+                    // 'teachingLanguages.language': { 
+                    //     $in: ['en', 'jp']
+                    //   },
+                    // 'alsoSpeaks.language': { 
+                    //     $in: ['en', 'zh', 'kr', 'jp']
+                    //   },
+                    dateApproved: query.dateApproved
 
-              }
-        },
-            { 
-              $lookup: 
-              { 
-                from: "users",
-                localField: "userId", 
-                foreignField: "_id", 
-                as: "userData" 
-              } 
-            }, 
+                }
+            },
             {
-              $project: 
-              {
-                'userData.settings': 0,
-                'userData.emailVerified': 0,
-                'userData.verificationToken': 0,
-                'userData.email': 0,
-              } 
-            } 
-            ]).exec(function(err, t) {
-                // console.log(t)
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            },
+            {
+                $project: {
+                    'userData.settings': 0,
+                    'userData.emailVerified': 0,
+                    'userData.verificationToken': 0,
+                    'userData.email': 0,
+                }
+            }
+        ]).exec(function(err, t) {
+            // console.log(t)
             return res.status(200).json(t)
             // students contain WorksnapsTimeEntries
         });
@@ -383,7 +459,7 @@ router.get('/teachers', (req, res, next) => {
     } catch (err) {
         console.log(err)
     }
-  
+
 });
 
 // Route for editing a teacher's profile information
@@ -691,19 +767,21 @@ router.get('/transaction/packageTransaction/:transactionId', VerifyToken, (req, 
 // todo only does related can access
 router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, next) => {
     PackageTransaction.find({
-        isTerminated: false,
-        $or: [{
-            reservedBy: req.params.uId
+            isTerminated: false,
+            $or: [{
+                reservedBy: req.params.uId
+            }, {
+                hostedBy: req.params.uId
+            }]
         }, {
-            hostedBy: req.params.uId
-        }]
-    }, { methodData: 0, }).sort({
-        transactionDate: 1
-    })
-    .lean()
-    .then((transactions) => {
-        return res.status(200).json(transactions);
-    }).catch((err) => handleErrors(err, req, res, next))
+            methodData: 0,
+        }).sort({
+            transactionDate: 1
+        })
+        .lean()
+        .then((transactions) => {
+            return res.status(200).json(transactions);
+        }).catch((err) => handleErrors(err, req, res, next))
 });
 
 
@@ -851,7 +929,7 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                         }
                     }
                 });
-            } 
+            }
         } else {
             return res.status(500).send('invalid transaction')
         }
