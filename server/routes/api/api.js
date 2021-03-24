@@ -22,7 +22,6 @@ const accessController = require('../../scripts/controller/accessController');
 const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
-const getHost = require('../../scripts/controller/utils/getHost')
 
 const {
     google
@@ -49,11 +48,18 @@ const exchangeRateScheduler = async () => {
         exchangeRate = await fetchExchangeRate();
     }, 60 * 60 * 24 * 1000);
 }
-exchangeRateScheduler();
+exchangeRateScheduler()
+
+let hostUrl = 'http://localhost:5000';
+
+if (process.env.NODE_ENV == 'production') {
+    hostUrl = `https://manabu.sg`;
+}
+
 const oauth2Client = new google.auth.OAuth2(
     process.env.G_CLIENTID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${getHost('server')}/api/auth/google`
+    `${hostUrl}/api/auth/google`
 );
 const client = new OAuth2Client(process.env.G_CLIENTID);
 
@@ -88,7 +94,7 @@ const storeTokenCookie = (res, user) => {
     return token;
 }
 
-// return a valid jwt res
+// return a valid jwt
 function returnToken(res, user) {
     let token = storeTokenCookie(res, user)
     return res.status(200).send({
@@ -144,7 +150,7 @@ router.post('/register', (req, res, next) => {
 
 
 // route to get access to user's own information
-router.get('/me', VerifyToken, function(req, res, next) {
+router.get('/me', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
     User.findById(req.userId, {
         email: 0,
         password: 0
@@ -163,7 +169,7 @@ router.get('/me', VerifyToken, function(req, res, next) {
 });
 
 // route to get access to user's teachers
-router.get('/myTeachers', VerifyToken, function(req, res, next) {
+router.get('/myTeachers', VerifyToken, accessController.grantAccess('readOwn', 'userProfile'), function(req, res, next) {
     MinuteBank.find({
         reservedBy: req.userId
     }).lean().then((minuteBanks) => {
@@ -184,8 +190,13 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
     }).catch((err) => handleErrors(err, req, res, next));
 });
 
-// route to verify email
+// route to get access to user's public information
 router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
+
     User.findOne({
         verificationToken: req.params.verificationToken
     }).then(async function(user) {
@@ -195,11 +206,30 @@ router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, ne
                 console.log(err)
             });
 
-            return res.status(200).redirect(`${getHost('client')}/dashboard`)
+            return res.status(200).redirect(`${host}/dashboard`)
         } else {
             return res.status(404).send('no user found');
         }
     }).catch((err) => handleErrors(err, req, res, next));
+});
+
+
+// Getting login URL
+router.get("/auth/google/url", (req, res) => {
+    // generate a url that asks permissions for Blogger and Google Calendar scopes
+    const scopes = [
+        "https://www.googleapis.com/auth/userinfo.profile",
+        "https://www.googleapis.com/auth/userinfo.email",
+    ];
+
+    const url = oauth2Client.generateAuthUrl({
+        // 'online' (default) or 'offline' (gets refresh_token)
+        access_type: 'offline',
+        state: '',
+        // If you only need one scope you can pass it as a string
+        scope: scopes
+    });
+    return res.send(url);
 });
 
 // route for google logins
@@ -209,6 +239,10 @@ router.get('/auth/google', async (req, res, next) => {
     const {
         tokens
     } = await oauth2Client.getToken(code)
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
 
     oauth2Client.setCredentials({
         access_token: tokens.access_token
@@ -247,30 +281,12 @@ router.get('/auth/google', async (req, res, next) => {
                                         const newTeacher = new Teacher({
                                             userId: user._id,
                                         });
-                                        newTeacher.save().catch(async (err) => {
-                                            let transporter = nodemailer.createTransport({
-                                                host: 'mail.privateemail.com',
-                                                port: 587,
-                                                secure: false, // true for 465, false for other ports
-                                                auth: {
-                                                  user: 'support@manabu.sg',
-                                                  pass: process.env.MANABU_EMAIL_SUPPORT_PASS,
-                                                },
-                                              });
-                                            
-                                              // send mail with defined transport object
-                                              let info = await transporter.sendMail({
-                                                from: 'Manabu Support <support@manabu.sg>', // sender address
-                                                to: 'greencopter4444@gmail.com', // list of receivers
-                                                subject: "Please confirm your email", // Subject line
-                                                html: `${err}`,
-                                              }).catch((err) => { console.log(err) });
-
+                                        newTeacher.save().catch((err) => {
                                             console.log(err);
                                         });
                                     }
                                     storeTokenCookie(res, user)
-                                    return res.status(200).redirect(`${getHost('client')}/dashboard`)
+                                    return res.status(200).redirect(`${host}/dashboard`)
                                 }
                             });
                         } else { // user already in db
@@ -284,37 +300,93 @@ router.get('/auth/google', async (req, res, next) => {
                                             const newTeacher = new Teacher({
                                                 userId: user._id,
                                             });
-                                            newTeacher.save().catch(async (err) => {
-
-                                                let transporter = nodemailer.createTransport({
-                                                    host: 'mail.privateemail.com',
-                                                    port: 587,
-                                                    secure: false, // true for 465, false for other ports
-                                                    auth: {
-                                                      user: 'support@manabu.sg',
-                                                      pass: process.env.MANABU_EMAIL_SUPPORT_PASS,
-                                                    },
-                                                  });
-                                                
-                                                  // send mail with defined transport object
-                                                  let info = await transporter.sendMail({
-                                                    from: 'Manabu Support <support@manabu.sg>', // sender address
-                                                    to: 'greencopter4444@gmail.com', // list of receivers
-                                                    subject: "Please confirm your email", // Subject line
-                                                    html: `${err}`,
-                                                  }).catch((err) => { console.log(err) });
+                                            newTeacher.save().catch((err) => {
                                                 console.log(err)
                                             });
                                         }
                                     }).catch((err) => handleErrors(err, req, res, next));
                             }
                             storeTokenCookie(res, user)
-                            return res.status(200).redirect(`${getHost('client')}/dashboard`)
+                            return res.status(200).redirect(`${host}/dashboard`)
                         }
                     })
+                // res.status(200).send(gRes.data);
             }
         });
 })
+
+
+router.post('/glogin', (req, res, next) => {
+    const {
+        idToken,
+        isTeacherApp
+    } = req.body;
+
+    async function verify() {
+        const ticket = await client.verifyIdToken({
+            idToken: idToken,
+            audience: process.env.G_CLIENTID,
+        });
+        const payload = ticket.getPayload();
+        const userid = payload['sub'];
+    }
+    verify().then(() => {
+        // token is verified
+        const parts = idToken.split('.');
+        const bodyBuf = Buffer.from(parts[1], 'base64');
+        const body = JSON.parse(bodyBuf.toString());
+        User.findOne({
+                email: body.email,
+            })
+            .lean()
+            .then((user) => {
+                if (!user) {
+                    // user does not exist, create a user from google info
+                    const newUser = new User({
+                        name: body.name,
+                        email: body.email,
+                        profileImage: body.picture,
+                    });
+
+                    newUser.save((err, user) => {
+                        if (err) return res.json(err).status(500)
+                        else {
+                            if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
+                                const newTeacher = new Teacher({
+                                    userId: user._id,
+                                });
+                                newTeacher.save().catch((err) => {
+                                    console.log(err);
+                                });
+                            }
+                            returnToken(res, user);
+                        }
+                    });
+                } else { // user already in db
+                    if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
+                        Teacher.findOne({
+                                userId: user._id
+                            })
+                            .lean()
+                            .then((teacher) => {
+                                if (!teacher) {
+                                    const newTeacher = new Teacher({
+                                        userId: user._id,
+                                    });
+                                    newTeacher.save().catch((err) => {
+                                        console.log(err)
+                                    });
+                                }
+                            }).catch((err) => handleErrors(err, req, res, next));
+                    }
+                    returnToken(res, user);
+                }
+            })
+    }).catch((err) => {
+        return res.status(401).json(err);
+    });
+
+});
 
 // POST login
 // logging users in 
@@ -347,7 +419,7 @@ router.post('/login', function(req, res, next) {
 });
 
 // Route for editing a user's profile information
-router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
+router.put('/user/:uId/updateProfile', VerifyToken, accessController.grantAccess('updateOwn', 'userProfile'), (req, res, next) => {
     if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
         User.findOneAndUpdate({
                 _id: req.params.uId
@@ -454,26 +526,27 @@ router.get('/teachers', (req, res, next) => {
 });
 
 // Route for editing a teacher's profile information
-router.put('/teacher/:uId/updateProfile', VerifyToken, (req, res, next) => {
+router.put('/teacher/:uId/updateProfile', VerifyToken, accessController.grantAccess('updateOwn', 'teacherProfile'), (req, res, next) => {
     if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body._id && !req.body.userId))) {
+        const permissions = roles.can(req.role).updateOwn('teacherProfile')
         Teacher.findOneAndUpdate({
-            userId: req.params.uId,
-        }, req.body, {
-            returnOriginal: false,
-            "fields": { _id: 0, licensePath: 0 },
-        })
-        .lean()
-        .then((teacher) => {
-            return res.status(200).json(teacher);
-        }).catch((err) => {
-            handleErrors(err, req, res, next);
-        });
+                userId: req.params.uId
+            }, req.body, {
+                returnOriginal: false
+            })
+            .lean()
+            .then((teacher) => {
+                teacher.userId = teacher.userId.toString()
+                return res.status(200).json(permissions.filter(teacher));
+            }).catch((err) => {
+                handleErrors(err, req, res, next);
+            });
     } else {
         return res.status(401).send('You cannot modify this profile.')
     }
 });
 
-router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
+router.post('/schedule/availableTime', VerifyToken, accessController.grantAccess('createOwn', 'availableTime'), (req, res, next) => {
     if (req.userId == req.body.hostedBy) {
         const newAvailableTime = {
             hostedBy: req.body.hostedBy,
@@ -501,8 +574,7 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
     }
 });
 
-// get route for avail time
-router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, next) => {
+router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', VerifyToken, (req, res, next) => {
     AvailableTime.find({
             hostedBy: req.params.uId,
             from: {
@@ -534,10 +606,11 @@ router.delete('/schedule/availableTime', VerifyToken, accessController.grantAcce
             error: "You don't have enough permission to perform this action"
         });
     }
+
 });
 
 // create appointment
-router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
+router.post('/schedule/appointment', VerifyToken, accessController.grantAccess('createOwn', 'appointment'), (req, res, next) => {
     const newAppointment = req.body;
 
     Appointment.findOne(newAppointment)
@@ -560,44 +633,41 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 
 // get appointment details for the user
 // startWeekDay/endWeekDay are ISO strings
-// to do figure out way to restrict auth
 router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken, (req, res, next) => {
     Appointment.find({
-        from: {
-            $gt: req.params.startWeekDay
-        },
-        to: {
-            $lt: req.params.endWeekDay
-        },
-        $or: [{
-            reservedBy: req.params.uId
-        }, {
-            hostedBy: req.params.uId
-        }]
-    }).sort({
-        from: 1
-    })
-    .lean()
-    .then((appointments) => {
-        if (!appointments) return res.status(404).send('no appointments found');
-        return res.status(200).json(appointments);
-    }).catch((err) => handleErrors(err, req, res, next))
+            from: {
+                $gt: req.params.startWeekDay
+            },
+            to: {
+                $lt: req.params.endWeekDay
+            },
+            $or: [{
+                reservedBy: req.params.uId
+            }, {
+                hostedBy: req.params.uId
+            }]
+        }).sort({
+            from: 1
+        })
+        .lean()
+        .then((appointments) => {
+            if (!appointments) return res.status(404).send('no appointments found');
+            return res.status(200).json(appointments);
+        }).catch((err) => handleErrors(err, req, res, next))
 })
 
 // Route for editing/confirming an appointment
-router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-    Appointment.findById(req.params.aId).then((appointment) => {
-        if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
-            const { cancellationReason, status, from, to } = req.body
-            if (cancellationReason) appointment.cancellationReason = cancellationReason;
-            if (status) appointment.status = status;
-            if (from) appointment.from = from;
-            if (to) appointment.to = to;
-            appointment.save().then((appointment) => {
-                return res.status(200).json(appointment);
-            }).catch((err) => handleErrors(err, req, res, next));
-        }
-    })
+// todo only self can do this
+router.put('/schedule/appointment/:aId', VerifyToken, accessController.grantAccess('updateOwn', 'appointment'), (req, res, next) => {
+    Appointment.findOneAndUpdate({
+            _id: req.params.aId
+        }, req.body, {
+            returnOriginal: false
+        })
+        .lean()
+        .then((appointment) => {
+            return res.status(200).json(appointment);
+        }).catch((err) => handleErrors(err, req, res, next));
 });
 
 // POST route to create/edit package(s)
@@ -734,7 +804,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
 });
 
 // GET route for package details
-router.get('/transaction/package/:hostedBy', (req, res, next) => {
+router.get('/transaction/package/:hostedBy', VerifyToken, (req, res, next) => {
     Package.find({
             hostedBy: req.params.hostedBy
         })
@@ -746,24 +816,23 @@ router.get('/transaction/package/:hostedBy', (req, res, next) => {
         }).catch((err) => handleErrors(err, req, res, next));
 });
 
-// get transaction details
+//TODO TO DO only those related can get
 router.get('/transaction/packageTransaction/:transactionId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.transactionId)
         .lean()
         .then((transaction) => {
             if (!transaction) return res.status(404).send('a transaction with that id was not found');
-            if (transaction.hostedBy == req.userId || transaction.reservedBy == req.userId) return res.status(200).json(transaction)
-            else return res.status(500).send('you cannot access this transaction')
+            return res.status(200).json(transaction)
         }).catch((err) => handleErrors(err, req, res, next));
 });
 
-//get all transactions by logged in user
+//get all transactions by a user
+// todo only does related can access
 router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, next) => {
-    if (req.params.uId == req.userId) {
-        PackageTransaction.find({
+    PackageTransaction.find({
             isTerminated: false,
             $or: [{
-                reservedBy: req.params.uId  
+                reservedBy: req.params.uId
             }, {
                 hostedBy: req.params.uId
             }]
@@ -776,11 +845,10 @@ router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, 
         .then((transactions) => {
             return res.status(200).json(transactions);
         }).catch((err) => handleErrors(err, req, res, next))
-    }
 });
 
 
-// get minutebanks
+//TODO TO DO only those related can get
 router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
     MinuteBank.findOne({
             hostedBy: req.params.hostedBy,
@@ -788,12 +856,11 @@ router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, r
         }).lean()
         .then((minuteBank) => {
             if (!minuteBank) return res.status(404).send('404');
-            if (minuteBank.hostedBy == req.userId || minuteBank.reservedBy == req.userId) return res.status(200).json(minuteBank)
-            else return res.status(500).send('unauthorized');
+            return res.status(200).json(minuteBank)
         }).catch((err) => handleErrors(err, req, res, next));
 });
 
-// Route for editing a package transaction (eg lowering remainingAppointments, etc)
+// Route for editing a package transaction
 router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.tId)
         .lean()
@@ -891,8 +958,8 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                         "payment_method": "paypal"
                     },
                     "redirect_urls": {
-                        "return_url": `${getHost('server')}/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
-                        "cancel_url": `${getHost('server')}/api/cancel`
+                        "return_url": `${hostUrl}/api/success/?hostedBy=${teacherData.userId}&reservedBy=${reservedBy}&selectedPackageId=${pkg._id}&selectedDuration=${selectedDuration}&selectedPlan=${selectedPlan}&selectedLanguage=${selectedLanguage}&selectedSubscription=${selectedSubscription}&selectedMethod=${selectedMethod}`,
+                        "cancel_url": `${hostUrl}/api/cancel`
                     },
                     "transactions": [{
                         "item_list": {
@@ -1006,7 +1073,7 @@ router.get('/success', (req, res, next) => {
                                             if (err) return handleErrors(err, req, res, next);
                                             else {
                                                 newPackageTransaction.save().then((newTrans) => {
-                                                    return res.redirect(`${getHost('server')}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
+                                                    return res.redirect(`${hostUrl}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                                 }).catch((err) => {
                                                     return handleErrors(err, req, res, next)
                                                 });
@@ -1014,7 +1081,7 @@ router.get('/success', (req, res, next) => {
                                         })
                                     } else {
                                         newPackageTransaction.save().then((newTrans) => {
-                                            return res.redirect(`${getHost('server')}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
+                                            return res.redirect(`${hostUrl}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                         }).catch((err) => {
                                             return handleErrors(err, req, res, next)
                                         });
@@ -1033,12 +1100,20 @@ router.get('/success', (req, res, next) => {
 
 // route to redirect paypal
 router.get('/calendar/:hostedBy/:tId', (req, res) => {
-    res.redirect(`${getHost('client')}/calendar/${req.params.hostedBy}/${req.params.tId}`)
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
+    res.redirect(`${host}/calendar/${req.params.hostedBy}/${req.params.tId}`)
 });
 
 
 router.get('/cancel', (req, res) => {
-    res.redirect(`${getHost('client')}/payment`)
+    let host = hostUrl;
+    if (process.env.NODE_ENV != 'production') {
+        host = 'http://localhost:8080'
+    }
+    res.redirect(`${host}/payment`)
 });
 
 // Route for validating transaction information
