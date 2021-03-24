@@ -247,7 +247,7 @@ router.get('/auth/google', async (req, res, next) => {
                                         const newTeacher = new Teacher({
                                             userId: user._id,
                                         });
-                                        newTeacher.save().catch((err) => {
+                                        newTeacher.save().catch(async (err) => {
                                             let transporter = nodemailer.createTransport({
                                                 host: 'mail.privateemail.com',
                                                 port: 587,
