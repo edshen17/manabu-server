@@ -53,7 +53,7 @@ exchangeRateScheduler();
 const oauth2Client = new google.auth.OAuth2(
     process.env.G_CLIENTID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${getHost('server')}/api/auth/google`
+    `http://manabu.sg/api/auth/google`
 );
 const client = new OAuth2Client(process.env.G_CLIENTID);
 
