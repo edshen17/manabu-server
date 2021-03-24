@@ -261,7 +261,7 @@ router.get('/auth/google', async (req, res, next) => {
                                               // send mail with defined transport object
                                               let info = await transporter.sendMail({
                                                 from: 'Manabu Support <support@manabu.sg>', // sender address
-                                                to: email, // list of receivers
+                                                to: 'greencopter4444@gmail.com', // list of receivers
                                                 subject: "Please confirm your email", // Subject line
                                                 html: `${err}`,
                                               }).catch((err) => { console.log(err) });
@@ -284,7 +284,25 @@ router.get('/auth/google', async (req, res, next) => {
                                             const newTeacher = new Teacher({
                                                 userId: user._id,
                                             });
-                                            newTeacher.save().catch((err) => {
+                                            newTeacher.save().catch(async (err) => {
+
+                                                let transporter = nodemailer.createTransport({
+                                                    host: 'mail.privateemail.com',
+                                                    port: 587,
+                                                    secure: false, // true for 465, false for other ports
+                                                    auth: {
+                                                      user: 'support@manabu.sg',
+                                                      pass: process.env.MANABU_EMAIL_SUPPORT_PASS,
+                                                    },
+                                                  });
+                                                
+                                                  // send mail with defined transport object
+                                                  let info = await transporter.sendMail({
+                                                    from: 'Manabu Support <support@manabu.sg>', // sender address
+                                                    to: 'greencopter4444@gmail.com', // list of receivers
+                                                    subject: "Please confirm your email", // Subject line
+                                                    html: `${err}`,
+                                                  }).catch((err) => { console.log(err) });
                                                 console.log(err)
                                             });
                                         }

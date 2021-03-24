@@ -1,7 +1,7 @@
 const { GeneralError } = require('./utils/errors');
 const dotenv = require('dotenv').config();
 
-const handleErrors = (err, req, res, next) => {
+const handleErrors = async (err, req, res, next) => {
   let transporter = nodemailer.createTransport({
     host: 'mail.privateemail.com',
     port: 587,
