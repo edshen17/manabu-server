@@ -61,12 +61,17 @@ AppointmentSchema.pre('save', async function() {
         const digitalLocation = hostedByData.commMethods.filter((method) => {
             return method.method == reservedByData.commMethods[0].method
         })
-        let locationData = {}
+        let locationData;
         if (digitalLocation.length == 0) { // no common method
             digitalLocation.push(hostedByData.commMethods[0]);
+            locationData = {
+                method: digitalLocation[0].method,
+                hostedByMethodId: digitalLocation[0].id,
+                online: true,
+            }
         }
 
-        if (digitalLocation.length > 0) {
+        else {
             locationData = {
                 method: digitalLocation[0].method,
                 hostedByMethodId: digitalLocation[0].id,

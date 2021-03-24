@@ -3,6 +3,7 @@ const Teacher = require('../models/Teacher');
 const Package = require('../models/Package').Package;
 const roles = require('./controller/roles').roles;
 const fx = require('money');
+
 // verify transaction data from client
 const verifyTransactionData = async (req, res, exchangeRate) => {
     if (!req.role) req.role = 'user';

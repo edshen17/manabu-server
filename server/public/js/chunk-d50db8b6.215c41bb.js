@@ -12,4 +12,4 @@
  * http://openexchangerates.github.io/money.js/
  */
 (function(a,s){var n=function(e){return new c(e)};n.version="0.2";var r=a.fxSetup||{rates:{},base:""};n.rates=r.rates,n.base=r.base,n.settings={from:r.from||n.base,to:r.to||n.base};var i=n.convert=function(e,t){if("object"===typeof e&&e.length){for(var a=0;a<e.length;a++)e[a]=i(e[a],t);return e}return t=t||{},t.from||(t.from=n.settings.from),t.to||(t.to=n.settings.to),e*o(t.to,t.from)},o=function(e,t){var a=n.rates;if(a[n.base]=1,!a[e]||!a[t])throw"fx error";return t===n.base?a[e]:e===n.base?1/a[t]:a[e]*(1/a[t])},c=function(e){"string"===typeof e?(this._v=parseFloat(e.replace(/[^0-9-.]/g,"")),this._fx=e.replace(/([^A-Za-z])/g,"")):this._v=e},l=n.prototype=c.prototype;l.convert=function(){var e=Array.prototype.slice.call(arguments);return e.unshift(this._v),i.apply(n,e)},l.from=function(e){var t=n(i(this._v,{from:e,to:n.base}));return t._fx=n.base,t},l.to=function(e){return i(this._v,{from:this._fx?this._fx:n.settings.from,to:e})},e.exports&&(t=e.exports=n),t.fx=n})(this)}}]);
-//# sourceMappingURL=chunk-d50db8b6.a485b2b8.js.map
+//# sourceMappingURL=chunk-d50db8b6.215c41bb.js.map

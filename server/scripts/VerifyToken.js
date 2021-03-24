@@ -14,6 +14,8 @@ const verifyToken = (req, res, next) => {
       req.isVerified = true;
       // res.cookie('hp', req.cookies.hp, { expires: new Date(Date.now() + 30 * 60 * 1000), httpOnly: true }) // extend hp cookie life by 30m
     });
+  } else {
+    req.isVerified = false;
   }
 
   next();
