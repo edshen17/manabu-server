@@ -55,8 +55,6 @@ const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_SECRET,
     `${getHost('server')}/api/auth/google`
 );
-const client = new OAuth2Client(process.env.G_CLIENTID);
-
 
 // Connect to Mongodb
 mongoose.connect(db, {
@@ -64,6 +62,7 @@ mongoose.connect(db, {
         useUnifiedTopology: true,
         useFindAndModify: false,
         ignoreUndefined: true,
+        useCreateIndex: true 
     })
     .then(() => console.log('connected to MongoDB'))
     .catch(err => console.log(err));
@@ -111,6 +110,7 @@ router.post('/register', (req, res, next) => {
             email,
         })
         .lean()
+        .select({ _id: 1, email: 1, }) //select relevant things
         .then((user) => {
             if (user && !isTeacherApp) {
                 // user exists
@@ -124,7 +124,7 @@ router.post('/register', (req, res, next) => {
                     password: bcrypt.hashSync(password, 10),
                 });
 
-                newUser.save((err, user) => {
+                newUser.save(async (err, user) => {
                     if (err) return res.json(err).status(500)
                     else {
                         if (isTeacherApp) { // if it's a teacher application, link it with the user
@@ -145,10 +145,10 @@ router.post('/register', (req, res, next) => {
 
 // route to get access to user's own information
 router.get('/me', VerifyToken, function(req, res, next) {
-    User.findById(req.userId, {
+    User.findById(req.userId).lean().select({
         email: 0,
         password: 0
-    }).lean().then(function(user) {
+    }).then(function(user) {
         if (!user) return res.status(404).send("No user found.");
         next(user);
         User.findOneAndUpdate({ // update online
@@ -188,7 +188,7 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
 router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
     User.findOne({
         verificationToken: req.params.verificationToken
-    }).then(async function(user) {
+    }).select({ emailVerified: 0 }).then(async function(user) {
         if (user) {
             user.emailVerified = true;
             await user.save().catch((err) => {
@@ -231,7 +231,8 @@ router.get('/auth/google', async (req, res, next) => {
                         email,
                     })
                     .lean()
-                    .then((user) => {
+                    .select({ _id: 1, email: 1, })
+                    .then(async (user) => {
                         if (!user) {
                             // user does not exist, create a user from google info
                             const newUser = new User({
@@ -240,11 +241,11 @@ router.get('/auth/google', async (req, res, next) => {
                                 profileImage: picture,
                             });
 
-                            newUser.save((err, user) => {
+                            newUser.save(async (err, user) => {
                                 if (err) return res.json(err).status(500)
                                 else {
                                     if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
-                                        const newTeacher = new Teacher({
+                                    const newTeacher = new Teacher({
                                             userId: user._id,
                                         });
                                         newTeacher.save().catch(async (err) => {
@@ -257,10 +258,11 @@ router.get('/auth/google', async (req, res, next) => {
                             });
                         } else { // user already in db
                             if (isTeacherApp) { // if teacher app, create teacher if it doesn't exist. otherwise, do nothing if it does
-                                Teacher.findOne({
+                            Teacher.findOne({
                                         userId: user._id
                                     })
                                     .lean()
+                                    .select({ userId: 1, })
                                     .then((teacher) => {
                                         if (!teacher) {
                                             const newTeacher = new Teacher({
@@ -288,14 +290,15 @@ router.post('/login', function(req, res, next) {
             email: req.body.email
         })
         .lean()
-        .then(function(user) {
+        .select({_id: 1})
+        .then(async function(user) {
             if (!user) return res.status(404).send('An account with that email was not found.');
             if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
             const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) return res.status(401).send('Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.');
 
             else {
-                const isTeacherApp = req.body.isTeacherApp;
+                const isTeacherApp = req.body.isTeacherApp;            
                 if (isTeacherApp) {
                     const newTeacher = new Teacher({
                         userId: user._id,
@@ -447,6 +450,7 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
 
         AvailableTime.findOne(newAvailableTime)
             .lean()
+            .select({ _id: 1})
             .then((availableTime) => {
                 if (availableTime) {
                     return res.status(500).send('Available time already exists');
@@ -506,6 +510,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
 
     Appointment.findOne(newAppointment)
         .lean()
+        .select({_id: 1})
         .then((appointment) => {
             if (appointment) {
                 return res.status(500).send('Appointment already exists');
@@ -550,7 +555,7 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
 
 // Route for editing/confirming an appointment
 router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-    Appointment.findById(req.params.aId).then((appointment) => {
+    Appointment.findById(req.params.aId).lean().select({ locationData: 0, packageTransactionData: 0, }).then((appointment) => {
         if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
             const { cancellationReason, status, from, to } = req.body
             if (cancellationReason) appointment.cancellationReason = cancellationReason;
@@ -606,6 +611,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
             userId: hostedBy
         })
         .lean()
+        .select({ userId: 0, })
         .then((teacher) => {
             if (teacher && (hostedBy == req.userId || req.role == 'admin')) {
                 Teacher.findOneAndUpdate({
@@ -761,6 +767,7 @@ router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, r
 router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.tId)
         .lean()
+        .select({ transactionDetails: 0, hostedByData: 0, reservedByData: 0, packageData: 0, })
         .then((transaction) => {
             if (!transaction) return res.status(404).send('a transaction with that id was not found');
             if (req.role == 'admin' || (req.userId == transaction.reservedBy || req.userId == transaction.hostedBy)) {

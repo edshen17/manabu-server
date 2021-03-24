@@ -37,6 +37,7 @@ AvailableTimeSchema.pre('save', async function() {
  
 });
 
+AvailableTimeSchema.index({hostedBy: 1 });
 
 const AvailableTime = mongoose.model('AvailableTime', AvailableTimeSchema);
 module.exports = AvailableTime;

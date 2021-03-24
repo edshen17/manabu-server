@@ -42,6 +42,7 @@ const PackageSchema = new mongoose.Schema({
   },
 });
 
+PackageSchema.index({hostedBy: 1, packageType: 1, });
 
 const Package = mongoose.model('Package', PackageSchema);
 module.exports.Package = Package;

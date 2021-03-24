@@ -87,5 +87,7 @@ PackageTransactionSchema.pre('save', async function() {
 });
 
 
+PackageTransactionSchema.index({hostedBy: 1, packageId: 1, reservedBy: 1});
+
 const PackageTransaction = mongoose.model('PackageTransaction', PackageTransactionSchema);
 module.exports = PackageTransaction;

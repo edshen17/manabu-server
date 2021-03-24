@@ -40,6 +40,7 @@ MinuteBankSchema.pre('save', async function() {
     this.set({ hostedByData, reservedByData, });
    });
 
+MinuteBankSchema.index({hostedBy: 1, reservedBy: 1, });
 
 const MinuteBank = mongoose.model('MinuteBank', MinuteBankSchema);
 module.exports = MinuteBank;

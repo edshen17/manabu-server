@@ -90,6 +90,7 @@ AppointmentSchema.pre('save', async function() {
 
 })
 
+AppointmentSchema.index({hostedBy: 1, reservedBy: 1, packageTransactionId: 1, });
 
 const Appointment = mongoose.model('Appointment', AppointmentSchema);
 module.exports = Appointment;
