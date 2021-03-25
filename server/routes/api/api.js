@@ -13,7 +13,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const dotenv = require('dotenv').config();
-const db = require('../../../config/keys').MongoURI;
 const config = require('../../../config/auth.config');
 const VerifyToken = require('../../scripts/VerifyToken');
 const scheduler = require('../../scripts/scheduler/schedule');
@@ -23,6 +22,9 @@ const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
 const getHost = require('../../scripts/controller/utils/getHost')
+let dbHost;
+if (process.env.NODE_ENV == 'production') dbHost = 'users';
+else dbHost = 'dev';
 
 const {
     google
@@ -57,7 +59,7 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 // Connect to Mongodb
-mongoose.connect(db, {
+mongoose.connect(`mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
