@@ -555,7 +555,7 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
 
 // Route for editing/confirming an appointment
 router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-    Appointment.findById(req.params.aId).lean().select({ locationData: 0, packageTransactionData: 0, }).then((appointment) => {
+    Appointment.findById(req.params.aId).select({ locationData: 0, packageTransactionData: 0, }).then((appointment) => {
         if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
             const { cancellationReason, status, from, to } = req.body
             if (cancellationReason) appointment.cancellationReason = cancellationReason;
