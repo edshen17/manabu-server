@@ -113,9 +113,14 @@ TeacherSchema.pre('save', async function() {
   
     })
   
-    const user = await User.findById(this.userId).lean().select({ name: 1 }).catch((err) => {});
+    
     const name = user.name;
-    this.set({ name });
+    const user = await User.findById(this.userId).lean().select({ name: 1 }).catch((err) => {});
+    const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
+    const alsoSpeaks = user.languages.filter((lang) => { return lang.level != 'C2' });
+    
+    this.set({ teachingLanguages, alsoSpeaks, name });
+
   } else {
     throw new Error('teacher already exists')
   }
