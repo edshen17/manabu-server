@@ -405,6 +405,7 @@ router.get('/teachers', (req, res, next) => {
                     'userData.emailVerified': 0,
                     'userData.verificationToken': 0,
                     'userData.email': 0,
+                    'userData.commMethods': 0,
                 }
             }
         ]).exec(function(err, t) {
