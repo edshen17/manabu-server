@@ -12,7 +12,9 @@ function terminatePackageTransactions() {
             },
             isTerminated: false,
         }, {
-            isTerminated: true
+            isTerminated: true,
+            remainingReschedules: 0,
+            remainingAppointments: 0,
         })
         .lean()
         .catch((err) => { console.log(err) })
@@ -38,35 +40,21 @@ function endAppointments() {
                                     hostedBy: appointments[i].hostedBy
                                 }
                                 MinuteBank.findOne(participants)
-                                    .lean()
                                     .then((searchBank) => {
                                         if (searchBank) {
-                                            const updatePackageTransaction = {
-                                                isTerminated: true,
-                                            };
-                                            const updateMinuteBank = {
-                                                minuteBank: searchBank.minuteBank + 5,
-                                                lastUpdated: new Date(),
-                                            }
                                             if (appointments[i].status == 'confirmed') { // add to minute bank only if confirmed
+                                                searchBank.minuteBank = searchBank.minuteBank + 5;
+                                                searchBank.lastUpdated = new Date();
                                                 if (Math.floor((searchBank.minuteBank + 5) / packageTransaction.reservationLength) == 1) {
-                                                    updatePackageTransaction.remainingAppointments = packageTransaction.remainingAppointments + 1;
-                                                    updateMinuteBank.minuteBank = 0;
+                                                    searchBank.minuteBank = 0;
+                                                    packageTransaction.remainingAppointments = packageTransaction.remainingAppointments + 1;
                                                 }
-                                                MinuteBank.findOneAndUpdate(participants, updateMinuteBank).lean().catch((err) => {
-                                                    console.log(err)
-                                                })
                                             } else if (appointments[i].status == 'pending') { // give reservedBy a lesson back
-                                                updatePackageTransaction.remainingAppointments = packageTransaction.remainingAppointments + 1;
+                                                packageTransaction.remainingAppointments = packageTransaction.remainingAppointments + 1;
+                                                packageTransaction.save().catch((err) => { console.log(err)})
                                             }
-
-                                            PackageTransaction.findOneAndUpdate({
-                                                    _id: packageTransaction._id
-                                                },
-                                                updatePackageTransaction).lean().catch((err) => {
-                                                console.log(err)
-                                            })
                                         }
+                                        searchBank.save().catch((err) => { console.log(err)})
                                     }).catch((err) => {
                                         console.log(err)
                                     })
