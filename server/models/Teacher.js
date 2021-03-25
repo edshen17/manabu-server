@@ -113,12 +113,11 @@ TeacherSchema.pre('save', async function() {
   
     })
   
-    
+    const user = await User.findById(this.userId).lean().select({ name: 1, languages: 1, }).catch((err) => {});
     const name = user.name;
-    const user = await User.findById(this.userId).lean().select({ name: 1 }).catch((err) => {});
     const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
     const alsoSpeaks = user.languages.filter((lang) => { return lang.level != 'C2' });
-    
+
     this.set({ teachingLanguages, alsoSpeaks, name });
 
   } else {
