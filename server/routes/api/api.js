@@ -64,7 +64,8 @@ mongoose.connect(`mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.M
         useUnifiedTopology: true,
         useFindAndModify: false,
         ignoreUndefined: true,
-        useCreateIndex: true 
+        useCreateIndex: true,
+        readPreference: 'nearest',
     })
     .then(() => console.log('connected to MongoDB'))
     .catch(err => console.log(err));
