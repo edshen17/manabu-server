@@ -72,7 +72,8 @@ mongoose.connect(`mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.M
 const storeTokenCookie = (res, user) => {
     const token = jwt.sign({
         id: user._id,
-        role: user.role
+        role: user.role,
+        name: user.name,
     }, config.secret, {
         expiresIn: 86400 * 7 // expires in 7 days
     });
@@ -112,7 +113,7 @@ router.post('/register', (req, res, next) => {
             email,
         })
         .lean()
-        .select({ _id: 1, email: 1, }) //select relevant things
+        .select({ _id: 1, email: 1, role: 1 }) //select relevant things
         .then((user) => {
             if (user && !isTeacherApp) {
                 // user exists
@@ -190,7 +191,7 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
 router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
     User.findOne({
         verificationToken: req.params.verificationToken
-    }).select({ emailVerified: 0 }).then(async function(user) {
+    }).select({ emailVerified: 1 }).then(async function(user) {
         if (user) {
             user.emailVerified = true;
             await user.save().catch((err) => {
@@ -233,7 +234,7 @@ router.get('/auth/google', async (req, res, next) => {
                         email,
                     })
                     .lean()
-                    .select({ _id: 1, email: 1, })
+                    .select({ _id: 1, email: 1, role: 1 })
                     .then(async (user) => {
                         if (!user) {
                             // user does not exist, create a user from google info
@@ -292,7 +293,7 @@ router.post('/login', function(req, res, next) {
             email: req.body.email
         })
         .lean()
-        .select({_id: 1})
+        .select({ _id: 1, email: 1, role: 1 })
         .then(async function(user) {
             if (!user) return res.status(404).send('An account with that email was not found.');
             if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')

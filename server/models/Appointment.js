@@ -67,6 +67,10 @@ AppointmentSchema.pre('save', async function() {
             locationData = {
                 method: digitalLocation[0].method,
                 hostedByMethodId: digitalLocation[0].id,
+                alternativeContact: {
+                    method: reservedByData.commMethods[0].method, 
+                    reservedByMethodId: reservedByData.commMethods[0].id,
+                },
                 online: true,
             }
         }
