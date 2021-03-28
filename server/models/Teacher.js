@@ -6,17 +6,13 @@ const MinuteBank = require('./MinuteBank');
 const PackageTransaction = require('./PackageTransaction');
 const User = require('./User');
 const Package = require('./Package').Package;
-const mongoosePaginate = require('mongoose-paginate-v2');
+const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
 
 const TeacherSchema = new mongoose.Schema({
   userId: { 
       type: Schema.Types.ObjectId, 
       ref: "User",
       required: true 
-    },
-    name: {
-      type: String,
-      required: false,
     },
   dateApproved: {
     type: Date,
@@ -113,12 +109,11 @@ TeacherSchema.pre('save', async function() {
   
     })
   
-    const user = await User.findById(this.userId).lean().select({ name: 1, languages: 1, }).catch((err) => {});
-    const name = user.name;
+    const user = await User.findById(this.userId).lean().select({ languages: 1, }).catch((err) => {});
     const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
     const alsoSpeaks = user.languages.filter((lang) => { return lang.level != 'C2' });
 
-    this.set({ teachingLanguages, alsoSpeaks, name });
+    this.set({ teachingLanguages, alsoSpeaks });
 
   } else {
     throw new Error('teacher already exists')
@@ -126,7 +121,7 @@ TeacherSchema.pre('save', async function() {
   
 });
 
-TeacherSchema.plugin(mongoosePaginate);
+TeacherSchema.plugin(aggregatePaginate);
 TeacherSchema.index({teacherType: 1, name: 1});
 
 const Teacher = mongoose.model('Teacher', TeacherSchema);
