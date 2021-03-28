@@ -12,6 +12,9 @@ const verifyToken = (req, res, next) => {
       req.userId = decoded.id;
       req.role = decoded.role;
       req.isVerified = true;
+      User.findOneAndUpdate({ // update online
+        _id: req.params.uId
+      }, { lastOnline: new Date() }).catch((err) => { console.log(err) });
       // res.cookie('hp', req.cookies.hp, { expires: new Date(Date.now() + 30 * 60 * 1000), httpOnly: true }) // extend hp cookie life by 30m
     });
   } else {

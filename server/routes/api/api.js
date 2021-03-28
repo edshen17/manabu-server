@@ -83,11 +83,13 @@ const storeTokenCookie = (res, user) => {
     const tokenArr = token.split('.')
     res.cookie('hp', `${tokenArr[0]}.${tokenArr[1]}`, {
         maxAge: 2 * 24 * 60 * 60 * 1000,
-        httpOnly: true
+        httpOnly: false,
+        secure: true,
     })
     res.cookie('sig', `.${tokenArr[2]}`, {
         maxAge: 2 * 24 * 60 * 60 * 1000,
-        httpOnly: false
+        httpOnly: true,
+        secure: true,
     })
     return token;
 }
