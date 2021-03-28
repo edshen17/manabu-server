@@ -382,7 +382,7 @@ router.get('/teachers', VerifyToken, (req, res, next) => {
             }
             const teacherAggregate = Teacher.aggregate([{
                     $match: {
-                        'isApproved': false,
+                        'isApproved': true,
                         'teacherType': {
                             $in: query.teacherType
                         },
