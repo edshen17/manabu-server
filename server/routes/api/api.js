@@ -364,7 +364,7 @@ router.get('/teachers', VerifyToken, (req, res, next) => {
             page: page || 1,
             limit: 20,
             sort: {
-                dateApproved: -1
+                dateApproved: -1,
             },
         };
     
