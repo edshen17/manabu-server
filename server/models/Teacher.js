@@ -34,6 +34,10 @@ const TeacherSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isRejected: {
+    type: Boolean,
+    default: false,
+  },
   teacherType: {
       type: String,
       default: 'unlicensed',
@@ -109,7 +113,7 @@ TeacherSchema.pre('save', async function() {
   
     })
   
-    const user = await User.findById(this.userId).lean().select({ languages: 1, }).catch((err) => {});
+    const user = await User.findById(this.userId).lean().select({ languages: 1, email: 1, name: 1, commMethods: 1, }).catch((err) => {});
     const teachingLanguages = user.languages.filter((lang) => { return lang.level == 'C2' });
     const alsoSpeaks = user.languages.filter((lang) => { return lang.level != 'C2' });
 

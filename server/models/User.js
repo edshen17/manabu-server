@@ -77,8 +77,8 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', function() { 
-  sendVerificationEmail(this.email, this.verificationToken);
+UserSchema.post('save', function() { 
+  sendVerificationEmail(this.email, this.verificationToken); 
 });
 
 UserSchema.index({role: 1, name: 1, email: 1});

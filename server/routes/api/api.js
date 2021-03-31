@@ -39,9 +39,9 @@ const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
 
 paypal.configure({
-    'mode': 'live', //sandbox or live, change to use process env
-    'client_id': process.env.PAYPAL_CLIENT_ID,
-    'client_secret': process.env.PAYPAL_CLIENT_SECRET,
+    'mode': 'sandbox', //sandbox or live, change to use process env
+    'client_id':  'AREj6Q7nYtjH61bzVVlRdlhJ60n1j_VpkLEsKN450WcHATfLIpjuAFos4_75fTYYehQhLgv0lC_qGyqP', //process.env.PAYPAL_CLIENT_ID,
+    'client_secret': 'EBrZ8Kk449KcqA5iL4CwkFLSpnIy2oLqgZT5q8aI7kA4Qp7vyTagaqP4u0GKhvRVZWRJtlXjMhsDR2oc' //process.env.PAYPAL_CLIENT_SECRET,
 });
 
 scheduler();
@@ -180,10 +180,12 @@ router.get('/myTeachers', VerifyToken, function(req, res, next) {
 
 // route to get access to user's public information
 router.get('/user/:uId', VerifyToken, function(req, res, next) {
-    User.findById(req.params.uId, {
+    let dbQuery = {
         email: 0,
-        password: 0
-    }).lean().then(function(user) {
+        password: 0,
+    }
+    if (req.role == 'admin') dbQuery = { password: 0 }
+    User.findById(req.params.uId, dbQuery).lean().then(function(user) {
         if (!user) {
             return res.status(404).send("No user found.");
         }
@@ -583,7 +585,16 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
                 return res.status(200).json(appointment);
             }).catch((err) => handleErrors(err, req, res, next));
         }
-    })
+    }).catch((err) => { handleErrors(err, req, res, next) })
+});
+
+// Route for getting a specific appointment
+router.get('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
+    Appointment.findById(req.params.aId).lean().then((appointment) => {
+        if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
+            return res.status(200).json(appointment)
+        }
+    }).catch((err) => { handleErrors(err, req, res, next) })
 });
 
 // POST route to create/edit package(s)

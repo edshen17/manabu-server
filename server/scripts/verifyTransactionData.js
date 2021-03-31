@@ -54,7 +54,7 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
                     let transactionPrice;
                     let subTotal;
                     const paymentMethods = {
-                        'PayPal': .045,
+                        'PayPal': .03,
                         'Credit / Debit Card': 0,
                     }
 

@@ -49,6 +49,7 @@ const AppointmentSchema = new mongoose.Schema({
 AppointmentSchema.pre('save', async function() {
     try {
         const packageTransactionData = await PackageTransaction.findById(this.packageTransactionId, {
+            _id: 0,
             methodData: 0,
             remainingReschedules: 0,
             hostedBy: 0,
