@@ -11,7 +11,6 @@ const router = express.Router();
 const querystring = require('querystring')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
 const dotenv = require('dotenv').config();
 const config = require('../../../config/auth.config');
 const VerifyToken = require('../../scripts/VerifyToken');
@@ -22,9 +21,6 @@ const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
 const getHost = require('../../scripts/controller/utils/getHost')
-let dbHost;
-if (process.env.NODE_ENV == 'production') dbHost = 'users';
-else dbHost = 'dev';
 
 const {
     google
@@ -37,12 +33,23 @@ const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-
-paypal.configure({
+const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
-    'client_id':  'AREj6Q7nYtjH61bzVVlRdlhJ60n1j_VpkLEsKN450WcHATfLIpjuAFos4_75fTYYehQhLgv0lC_qGyqP', //process.env.PAYPAL_CLIENT_ID,
-    'client_secret': 'EBrZ8Kk449KcqA5iL4CwkFLSpnIy2oLqgZT5q8aI7kA4Qp7vyTagaqP4u0GKhvRVZWRJtlXjMhsDR2oc' //process.env.PAYPAL_CLIENT_SECRET,
-});
+    'client_id':  process.env.PAYPAL_CLIENT_ID_DEV, //process.env.PAYPAL_CLIENT_ID,
+    'client_secret': process.env.PAYPAL_CLIENT_SECRET_DEV, //process.env.PAYPAL_CLIENT_SECRET,
+}
+
+let dbHost;
+if (process.env.NODE_ENV == 'production') {
+    dbHost = 'users';
+    paypalConfig.client_id = process.env.PAYPAL_CLIENT_ID;
+    paypalConfig.client_secret = process.env.PAYPAL_CLIENT_SECRET;
+}
+else {
+    dbHost = 'dev';
+}
+
+paypal.configure(paypalConfig);
 
 scheduler();
 
@@ -58,6 +65,8 @@ const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_SECRET,
     `${getHost('server')}/api/auth/google`
 );
+
+
 
 // Connect to Mongodb
 mongoose.connect(`mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?retryWrites=true&w=majority`, {
