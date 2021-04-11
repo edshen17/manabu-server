@@ -304,12 +304,11 @@ router.get('/auth/google', async (req, res, next) => {
 // POST login
 // logging users in 
 router.post('/login', function(req, res, next) {
-
     User.findOne({
             email: req.body.email
         })
         .lean()
-        .select({ _id: 1, email: 1, role: 1 })
+        .select({ _id: 1, email: 1, role: 1, password: 1 })
         .then(async function(user) {
             if (!user) return res.status(404).send('An account with that email was not found.');
             if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
@@ -906,7 +905,7 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                     "transactions": [{
                         "item_list": {
                             "items": [{
-                                "name": `${selectedPlan} plan @ ${selectedDuration} minutes by ${teacherData.name}:${teacherData.userId}`,
+                                "name": `${selectedPlan} plan - ${selectedDuration} minutes (Teacher ID: ${teacherData.userId})`,
                                 "sku": `${pkg._id}`,
                                 "price": `${transactionPrice.toFixed(2)}`,
                                 "currency": 'SGD',
@@ -917,7 +916,7 @@ router.post('/pay', VerifyToken, (req, res, next) => {
                             "currency": 'SGD',
                             "total": `${transactionPrice.toFixed(2)}`
                         },
-                        "description": `${selectedPlan} plan @ ${selectedDuration} minutes by ${teacherData.name}:${teacherData.userId}`
+                        "description": `${selectedPlan} plan - ${selectedDuration} minutes (Teacher ID: ${teacherData.userId})`
                     }]
                 };
 
