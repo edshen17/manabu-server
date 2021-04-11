@@ -7,6 +7,7 @@ const Appointment = require('../../models/Appointment');
 const Package = require('../../models/Package').Package;
 const PackageTransaction = require('../../models/PackageTransaction');
 const MinuteBank = require('../../models/MinuteBank');
+const TeacherBalance = require('../../models/TeacherBalance');
 const router = express.Router();
 const querystring = require('querystring')
 const bcrypt = require('bcryptjs');
@@ -35,8 +36,8 @@ const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
 const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
-    'client_id':  process.env.PAYPAL_CLIENT_ID_DEV, //process.env.PAYPAL_CLIENT_ID,
-    'client_secret': process.env.PAYPAL_CLIENT_SECRET_DEV, //process.env.PAYPAL_CLIENT_SECRET,
+    'client_id':  process.env.PAYPAL_CLIENT_ID_DEV,
+    'client_secret': process.env.PAYPAL_CLIENT_SECRET_DEV,
 }
 
 let dbHost;
@@ -44,6 +45,7 @@ if (process.env.NODE_ENV == 'production') {
     dbHost = 'users';
     paypalConfig.client_id = process.env.PAYPAL_CLIENT_ID;
     paypalConfig.client_secret = process.env.PAYPAL_CLIENT_SECRET;
+    paypalConfig.mode = 'live';
 }
 else {
     dbHost = 'dev';
@@ -65,7 +67,6 @@ const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_SECRET,
     `${getHost('server')}/api/auth/google`
 );
-
 
 
 // Connect to Mongodb

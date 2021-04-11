@@ -4,6 +4,7 @@ const dotenv = require('dotenv').config();
 const dayjs = require('dayjs');
 const MinuteBank = require('./MinuteBank');
 const PackageTransaction = require('./PackageTransaction');
+const TeacherBalance = require('./TeacherBalance');
 const User = require('./User');
 const Package = require('./Package').Package;
 const aggregatePaginate = require('mongoose-aggregate-paginate-v2');
@@ -66,7 +67,7 @@ const TeacherSchema = new mongoose.Schema({
 
 TeacherSchema.pre('save', async function() {
   const thisTeacher = await Teacher.findOne({ userId: this.userId }).lean().select({ userId: 1 });
-  if (!thisTeacher) {
+  if (!thisTeacher) { // new teacher
     const newPackageTransaction = new PackageTransaction({
       hostedBy: process.env.MANABU_ADMIN_ID,
       packageId: process.env.MANABU_ADMIN_PKG_ID,
@@ -96,6 +97,9 @@ TeacherSchema.pre('save', async function() {
         console.log(err);
       }
   });
+
+  const newTeacherBalance = new TeacherBalance({ userId: this.userId })
+  newTeacherBalance.save().catch((err) => { console.log(err) })
   
     const defaultPackageDurations = [30, 60];
     const defaultPackageTypes = [{ type: 'mainichi', lessonAmount: 22, }, { type: 'moderate', lessonAmount: 12, }, { type: 'light', lessonAmount: 5, }];
