@@ -39,6 +39,10 @@ const TeacherSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isHidden: {
+    type: Boolean,
+    default: false,
+  },
   teacherType: {
       type: String,
       default: 'unlicensed',
