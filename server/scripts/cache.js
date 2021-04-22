@@ -11,6 +11,9 @@ const client = redis.createClient({
 client.hget = util.promisify(client.hget);
 client.hget = util.promisify(client.hget);
 const exec = mongoose.Query.prototype.exec;
+// client.flushdb( function (err, succeeded) {
+//   console.log(succeeded); // will be true if successfull
+// });
 mongoose.Query.prototype.cache = function(options = { time: 24 * 60 * 60 * 1000 }) {
   this.useCache = true;
   this.time = options.time;
@@ -44,6 +47,8 @@ module.exports = {
     client.del(JSON.stringify(hashKey));
   },
   clearSpecificKey(hashKey, key) {
-    client.hdel(JSON.stringify(hashKey), JSON.stringify(key))
+    client.hdel(JSON.stringify(hashKey), JSON.stringify(key), (err, res) => {
+      console.log(res, hashKey, key)
+    })
   }
 };

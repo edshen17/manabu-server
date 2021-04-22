@@ -744,7 +744,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 returnOriginal: false
                             }).then(() => {
                                 clearSpecificKey(Package.collection.collectionName, {
-                                    _id: offering._id
+                                    hostedBy
                                 })
                             }).catch((err) => handleErrors(err, req, res, next))
                         })
@@ -757,7 +757,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 returnOriginal: false
                             }).then(() => {
                                 clearSpecificKey(Package.collection.collectionName, {
-                                    _id: offering._id
+                                    hostedBy
                                 })
                             }).catch((err) => handleErrors(err, req, res, next))
                         })
