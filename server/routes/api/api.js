@@ -22,7 +22,7 @@ const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
 const getHost = require('../../scripts/controller/utils/getHost')
-
+const cache = require('../../scripts/cache');
 const {
     google
 } = require('googleapis');
@@ -34,6 +34,7 @@ const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
+const { clearKey } = require('../../scripts/cache');
 const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
     'client_id':  process.env.PAYPAL_CLIENT_ID_DEV,
@@ -149,9 +150,11 @@ router.post('/register', (req, res, next) => {
                                 userId: user._id,
                             });
                             newTeacher.save().catch((err) => {
+                                clearKey(Teacher.collection.collectionName)
                                 console.log(err)
                             });
                         }
+                        clearKey(User.collection.collectionName)
                         returnToken(res, user);
                     }
                 });
@@ -161,22 +164,22 @@ router.post('/register', (req, res, next) => {
 
 
 // route to get access to user's own information
-router.get('/me', VerifyToken, function(req, res, next) {
-    User.findById(req.userId).lean().select({
+router.get('/me', VerifyToken, async function(req, res, next) {
+    const user = await User.findById(req.userId).lean().select({
         email: 0,
         password: 0
-    }).then(function(user) {
-        if (!user) return res.status(404).send("No user found.");
-        next(user);
+    }).cache().lean().catch((err) => handleErrors(err, req, res, next));
+    if (!user) return res.status(404).send("No user found.");
+    else {
         User.findOneAndUpdate({ // update online
-            _id: req.params.uId
+            _id: req.userId
         }, {
             lastOnline: new Date()
         }).catch((err) => {
             console.log(err)
-        });
-
-    }).catch((err) => handleErrors(err, req, res, next));
+        }).catch((err) => handleErrors(err, req, res, next));;
+        next(user);
+    }
 });
 
 // route to get access to user's teachers
@@ -195,6 +198,9 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
         password: 0,
     }
     if (req.role == 'admin') dbQuery = { password: 0 }
+    if (req.userId != req.params.uId) { // if not self, do not include settings
+        dbQuery.settings = 0
+    }
     User.findById(req.params.uId, dbQuery).lean().then(function(user) {
         if (!user) {
             return res.status(404).send("No user found.");
@@ -341,6 +347,7 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
             })
             .lean()
             .then((user) => {
+                clearKey(User.collection.collectionName)
                 next(user)
             }).catch((err) => {
                 handleErrors(err, req, res, next);
@@ -462,6 +469,7 @@ router.put('/teacher/:uId/updateProfile', VerifyToken, (req, res, next) => {
         })
         .lean()
         .then((teacher) => {
+            clearKey(Teacher.collection.collectionName)
             return res.status(200).json(teacher);
         }).catch((err) => {
             handleErrors(err, req, res, next);
@@ -842,40 +850,29 @@ router.get('/utils/verifyTransactionData', VerifyToken, async (req, res, next) =
 });
 
 // enable router to use middleware
-router.use(function(user, req, res, next) {
+router.use(async function(user, req, res, next) {
+    user = JSON.parse(JSON.stringify(user));
     if (!req.role) req.role = 'user';
-    Teacher.findOne({
+    const teacherQuery = {
+        _id: 0,
+        licensePath: 0,
+    }
+    const teacher = JSON.parse(JSON.stringify(await Teacher.findOne({
         userId: user._id
-    }).lean().then((teacher) => {
-        // need to toString ids so accesscontrol filters correctly (refactor to just use filter on mongoose)
-        user._id = user._id.toString()
-        const teacherFilter = roles.can(req.role).readAny('teacherProfile')
-        const selfFilter = roles.can(req.role).readOwn('userProfile')
-        const userFilter = roles.can(req.role).readAny('userProfile')
+    }, teacherQuery).lean().cache()));
 
-        if (req.userId == user._id) { // if self, include settings
-            user = selfFilter.filter(user)
-        } else {
-            user = userFilter.filter(user)
-        }
-        if (teacher) {
-            teacher.userId = teacher.userId.toString()
-
-            Package.find({
-                hostedBy: user._id
-            }).lean().then((packages) => {
-                user.teacherAppPending = !teacher.isApproved;
-                user.teacherData = teacherFilter.filter(teacher);
-                user.teacherData.packages = packages;
-                return res.status(200).json(user);
-            })
-        } else {
-            return res.status(200).json(user);
-        }
-    }).catch((err) => {
-        console.log(err);
-        handleErrors(err, req, res, next)
-    })
+    if (teacher) {
+        const packages = JSON.parse(JSON.stringify(await Package.find({
+            hostedBy: user._id
+        }).lean().cache()));
+        user.teacherAppPending = !teacher.isApproved;
+        user.teacherData = teacher;
+        user.teacherData.packages = packages;
+        return res.status(200).json(user);
+    } 
+     else {
+        return res.status(200).json(user);
+    }
 });
 
 router.post('/pay', VerifyToken, (req, res, next) => {
