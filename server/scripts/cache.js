@@ -35,10 +35,15 @@ mongoose.Query.prototype.exec = async function() {
   const result = await exec.apply(this, arguments);
   client.hset(this.hashKey, key, JSON.stringify(result));
   client.expire(this.hashKey, this.time);
+  console.log('mongodb', this.hashKey)
+
   return result;
 };
 module.exports = {
   clearKey(hashKey) {
     client.del(JSON.stringify(hashKey));
+  },
+  clearSpecificKey(hashKey, key) {
+    client.hdel(JSON.stringify(hashKey), JSON.stringify(key))
   }
 };

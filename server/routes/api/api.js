@@ -34,7 +34,7 @@ const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-const { clearKey } = require('../../scripts/cache');
+const { clearKey, clearSpecificKey } = require('../../scripts/cache');
 const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
     'client_id':  process.env.PAYPAL_CLIENT_ID_DEV,
@@ -165,30 +165,36 @@ router.post('/register', (req, res, next) => {
 
 // route to get access to user's own information
 router.get('/me', VerifyToken, async function(req, res, next) {
-    const user = await User.findById(req.userId).lean().select({
+    const selectOptions = {
         email: 0,
         password: 0
-    }).cache().lean().catch((err) => handleErrors(err, req, res, next));
+    }
+    const user = await User.findById(req.userId).cache().lean().select(selectOptions).lean().catch((err) => handleErrors(err, req, res, next));
     if (!user) return res.status(404).send("No user found.");
     else {
-        User.findOneAndUpdate({ // update online
-            _id: req.userId
-        }, {
-            lastOnline: new Date()
-        }).catch((err) => {
-            console.log(err)
-        }).catch((err) => handleErrors(err, req, res, next));;
         next(user);
+        const updateQuery = { // update online
+            _id: req.userId
+        }
+
+        // make sure cache is up to date
+        User.findOneAndUpdate(updateQuery, {
+            lastOnline: new Date()
+        },{
+            returnOriginal: false,
+            "fields": selectOptions,
+        }).then(() => {
+            // clearSpecificKey(User.collection.collectionName, updateQuery)
+        }).catch((err) => handleErrors(err, req, res, next));
     }
 });
 
 // route to get access to user's teachers
-router.get('/myTeachers', VerifyToken, function(req, res, next) {
-    MinuteBank.find({
+router.get('/myTeachers', VerifyToken, async function(req, res, next) {
+    const minuteBanks = await MinuteBank.find({
         reservedBy: req.userId
-    }).lean().then((minuteBanks) => {
-        return res.status(200).json(minuteBanks);
-    }).catch((err) => handleErrors(err, req, res, next));
+    }).cache().lean().catch((err) => handleErrors(err, req, res, next))
+    return res.status(200).json(minuteBanks);
 });
 
 // route to get access to user's public information
@@ -201,7 +207,7 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
     if (req.userId != req.params.uId) { // if not self, do not include settings
         dbQuery.settings = 0
     }
-    User.findById(req.params.uId, dbQuery).lean().then(function(user) {
+    User.findById(req.params.uId, dbQuery).cache().lean().then(function(user) {
         if (!user) {
             return res.status(404).send("No user found.");
         }
@@ -213,7 +219,7 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
 router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, next) {
     User.findOne({
         verificationToken: req.params.verificationToken
-    }).select({ emailVerified: 1 }).then(async function(user) {
+    }).select({ emailVerified: 1 }).cache().then(async function(user) {
         if (user) {
             user.emailVerified = true;
             await user.save().catch((err) => {
@@ -257,6 +263,7 @@ router.get('/auth/google', async (req, res, next) => {
                     })
                     .lean()
                     .select({ _id: 1, email: 1, role: 1 })
+                    .cache()
                     .then(async (user) => {
                         if (!user) {
                             // user does not exist, create a user from google info
@@ -267,13 +274,18 @@ router.get('/auth/google', async (req, res, next) => {
                             });
 
                             newUser.save(async (err, user) => {
-                                if (err) return res.json(err).status(500)
+                                if (err) {
+                                    clearKey(User.collection.collectionName)
+                                    return res.json(err).status(500)
+                                }
                                 else {
                                     if (isTeacherApp) { // if it's a teacher application, link it with the corresponding user account
                                     const newTeacher = new Teacher({
                                             userId: user._id,
                                         });
-                                        newTeacher.save().catch(async (err) => {
+                                        newTeacher.save().then(() => {
+                                            clearKey(Teacher.collection.collectionName)
+                                        }).catch(async (err) => {
                                             console.log(err);
                                         });
                                     }
@@ -288,12 +300,15 @@ router.get('/auth/google', async (req, res, next) => {
                                     })
                                     .lean()
                                     .select({ userId: 1, })
+                                    .cache()
                                     .then((teacher) => {
                                         if (!teacher) {
                                             const newTeacher = new Teacher({
                                                 userId: user._id,
                                             });
-                                            newTeacher.save().catch(async (err) => {
+                                            newTeacher.save().then(() => {
+                                                clearKey(Teacher.collection.collectionName)
+                                            }).catch(async (err) => {
                                                 console.log(err)
                                             });
                                         }
@@ -315,6 +330,7 @@ router.post('/login', function(req, res, next) {
         })
         .lean()
         .select({ _id: 1, email: 1, role: 1, password: 1 })
+        .cache()
         .then(async function(user) {
             if (!user) return res.status(404).send('An account with that email was not found.');
             if (!user.password) return res.status(500).send('You already signed up with Google or Facebook.')
@@ -327,7 +343,9 @@ router.post('/login', function(req, res, next) {
                     const newTeacher = new Teacher({
                         userId: user._id,
                     });
-                    newTeacher.save().catch((err) => {
+                    newTeacher.save().then(() => {
+                        clearKey(Teacher.collection.collectionName)
+                    }).catch((err) => {
                         console.log(err)
                     });
                 }
@@ -340,14 +358,15 @@ router.post('/login', function(req, res, next) {
 // Route for editing a user's profile information
 router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
     if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body.role && !req.body._id && !req.body.dateRegistered))) {
-        User.findOneAndUpdate({
-                _id: req.params.uId
-            }, req.body, {
+        const updateQuery = {
+            _id: req.params.uId
+        }
+        User.findOneAndUpdate(updateQuery, req.body, {
                 returnOriginal: false
             })
             .lean()
             .then((user) => {
-                clearKey(User.collection.collectionName)
+                clearSpecificKey(User.collection.collectionName, updateQuery)
                 next(user)
             }).catch((err) => {
                 handleErrors(err, req, res, next);
@@ -461,15 +480,16 @@ router.get('/teachers', VerifyToken, (req, res, next) => {
 // Route for editing a teacher's profile information
 router.put('/teacher/:uId/updateProfile', VerifyToken, (req, res, next) => {
     if (req.role == 'admin' || ((req.userId == req.params.uId) && (!req.body._id && !req.body.userId))) {
-        Teacher.findOneAndUpdate({
+        const updateQuery = {
             userId: req.params.uId,
-        }, req.body, {
+        }
+        Teacher.findOneAndUpdate(updateQuery, req.body, {
             returnOriginal: false,
             "fields": { _id: 0, licensePath: 0 },
         })
         .lean()
         .then((teacher) => {
-            clearKey(Teacher.collection.collectionName)
+            clearSpecificKey(Teacher.collection.collectionName, updateQuery)
             return res.status(200).json(teacher);
         }).catch((err) => {
             handleErrors(err, req, res, next);
@@ -490,11 +510,13 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
         AvailableTime.findOne(newAvailableTime)
             .lean()
             .select({ _id: 1})
+            .cache()
             .then((availableTime) => {
                 if (availableTime) {
                     return res.status(500).send('Available time already exists');
                 } else {
                     new AvailableTime(newAvailableTime).save().then((availTime) => {
+                        clearKey(AvailableTime.collection.collectionName)
                         return res.status(200).json(availTime);
                     }).catch((err) => {
                         return res.status(500).send(err)
@@ -521,6 +543,7 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, 
         }).sort({
             from: 1
         }).lean()
+        .cache()
         .then((availTime) => {
             if (!availTime) return res.status(404).send('no available time');
             return res.status(200).json(availTime);
@@ -529,8 +552,9 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, 
 
 router.delete('/schedule/availableTime', VerifyToken, accessController.grantAccess('deleteOwn', 'availableTime'), (req, res, next) => {
     if (req.userId == req.body.deleteObj.hostedBy) {
-        AvailableTime.findByIdAndDelete(req.body.deleteObj.appointmentId).then((availableTime) => {
+        AvailableTime.findByIdAndDelete(req.body.deleteObj.appointmentId).cache().then((availableTime) => {
             if (availableTime) {
+                clearKey(AvailableTime.collection.collectionName)
                 return res.status(200).send('success');
             } else {
                 return res.status(404).send('no available time found to be deleted');
@@ -550,6 +574,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
     Appointment.findOne(newAppointment)
         .lean()
         .select({_id: 1})
+        .cache()
         .then((appointment) => {
             if (appointment) {
                 return res.status(500).send('Appointment already exists');
@@ -557,6 +582,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
                 newAppointment.reservedBy = req.body.reservedBy;
                 if (req.userId == req.body.reservedBy) {
                     new Appointment(newAppointment).save().then((appointment) => {
+                        clearKey(Appointment.collection.collectionName)
                         return res.status(200).json(appointment);
                     }).catch((err) => {
                         return res.status(500).send(err)
@@ -586,6 +612,7 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
         from: 1
     })
     .lean()
+    .cache()
     .then((appointments) => {
         if (!appointments) return res.status(404).send('no appointments found');
         return res.status(200).json(appointments);
@@ -602,6 +629,7 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
             if (from) appointment.from = from;
             if (to) appointment.to = to;
             appointment.save().then((appointment) => {
+                clearSpecificKey(Appointment.collection.collectionName, req.params.aId)
                 return res.status(200).json(appointment);
             }).catch((err) => handleErrors(err, req, res, next));
         }
@@ -610,7 +638,7 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
 
 // Route for getting a specific appointment
 router.get('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-    Appointment.findById(req.params.aId).lean().then((appointment) => {
+    Appointment.findById(req.params.aId).lean().cache().then((appointment) => {
         if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
             return res.status(200).json(appointment)
         }
@@ -638,7 +666,9 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
             packageDurations,
         })
 
-        newPackage.save().catch((err) => {
+        newPackage.save().then(() => {
+            clearKey(Package.collection.collectionName)
+        }).catch((err) => {
             console.log(err);
         })
     }
@@ -659,6 +689,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
             userId: hostedBy
         })
         .lean()
+        .cache()
         .select({ userId: 0, })
         .then((teacher) => {
             if (teacher && (hostedBy == req.userId || req.role == 'admin')) {
@@ -672,7 +703,11 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                     offeringTypes: teacherPackages
                 }, {
                     returnOriginal: false
-                }).lean().catch((err) => {
+                }).lean().then(() => {
+                    clearSpecificKey(Teacher.collection.collectionName, {
+                        userId: hostedBy
+                    })
+                }).catch((err) => {
                     console.log(err);
                 })
 
@@ -683,7 +718,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                 }
                 Package.find({
                     hostedBy: hostedBy
-                }).lean().then((pkgs) => {
+                }).lean().cache().then((pkgs) => {
                     if (pkgs.length > 0) {
                         const toUpdateOffering = pkgs.filter((pkg) => {
                             return teacherPackages.includes(pkg.packageType)
@@ -707,6 +742,10 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 packageDurations: toUpdateDurations,
                             }, {
                                 returnOriginal: false
+                            }).then(() => {
+                                clearSpecificKey(Package.collection.collectionName, {
+                                    _id: offering._id
+                                })
                             }).catch((err) => handleErrors(err, req, res, next))
                         })
                         toRemoveOffering.forEach((offering) => {
@@ -716,6 +755,10 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 isOffering: false,
                             }, {
                                 returnOriginal: false
+                            }).then(() => {
+                                clearSpecificKey(Package.collection.collectionName, {
+                                    _id: offering._id
+                                })
                             }).catch((err) => handleErrors(err, req, res, next))
                         })
 
@@ -756,6 +799,7 @@ router.get('/transaction/package/:hostedBy', (req, res, next) => {
     Package.find({
             hostedBy: req.params.hostedBy
         })
+        .cache()
         .lean().sort([
             ['lessonAmount', 1]
         ])
@@ -768,6 +812,7 @@ router.get('/transaction/package/:hostedBy', (req, res, next) => {
 router.get('/transaction/packageTransaction/:transactionId', VerifyToken, (req, res, next) => {
     PackageTransaction.findById(req.params.transactionId)
         .lean()
+        .cache()
         .then((transaction) => {
             if (!transaction) return res.status(404).send('a transaction with that id was not found');
             if (transaction.hostedBy == req.userId || transaction.reservedBy == req.userId) return res.status(200).json(transaction)
@@ -790,6 +835,7 @@ router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, 
         }).sort({
             transactionDate: 1
         })
+        .cache()
         .lean()
         .then((transactions) => {
             return res.status(200).json(transactions);
@@ -804,6 +850,7 @@ router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, r
             hostedBy: req.params.hostedBy,
             reservedBy: req.params.reservedBy
         }).lean()
+        .cache()
         .then((minuteBank) => {
             if (!minuteBank) return res.status(404).send('404');
             if (minuteBank.hostedBy == req.userId || minuteBank.reservedBy == req.userId) return res.status(200).json(minuteBank)
@@ -825,6 +872,9 @@ router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
                         returnOriginal: false
                     })
                     .then((transaction) => {
+                        clearSpecificKey(PackageTransaction.collection.collectionName, {
+                            _id: req.params.tId
+                        })
                         return res.status(200).json(transaction);
                     }).catch((err) => handleErrors(err, req, res, next));
             } else {
@@ -995,13 +1045,14 @@ router.get('/success', (req, res, next) => {
                         methodData: {
                             paymentId: payment.id
                         }
-                    }).lean().then((trans) => {
+                    }).lean().cache().then((trans) => {
                         if (!trans) {
                             MinuteBank.findOne({
                                     hostedBy: newPackageTransaction.hostedBy,
                                     reservedBy: newPackageTransaction.reservedBy,
                                 })
                                 .lean()
+                                .cache()
                                 .then(async (minutebank) => {
                                     if (!minutebank) { // create a minutebank when there isn't one (reservedBy's first package with hostedBy)
                                         const newMinuteBank = new MinuteBank({
@@ -1011,9 +1062,11 @@ router.get('/success', (req, res, next) => {
                                             reservedByData: userData,
                                         })
                                         newMinuteBank.save((err, minutebank) => {
+                                            clearKey(MinuteBank.collection.collectionName)
                                             if (err) return handleErrors(err, req, res, next);
                                             else {
                                                 newPackageTransaction.save().then((newTrans) => {
+                                                    clearKey(PackageTransaction.collection.collectionName)
                                                     return res.redirect(`${getHost('server')}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                                 }).catch((err) => {
                                                     return handleErrors(err, req, res, next)
@@ -1022,6 +1075,7 @@ router.get('/success', (req, res, next) => {
                                         })
                                     } else {
                                         newPackageTransaction.save().then((newTrans) => {
+                                            clearKey(PackageTransaction.collection.collectionName)
                                             return res.redirect(`${getHost('server')}/api/calendar/${newTrans.hostedBy}/${newTrans._id}`)
                                         }).catch((err) => {
                                             return handleErrors(err, req, res, next)

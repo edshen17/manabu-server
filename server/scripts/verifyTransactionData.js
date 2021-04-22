@@ -12,7 +12,7 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
     const { hostedBy, reservedBy, selectedPlan, selectedDuration, selectedSubscription, selectedPackageId, selectedLanguage, selectedMethod } = req.query
     const teacherData = await Teacher.findOne({
         userId: hostedBy,
-    }, { _id: 0, licensePath: 0, }).lean();
+    }, { _id: 0, licensePath: 0, }).lean().cache();
 
     if (!teacherData) {
         return {
@@ -29,8 +29,8 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
             dateRegistered: 0,
           }
 
-        const teacherUserData = await User.findById(hostedBy, options).lean().catch((err) => {err});
-        const user =  await User.findById(reservedBy, options).lean().catch((err) => {err});
+        const teacherUserData = await User.findById(hostedBy, options).lean().cache().catch((err) => {err});
+        const user =  await User.findById(reservedBy, options).lean().cache().catch((err) => {err});
         if (!user) {
             return {
                 status: 404,
@@ -38,7 +38,7 @@ const verifyTransactionData = async (req, res, exchangeRate) => {
             }
         }
         else {
-            const pkg = await Package.findById(selectedPackageId).lean()
+            const pkg = await Package.findById(selectedPackageId).lean().cache()
             if (!pkg) {
                 return {
                     status: 404,
