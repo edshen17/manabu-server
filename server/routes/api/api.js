@@ -22,7 +22,6 @@ const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
 const getHost = require('../../scripts/controller/utils/getHost')
-const cache = require('../../scripts/cache');
 const {
     google
 } = require('googleapis');
@@ -34,7 +33,7 @@ const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-const { clearKey, clearSpecificKey } = require('../../scripts/cache');
+const { clearKey, clearSpecificKey, updateSpecificKey  } = require('../../scripts/cache');
 const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
     'client_id':  process.env.PAYPAL_CLIENT_ID_DEV,
@@ -173,7 +172,7 @@ router.get('/me', VerifyToken, async function(req, res, next) {
     if (!user) return res.status(404).send("No user found.");
     else {
         next(user);
-        const updateQuery = { // update online
+        const updateQuery = { // update last online
             _id: req.userId
         }
 
@@ -183,8 +182,8 @@ router.get('/me', VerifyToken, async function(req, res, next) {
         },{
             returnOriginal: false,
             "fields": selectOptions,
-        }).then(() => {
-            // clearSpecificKey(User.collection.collectionName, updateQuery)
+        }).then((updatedUser) => {
+            updateSpecificKey(User.collection.collectionName, updateQuery, updatedUser)
         }).catch((err) => handleErrors(err, req, res, next));
     }
 });
@@ -361,12 +360,19 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
         const updateQuery = {
             _id: req.params.uId
         }
+
+        const selectOptions = {
+            email: 0,
+            password: 0
+        }
+        
         User.findOneAndUpdate(updateQuery, req.body, {
-                returnOriginal: false
+                returnOriginal: false,
+                'fields': selectOptions
             })
             .lean()
             .then((user) => {
-                clearSpecificKey(User.collection.collectionName, updateQuery)
+                updateSpecificKey(User.collection.collectionName, updateQuery, user)
                 next(user)
             }).catch((err) => {
                 handleErrors(err, req, res, next);
@@ -489,7 +495,7 @@ router.put('/teacher/:uId/updateProfile', VerifyToken, (req, res, next) => {
         })
         .lean()
         .then((teacher) => {
-            clearSpecificKey(Teacher.collection.collectionName, updateQuery)
+            updateSpecificKey(Teacher.collection.collectionName, updateQuery, teacher)
             return res.status(200).json(teacher);
         }).catch((err) => {
             handleErrors(err, req, res, next);
@@ -629,7 +635,7 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
             if (from) appointment.from = from;
             if (to) appointment.to = to;
             appointment.save().then((appointment) => {
-                clearSpecificKey(Appointment.collection.collectionName, req.params.aId)
+                updateSpecificKey(Appointment.collection.collectionName, req.params.aId, appointment)
                 return res.status(200).json(appointment);
             }).catch((err) => handleErrors(err, req, res, next));
         }
@@ -702,11 +708,15 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                     },
                     offeringTypes: teacherPackages
                 }, {
-                    returnOriginal: false
-                }).lean().then(() => {
-                    clearSpecificKey(Teacher.collection.collectionName, {
+                    returnOriginal: false,
+                    'fields': {
+                        _id: 0,
+                        licensePath: 0
+                    }
+                }).lean().then((teacher) => {
+                    updateSpecificKey(Teacher.collection.collectionName, {
                         userId: hostedBy
-                    })
+                    }, teacher)
                 }).catch((err) => {
                     console.log(err);
                 })
@@ -742,7 +752,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 packageDurations: toUpdateDurations,
                             }, {
                                 returnOriginal: false
-                            }).then(() => {
+                            }).lean().then(() => {
                                 clearSpecificKey(Package.collection.collectionName, {
                                     hostedBy
                                 })
@@ -755,7 +765,7 @@ router.post('/transaction/package', VerifyToken, accessController.grantAccess('c
                                 isOffering: false,
                             }, {
                                 returnOriginal: false
-                            }).then(() => {
+                            }).lean().then(() => {
                                 clearSpecificKey(Package.collection.collectionName, {
                                     hostedBy
                                 })
@@ -872,9 +882,9 @@ router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
                         returnOriginal: false
                     })
                     .then((transaction) => {
-                        clearSpecificKey(PackageTransaction.collection.collectionName, {
+                        updateSpecificKey(PackageTransaction.collection.collectionName, {
                             _id: req.params.tId
-                        })
+                        }, transaction)
                         return res.status(200).json(transaction);
                     }).catch((err) => handleErrors(err, req, res, next));
             } else {
