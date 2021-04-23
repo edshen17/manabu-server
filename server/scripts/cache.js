@@ -22,19 +22,18 @@ const exec = mongoose.Query.prototype.exec;
 // client.flushdb( function (err, succeeded) {
 //   console.log(succeeded); // will be true if successfull
 // });
-mongoose.Query.prototype.cache = function(options = {
-    time: 24 * 60 * 60 * 1000
-}) {
+mongoose.Query.prototype.cache = function(options = { }) {
     this.useCache = true;
-    this.time = options.time;
-    this.hashKey = JSON.stringify(options.key || this.mongooseCollection.name);
+    this.time = 24 * 60 * 60 * 1000;
+    this.hashKey = JSON.stringify(this.mongooseCollection.name);
+    this.queryKey = options.queryKey
     return this;
 };
 mongoose.Query.prototype.exec = async function() {
     if (!this.useCache) {
         return await exec.apply(this, arguments);
     }
-    const key = JSON.stringify({
+    const key = JSON.stringify(this.queryKey) || JSON.stringify({
         ...this.getQuery()
     });
     const cacheValue = await client.hget(this.hashKey, key);

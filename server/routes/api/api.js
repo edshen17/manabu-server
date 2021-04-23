@@ -549,7 +549,11 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, 
         }).sort({
             from: 1
         }).lean()
-        .cache()
+        .cache({
+            queryKey: {
+                hostedBy: req.params.uId
+            }
+        })
         .then((availTime) => {
             if (!availTime) return res.status(404).send('no available time');
             return res.status(200).json(availTime);
@@ -618,7 +622,13 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
         from: 1
     })
     .lean()
-    .cache()
+    .cache({
+        queryKey: [{
+            reservedBy: req.params.uId
+        }, {
+            hostedBy: req.params.uId
+        }]
+    })
     .then((appointments) => {
         if (!appointments) return res.status(404).send('no appointments found');
         return res.status(200).json(appointments);
@@ -635,7 +645,11 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
             if (from) appointment.from = from;
             if (to) appointment.to = to;
             appointment.save().then((appointment) => {
-                updateSpecificKey(Appointment.collection.collectionName, req.params.aId, appointment)
+                clearSpecificKey(Appointment.collection.collectionName, [{
+                    reservedBy: appointment.reservedBy
+                }, {
+                    hostedBy: appointment.reservedBy
+                }])
                 return res.status(200).json(appointment);
             }).catch((err) => handleErrors(err, req, res, next));
         }
@@ -644,7 +658,13 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
 
 // Route for getting a specific appointment
 router.get('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-    Appointment.findById(req.params.aId).lean().cache().then((appointment) => {
+    Appointment.findById(req.params.aId).lean().cache({
+        queryKey: [{
+            reservedBy: req.params.uId
+        }, {
+            hostedBy: req.params.uId
+        }]
+    }).then((appointment) => {
         if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
             return res.status(200).json(appointment)
         }
