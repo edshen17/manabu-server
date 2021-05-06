@@ -32,6 +32,10 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  lastUpdated: {
+    type: Date,
+    default: Date.now,
+  },
   languages: { // all languages user knows
     type: Array,
     default: [],

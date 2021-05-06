@@ -17,8 +17,6 @@ const config = require('../../../config/auth.config');
 const VerifyToken = require('../../scripts/VerifyToken');
 const scheduler = require('../../scripts/scheduler/schedule');
 const fetchExchangeRate = require('../../scripts/scheduler/exchangeRateFetcher').fetchExchangeRate;
-const accessController = require('../../scripts/controller/accessController');
-const roles = require('../../scripts/controller/roles').roles;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
 const getHost = require('../../scripts/controller/utils/getHost')
@@ -517,7 +515,7 @@ router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
         AvailableTime.findOne(newAvailableTime)
             .lean()
             .select({ _id: 1})
-            .cache()
+            // .cache()
             .then((availableTime) => {
                 if (availableTime) {
                     return res.status(500).send('Available time already exists');
@@ -550,20 +548,22 @@ router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, 
         }).sort({
             from: 1
         }).lean()
-        .cache({
-            queryKey: {
-                hostedBy: req.params.uId
-            }
-        })
+        // .cache({
+        //     queryKey: {
+        //         hostedBy: req.params.uId
+        //     }
+        // })
         .then((availTime) => {
             if (!availTime) return res.status(404).send('no available time');
             return res.status(200).json(availTime);
         }).catch((err) => handleErrors(err, req, res, next))
 })
 
-router.delete('/schedule/availableTime', VerifyToken, accessController.grantAccess('deleteOwn', 'availableTime'), (req, res, next) => {
+router.delete('/schedule/availableTime', VerifyToken, (req, res, next) => {
     if (req.userId == req.body.deleteObj.hostedBy) {
-        AvailableTime.findByIdAndDelete(req.body.deleteObj.appointmentId).cache().then((availableTime) => {
+        AvailableTime.findByIdAndDelete(req.body.deleteObj.appointmentId)
+        // .cache()
+        .then((availableTime) => {
             if (availableTime) {
                 clearKey(AvailableTime.collection.collectionName)
                 return res.status(200).send('success');
@@ -585,7 +585,7 @@ router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
     Appointment.findOne(newAppointment)
         .lean()
         .select({_id: 1})
-        .cache()
+        // .cache()
         .then((appointment) => {
             if (appointment) {
                 return res.status(500).send('Appointment already exists');
@@ -623,13 +623,13 @@ router.get('/schedule/:uId/appointment/:startWeekDay/:endWeekDay/', VerifyToken,
         from: 1
     })
     .lean()
-    .cache({
-        queryKey: [{
-            reservedBy: req.params.uId
-        }, {
-            hostedBy: req.params.uId
-        }]
-    })
+    // .cache({
+    //     queryKey: [{
+    //         reservedBy: req.params.uId
+    //     }, {
+    //         hostedBy: req.params.uId
+    //     }]
+    // })
     .then((appointments) => {
         if (!appointments) return res.status(404).send('no appointments found');
         return res.status(200).json(appointments);
@@ -659,13 +659,15 @@ router.put('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
 
 // Route for getting a specific appointment
 router.get('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
-    Appointment.findById(req.params.aId).lean().cache({
-        queryKey: [{
-            reservedBy: req.params.uId
-        }, {
-            hostedBy: req.params.uId
-        }]
-    }).then((appointment) => {
+    Appointment.findById(req.params.aId).lean()
+    // .cache({
+    //     queryKey: [{
+    //         reservedBy: req.params.uId
+    //     }, {
+    //         hostedBy: req.params.uId
+    //     }]
+    // })
+    .then((appointment) => {
         if (appointment && (appointment.hostedBy == req.userId || appointment.reservedBy == req.userId)) {
             return res.status(200).json(appointment)
         }
@@ -674,7 +676,7 @@ router.get('/schedule/appointment/:aId', VerifyToken, (req, res, next) => {
 
 // POST route to create/edit package(s)
 // to do update so just PUT
-router.post('/transaction/package', VerifyToken, accessController.grantAccess('createOwn', 'package'), (req, res, next) => {
+router.post('/transaction/package', VerifyToken, (req, res, next) => {
     const {
         hostedBy,
         hourlyPrice,
