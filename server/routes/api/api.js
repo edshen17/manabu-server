@@ -832,8 +832,8 @@ router.get('/transaction/package/:hostedBy', (req, res, next) => {
     Package.find({
             hostedBy: req.params.hostedBy
         })
-        .cache()
-        .lean().sort([
+        .lean() // TODO TO DO cache here
+        .sort([
             ['lessonAmount', 1]
         ])
         .then((package) => {
