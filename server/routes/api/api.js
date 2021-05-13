@@ -165,7 +165,8 @@ router.post('/register', (req, res, next) => {
 router.get('/me', VerifyToken, async function(req, res, next) {
     const selectOptions = {
         email: 0,
-        password: 0
+        password: 0,
+        verificationToken: 0,
     }
     const user = await User.findById(req.userId).cache().lean().select(selectOptions).lean().catch((err) => handleErrors(err, req, res, next));
     if (!user) return res.status(404).send("No user found.");
@@ -200,8 +201,9 @@ router.get('/user/:uId', VerifyToken, function(req, res, next) {
     let dbQuery = {
         email: 0,
         password: 0,
+        verificationToken: 0,
     }
-    if (req.role == 'admin') dbQuery = { password: 0 }
+    if (req.role == 'admin') dbQuery = { password: 0, verificationToken: 0, }
     if (req.userId != req.params.uId) { // if not self, do not include settings
         dbQuery.settings = 0
     }
@@ -234,7 +236,16 @@ router.get('/user/verify/:verificationToken', VerifyToken, function(req, res, ne
 // route for google logins
 router.get('/auth/google', async (req, res, next) => {
     const code = req.query.code;
-    const isTeacherApp = req.query.state == 'true';
+    const decoded64 = Buffer.from(req.query.state, 'base64').toString()
+    let parsedState;
+    try {
+        parsedState = JSON.parse(decoded64)
+    }
+    catch (err) {
+        console.log(err)
+    }
+    const isTeacherApp = parsedState.isTeacherApp;
+    const hostedBy = parsedState.hostedBy;
     const {
         tokens
     } = await oauth2Client.getToken(code)
@@ -242,10 +253,12 @@ router.get('/auth/google', async (req, res, next) => {
     oauth2Client.setCredentials({
         access_token: tokens.access_token
     });
-    var oauth2 = google.oauth2({
+
+    const oauth2 = google.oauth2({
         auth: oauth2Client,
         version: 'v2'
     });
+
     oauth2.userinfo.get(
         function(err, gRes) {
             if (err) {
@@ -312,8 +325,11 @@ router.get('/auth/google', async (req, res, next) => {
                                         }
                                     }).catch((err) => handleErrors(err, req, res, next));
                             }
+
                             storeTokenCookie(res, user)
-                            return res.status(200).redirect(`${getHost('client')}/dashboard`)
+                            let redirectStr = `${getHost('client')}/dashboard`
+                            if (hostedBy) redirectStr += `?hostedBy=${hostedBy}`
+                            return res.status(200).redirect(redirectStr)
                         }
                     })
             }
@@ -362,7 +378,8 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
 
         const selectOptions = {
             email: 0,
-            password: 0
+            password: 0,
+            verificationToken: 0,
         }
         
         User.findOneAndUpdate(updateQuery, req.body, {
