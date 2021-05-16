@@ -4,8 +4,8 @@ const dotenv = require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const cryptoRandomString = require('crypto-random-string');
 const sendVerificationEmail = require('../scripts/controller/sendVerificationEmail');
+const EmailHandler = require('../scripts/controller/emails/emailHandler');
 const randToken = cryptoRandomString({length: 15});
-const verificationToken = jwt.sign({ randToken: randToken }, process.env.JWT_SECRET);
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -77,12 +77,24 @@ const UserSchema = new mongoose.Schema({
   },
   verificationToken: {
     type: String,
-    default: verificationToken,
   },
 });
 
-UserSchema.post('save', function() { 
-  sendVerificationEmail(this.email, this.verificationToken); 
+UserSchema.post('save', function() {
+  const verificationToken = jwt.sign({ randToken: randToken }, process.env.JWT_SECRET);
+  const emailHandler = new EmailHandler();
+  let host = 'https://manabu.sg';
+
+  if (process.env.NODE_ENV != 'production') {
+      host = 'http://localhost:8080'
+  }
+  
+  this.set({ verificationToken });
+
+  // emailHandler.sendEmail(this.email, 'NOREPLY', 'Manabu email verification', verificationEmailTemplateString, {
+  //   host,
+  //   verificationToken,
+  // })
 });
 
 UserSchema.index({role: 1, name: 1, email: 1});

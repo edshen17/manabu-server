@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const Teacher = require('../models/Teacher');
 const Package = require('../models/Package').Package;
-const roles = require('./controller/roles').roles;
 const fx = require('money');
 
 // verify transaction data from client

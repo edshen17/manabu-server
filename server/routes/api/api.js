@@ -9,7 +9,6 @@ const PackageTransaction = require('../../models/PackageTransaction');
 const MinuteBank = require('../../models/MinuteBank');
 const TeacherBalance = require('../../models/TeacherBalance');
 const router = express.Router();
-const querystring = require('querystring')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
