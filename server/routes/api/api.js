@@ -18,7 +18,8 @@ const scheduler = require('../../scripts/scheduler/schedule');
 const fetchExchangeRate = require('../../scripts/scheduler/exchangeRateFetcher').fetchExchangeRate;
 const handleErrors = require('../../scripts/controller/errorHandler');
 const verifyTransactionData = require('../../scripts/verifyTransactionData');
-const getHost = require('../../scripts/controller/utils/getHost')
+const getHost = require('../../scripts/controller/utils/getHost');
+const EmailHandler = require('../../scripts/controller/emails/emailHandler')
 const {
     google
 } = require('googleapis');

@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const dotenv = require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const cryptoRandomString = require('crypto-random-string');
-const sendVerificationEmail = require('../scripts/controller/sendVerificationEmail');
 const EmailHandler = require('../scripts/controller/emails/emailHandler');
 const randToken = cryptoRandomString({length: 15});
 
@@ -80,7 +79,7 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.post('save', function() {
+UserSchema.pre('save', function() {
   const verificationToken = jwt.sign({ randToken: randToken }, process.env.JWT_SECRET);
   const emailHandler = new EmailHandler();
   let host = 'https://manabu.sg';
@@ -91,15 +90,14 @@ UserSchema.post('save', function() {
   
   this.set({ verificationToken });
 
-  // emailHandler.sendEmail(this.email, 'NOREPLY', 'Manabu email verification', verificationEmailTemplateString, {
-  //   host,
-  //   verificationToken,
-  // })
+  emailHandler.sendEmail(this.email, 'NOREPLY', 'Manabu email verification', 'verificationEmail', {
+    name: this.name,
+    host,
+    verificationToken,
+  })
 });
 
 UserSchema.index({role: 1, name: 1, email: 1});
-
-
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;

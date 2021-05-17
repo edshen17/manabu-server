@@ -33,25 +33,27 @@ const readHTMLFile = function(path, callback) {
     });
 };
 
-
+/**
+ * Class to represent an Email Handler. This class handles all email transaction.
+ */
 class EmailHandler {
     /**
      * 
      * @param {String || Array<String>} recipientEmails emails to send to
      * @param {String} sendFrom email to send from. Possible values are defined in MAIL_SEND_FROM_OPTIONS
      * @param {String} subjectLine subject line
-     * @param {String} htmlPath html path
+     * @param {String} htmlFileName html filename (template must be inside the templates directory)
      * @param {Object} templateStrings template strings used in htmlContent
      */
-    async sendEmail(recipientEmails, sendFrom, subjectLine, htmlPath, templateStrings) {
+    async sendEmail(recipientEmails, sendFrom, subjectLine, htmlFileName, templateStrings) {
         const nodeMailerOptions = {
             ...NODE_MAILER_OPTIONS
         };
         nodeMailerOptions.auth = MAIL_SEND_FROM_OPTIONS[sendFrom];
         const transporter = nodemailer.createTransport(nodeMailerOptions);
 
-        // change to htmlpath
-        readHTMLFile(__dirname + '/templates/verificationEmail.html', function (err, html) {
+        readHTMLFile(`${__dirname}/templates/${htmlFileName}.html`, function (err, html) {
+            if (err) console.log(err);
             const template = handlebars.compile(html);
             const htmlToSend = template(templateStrings);
             const mailOptions = {
@@ -61,18 +63,15 @@ class EmailHandler {
                 html : htmlToSend
              };
 
-            transporter.sendMail(mailOptions, function (error, response) {
-                if (error) {
-                    console.log(error);
-                    callback(error);
-                }
+            transporter.sendMail(mailOptions, function (err, response) {
+                if (err) console.log(err);
             });
         });
     }
 }
 
 const test = new EmailHandler()
-test.sendEmail('greencopter4444@gmail.com', 'NOREPLY', 'Manabu email verification', 'test', {
+test.sendEmail('greencopter4444@gmail.com', 'NOREPLY', 'Manabu email verification', 'verificationEmail', {
     name: 'bei',
     host: 'testhost',
     verificationToken: 'testtoken',
