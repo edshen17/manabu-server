@@ -325,7 +325,6 @@ router.get('/auth/google', async (req, res, next) => {
                                         }
                                     }).catch((err) => handleErrors(err, req, res, next));
                             }
-
                             storeTokenCookie(res, user)
                             let redirectStr = `${getHost('client')}/dashboard`
                             if (hostedBy) redirectStr += `?hostedBy=${hostedBy}`

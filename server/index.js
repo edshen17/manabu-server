@@ -5,10 +5,10 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const compression = require('compression')
 const http = require('http');
-const Ddos = require('ddos')
-const ddos = new Ddos({burst:50, limit:50})
-const helmet = require("helmet");
-
+const Ddos = require('ddos');
+const helmet = require('helmet');
+const api = require('./routes/api/api');
+const ddos = new Ddos({ burst:50, limit:50 })
 const corsConfig = {
   origin: true,
   credentials: true,
@@ -29,11 +29,7 @@ app.use(
   })
 );
 app.use(ddos.express);
-
 app.use(compression());
-
-const api = require('./routes/api/api');
-
 app.use('/api/', api);
 
 
@@ -43,9 +39,8 @@ if (process.env.NODE_ENV == 'production') {
       res.redirect(`https://${req.header('host')}${req.url}`)
     } else {
       next();
-    }
-  });
-
+  }
+});
   // static folder
   app.use(express.static(__dirname + '/public/'));
 
@@ -53,8 +48,7 @@ if (process.env.NODE_ENV == 'production') {
   app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));  
 }
 
-app.use(express.static('public'))
-
+app.use(express.static('public'));
 const port = process.env.PORT || 5000;
 
 http.createServer(app).listen(port, function() {

@@ -43,7 +43,7 @@ class EmailHandler {
      * @param {String} sendFrom email to send from. Possible values are defined in MAIL_SEND_FROM_OPTIONS
      * @param {String} subjectLine subject line
      * @param {String} htmlFileName html filename (template must be inside the templates directory)
-     * @param {Object} templateStrings template strings used in htmlContent
+     * @param {Object} templateStrings template strings used in html
      */
     async sendEmail(recipientEmails, sendFrom, subjectLine, htmlFileName, templateStrings) {
         const nodeMailerOptions = {
@@ -69,12 +69,5 @@ class EmailHandler {
         });
     }
 }
-
-const test = new EmailHandler()
-test.sendEmail('greencopter4444@gmail.com', 'NOREPLY', 'Manabu email verification', 'verificationEmail', {
-    name: 'bei',
-    host: 'testhost',
-    verificationToken: 'testtoken',
-})
 
 module.exports = EmailHandler
