@@ -1,4 +1,4 @@
-const listUsers = require('../../usecases/user/index').listUsers;
+const { listUsers } = require('../../usecases/user/index')
 const makeGetUsers = require('./getUsers')
 const getUsers = makeGetUsers({ listUsers });
 

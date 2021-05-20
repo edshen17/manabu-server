@@ -13,15 +13,15 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const config = require('../../../config/auth.config');
-const VerifyToken = require('../../entities/VerifyToken');
-const scheduler = require('../../entities/scheduler/schedule');
-const fetchExchangeRate = require('../../entities/scheduler/exchangeRateFetcher').fetchExchangeRate;
-const handleErrors = require('../../entities/controller/errorHandler');
-const verifyTransactionData = require('../../entities/verifyTransactionData');
-const getHost = require('../../entities/controller/utils/getHost');
-const EmailHandler = require('../../entities/controller/emails/emailHandler');
-const makeCallback = require('../../entities/express-callback/index');
-const { getUsers, userController } = require('../../entities/controller/user/index');
+const VerifyToken = require('../../components/VerifyToken');
+const scheduler = require('../../components/scheduler/schedule');
+const fetchExchangeRate = require('../../components/scheduler/exchangeRateFetcher').fetchExchangeRate;
+const handleErrors = require('../../components/controller/errorHandler');
+const verifyTransactionData = require('../../components/verifyTransactionData');
+const getHost = require('../../components/controller/utils/getHost');
+const EmailHandler = require('../../components/controller/emails/emailHandler');
+const makeCallback = require('../../components/express-callback/index');
+const { getUsers, userController } = require('../../components/controller/user/index');
 
 const {
     google
@@ -34,7 +34,7 @@ const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-const { clearKey, clearSpecificKey, updateSpecificKey  } = require('../../entities/cache');
+const { clearKey, clearSpecificKey, updateSpecificKey  } = require('../../components/cache');
 const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
     'client_id':  process.env.PAYPAL_CLIENT_ID_DEV,
