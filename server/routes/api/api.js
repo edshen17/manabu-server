@@ -13,13 +13,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const config = require('../../../config/auth.config');
-const VerifyToken = require('../../scripts/VerifyToken');
-const scheduler = require('../../scripts/scheduler/schedule');
-const fetchExchangeRate = require('../../scripts/scheduler/exchangeRateFetcher').fetchExchangeRate;
-const handleErrors = require('../../scripts/controller/errorHandler');
-const verifyTransactionData = require('../../scripts/verifyTransactionData');
-const getHost = require('../../scripts/controller/utils/getHost');
-const EmailHandler = require('../../scripts/controller/emails/emailHandler')
+const VerifyToken = require('../../components/VerifyToken');
+const scheduler = require('../../components/scheduler/schedule');
+const fetchExchangeRate = require('../../components/scheduler/exchangeRateFetcher').fetchExchangeRate;
+const handleErrors = require('../../components/controller/errorHandler');
+const verifyTransactionData = require('../../components/verifyTransactionData');
+const getHost = require('../../components/controller/utils/getHost');
+const EmailHandler = require('../../components/controller/emails/emailHandler');
+const makeCallback = require('../../components/express-callback/index');
+const { getUsers, createUser } = require('../../components/controller/user/index');
+
 const {
     google
 } = require('googleapis');
@@ -31,7 +34,7 @@ const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-const { clearKey, clearSpecificKey, updateSpecificKey  } = require('../../scripts/cache');
+const { clearKey, clearSpecificKey, updateSpecificKey  } = require('../../components/cache');
 const paypalConfig = {
     'mode': 'sandbox', //sandbox or live, change to use process env
     'client_id':  process.env.PAYPAL_CLIENT_ID_DEV,
@@ -111,6 +114,9 @@ function returnToken(res, user) {
         token: token
     });
 }
+
+router.get('/test/:uId', makeCallback(getUsers))
+router.post('/test/', makeCallback(createUser))
 
 // Get User
 // Making a user in the db
