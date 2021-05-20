@@ -72,12 +72,6 @@ export default function buildMakeUser ({ sanitize, inputValidator, passwordHashe
         getCommMethods: () => commMethods,
         getEmailVerified: () => emailVerified,
         getVerificationToken: () => verificationToken,
-        getPostId: () => postId,
-        getReplyToId: () => replyToId,
-        getSource: () => validSource,
-        getText: () => sanitizedText,
-        isDeleted: () => sanitizedText === deletedText,
-        isPublished: () => published,
         verifyEmail: () => {
           emailVerified = true
         },

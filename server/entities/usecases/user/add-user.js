@@ -3,28 +3,28 @@ const makeUser = require('../../user/user');
 export default function makeAddUser ({ userDb }) {
   return async function addUser (userData) {
     const user = makeUser(userData)
-    const exists = await userDb.findOne({ email: user.getHash() })
+    const exists = await userDb.findOne({ email: user.getEmail() })
     if (exists) {
       return exists
     }
 
-    const moderated = await handleModeration({ comment })
-    const commentSource = moderated.getSource()
-    return commentsDb.insert({
-      author: moderated.getAuthor(),
-      createdOn: moderated.getCreatedOn(),
-      hash: moderated.getHash(),
-      id: moderated.getId(),
-      modifiedOn: moderated.getModifiedOn(),
-      postId: moderated.getPostId(),
-      published: moderated.isPublished(),
-      replyToId: moderated.getReplyToId(),
-      source: {
-        ip: commentSource.getIp(),
-        browser: commentSource.getBrowser(),
-        referrer: commentSource.getReferrer()
+    return userDb.insert({
+      name: user.getName(),
+      email: user.getEmail(),
+      password: user.getPassword(),
+      profileImage: user.getProfileImage(),
+      profileBio: user.getProfileBio(),
+      dateRegistered: user.getDateRegistered(),
+      lastUpdated: user.getLastUpdated(),
+      languages: user.getLanguages(),
+      region: user.getRegion(),
+      timezone: user.getTimeZone(),
+      settings: {
+        currency: 'SGD',
       },
-      text: moderated.getText()
+      commMethods: user.getCommMethods(),
+      emailVerified: user.getEmailVerified(),
+      verificationToken: user.getVerificationToken(),
     })
   }
 }

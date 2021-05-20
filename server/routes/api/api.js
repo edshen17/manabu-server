@@ -19,7 +19,10 @@ const fetchExchangeRate = require('../../entities/scheduler/exchangeRateFetcher'
 const handleErrors = require('../../entities/controller/errorHandler');
 const verifyTransactionData = require('../../entities/verifyTransactionData');
 const getHost = require('../../entities/controller/utils/getHost');
-const EmailHandler = require('../../entities/controller/emails/emailHandler')
+const EmailHandler = require('../../entities/controller/emails/emailHandler');
+const makeCallback = require('../../entities/express-callback/index');
+const { getUsers, userController } = require('../../entities/controller/user/index');
+
 const {
     google
 } = require('googleapis');
@@ -111,6 +114,8 @@ function returnToken(res, user) {
         token: token
     });
 }
+
+router.get('/test/:uId', makeCallback(getUsers))
 
 // Get User
 // Making a user in the db
