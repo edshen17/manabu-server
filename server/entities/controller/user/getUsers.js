@@ -4,13 +4,13 @@ function makeGetUsers ({ listUsers }) {
       'Content-Type': 'application/json'
     }
     try {
-      const postUsers = await listUsers({
+      const users = await listUsers({
         uId: httpRequest.params.uId
       })
       return {
         headers,
         statusCode: 200,
-        body: postUsers
+        body: users
       }
     } catch (e) {
       // TODO: Error logging
