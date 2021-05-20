@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const makeUsersDb = require('./usersDb');
 const User = require('../../models/User');
+const Teacher = require('../../models/Teacher');
+const AvailableTime = require('../../models/AvailableTime');
+const Appointment = require('../../models/Appointment');
+const Package = require('../../models/Package').Package;
+const PackageTransaction = require('../../models/PackageTransaction');
+const MinuteBank = require('../../models/MinuteBank');
+const TeacherBalance = require('../../models/TeacherBalance');
 let dbHost;
 if (process.env.NODE_ENV == 'production') {
     dbHost = 'users';

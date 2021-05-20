@@ -2,11 +2,17 @@ function makeUsersDb ({ makeDb, User }) {
   return Object.freeze({
     findById,
     insert,
-    update
+    update,
+    findOne,
   })
   async function findById (id) {
     const db = await makeDb()
     const result = await User.findById(id)
+    return result;
+  }
+  async function findOne (attrObj) {
+    const db = await makeDb()
+    const result = await User.findOne(attrObj)
     return result;
   }
   async function insert (...userData) {

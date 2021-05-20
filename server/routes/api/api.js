@@ -21,7 +21,7 @@ const verifyTransactionData = require('../../components/verifyTransactionData');
 const getHost = require('../../components/controller/utils/getHost');
 const EmailHandler = require('../../components/controller/emails/emailHandler');
 const makeCallback = require('../../components/express-callback/index');
-const { getUsers, userController } = require('../../components/controller/user/index');
+const { getUsers, createUser } = require('../../components/controller/user/index');
 
 const {
     google
@@ -116,6 +116,7 @@ function returnToken(res, user) {
 }
 
 router.get('/test/:uId', makeCallback(getUsers))
+router.post('/test/', makeCallback(createUser))
 
 // Get User
 // Making a user in the db

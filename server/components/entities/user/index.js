@@ -1,35 +1,33 @@
 const bcrypt = require('bcryptjs');
 const sanitizeHtml = require('sanitize-html');
-const buildMakeUser = require('./user');
-
-const makeUser = buildMakeUser({ sanitize, inputValidator, passwordHasher });
-
-export default makeUser
+const { buildMakeUser } = require('./user');
 
 function sanitize(text) {
   // TODO: configure sanitizeHtml
   return sanitizeHtml(text);
 }
 
-class inputValidator {
-    // TODO: complete all validations
-    isValidName() {
+const inputValidator = {
+    // TODO: Finish all validations
+    isValidName: () => {
         return true;
-    }
-
-    isValidEmail() {
+    },
+    isValidEmail: () => {
         return true;
-    }
-
-    isValidPassword() {
+    },
+    isValidPassword: () => {
         return true;
-    }
-
-    isValidURL() {
+    },
+    isValidURL: () => {
         return true;
     }
 }
+
 
 const passwordHasher = (password) => {
     return bcrypt.hashSync(password, 10)
 }
+
+const makeUser = buildMakeUser({ sanitize, inputValidator, passwordHasher });
+
+module.exports = { makeUser }
