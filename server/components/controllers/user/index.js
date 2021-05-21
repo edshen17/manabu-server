@@ -6,12 +6,12 @@ const getUserController = makeGetUserController({ getUserUsecase });
 const postUserController = makePostUserController({ postUserUsecase });
 
 const userControllerMain = Object.freeze({
-    getUserController,
-    postUserController,
-})
+  getUserController,
+  postUserController,
+});
 
 module.exports = {
-    userControllerMain,
-    getUserController,
-    postUserController,
+  userControllerMain,
+  getUserController,
+  postUserController,
 };

@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/index.js",
-    "server": "nodemon server/index.js"
+    "server": "nodemon server/index.js",
+    "test": "jest --runInBand server/test"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "author": "",
   "license": "ISC",
@@ -42,6 +46,12 @@
     "vue-i18n": "^8.24.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.6"
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "jest": "^26.6.3",
+    "mongodb-memory-server": "^6.9.6",
+    "nodemon": "^2.0.6",
+    "prettier": "^2.3.0"
   }
 }
