@@ -16,12 +16,12 @@ const config = require('../../../config/auth.config');
 const VerifyToken = require('../../components/VerifyToken');
 const scheduler = require('../../components/scheduler/schedule');
 const fetchExchangeRate = require('../../components/scheduler/exchangeRateFetcher').fetchExchangeRate;
-const handleErrors = require('../../components/controller/errorHandler');
+const handleErrors = require('../../components/controllers/errorHandler');
 const verifyTransactionData = require('../../components/verifyTransactionData');
-const getHost = require('../../components/controller/utils/getHost');
-const EmailHandler = require('../../components/controller/emails/emailHandler');
-const makeCallback = require('../../components/express-callback/index');
-const { getUsers, createUser } = require('../../components/controller/user/index');
+const getHost = require('../../components/controllers/utils/getHost');
+const EmailHandler = require('../../components/controllers/emails/emailHandler');
+const { makeExpressCallback } = require('../../components/express-callback/index');
+const { userControllerMain } = require('../../components/controllers/user/index');
 
 const {
     google
@@ -50,7 +50,6 @@ if (process.env.NODE_ENV == 'production') {
 }
 else {
     dbHost = 'dev';
-    // dbHost = 'users';
 }
 
 paypal.configure(paypalConfig);
@@ -115,8 +114,8 @@ function returnToken(res, user) {
     });
 }
 
-router.get('/test/:uId', makeCallback(getUsers))
-router.post('/test/', makeCallback(createUser))
+router.get('/test/:uId', makeExpressCallback(userControllerMain.getUserController))
+router.post('/test/', makeExpressCallback(userControllerMain.postUserController))
 
 // Get User
 // Making a user in the db

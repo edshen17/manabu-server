@@ -1,5 +1,6 @@
 const { makeUser } = require('../../entities/user/index');
-function makeAddUser ({ usersDb }) {
+
+function makePostUserUsecase ({ usersDb }) {
   return async function addUser (userData) {
     const user = makeUser(userData)
     const exists = await usersDb.findOne({ email: user.getEmail() })
@@ -16,4 +17,4 @@ function makeAddUser ({ usersDb }) {
   }
 }
 
-module.exports = { makeAddUser }
+module.exports = { makePostUserUsecase }

@@ -1,16 +1,16 @@
-const makeListUsers = require('./getUsers');
-const { makeAddUser } = require('./addUser');
-const { usersDb } = require('../../data-access/index')
-const listUsers = makeListUsers({ usersDb })
+const { makeGetUserUsecase } = require('./getUserUsecase');
+const { makePostUserUsecase } = require('./postUserUsecase');
+const { usersDb } = require('../../data-access/index');
 
-const addUser = makeAddUser({ usersDb })
+const getUserUsecase = makeGetUserUsecase({ usersDb });
+const postUserUsecase = makePostUserUsecase({ usersDb });
 const userService = Object.freeze({
-  listUsers,
-  addUser,
+  getUserUsecase,
+  postUserUsecase
 })
 
 module.exports = {
     userService,
-    listUsers,
-    addUser,
+    getUserUsecase,
+    postUserUsecase,
 }

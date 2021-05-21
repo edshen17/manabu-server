@@ -1,5 +1,5 @@
-function makeListUsers ({ usersDb }) {
-    return async function listUsers ({ uId } = {}) {
+function makeGetUserUsecase ({ usersDb }) {
+    return async function getUser ({ uId } = {}) {
       if (!uId) {
         throw new Error('You must supply an user id.')
       }
@@ -7,5 +7,5 @@ function makeListUsers ({ usersDb }) {
       return users;
     }
   }
-  module.exports = makeListUsers;
+  module.exports = { makeGetUserUsecase };
   

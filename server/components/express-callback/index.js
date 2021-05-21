@@ -1,4 +1,4 @@
-module.exports = function makeExpressCallback (controller) {
+function makeExpressCallback (controller) {
     return (req, res) => {
       const httpRequest = {
         body: req.body,
@@ -24,3 +24,5 @@ module.exports = function makeExpressCallback (controller) {
         .catch(e => res.status(500).send({ error: 'An unkown error occurred.' }))
     }
   }
+
+  module.exports = { makeExpressCallback }

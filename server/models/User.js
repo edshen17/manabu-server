@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const dotenv = require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const cryptoRandomString = require('crypto-random-string');
-const EmailHandler = require('../components/controller/emails/emailHandler');
+const EmailHandler = require('../components/controllers/emails/emailHandler');
 const randToken = cryptoRandomString({length: 15});
 
 const UserSchema = new mongoose.Schema({

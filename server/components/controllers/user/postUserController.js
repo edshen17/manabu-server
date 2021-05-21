@@ -1,10 +1,10 @@
-function makeAddUser ({ addUser }) {
+function makePostUserController ({ postUserUsecase }) {
     return async function createUser (httpRequest) {
       try {
         const userData = {
             ...httpRequest.body
         }
-        const newUser = await addUser(userData)
+        const newUser = await postUserUsecase(userData)
         return {
           headers: {
             'Content-Type': 'application/json',
@@ -28,5 +28,5 @@ function makeAddUser ({ addUser }) {
     }
   }
 
-module.exports = { makeAddUser }
+module.exports = { makePostUserController }
   
