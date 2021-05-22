@@ -4,25 +4,8 @@
  * @returns Object returns function makeUser
  */
 function buildMakeUser({ sanitize, inputValidator, passwordHasher }) {
-  return function makeUser({
-    name,
-    email,
-    password,
-    profileImage,
-    profileBio,
-    dateRegistered,
-    lastUpdated,
-    languages,
-    region,
-    timezone,
-    lastOnline,
-    role,
-    settings,
-    membership,
-    commMethods,
-    emailVerified = false,
-    verificationToken,
-  } = {}) {
+  // TODO: sanitize name
+  return function makeUser({ name, email, password, profileImage } = {}) {
     if (!inputValidator.isValidName(name)) {
       throw new Error('User must have a valid name.');
     }
@@ -33,33 +16,11 @@ function buildMakeUser({ sanitize, inputValidator, passwordHasher }) {
       throw new Error('User must have a valid password.');
     }
 
-    let sanitizedBio = sanitize(profileBio).trim();
-
-    if (sanitizedBio.length < 1) {
-      throw new Error('User bio contains no usable text.');
-    }
-
     return Object.freeze({
       getName: () => name,
       getEmail: () => email,
       getPassword: () => (password = passwordHasher(password)),
       getProfileImage: () => profileImage,
-      getProfileBio: () => profileBio,
-      getDateRegistered: () => dateRegistered,
-      getLastUpdated: () => lastUpdated,
-      getLanguages: () => languages,
-      getRegion: () => region,
-      getTimezone: () => timezone,
-      getLastOnline: () => lastOnline,
-      getRole: () => role,
-      getSettings: () => settings,
-      getMembership: () => membership,
-      getCommMethods: () => commMethods,
-      getEmailVerified: () => emailVerified,
-      getVerificationToken: () => verificationToken,
-      verifyEmail: () => {
-        emailVerified = true;
-      },
     });
   };
 }

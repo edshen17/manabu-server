@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const makeUsersDb = require('./usersDb');
+const makeTeachersDb = require('./teachersDb');
 const User = require('../../models/User');
 const Teacher = require('../../models/Teacher');
 const AvailableTime = require('../../models/AvailableTime');
@@ -8,6 +9,7 @@ const Package = require('../../models/Package').Package;
 const PackageTransaction = require('../../models/PackageTransaction');
 const MinuteBank = require('../../models/MinuteBank');
 const TeacherBalance = require('../../models/TeacherBalance');
+const { clearKey, clearSpecificKey, updateSpecificKey } = require('./cache');
 let dbHost;
 if (process.env.NODE_ENV == 'production') {
   dbHost = 'users';
@@ -32,5 +34,22 @@ async function makeDb() {
   }
 }
 
-const usersDb = makeUsersDb({ makeDb, User, Teacher, Package });
-module.exports = { makeDb, usersDb };
+const usersDb = makeUsersDb({
+  makeDb,
+  User,
+  Teacher,
+  Package,
+  clearKey,
+  clearSpecificKey,
+  updateSpecificKey,
+});
+
+const teachersDb = makeTeachersDb({
+  makeDb,
+  Teacher,
+  clearKey,
+  clearSpecificKey,
+  updateSpecificKey,
+});
+
+module.exports = { makeDb, usersDb, teachersDb };

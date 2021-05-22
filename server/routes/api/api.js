@@ -20,18 +20,19 @@ const fetchExchangeRate =
 const handleErrors = require('../../components/controllers/errorHandler');
 const verifyTransactionData = require('../../components/verifyTransactionData');
 const getHost = require('../../components/controllers/utils/getHost');
-const EmailHandler = require('../../components/controllers/emails/emailHandler');
 const { makeExpressCallback } = require('../../components/express-callback/index');
 const { userControllerMain } = require('../../components/controllers/user/index');
-
 const { google } = require('googleapis');
-const { OAuth2Client } = require('google-auth-library');
 
 const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-const { clearKey, clearSpecificKey, updateSpecificKey } = require('../../components/cache');
+const {
+  clearKey,
+  clearSpecificKey,
+  updateSpecificKey,
+} = require('../../components/dataAccess/cache');
 const paypalConfig = {
   mode: 'sandbox', //sandbox or live, change to use process env
   client_id: process.env.PAYPAL_CLIENT_ID_DEV,
@@ -119,9 +120,9 @@ function returnToken(res, user) {
   });
 }
 
-router.post('/test/', makeExpressCallback(userControllerMain.postUserController));
+// Making a user in the db
+router.post('/test', makeExpressCallback(userControllerMain.postUserController));
 
-// Get User
 // Making a user in the db
 router.post('/register', (req, res, next) => {
   const { name, email, password, isTeacherApp } = req.body;
@@ -158,10 +159,14 @@ router.post('/register', (req, res, next) => {
               const newTeacher = new Teacher({
                 userId: user._id,
               });
-              newTeacher.save().catch((err) => {
-                clearKey(Teacher.collection.collectionName);
-                console.log(err);
-              });
+              newTeacher
+                .save()
+                .then(() => {
+                  clearKey(Teacher.collection.collectionName);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
             }
             clearKey(User.collection.collectionName);
             returnToken(res, user);
