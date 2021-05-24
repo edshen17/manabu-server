@@ -3,8 +3,8 @@ function makeGetUserUsecase({ usersDb }) {
     if (!uId) {
       throw new Error('You must supply an user id.');
     }
-    const users = await usersDb.findById(uId, currentAPIUser);
-    return users;
+    const user = await usersDb.findById(uId, currentAPIUser);
+    return user;
   };
 }
 module.exports = { makeGetUserUsecase };

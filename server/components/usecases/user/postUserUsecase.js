@@ -1,16 +1,32 @@
 const { makeUser, makeTeacher } = require('../../entities/user/index');
+const EmailHandler = require('../../entities/email/emailHandler');
+const emailInstance = new EmailHandler();
+const _sendVerificationEmail = (user) => {
+  const host = 'https://manabu.sg';
+  emailInstance.sendEmail(
+    user.getEmail(),
+    'NOREPLY',
+    'Manabu email verification',
+    'verificationEmail',
+    {
+      name: user.getName(),
+      host,
+      verificationToken: user.getVerificationToken(),
+    }
+  );
+};
 
 /**
- * Given a user, generate a jwt.
- * @param {Object} user
- * @returns
+ * Given a db user, generate a jwt.
+ * @param {Object} savedDbUser
+ * @returns {String} jwt token for auth purposes
  */
-const _jwtTokenGenerator = (jwt, user) => {
+const _jwtToClient = (jwt, savedDbUser) => {
   const token = jwt.sign(
     {
-      id: user._id,
-      role: user.role,
-      name: user.name,
+      id: savedDbUser._id,
+      role: savedDbUser.role,
+      name: savedDbUser.name,
     },
     process.env.JWT_SECRET,
     {
@@ -51,7 +67,7 @@ const _ensureUniqueTeacher = async (user, teachersDb) => {
 };
 
 /**
- * Inserts a user into the db.
+ * Inserts a user object into the db.
  * @param {Object} user
  * @param {Object} usersDb
  * @returns Promise
@@ -62,8 +78,9 @@ const _insertUserIntoDb = async (user, usersDb) => {
     email: user.getEmail(),
     password: user.getPassword(),
     profileImage: user.getProfileImage(),
+    verificationToken: user.getVerificationToken(),
   });
-  usersDb.clearKeyCache();
+  usersDb.clearKeyInCache();
   return savedDbUser;
 };
 
@@ -77,12 +94,13 @@ const _insertTeacherIntoDb = async (savedDbUser, teachersDb) => {
   const savedDbTeacher = await teachersDb.insert({
     userId: teacher.getUserId(),
   });
-  teachersDb.clearKeyCache();
+  teachersDb.clearKeyInCache();
   return savedDbTeacher;
 };
 
 /**
  * Main function that adds the users in to the db, creates a teacher if there is one, and returns a token to the client.
+ * ASSUMPTIONS: All users/teachers are unique when they are inserted into the db.
  * @param {Object} usersDb
  * @param {Object} teachersDb
  * @returns Function that does the tasks listed above
@@ -99,10 +117,9 @@ function makePostUserUsecase({ usersDb, teachersDb, jwt }) {
       await _insertTeacherIntoDb(savedDbUser, teachersDb);
     }
 
-    return {
-      auth: true,
-      token: _jwtTokenGenerator(jwt, savedDbUser),
-    };
+    _sendVerificationEmail(user);
+
+    return _jwtToClient(jwt, savedDbUser);
   };
 }
 

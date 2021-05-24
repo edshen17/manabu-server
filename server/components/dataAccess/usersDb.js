@@ -1,3 +1,54 @@
+/**
+ * Finds the teacher with the user id in the db
+ * @param {String} userId
+ * @returns {Object} teacher
+ */
+async function _findTeacher(userId, Teacher) {
+  const teacherQuery = {
+    _id: 0,
+    licensePath: 0,
+  };
+
+  const teacher = JSON.parse(
+    JSON.stringify(
+      await Teacher.findOne(
+        {
+          userId,
+        },
+        teacherQuery
+      )
+        .lean()
+        .cache()
+    )
+  );
+  return teacher;
+}
+
+async function _findPackages(hostedBy, Package) {
+  const packages = JSON.parse(
+    JSON.stringify(
+      await Package.find({
+        hostedBy,
+      })
+        .lean()
+        .cache()
+    )
+  );
+}
+
+async function _joinUserTeacher(user, Teacher, Package) {
+  user = JSON.parse(JSON.stringify(user));
+  const teacher = _findTeacher(user._id, Teacher);
+  const packages = _findPackages(user._id, Package);
+  if (teacher) {
+    user.teacherAppPending = !teacher.isApproved;
+    user.teacherData = teacher;
+    user.teacherData.packages = packages;
+  }
+
+  return user;
+}
+
 function makeUsersDb({
   makeDb,
   User,
@@ -12,49 +63,11 @@ function makeUsersDb({
     insert,
     update,
     findOne,
-    clearKeyCache,
+    clearKeyInCache,
   });
 
-  async function _joinUserTeacher(user) {
-    user = JSON.parse(JSON.stringify(user));
-    const teacherQuery = {
-      _id: 0,
-      licensePath: 0,
-    };
-    const teacher = JSON.parse(
-      JSON.stringify(
-        await Teacher.findOne(
-          {
-            userId: user._id,
-          },
-          teacherQuery
-        )
-          .lean()
-          .cache()
-      )
-    );
-
-    if (teacher) {
-      const packages = JSON.parse(
-        JSON.stringify(
-          await Package.find({
-            hostedBy: user._id,
-          })
-            .lean()
-            .cache()
-        )
-      );
-
-      user.teacherAppPending = !teacher.isApproved;
-      user.teacherData = teacher;
-      user.teacherData.packages = packages;
-    }
-
-    return user;
-  }
-
   /**
-   * Find a user by id.
+   * Find a user by id and joins user/teacher.
    * @param {String} id user id
    * @param {Object} currentUser object containing information from verifyToken (current requesting user's role, etc)
    * @returns Object user data
@@ -73,21 +86,23 @@ function makeUsersDb({
       selectOptions.settings = 0;
     }
     const user = await User.findById(id, selectOptions).lean().cache();
-    if (user) return _joinUserTeacher(user);
+    if (user) return _joinUserTeacher(user, Teacher, Package);
     else return null;
   }
+
   async function findOne(attrObj) {
     const db = await makeDb();
     const user = await User.findOne(attrObj).lean().cache();
-    if (user) return _joinUserTeacher(user);
+    if (user) return _joinUserTeacher(user, Teacher, Package);
     else return null;
   }
+
   async function insert(...userData) {
     const db = await makeDb();
     const newUser = await new User(...userData).save();
     if (newUser) {
-      clearKeyCache();
-      return _joinUserTeacher(newUser);
+      clearKeyInCache();
+      return _joinUserTeacher(newUser, Teacher, Package);
     } else throw new Error('Something went during user creation.');
   }
 
@@ -96,7 +111,7 @@ function makeUsersDb({
     return result.modifiedCount > 0 ? { id: _id, ...commentInfo } : null;
   }
 
-  function clearKeyCache() {
+  function clearKeyInCache() {
     return clearKey(User.collection.collectionName);
   }
 }

@@ -4,13 +4,13 @@ function makePostUserController({ postUserUsecase }) {
       const userData = {
         ...httpRequest.body,
       };
-      const newUser = await postUserUsecase({ userData });
+      const token = await postUserUsecase({ userData });
       return {
         headers: {
           'Content-Type': 'application/json',
         },
         statusCode: 201,
-        body: { newUser },
+        body: { token },
       };
     } catch (e) {
       // TODO: Error logging

@@ -121,61 +121,7 @@ function returnToken(res, user) {
 }
 
 // Making a user in the db
-router.post('/test', makeExpressCallback(userControllerMain.postUserController));
-
-// Making a user in the db
-router.post('/register', (req, res, next) => {
-  const { name, email, password, isTeacherApp } = req.body;
-
-  User.findOne({
-    email,
-  })
-    .lean()
-    .select({ _id: 1, email: 1, role: 1 }) //select relevant things
-    .then((user) => {
-      if (user && !isTeacherApp) {
-        // user exists
-        return res.status(500).send('An account with that email already exists.');
-      } else if (user && isTeacherApp) {
-        // user exists and is registering for teacher account (linking accounts)
-        return res
-          .status(500)
-          .send(
-            'You seem to already have an user account. Log in using the link below to connect that account with your teacher one.'
-          );
-      } else {
-        // no user, so create a new one
-        const newUser = new User({
-          name: name,
-          email,
-          password: bcrypt.hashSync(password, 10),
-        });
-
-        newUser.save(async (err, user) => {
-          if (err) return res.json(err).status(500);
-          else {
-            if (isTeacherApp) {
-              // if it's a teacher application, link it with the user
-              const newTeacher = new Teacher({
-                userId: user._id,
-              });
-              newTeacher
-                .save()
-                .then(() => {
-                  clearKey(Teacher.collection.collectionName);
-                })
-                .catch((err) => {
-                  console.log(err);
-                });
-            }
-            clearKey(User.collection.collectionName);
-            returnToken(res, user);
-          }
-        });
-      }
-    })
-    .catch((err) => handleErrors(err, req, res, next));
-});
+router.post('/register', makeExpressCallback(userControllerMain.postUserController));
 
 // route to get access to user's own information
 router.get('/me', VerifyToken, async function (req, res, next) {

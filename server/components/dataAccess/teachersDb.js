@@ -4,7 +4,7 @@ function makeTeachersDb({ makeDb, Teacher, clearKey, clearSpecificKey, updateSpe
     insert,
     update,
     findOne,
-    clearKeyCache,
+    clearKeyInCache,
   });
 
   /**
@@ -38,7 +38,7 @@ function makeTeachersDb({ makeDb, Teacher, clearKey, clearSpecificKey, updateSpe
     return result.modifiedCount > 0 ? { id: _id, ...commentInfo } : null;
   }
 
-  function clearKeyCache() {
+  function clearKeyInCache() {
     return clearKey(Teacher.collection.collectionName);
   }
 }

@@ -1,10 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const dotenv = require('dotenv').config();
-const jwt = require('jsonwebtoken');
-const cryptoRandomString = require('crypto-random-string');
-const EmailHandler = require('../components/controllers/emails/emailHandler');
-const randToken = cryptoRandomString({length: 15});
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -35,7 +30,8 @@ const UserSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  languages: { // all languages user knows
+  languages: {
+    // all languages user knows
     type: Array,
     default: [],
   },
@@ -54,21 +50,21 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     default: 'user',
-    enum: ["user", "teacher", "admin"]
-   },
-   settings: {
-     type: Object,
-     default: {
-       currency: 'SGD',
-     },
-   },
-   membership: {
-     type: Array,
-     default: []
-   },
-   commMethods: {
+    enum: ['user', 'teacher', 'admin'],
+  },
+  settings: {
+    type: Object,
+    default: {
+      currency: 'SGD',
+    },
+  },
+  membership: {
     type: Array,
-    default: []
+    default: [],
+  },
+  commMethods: {
+    type: Array,
+    default: [],
   },
   emailVerified: {
     type: Boolean,
@@ -79,25 +75,7 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', function() {
-  const verificationToken = jwt.sign({ randToken: randToken }, process.env.JWT_SECRET);
-  const emailHandler = new EmailHandler();
-  let host = 'https://manabu.sg';
-
-  if (process.env.NODE_ENV != 'production') {
-      host = 'http://localhost:8080'
-  }
-  
-  this.set({ verificationToken });
-
-  emailHandler.sendEmail(this.email, 'NOREPLY', 'Manabu email verification', 'verificationEmail', {
-    name: this.name,
-    host,
-    verificationToken,
-  })
-});
-
-UserSchema.index({role: 1, name: 1, email: 1});
+UserSchema.index({ role: 1, name: 1, email: 1 });
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
