@@ -34,6 +34,7 @@ async function _findPackages(hostedBy, Package) {
         .cache()
     )
   );
+  return packages;
 }
 
 async function _joinUserTeacher(user, Teacher, Package) {
@@ -41,9 +42,9 @@ async function _joinUserTeacher(user, Teacher, Package) {
   const teacher = _findTeacher(user._id, Teacher);
   const packages = _findPackages(user._id, Package);
   if (teacher) {
-    user.teacherAppPending = !teacher.isApproved;
     user.teacherData = teacher;
     user.teacherData.packages = packages;
+    user.teacherAppPending = !teacher.isApproved;
   }
 
   return user;

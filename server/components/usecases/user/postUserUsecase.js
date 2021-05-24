@@ -1,6 +1,7 @@
 const { makeUser, makeTeacher } = require('../../entities/user/index');
 const EmailHandler = require('../../entities/email/emailHandler');
 const emailInstance = new EmailHandler();
+
 const _sendVerificationEmail = (user) => {
   const host = 'https://manabu.sg';
   emailInstance.sendEmail(
@@ -12,6 +13,21 @@ const _sendVerificationEmail = (user) => {
       name: user.getName(),
       host,
       verificationToken: user.getVerificationToken(),
+    }
+  );
+};
+
+const _sendInternalEmail = (user, isTeacherApp) => {
+  const userType = isTeacherApp ? 'teacher' : 'user';
+  emailInstance.sendEmail(
+    'manabulessons@gmail.com',
+    'NOREPLY',
+    `A new ${userType} signed up`,
+    'internalNewSignUpEmail',
+    {
+      name: user.getName(),
+      email: user.getEmail(),
+      userType,
     }
   );
 };
@@ -118,6 +134,7 @@ function makePostUserUsecase({ usersDb, teachersDb, jwt }) {
     }
 
     _sendVerificationEmail(user);
+    // _sendInternalEmail(user, isTeacherApp);
 
     return _jwtToClient(jwt, savedDbUser);
   };
