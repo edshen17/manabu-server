@@ -6,7 +6,8 @@ function makeGetUserController({ getUserUsecase }) {
     try {
       const users = await getUserUsecase({
         uId: httpRequest.params.uId,
-        currentAPIUser: httpRequest.currentUser,
+        currentAPIUser: httpRequest.currentAPIUser,
+        path: httpRequest.path,
       });
       return {
         headers,

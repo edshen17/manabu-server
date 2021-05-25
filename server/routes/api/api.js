@@ -12,7 +12,6 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
-const config = require('../../../config/auth.config');
 const VerifyToken = require('../../components/VerifyToken');
 const scheduler = require('../../components/scheduler/schedule');
 const fetchExchangeRate =
@@ -91,7 +90,7 @@ const storeTokenCookie = (res, user) => {
       role: user.role,
       name: user.name,
     },
-    config.secret,
+    process.env.JWT_SECRET,
     {
       expiresIn: 86400 * 7, // expires in 7 days
     }
@@ -124,21 +123,11 @@ function returnToken(res, user) {
 router.post('/register', makeExpressCallback(userControllerMain.postUserController));
 
 // route to get access to user's own information
-router.get('/me', VerifyToken, async function (req, res, next) {
-  const selectOptions = {
-    email: 0,
-    password: 0,
-    verificationToken: 0,
-  };
-  const user = await User.findById(req.userId)
-    .cache()
-    .lean()
-    .select(selectOptions)
-    .lean()
-    .catch((err) => handleErrors(err, req, res, next));
-  if (!user) return res.status(404).send('No user found.');
-  else {
-    next(user);
+router.get(
+  '/me',
+  VerifyToken,
+  makeExpressCallback(userControllerMain.getUserController),
+  (req, res, next) => {
     const updateQuery = {
       // update last online
       _id: req.userId,
@@ -160,7 +149,7 @@ router.get('/me', VerifyToken, async function (req, res, next) {
       })
       .catch((err) => handleErrors(err, req, res, next));
   }
-});
+);
 
 // route to get access to user's teachers
 router.get('/myTeachers', VerifyToken, async function (req, res, next) {

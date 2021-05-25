@@ -7,7 +7,7 @@ function makeExpressCallback(controller) {
       ip: req.ip,
       method: req.method,
       path: req.path,
-      currentUser: {
+      currentAPIUser: {
         userId: req.userId,
         role: req.role,
         isVerified: req.isVerified,

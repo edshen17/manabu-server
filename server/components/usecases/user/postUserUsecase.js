@@ -1,7 +1,6 @@
 const { makeUser, makeTeacher } = require('../../entities/user/index');
 const EmailHandler = require('../../entities/email/emailHandler');
 const emailInstance = new EmailHandler();
-
 const _sendVerificationEmail = (user) => {
   const host = 'https://manabu.sg';
   emailInstance.sendEmail(
@@ -125,16 +124,16 @@ function makePostUserUsecase({ usersDb, teachersDb, jwt }) {
   return async function addUser({ userData }) {
     const isTeacherApp = userData.isTeacherApp;
     const user = makeUser(userData);
-    _ensureUniqueUser(userData, isTeacherApp, usersDb);
+    await _ensureUniqueUser(userData, isTeacherApp, usersDb);
     const savedDbUser = await _insertUserIntoDb(user, usersDb);
 
     if (isTeacherApp) {
-      _ensureUniqueTeacher(savedDbUser, teachersDb);
+      await _ensureUniqueTeacher(savedDbUser, teachersDb);
       await _insertTeacherIntoDb(savedDbUser, teachersDb);
     }
 
     _sendVerificationEmail(user);
-    // _sendInternalEmail(user, isTeacherApp);
+    _sendInternalEmail(user, isTeacherApp);
 
     return _jwtToClient(jwt, savedDbUser);
   };

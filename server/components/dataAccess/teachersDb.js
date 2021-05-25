@@ -14,7 +14,7 @@ function makeTeachersDb({ makeDb, Teacher, clearKey, clearSpecificKey, updateSpe
    */
   async function findByUserId(userId) {
     const db = await makeDb();
-    const teacher = await Teacher.findOne({ userId: userId }).lean().cache();
+    const teacher = await Teacher.findOne({ userId }).lean().cache();
     if (teacher) return teacher;
     else return null;
   }

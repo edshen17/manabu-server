@@ -34,19 +34,20 @@ async function _findPackages(hostedBy, Package) {
         .cache()
     )
   );
+
   return packages;
 }
 
 async function _joinUserTeacher(user, Teacher, Package) {
   user = JSON.parse(JSON.stringify(user));
-  const teacher = _findTeacher(user._id, Teacher);
-  const packages = _findPackages(user._id, Package);
+  const teacher = await _findTeacher(user._id, Teacher);
+  const packages = await _findPackages(user._id, Package);
+
   if (teacher) {
+    user.teacherAppPending = !teacher.isApproved;
     user.teacherData = teacher;
     user.teacherData.packages = packages;
-    user.teacherAppPending = !teacher.isApproved;
   }
-
   return user;
 }
 
@@ -87,14 +88,14 @@ function makeUsersDb({
       selectOptions.settings = 0;
     }
     const user = await User.findById(id, selectOptions).lean().cache();
-    if (user) return _joinUserTeacher(user, Teacher, Package);
+    if (user) return await _joinUserTeacher(user, Teacher, Package);
     else return null;
   }
 
   async function findOne(attrObj) {
     const db = await makeDb();
     const user = await User.findOne(attrObj).lean().cache();
-    if (user) return _joinUserTeacher(user, Teacher, Package);
+    if (user) return await _joinUserTeacher(user, Teacher, Package);
     else return null;
   }
 
@@ -103,7 +104,7 @@ function makeUsersDb({
     const newUser = await new User(...userData).save();
     if (newUser) {
       clearKeyInCache();
-      return _joinUserTeacher(newUser, Teacher, Package);
+      return await _joinUserTeacher(newUser, Teacher, Package);
     } else throw new Error('Something went during user creation.');
   }
 
