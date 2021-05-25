@@ -14,8 +14,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
 const VerifyToken = require('../../components/VerifyToken');
 const scheduler = require('../../components/scheduler/schedule');
-const fetchExchangeRate =
-  require('../../components/scheduler/exchangeRateFetcher').fetchExchangeRate;
+const { fetchExchangeRate } = require('../../components/scheduler/exchangeRateFetcher');
 const handleErrors = require('../../components/controllers/errorHandler');
 const verifyTransactionData = require('../../components/verifyTransactionData');
 const getHost = require('../../components/controllers/utils/getHost');
@@ -53,14 +52,11 @@ paypal.configure(paypalConfig);
 scheduler();
 
 const exchangeRateScheduler = async () => {
-  if (!exchangeRate && process.env.NODE_ENV != 'production')
-    exchangeRate = await fetchExchangeRate();
-
+  if (!exchangeRate) exchangeRate = await fetchExchangeRate();
   setInterval(async () => {
     exchangeRate = await fetchExchangeRate();
   }, 60 * 60 * 24 * 1000);
 };
-
 exchangeRateScheduler();
 
 const oauth2Client = new google.auth.OAuth2(

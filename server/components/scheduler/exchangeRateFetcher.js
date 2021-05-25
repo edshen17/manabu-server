@@ -14,4 +14,4 @@ const fetchExchangeRate = async () => {
   return res.data.rates;
 };
 
-module.exports.fetchExchangeRate = fetchExchangeRate;
+module.exports = { fetchExchangeRate };
