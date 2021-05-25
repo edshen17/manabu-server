@@ -365,7 +365,7 @@ router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
 });
 
 // route for finding/filtering teachers
-router.get('/teachers', VerifyToken, (req, res, next) => {
+router.get('/teachers', (req, res, next) => {
   let { dateApproved, hourlyRate, teacherType, alsoSpeaks, teachingLanguages, page, pending } =
     req.query;
 
