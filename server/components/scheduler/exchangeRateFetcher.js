@@ -2,7 +2,7 @@ const axios = require('axios');
 const fetchExchangeRate = async () => {
   let apiKey;
   if (process.env.NODE_ENV == 'production') {
-    apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY_DEV;
+    apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY;
   } else {
     apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY_DEV;
   }
