@@ -1018,7 +1018,8 @@ router.put('/transaction/packageTransaction/:tId', VerifyToken, (req, res, next)
 });
 
 // Route for fetching exchange rate information
-router.get('/utils/exchangeRate', VerifyToken, (req, res, next) => {
+router.get('/utils/exchangeRate', VerifyToken, async (req, res, next) => {
+  if (!exchangeRate) exchangeRate = await fetchExchangeRate();
   return res.status(200).json(exchangeRate);
 });
 
