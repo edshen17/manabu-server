@@ -19,7 +19,7 @@ const _sendVerificationEmail = (user) => {
 const _sendInternalEmail = (user, isTeacherApp) => {
   const userType = isTeacherApp ? 'teacher' : 'user';
   emailInstance.sendEmail(
-    'manabulessons@gmail.com',
+    'greencopter4444@gmail.com',
     'NOREPLY',
     `A new ${userType} signed up`,
     'internalNewSignUpEmail',
