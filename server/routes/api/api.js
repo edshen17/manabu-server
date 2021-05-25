@@ -124,35 +124,35 @@ router.post('/register', makeExpressCallback(userControllerMain.postUserControll
 router.get(
   '/me',
   VerifyToken,
-  makeExpressCallback(userControllerMain.getUserController),
-  (req, res, next) => {
-    const updateQuery = {
-      // update last online
-      _id: req.userId,
-    };
+  makeExpressCallback(userControllerMain.getUserController)
+  // (req, res, next) => {
+  //   const updateQuery = {
+  //     // update last online
+  //     _id: req.userId,
+  //   };
 
-    const selectOptions = {
-      email: 0,
-      password: 0,
-      verificationToken: 0,
-    };
+  //   const selectOptions = {
+  //     email: 0,
+  //     password: 0,
+  //     verificationToken: 0,
+  //   };
 
-    // make sure cache is up to date
-    User.findOneAndUpdate(
-      updateQuery,
-      {
-        lastOnline: new Date(),
-      },
-      {
-        returnOriginal: false,
-        fields: selectOptions,
-      }
-    )
-      .then((updatedUser) => {
-        updateSpecificKey(User.collection.collectionName, updateQuery, updatedUser);
-      })
-      .catch((err) => handleErrors(err, req, res, next));
-  }
+  //   // make sure cache is up to date
+  //   User.findOneAndUpdate(
+  //     updateQuery,
+  //     {
+  //       lastOnline: new Date(),
+  //     },
+  //     {
+  //       returnOriginal: false,
+  //       fields: selectOptions,
+  //     }
+  //   )
+  //     .then((updatedUser) => {
+  //       updateSpecificKey(User.collection.collectionName, updateQuery, updatedUser);
+  //     })
+  //     .catch((err) => handleErrors(err, req, res, next));
+  // }
 );
 
 // route to get access to user's teachers

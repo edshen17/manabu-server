@@ -59,10 +59,7 @@ const _jwtToClient = (jwt, savedDbUser) => {
 const _ensureUniqueUser = async (userData, isTeacherApp, usersDb) => {
   const user = makeUser(userData);
   const exists = await usersDb.findOne({ email: user.getEmail() });
-
-  if (exists && isTeacherApp) {
-    throw new Error('An account with that email already exists.');
-  } else if (exists && isTeacherApp) {
+  if (exists && !isTeacherApp) {
     throw new Error(
       'You seem to already have an user account. Log in using the link below to connect that account with your teacher one.'
     );
@@ -124,18 +121,22 @@ function makePostUserUsecase({ usersDb, teachersDb, jwt }) {
   return async function addUser({ userData }) {
     const isTeacherApp = userData.isTeacherApp;
     const user = makeUser(userData);
-    await _ensureUniqueUser(userData, isTeacherApp, usersDb);
-    const savedDbUser = await _insertUserIntoDb(user, usersDb);
+    try {
+      await _ensureUniqueUser(userData, isTeacherApp, usersDb);
+      const savedDbUser = await _insertUserIntoDb(user, usersDb);
 
-    if (isTeacherApp) {
-      await _ensureUniqueTeacher(savedDbUser, teachersDb);
-      await _insertTeacherIntoDb(savedDbUser, teachersDb);
+      if (isTeacherApp) {
+        await _ensureUniqueTeacher(savedDbUser, teachersDb);
+        await _insertTeacherIntoDb(savedDbUser, teachersDb);
+      }
+
+      _sendVerificationEmail(user);
+      _sendInternalEmail(user, isTeacherApp);
+
+      return _jwtToClient(jwt, savedDbUser);
+    } catch (err) {
+      throw err;
     }
-
-    _sendVerificationEmail(user);
-    _sendInternalEmail(user, isTeacherApp);
-
-    return _jwtToClient(jwt, savedDbUser);
   };
 }
 
