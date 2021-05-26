@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const PackageSchema = new mongoose.Schema({
-  hostedBy: { 
-      type: Schema.Types.ObjectId, 
-      required: true 
-    },
+  hostedBy: {
+    type: Schema.Types.ObjectId,
+    required: true,
+  },
   priceDetails: {
     type: Object,
     required: true,
@@ -29,7 +29,7 @@ const PackageSchema = new mongoose.Schema({
   packageType: {
     type: String,
     required: true,
-    enum: ['mainichi', 'moderate', 'light', 'internal']
+    enum: ['mainichi', 'moderate', 'light', 'internal'],
   },
   packageDurations: {
     type: Array,
@@ -42,7 +42,6 @@ const PackageSchema = new mongoose.Schema({
   },
 });
 
-PackageSchema.index({hostedBy: 1, packageType: 1, });
+PackageSchema.index({ hostedBy: 1, packageType: 1 });
 
-const Package = mongoose.model('Package', PackageSchema);
-module.exports.Package = Package;
+export const Package = mongoose.model('Package', PackageSchema);

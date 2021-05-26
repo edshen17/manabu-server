@@ -80,7 +80,6 @@ mongoose
   )
   .then(() => console.log('connected to MongoDB'))
   .catch((err) => console.log(err));
-
 const storeTokenCookie = (res, user) => {
   const token = jwt.sign(
     {

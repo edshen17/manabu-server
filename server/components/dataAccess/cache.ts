@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
-const redis = require('redis');
-const util = require('util');
-const dotenv = require('dotenv').config();
-let clientOptions = {
+import mongoose from 'mongoose';
+import redis from 'redis';
+import util from 'util';
+
+let clientOptions: {} = {
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
   password: process.env.REDIS_PASS,
@@ -16,8 +16,7 @@ if (process.env.NODE_ENV != 'production') {
 
 const client = redis.createClient(clientOptions);
 
-client.hget = util.promisify(client.hget);
-client.hget = util.promisify(client.hget);
+client.hgetPromise = util.promisify(client.hget);
 const exec = mongoose.Query.prototype.exec;
 // client.flushdb(function (err, succeeded) {
 //   console.log(succeeded); // will be true if successfull
@@ -38,7 +37,7 @@ mongoose.Query.prototype.exec = async function () {
     JSON.stringify({
       ...this.getQuery(),
     });
-  const cacheValue = await client.hget(this.hashKey, key);
+  const cacheValue = await client.hgetPromise(this.hashKey, key);
   if (cacheValue && cacheValue !== 'null') {
     const doc = JSON.parse(cacheValue);
     return Array.isArray(doc) ? doc.map((d) => new this.model(d)) : new this.model(doc);
@@ -49,14 +48,14 @@ mongoose.Query.prototype.exec = async function () {
   return result;
 };
 
-module.exports = {
-  clearKey(hashKey) {
+export = {
+  clearKey(hashKey: unknown) {
     client.del(JSON.stringify(hashKey));
   },
-  clearSpecificKey(hashKey, key) {
+  clearSpecificKey(hashKey: unknown, key: unknown) {
     client.hdel(JSON.stringify(hashKey), JSON.stringify(key));
   },
-  updateSpecificKey(hashKey, key, value) {
+  updateSpecificKey(hashKey: unknown, key: unknown, value: unknown) {
     client.hset(JSON.stringify(hashKey), JSON.stringify(key), JSON.stringify(value));
   },
 };

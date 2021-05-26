@@ -1,3 +1,5 @@
+// import { IUsersDb } from '../../dataAccess/index';
+
 function makeGetUserUsecase({ usersDb }) {
   return async function getUser({ uId, currentAPIUser, path } = {}) {
     if (uId || currentAPIUser.userId) {
