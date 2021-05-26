@@ -11,7 +11,7 @@ import http from 'http';
 import Ddos from 'ddos';
 import helmet from 'helmet';
 //@ts-ignore
-import api from "./routes/api/api"
+import api from './routes/api/api';
 
 const app = express();
 const ddos = new Ddos({ burst: 50, limit: 50 });
@@ -37,7 +37,6 @@ app.use(
 app.use(ddos.express);
 app.use(compression());
 app.use('/api/', api);
-
 
 if (process.env.NODE_ENV == 'production') {
   app.use((req: Request, res: Response, next: NextFunction) => {
