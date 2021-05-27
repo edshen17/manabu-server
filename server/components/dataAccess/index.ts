@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
-import makeUsersDb from './usersDb';
-import makeTeachersDb from './teachersDb';
+import { UsersDbService } from './services/usersDb';
+import { TeachersDbService } from './services/teachersDb';
+import { PackagesDbService } from './services/packagesDb';
+import { CacheService } from './services/cache';
 import { User } from '../../models/User';
 import { Teacher } from '../../models/Teacher';
 import { Package } from '../../models/Package';
-import { clearKey, clearSpecificKey, updateSpecificKey } from './cache';
+
 let dbHost: string;
 if (process.env.NODE_ENV == 'production') {
   dbHost = 'users';
@@ -27,22 +29,10 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
     );
   }
 };
-const usersDb = makeUsersDb({
-  makeDb,
-  User,
-  Teacher,
-  Package,
-  clearKey,
-  clearSpecificKey,
-  updateSpecificKey,
-});
 
-const teachersDb = makeTeachersDb({
-  makeDb,
-  Teacher,
-  clearKey,
-  clearSpecificKey,
-  updateSpecificKey,
-});
+const cacheService = new CacheService();
+const teachersDbService = new TeachersDbService(Teacher, cacheService);
+const packagesDbService = new PackagesDbService(Package, cacheService);
+const usersDbService = new UsersDbService(User, teachersDbService, packagesDbService, cacheService);
 
-export { makeDb, usersDb, teachersDb };
+export { cacheService, teachersDbService, packagesDbService, usersDbService };

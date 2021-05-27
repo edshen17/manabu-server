@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import redis from 'redis';
+import redis, { RedisClient } from 'redis';
 import util from 'util';
 
 let clientOptions: {} = {
@@ -46,20 +46,23 @@ mongoose.Query.prototype.exec = async function () {
   return result;
 };
 
-const clearKey = (hashKey: unknown): void => {
-  client.del(JSON.stringify(hashKey));
-};
+class CacheService {
+  private static client: RedisClient = client;
 
-const clearSpecificKey = (hashKey: unknown, key: unknown): void => {
-  client.hdel(JSON.stringify(hashKey), JSON.stringify(key));
-};
+  public clearKey = (hashKey: unknown): void => {
+    CacheService.client.del(JSON.stringify(hashKey));
+  };
 
-const updateSpecificKey = (hashKey: unknown, key: unknown, value: unknown): void => {
-  client.hset(JSON.stringify(hashKey), JSON.stringify(key), JSON.stringify(value));
-};
+  public clearSpecificKey = (hashKey: unknown, key: unknown): void => {
+    client.hdel(JSON.stringify(hashKey), JSON.stringify(key));
+  };
 
+  public updateSpecificKey = (hashKey: unknown, key: unknown, value: unknown): void => {
+    client.hset(JSON.stringify(hashKey), JSON.stringify(key), JSON.stringify(value));
+  };
+}
 // client.flushdb(function (err, succeeded) {
 //   console.log(succeeded); // will be true if successfull
 // });
 
-export { clearKey, clearSpecificKey, updateSpecificKey };
+export { CacheService };
