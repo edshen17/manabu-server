@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import makeUsersDb from './usersDb';
 import makeTeachersDb from './teachersDb';
-import User from '../../models/User';
-import Teacher from '../../models/Teacher';
-import Package from '../../models/Package';
+import { User } from '../../models/User';
+import { Teacher } from '../../models/Teacher';
+import { Package } from '../../models/Package';
 import { clearKey, clearSpecificKey, updateSpecificKey } from './cache';
 let dbHost: string;
 if (process.env.NODE_ENV == 'production') {

@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 
 const PackageSchema = createSchema({
@@ -17,5 +17,6 @@ const PackageSchema = createSchema({
 });
 
 const Package = typedModel('Package', PackageSchema);
+type PackageDoc = ExtractDoc<typeof PackageSchema>;
 
-export { Package, PackageSchema };
+export { Package, PackageSchema, PackageDoc };

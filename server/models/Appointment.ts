@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 import { PackageTransactionSchema } from './PackageTransaction';
 
@@ -22,5 +22,6 @@ const AppointmentSchema = createSchema({
 });
 
 const Appointment = typedModel('Appointment', AppointmentSchema);
+type AppointmentDoc = ExtractDoc<typeof AppointmentSchema>;
 
-export { Appointment, AppointmentSchema };
+export { Appointment, AppointmentSchema, AppointmentDoc };

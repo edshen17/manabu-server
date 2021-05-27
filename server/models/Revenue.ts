@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 
 const RevenueSchema = createSchema({
   revenue: Type.object({ required: false }),
@@ -6,5 +6,6 @@ const RevenueSchema = createSchema({
 });
 
 const Revenue = typedModel('Revenue', RevenueSchema);
+type RevenueDoc = ExtractDoc<typeof RevenueSchema>;
 
-export { Revenue, RevenueSchema };
+export { Revenue, RevenueSchema, RevenueDoc };

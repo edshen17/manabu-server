@@ -15,12 +15,9 @@ if (process.env.NODE_ENV != 'production') {
 }
 
 const client = redis.createClient(clientOptions);
-
 client.hgetPromise = util.promisify(client.hget);
 const exec = mongoose.Query.prototype.exec;
-// client.flushdb(function (err, succeeded) {
-//   console.log(succeeded); // will be true if successfull
-// });
+
 mongoose.Query.prototype.cache = function (options = {}) {
   this.useCache = true;
   this.time = 24 * 60 * 60 * 1000;
@@ -28,6 +25,7 @@ mongoose.Query.prototype.cache = function (options = {}) {
   this.queryKey = options.queryKey;
   return this;
 };
+
 mongoose.Query.prototype.exec = async function () {
   if (!this.useCache) {
     return await exec.apply(this, arguments);
@@ -48,14 +46,20 @@ mongoose.Query.prototype.exec = async function () {
   return result;
 };
 
-export = {
-  clearKey(hashKey: unknown) {
-    client.del(JSON.stringify(hashKey));
-  },
-  clearSpecificKey(hashKey: unknown, key: unknown) {
-    client.hdel(JSON.stringify(hashKey), JSON.stringify(key));
-  },
-  updateSpecificKey(hashKey: unknown, key: unknown, value: unknown) {
-    client.hset(JSON.stringify(hashKey), JSON.stringify(key), JSON.stringify(value));
-  },
+const clearKey = (hashKey: unknown): void => {
+  client.del(JSON.stringify(hashKey));
 };
+
+const clearSpecificKey = (hashKey: unknown, key: unknown): void => {
+  client.hdel(JSON.stringify(hashKey), JSON.stringify(key));
+};
+
+const updateSpecificKey = (hashKey: unknown, key: unknown, value: unknown): void => {
+  client.hset(JSON.stringify(hashKey), JSON.stringify(key), JSON.stringify(value));
+};
+
+// client.flushdb(function (err, succeeded) {
+//   console.log(succeeded); // will be true if successfull
+// });
+
+export { clearKey, clearSpecificKey, updateSpecificKey };

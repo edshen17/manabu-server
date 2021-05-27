@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 
 const AvailableTimeSchema = createSchema({
@@ -9,5 +9,6 @@ const AvailableTimeSchema = createSchema({
 });
 
 const AvailableTime = typedModel('AvailableTime', AvailableTimeSchema);
+type AvailableTimeDoc = ExtractDoc<typeof AvailableTimeSchema>;
 
-export { AvailableTime, AvailableTimeSchema };
+export { AvailableTime, AvailableTimeSchema, AvailableTimeDoc };

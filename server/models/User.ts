@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 
 const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
@@ -25,4 +25,6 @@ const UserSchema = createSchema({
 });
 
 const User = typedModel('User', UserSchema);
-export { User, UserSchema };
+type UserDoc = ExtractDoc<typeof UserSchema>;
+
+export { User, UserSchema, UserDoc };

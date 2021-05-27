@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 
 const TeacherBalanceSchema = createSchema({
@@ -12,5 +12,6 @@ const TeacherBalanceSchema = createSchema({
 });
 
 const TeacherBalance = typedModel('TeacherBalance', TeacherBalanceSchema);
+type TeacherBalanceDoc = ExtractDoc<typeof TeacherBalanceSchema>;
 
-export { TeacherBalance, TeacherBalanceSchema };
+export { TeacherBalance, TeacherBalanceSchema, TeacherBalanceDoc };

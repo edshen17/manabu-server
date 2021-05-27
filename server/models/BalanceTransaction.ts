@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 
 const BalanceTransactionSchema = createSchema({
@@ -10,4 +10,6 @@ const BalanceTransactionSchema = createSchema({
 });
 
 const BalanceTransaction = typedModel('BalanceTransaction', BalanceTransactionSchema);
-export { BalanceTransaction, BalanceTransactionSchema };
+type BalanceTransactionDoc = ExtractDoc<typeof BalanceTransactionSchema>;
+
+export { BalanceTransaction, BalanceTransactionSchema, BalanceTransactionDoc };

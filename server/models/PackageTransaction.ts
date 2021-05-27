@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 import { PackageSchema } from './Package';
 
@@ -22,5 +22,6 @@ const PackageTransactionSchema = createSchema({
 });
 
 const PackageTransaction = typedModel('PackageTransaction', PackageTransactionSchema);
+type PackageTransactionDoc = ExtractDoc<typeof PackageTransactionSchema>;
 
-export { PackageTransaction, PackageTransactionSchema };
+export { PackageTransaction, PackageTransactionSchema, PackageTransactionDoc };

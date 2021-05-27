@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel } from 'ts-mongoose';
+import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 
 const MinuteBankSchema = createSchema({
@@ -11,5 +11,6 @@ const MinuteBankSchema = createSchema({
 });
 
 const MinuteBank = typedModel('MinuteBank', MinuteBankSchema);
+type MinuteBankDoc = ExtractDoc<typeof MinuteBankSchema>;
 
-export { MinuteBank, MinuteBankSchema };
+export { MinuteBank, MinuteBankSchema, MinuteBankDoc };
