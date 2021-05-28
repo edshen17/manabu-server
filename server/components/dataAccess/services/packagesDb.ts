@@ -4,9 +4,12 @@ import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 
 class PackageDbService extends CommonDbOperations implements IDbOperations {
   private packageDb: any;
-  constructor(packageDb: any, cacheService: any) {
-    super({ cacheService, collectionName: packageDb.collection.collectionName });
-    this.packageDb = packageDb;
+  constructor(props: any) {
+    super({
+      cacheService: props.cacheService,
+      collectionName: props.packageDb.collection.collectionName,
+    });
+    this.packageDb = props.packageDb;
   }
 
   public findOne = async (searchQuery: {}): Promise<PackageDoc | Error> => {

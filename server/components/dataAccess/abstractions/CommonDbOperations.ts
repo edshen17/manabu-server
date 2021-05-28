@@ -2,7 +2,7 @@ import { IDbOperations } from './IDbOperations';
 
 export abstract class CommonDbOperations implements IDbOperations {
   protected cacheService: any;
-  protected collectionName: string;
+  public collectionName: string;
 
   constructor(dbData: any) {
     this.cacheService = dbData.cacheService;
@@ -17,7 +17,7 @@ export abstract class CommonDbOperations implements IDbOperations {
     this.cacheService.clearKey(this.collectionName);
   }
 
-  async build(createDbPromise: () => Promise<any>): Promise<this> {
+  async build(createDbPromise: () => Promise<any>): Promise<IDbOperations> {
     await createDbPromise();
     return this;
   }

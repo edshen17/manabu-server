@@ -6,7 +6,8 @@ class UserEntity implements IEntity {
   private passwordHasher: any;
   private randTokenGenerator: any;
 
-  constructor(sanitize: any, inputValidator: any, passwordHasher: any, randTokenGenerator: any) {
+  constructor(props: any) {
+    const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = props;
     this.sanitize = sanitize;
     this.inputValidator = inputValidator;
     this.passwordHasher = passwordHasher;
@@ -36,7 +37,7 @@ class UserEntity implements IEntity {
         getName: () => userData.name,
         getEmail: () => userData.email,
         getPassword: () => (userData.password = this.passwordHasher(userData.password)),
-        getProfileImage: () => userData.profileImage,
+        getProfileImage: () => userData.profileImage || '',
         getVerificationToken: () =>
           (verificationToken = this.randTokenGenerator(userData.name, userData.email)),
       });

@@ -31,13 +31,13 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
 };
 
 const cacheService = new CacheService();
-const teacherDbService = new TeacherDbService(Teacher, cacheService).build(makeDb);
-const packageDbService = new PackageDbService(Package, cacheService).build(makeDb);
-const userDbService = new UserDbService(
-  User,
+const teacherDbService = new TeacherDbService({ teacherDb: Teacher, cacheService }).build(makeDb);
+const packageDbService = new PackageDbService({ packageDb: Package, cacheService }).build(makeDb);
+const userDbService = new UserDbService({
+  userDb: User,
   teacherDbService,
   packageDbService,
-  cacheService
-).build(makeDb);
+  cacheService,
+}).build(makeDb);
 
 export { cacheService, teacherDbService, packageDbService, userDbService };

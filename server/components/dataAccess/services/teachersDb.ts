@@ -4,9 +4,12 @@ import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 
 class TeacherDbService extends CommonDbOperations implements IDbOperations {
   private teacherDb: any;
-  constructor(teacherDb: any, cacheService: any) {
-    super(cacheService);
-    this.teacherDb = teacherDb;
+  constructor(props: any) {
+    super({
+      cacheService: props.cacheService,
+      collectionName: props.teacherDb.collection.collectionName,
+    });
+    this.teacherDb = props.teacherDb;
   }
 
   public findOne = async (searchQuery: {}): Promise<TeacherDoc | Error> => {

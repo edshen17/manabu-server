@@ -1,8 +1,8 @@
 export interface IDbOperations {
-  findById?: (id: string, currentAPIUser?: any) => Promise<{} | Error>;
-  findOne: (searchQuery: {}) => Promise<{} | Error>;
-  insert: (modelToInsert: {}) => Promise<{} | Error>;
-  update: (searchQuery: {}) => Promise<{} | Error>;
+  findById?: (id: string, currentAPIUser?: any) => Promise<any>;
+  findOne: (searchQuery: {}) => Promise<any>;
+  insert: (modelToInsert: {}) => Promise<any>;
+  update: (searchQuery: {}) => Promise<any>;
   clearCollectionCache: () => void;
   build: (createDbPromise: () => Promise<any>) => Promise<IDbOperations>;
 }

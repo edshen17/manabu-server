@@ -7,11 +7,14 @@ class UserDbService extends CommonDbOperations implements IDbOperations {
   private teacherDbService: any;
   private packageDbService: any;
 
-  constructor(userDb: any, teacherDbService: any, packageDbService: any, cacheService: any) {
-    super({ cacheService, collectionName: packageDbService.collection.collectionName });
-    this.userDb = userDb;
-    this.teacherDbService = teacherDbService;
-    this.packageDbService = packageDbService;
+  constructor(props: any) {
+    super({
+      cacheService: props.cacheService,
+      collectionName: props.userDb.collection.collectionName,
+    });
+    this.userDb = props.userDb;
+    this.teacherDbService = props.teacherDbService;
+    this.packageDbService = props.packageDbService;
   }
 
   private _joinUserTeacher = async (user: UserDoc): Promise<{} | Error> => {
