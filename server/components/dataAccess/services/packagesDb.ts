@@ -5,10 +5,7 @@ import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 class PackageDbService extends CommonDbOperations implements IDbOperations {
   private packageDb: any;
   constructor(props: any) {
-    super({
-      cacheService: props.cacheService,
-      collectionName: props.packageDb.collection.collectionName,
-    });
+    super();
     this.packageDb = props.packageDb;
   }
 

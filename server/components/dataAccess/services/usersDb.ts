@@ -8,10 +8,7 @@ class UserDbService extends CommonDbOperations implements IDbOperations {
   private packageDbService: any;
 
   constructor(props: any) {
-    super({
-      cacheService: props.cacheService,
-      collectionName: props.userDb.collection.collectionName,
-    });
+    super();
     this.userDb = props.userDb;
     this.teacherDbService = props.teacherDbService;
     this.packageDbService = props.packageDbService;
@@ -32,13 +29,13 @@ class UserDbService extends CommonDbOperations implements IDbOperations {
 
   //TODO: findById with admin stuff
   public findById = async (id: string, currentAPIUser: any): Promise<{} | Error> => {
-    const user: UserDoc = await this.userDb.findById(id).lean().cache();
+    const user: UserDoc = await this.userDb.findById(id);
     if (user) return await this._joinUserTeacher(user);
     else throw new Error('User not found.');
   };
 
   public findOne = async (searchQuery: {}): Promise<{} | Error> => {
-    const user: UserDoc = await this.userDb.findOne(searchQuery).lean().cache();
+    const user: UserDoc = await this.userDb.findOne(searchQuery);
     if (user) return await this._joinUserTeacher(user);
     else throw new Error('User not found.');
   };

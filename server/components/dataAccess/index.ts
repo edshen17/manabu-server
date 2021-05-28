@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { UserDbService } from './services/usersDb';
 import { TeacherDbService } from './services/teachersDb';
 import { PackageDbService } from './services/packagesDb';
-import { CacheService } from './services/cache';
 import { User } from '../../models/User';
 import { Teacher } from '../../models/Teacher';
 import { Package } from '../../models/Package';
@@ -30,14 +29,12 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   }
 };
 
-const cacheService = new CacheService();
-const teacherDbService = new TeacherDbService({ teacherDb: Teacher, cacheService }).build(makeDb);
-const packageDbService = new PackageDbService({ packageDb: Package, cacheService }).build(makeDb);
+const teacherDbService = new TeacherDbService({ teacherDb: Teacher }).build(makeDb);
+const packageDbService = new PackageDbService({ packageDb: Package }).build(makeDb);
 const userDbService = new UserDbService({
   userDb: User,
   teacherDbService,
   packageDbService,
-  cacheService,
 }).build(makeDb);
 
-export { cacheService, teacherDbService, packageDbService, userDbService };
+export { teacherDbService, packageDbService, userDbService };

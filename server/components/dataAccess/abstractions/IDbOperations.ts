@@ -3,6 +3,5 @@ export interface IDbOperations {
   findOne: (searchQuery: {}) => Promise<any>;
   insert: (modelToInsert: {}) => Promise<any>;
   update: (searchQuery: {}) => Promise<any>;
-  clearCollectionCache: () => void;
   build: (createDbPromise: () => Promise<any>) => Promise<IDbOperations>;
 }

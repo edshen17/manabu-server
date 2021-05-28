@@ -4,7 +4,6 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { UserDbService } from '../../components/dataAccess/services/usersDb';
 import { TeacherDbService } from '../../components/dataAccess/services/teachersDb';
 import { PackageDbService } from '../../components/dataAccess/services/packagesDb';
-import { CacheService } from '../../components/dataAccess/services/cache';
 import { User } from '../../models/User';
 import { Teacher } from '../../models/Teacher';
 import { Package } from '../../models/Package';
@@ -25,14 +24,12 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   }
 };
 
-const cacheService = new CacheService();
-const teacherDbService = new TeacherDbService({ teacherDb: Teacher, cacheService }).build(makeDb);
-const packageDbService = new PackageDbService({ packageDb: Package, cacheService }).build(makeDb);
+const teacherDbService = new TeacherDbService({ teacherDb: Teacher }).build(makeDb);
+const packageDbService = new PackageDbService({ packageDb: Package }).build(makeDb);
 const makeUserDbService = new UserDbService({
   userDb: User,
   teacherDbService,
   packageDbService,
-  cacheService,
 });
 
 describe('userDb service', () => {
@@ -41,7 +38,7 @@ describe('userDb service', () => {
       const userDbService = await makeUserDbService.build(makeDb);
       let user;
       if (userDbService.findById) {
-        user = await userDbService.findById('123lsjadnasda', {});
+        user = await userDbService.findById('60979db0bb31ed001589a1ea', {});
       }
       expect(user).to.equal({});
     });
