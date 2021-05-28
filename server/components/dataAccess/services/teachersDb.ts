@@ -2,10 +2,7 @@ import { IDbOperations } from '../abstractions/IDbOperations';
 import { TeacherDoc } from '../../../models/Teacher';
 import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 
-class TeachersDbService<DbType>
-  extends CommonDbOperations<DbType>
-  implements IDbOperations<DbType>
-{
+class TeacherDbService extends CommonDbOperations implements IDbOperations {
   private teacherDb: any;
   constructor(teacherDb: any, cacheService: any) {
     super(cacheService);
@@ -34,4 +31,4 @@ class TeachersDbService<DbType>
   };
 }
 
-export { TeachersDbService };
+export { TeacherDbService };

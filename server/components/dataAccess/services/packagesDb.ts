@@ -2,13 +2,10 @@ import { IDbOperations } from '../abstractions/IDbOperations';
 import { PackageDoc } from '../../../models/Package';
 import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 
-class PackagesDbService<DbType>
-  extends CommonDbOperations<DbType>
-  implements IDbOperations<DbType>
-{
+class PackageDbService extends CommonDbOperations implements IDbOperations {
   private packageDb: any;
   constructor(packageDb: any, cacheService: any) {
-    super(cacheService);
+    super({ cacheService, collectionName: packageDb.collection.collectionName });
     this.packageDb = packageDb;
   }
 
@@ -34,4 +31,4 @@ class PackagesDbService<DbType>
   };
 }
 
-export { PackagesDbService };
+export { PackageDbService };

@@ -1,21 +1,23 @@
 import { IDbOperations } from './IDbOperations';
 
-export abstract class CommonDbOperations<DbType> implements IDbOperations<DbType> {
+export abstract class CommonDbOperations implements IDbOperations {
   protected cacheService: any;
+  protected collectionName: string;
 
-  constructor(cacheService: any) {
-    this.cacheService = cacheService;
+  constructor(dbData: any) {
+    this.cacheService = dbData.cacheService;
+    this.collectionName = dbData.collectionName;
   }
 
   abstract findOne: (searchQuery: {}) => Promise<{} | Error>;
   abstract insert: (modelToInsert: {}) => Promise<{} | Error>;
   abstract update: (searchQuery: {}) => Promise<{} | Error>;
 
-  clearCollectionCache(collection: string): void {
-    this.cacheService.clearKey(collection);
+  clearCollectionCache(): void {
+    this.cacheService.clearKey(this.collectionName);
   }
 
-  async build(createDbPromise: () => Promise<DbType>): Promise<this> {
+  async build(createDbPromise: () => Promise<any>): Promise<this> {
     await createDbPromise();
     return this;
   }

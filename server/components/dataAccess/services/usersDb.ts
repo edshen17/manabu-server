@@ -2,13 +2,13 @@ import { IDbOperations } from '../abstractions/IDbOperations';
 import { UserDoc } from '../../../models/User';
 import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 
-class UsersDbService<DbType> extends CommonDbOperations<DbType> implements IDbOperations<DbType> {
+class UserDbService extends CommonDbOperations implements IDbOperations {
   private userDb: any;
   private teacherDbService: any;
   private packageDbService: any;
 
   constructor(userDb: any, teacherDbService: any, packageDbService: any, cacheService: any) {
-    super(cacheService);
+    super({ cacheService, collectionName: packageDbService.collection.collectionName });
     this.userDb = userDb;
     this.teacherDbService = teacherDbService;
     this.packageDbService = packageDbService;
@@ -28,6 +28,11 @@ class UsersDbService<DbType> extends CommonDbOperations<DbType> implements IDbOp
   };
 
   //TODO: findById with admin stuff
+  public findById = async (id: string, currentAPIUser: any): Promise<{} | Error> => {
+    const user: UserDoc = await this.userDb.findById(id).lean().cache();
+    if (user) return await this._joinUserTeacher(user);
+    else throw new Error('User not found.');
+  };
 
   public findOne = async (searchQuery: {}): Promise<{} | Error> => {
     const user: UserDoc = await this.userDb.findOne(searchQuery).lean().cache();
@@ -35,7 +40,7 @@ class UsersDbService<DbType> extends CommonDbOperations<DbType> implements IDbOp
     else throw new Error('User not found.');
   };
 
-  //TODO: Finish
+  //TODO: Finish with join
   public insert = async (modelToInsert: {}): Promise<{} | Error> => {
     const result = await this.userDb.create(modelToInsert);
     return result;
@@ -48,7 +53,7 @@ class UsersDbService<DbType> extends CommonDbOperations<DbType> implements IDbOp
   };
 }
 
-export { UsersDbService };
+export { UserDbService };
 
 // function makeUsersDb({
 //   makeDb,
