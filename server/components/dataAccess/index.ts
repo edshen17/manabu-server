@@ -33,8 +33,8 @@ const teacherDbService = new TeacherDbService({ teacherDb: Teacher }).build(make
 const packageDbService = new PackageDbService({ packageDb: Package }).build(makeDb);
 const userDbService = new UserDbService({
   userDb: User,
-  teacherDbService,
-  packageDbService,
+  teacherDbService: TeacherDbService,
+  packageDbService: PackageDbService,
 }).build(makeDb);
 
 export { teacherDbService, packageDbService, userDbService };
