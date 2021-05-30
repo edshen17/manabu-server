@@ -1,8 +1,7 @@
 import chai from 'chai';
-import { TeacherEntity } from '../../components/entities/user/teacherEntity';
+import { teacherEntity } from './index';
 
 const expect = chai.expect;
-const teacherEntity = new TeacherEntity();
 
 describe('teacher entity', () => {
   describe('given valid inputs', () => {

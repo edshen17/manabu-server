@@ -1,24 +1,26 @@
-import { IDbOperations } from '../abstractions/IDbOperations';
-import { UserDoc } from '../../../models/User';
+import { AccessOption, IDbOperations } from '../abstractions/IDbOperations';
 import { CommonDbOperations } from '../abstractions/CommonDbOperations';
 import { TeacherDbService } from './teachersDb';
 import { PackageDbService } from './packagesDb';
+import { TeacherDoc } from '../../../models/Teacher';
 
 class UserDbService extends CommonDbOperations implements IDbOperations {
-  private userDb: any;
   private teacherDbService: TeacherDbService;
   private packageDbService: PackageDbService;
-
   constructor(props: any) {
-    super();
-    this.userDb = props.userDb;
-    this.teacherDbService = props.teacherDbService;
-    this.packageDbService = props.packageDbService;
+    super(props.userDb);
+    const { teacherDbService, packageDbService } = props;
+    this.teacherDbService = teacherDbService;
+    this.packageDbService = packageDbService;
   }
 
   private _joinUserTeacher = async (user: any): Promise<any> => {
-    const userCopy = JSON.parse(JSON.stringify(user));
-    const teacher = await this.teacherDbService.findByUserId(user._id);
+    const userCopy: any = JSON.parse(JSON.stringify(user));
+    const id = user._id;
+    const teacher: TeacherDoc = await this.teacherDbService.findById({
+      id,
+      accessOptions: { isProtectedResource: false, isCurrentAPIUserPermitted: true },
+    });
     // const packages = await this.packageDbService.findByHostedBy(user._id);
     const packages = {}; //TODO FILL OUT
     if (teacher) {
@@ -29,29 +31,56 @@ class UserDbService extends CommonDbOperations implements IDbOperations {
     return userCopy;
   };
 
-  //TODO: findById with admin stuff
-  public findById = async (id: string, currentAPIUser: any): Promise<any> => {
-    const user: UserDoc = await this.userDb.findById(id);
-    if (user) return await this._joinUserTeacher(user);
-    else throw new Error('User not found.');
+  public findOne = async (params: {
+    searchQuery: {};
+    accessOptions: AccessOption;
+  }): Promise<any | Error> => {
+    const { searchQuery, accessOptions } = params;
+    const asyncCallback = this.dbModel.findOne(searchQuery);
+    const user = this._grantAccess(accessOptions, asyncCallback);
+    // if (user) return await this._joinUserTeacher(user);
+    return user;
   };
 
-  public findOne = async (searchQuery: {}): Promise<any> => {
-    const user: UserDoc = await this.userDb.findOne(searchQuery);
-    if (user) return await this._joinUserTeacher(user);
-    else throw new Error('User not found.');
+  public findById = async (params: {
+    id: string;
+    accessOptions: AccessOption;
+  }): Promise<any | Error> => {
+    const { id, accessOptions } = params;
+    const asyncCallback = this.dbModel.findById(id);
+    const user = this._grantAccess(accessOptions, asyncCallback);
+    // if (user) return await this._joinUserTeacher(user);
+    return user;
   };
 
-  //TODO: Finish with join
-  public insert = async (modelToInsert: {}): Promise<any> => {
-    const result = await this.userDb.create(modelToInsert);
-    return result;
+  public insert = async (params: {
+    modelToInsert: {};
+    accessOptions: AccessOption;
+  }): Promise<any | Error> => {
+    const { modelToInsert, accessOptions } = params;
+    const asyncCallback = this.dbModel.create(modelToInsert);
+    const user = this._grantAccess(accessOptions, asyncCallback);
+    // if (user) return await this._joinUserTeacher(user);
+    return user;
   };
 
-  //TODO: Finish
-  public update = async (searchQuery: {}): Promise<any> => {
-    const result = await this.userDb.create(searchQuery);
-    return result;
+  public update = async (params: {
+    searchQuery: {};
+    updateParams: {};
+    accessOptions: any;
+  }): Promise<any | Error> => {
+    const { searchQuery, updateParams, accessOptions } = params;
+    const asyncCallback = this.dbModel.findOneAndUpdate(searchQuery, updateParams);
+    const user = this._grantAccess(accessOptions, asyncCallback);
+    // if (user) return await this._joinUserTeacher(user);
+    return user;
+  };
+
+  public build = async (makeDb: any, teacherDbService: any, packageDbService: any) => {
+    await makeDb();
+    this.teacherDbService = await teacherDbService;
+    this.packageDbService = await packageDbService;
+    return this;
   };
 }
 

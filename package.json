@@ -7,7 +7,7 @@
     "start": "node server/dist/index.js",
     "build": "tsc -p tsconfig.json",
     "server": "nodemon server/index.ts",
-    "test": "mocha -r ts-node/register server/tests/**/*.test.ts"
+    "test": "mocha -r ts-node/register server/**/*.test.ts"
   },
   "author": "",
   "license": "ISC",
