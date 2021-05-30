@@ -1,11 +1,17 @@
-import { IDbOperations } from '../abstractions/IDbOperations';
-import { TeacherDoc } from '../../../models/Teacher';
+import { AccessOptions, DbParams, IDbOperations } from '../abstractions/IDbOperations';
 import { CommonDbOperations } from '../abstractions/CommonDbOperations';
+import { TeacherDoc } from '../../../models/Teacher';
 
-class TeacherDbService extends CommonDbOperations implements IDbOperations {
+class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
   constructor(props: any) {
     super(props.teacherDb);
   }
+
+  public findById = async (params: DbParams): Promise<TeacherDoc> => {
+    const { id, accessOptions } = params;
+    const asyncCallback = this.findOne({ searchQuery: { userId: id }, accessOptions });
+    return await this._grantAccess(accessOptions, asyncCallback);
+  };
 }
 
 export { TeacherDbService };

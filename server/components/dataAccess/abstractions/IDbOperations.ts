@@ -1,18 +1,23 @@
-type AccessOption = {
+type AccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
 };
 
-interface IDbOperations {
-  findById: (params: { id: string; accessOptions: any }) => Promise<any>;
-  findOne: (params: { searchQuery: {}; accessOptions: any }) => Promise<any | Error>;
-  insert: (params: { modelToInsert: {}; accessOptions: any }) => Promise<any | Error>;
-  update: (params: {
-    searchQuery: {};
-    updateParams: {};
-    accessOptions: any;
-  }) => Promise<any | Error>;
-  build: (...args: any[]) => Promise<IDbOperations>;
+type DbParams = {
+  id?: string;
+  searchQuery?: {};
+  accessOptions: AccessOptions;
+  modelToInsert?: {};
+  updateParams?: {};
+};
+
+interface IDbOperations<DbDoc> {
+  findById: (params: DbParams) => Promise<DbDoc>;
+  findOne: (params: DbParams) => Promise<DbDoc>;
+  find: (params: DbParams) => Promise<[DbDoc]>;
+  insert: (params: DbParams) => Promise<DbDoc>;
+  update: (params: DbParams) => Promise<DbDoc>;
+  build: (...args: any[]) => Promise<this>;
 }
 
-export { AccessOption, IDbOperations };
+export { AccessOptions, DbParams, IDbOperations };

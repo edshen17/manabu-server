@@ -1,13 +1,13 @@
-import { AccessOption, IDbOperations } from './IDbOperations';
+import { AccessOptions, DbParams, IDbOperations } from './IDbOperations';
 
-export abstract class CommonDbOperations implements IDbOperations {
+export abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   protected dbModel: any;
   constructor(dbModel: any) {
     this.dbModel = dbModel;
   }
 
   protected _grantAccess = async (
-    accessOptions: AccessOption,
+    accessOptions: AccessOptions,
     asyncCallback: Promise<any>
   ): Promise<any | Error> => {
     try {
@@ -20,7 +20,7 @@ export abstract class CommonDbOperations implements IDbOperations {
         dbResult = await asyncCallback;
         return dbResult;
       } else if (isAccessPermitted && !dbResult) {
-        throw new Error('Resource was not found.');
+        throw new Error(`${this.dbModel.collection.collectionName} was not found.`);
       } else {
         throw new Error('Access denied');
       }
@@ -29,53 +29,37 @@ export abstract class CommonDbOperations implements IDbOperations {
     }
   };
 
-  public findOne = async (params: {
-    searchQuery: {};
-    accessOptions: AccessOption;
-  }): Promise<any | Error> => {
+  public findOne = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, accessOptions } = params;
-    const asyncCallback = this.dbModel.findOne(searchQuery);
-    return this._grantAccess(accessOptions, asyncCallback);
+    const asyncCallback = this.dbModel.findOne(searchQuery).lean();
+    return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public findById = async (params: {
-    id: string;
-    accessOptions: AccessOption;
-  }): Promise<any | Error> => {
+  public findById = async (params: DbParams): Promise<DbDoc> => {
     const { id, accessOptions } = params;
-    const asyncCallback = this.dbModel.findById(id);
-    return this._grantAccess(accessOptions, asyncCallback);
+    const asyncCallback = this.dbModel.findById(id).lean();
+    return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public find = async (params: {
-    searchQuery: {};
-    accessOptions: AccessOption;
-  }): Promise<any | Error> => {
+  public find = async (params: DbParams): Promise<[DbDoc]> => {
     const { searchQuery, accessOptions } = params;
-    const asyncCallback = this.dbModel.find(searchQuery);
-    return this._grantAccess(accessOptions, asyncCallback);
+    const asyncCallback = this.dbModel.find(searchQuery).lean();
+    return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public insert = async (params: {
-    modelToInsert: {};
-    accessOptions: AccessOption;
-  }): Promise<any | Error> => {
+  public insert = async (params: DbParams): Promise<DbDoc> => {
     const { modelToInsert, accessOptions } = params;
     const asyncCallback = this.dbModel.create(modelToInsert);
-    return this._grantAccess(accessOptions, asyncCallback);
+    return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public update = async (params: {
-    searchQuery: {};
-    updateParams: {};
-    accessOptions: any;
-  }): Promise<any | Error> => {
+  public update = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, updateParams, accessOptions } = params;
-    const asyncCallback = this.dbModel.findOneAndUpdate(searchQuery, updateParams);
-    return this._grantAccess(accessOptions, asyncCallback);
+    const asyncCallback = this.dbModel.findOneAndUpdate(searchQuery, updateParams).lean();
+    return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public build = async (...args: any): Promise<IDbOperations> => {
+  public build = async (...args: any): Promise<this> => {
     for (const promise of args) await promise;
     return this;
   };

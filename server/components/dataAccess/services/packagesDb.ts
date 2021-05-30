@@ -1,8 +1,8 @@
 import { IDbOperations } from '../abstractions/IDbOperations';
-import { PackageDoc } from '../../../models/Package';
 import { CommonDbOperations } from '../abstractions/CommonDbOperations';
+import { PackageDoc } from '../../../models/Package';
 
-class PackageDbService extends CommonDbOperations implements IDbOperations {
+class PackageDbService extends CommonDbOperations<PackageDoc> implements IDbOperations<PackageDoc> {
   constructor(props: any) {
     super(props.packageDb);
   }

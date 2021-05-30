@@ -7,16 +7,11 @@ import { User } from '../../models/User';
 import { Teacher } from '../../models/Teacher';
 import { Package } from '../../models/Package';
 const mongod = new MongoMemoryServer();
-let dbHost: string;
-if (process.env.NODE_ENV == 'production') {
-  dbHost = 'users';
-} else {
-  dbHost = 'dev';
-}
 
 const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   if (mongoose.connection.readyState != 1) {
-    let dbURI = `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?retryWrites=true&w=majority`;
+    let dbHost: string = 'users';
+    let dbURI: string = `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?retryWrites=true&w=majority`;
 
     if (process.env.NODE_ENV != 'production') {
       dbURI = await mongod.getUri();
@@ -33,10 +28,10 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   }
 };
 
-const teacherDbService = new TeacherDbService({ teacherDb: Teacher }).build(makeDb);
-const packageDbService = new PackageDbService({ packageDb: Package }).build(makeDb);
-const userDbService = new UserDbService({
+const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).build(makeDb);
+const makePackageDbService = new PackageDbService({ packageDb: Package }).build(makeDb);
+const makeUserDbService = new UserDbService({
   userDb: User,
-}).build(makeDb, teacherDbService, packageDbService);
+}).build(makeDb, makeTeacherDbService, makePackageDbService);
 
-export { teacherDbService, packageDbService, userDbService };
+export { makeTeacherDbService, makePackageDbService, makeUserDbService };
