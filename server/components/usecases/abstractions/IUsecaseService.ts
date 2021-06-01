@@ -1,8 +1,8 @@
 import { IUsecase } from './IUsecase';
 
-export interface IUsecaseService {
-  getUsecase: IUsecase;
-  postUsecase: IUsecase;
-  putUsecase: IUsecase;
-  deleteUsecase?: IUsecase;
+export interface IUsecaseService<DbDoc> {
+  getUsecase: IUsecase<DbDoc>;
+  postUsecase: IUsecase<DbDoc>;
+  putUsecase: IUsecase<DbDoc>;
+  deleteUsecase?: IUsecase<DbDoc>;
 }

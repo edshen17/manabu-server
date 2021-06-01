@@ -1,6 +1,8 @@
 type AccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
+  currentAPIUserRole: string;
+  isSelf: boolean;
 };
 
 type DbParams = {

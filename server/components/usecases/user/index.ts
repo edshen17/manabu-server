@@ -26,4 +26,4 @@ const userUsecaseService = new UserUsecaseService({
   putUserUsecase,
 });
 
-export { getUserUsecase, postUserUsecase, userUsecaseService };
+export { userUsecaseService };

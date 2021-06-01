@@ -13,22 +13,36 @@ class UserDbService
   extends CommonDbOperations<JoinedUserDoc>
   implements IDbOperations<JoinedUserDoc>
 {
-  private teacherDbService: TeacherDbService;
-  private packageDbService: PackageDbService;
+  private teacherDbService!: TeacherDbService;
+  private packageDbService!: PackageDbService;
   constructor(props: any) {
     super(props.userDb);
-    const { teacherDbService, packageDbService } = props;
-    this.teacherDbService = teacherDbService;
-    this.packageDbService = packageDbService;
+    this.defaultSelectSettings = {
+      defaultSettings: {
+        email: 0,
+        password: 0,
+        verificationToken: 0,
+        settings: 0,
+      },
+      adminSettings: {
+        password: 0,
+        verificationToken: 0,
+        settings: 0,
+      },
+      isSelfSettings: {
+        email: 0,
+        password: 0,
+        verificationToken: 0,
+      },
+    };
   }
 
-  private _joinUserTeacherPackage = async (user: any): Promise<JoinedUserDoc> => {
+  private _joinUserTeacherPackage = async (
+    user: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ): Promise<JoinedUserDoc> => {
     const userCopy: any = JSON.parse(JSON.stringify(user));
     const id: string = user._id;
-    const accessOptions: AccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted: true,
-    };
     const teacher: TeacherDoc = await this.teacherDbService.findById({
       id,
       accessOptions,
@@ -54,19 +68,21 @@ class UserDbService
   ): Promise<any> => {
     const user = await this._grantAccess(accessOptions, asyncCallback);
     if (user) {
-      return await this._joinUserTeacherPackage(user);
+      return await this._joinUserTeacherPackage(user, accessOptions);
     } else throw new Error('User not found');
   };
 
   public findOne = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { searchQuery, accessOptions } = params;
-    const asyncCallback = this.dbModel.findOne(searchQuery);
+    const selectSettings = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findOne(searchQuery, selectSettings);
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
   public findById = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { id, accessOptions } = params;
-    const asyncCallback = this.dbModel.findById(id).lean();
+    const selectSettings = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findById(id, selectSettings).lean();
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
@@ -78,7 +94,13 @@ class UserDbService
 
   public update = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { searchQuery, updateParams, accessOptions } = params;
-    const asyncCallback = this.dbModel.findOneAndUpdate(searchQuery, updateParams).lean();
+    const selectSettings = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel
+      .findOneAndUpdate(searchQuery, updateParams, {
+        fields: selectSettings,
+        returnOriginal: false,
+      })
+      .lean();
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
@@ -90,4 +112,4 @@ class UserDbService
   };
 }
 
-export { UserDbService };
+export { UserDbService, JoinedUserDoc };

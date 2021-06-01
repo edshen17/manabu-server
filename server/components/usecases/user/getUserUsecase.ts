@@ -1,18 +1,34 @@
-import { IUsecase } from '../abstractions/IUsecase';
+import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
+import { AbstractUsecase } from '../abstractions/AbstractUsecase';
+import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-class GetUserUsecase implements IUsecase {
-  private userDbService: any;
-  constructor(userDbService: any) {
-    this.userDbService = userDbService;
-  }
+class GetUserUsecase<JoinedUserDoc>
+  extends AbstractUsecase<JoinedUserDoc>
+  implements IUsecase<JoinedUserDoc>
+{
+  private userDbService!: UserDbService;
 
-  public build = async (controllerData: any): Promise<{} | undefined> => {
-    if (controllerData.uId || controllerData.currentAPIUser.userId) {
-      const idToSearch =
-        controllerData.endpointPath == '/me'
-          ? controllerData.currentAPIUser.userId
-          : controllerData.uId;
-      const user = await this.userDbService.findById(idToSearch, controllerData.currentAPIUser);
+  public makeRequest = async (
+    controllerData: ControllerData
+  ): Promise<JoinedUserDoc | undefined> => {
+    const { routeData, currentAPIUser, endpointPath } = controllerData;
+    const { routeParams } = routeData;
+    if (routeParams.uId || currentAPIUser.userId) {
+      const idToSearch: string =
+        endpointPath == '/me' ? currentAPIUser.userId : otherData.routeParams.uId;
+      const accessOptions: AccessOptions = {
+        isProtectedResource: false,
+        isCurrentAPIUserPermitted: true,
+        currentAPIUserRole: currentAPIUser.role,
+        isSelf: routeParams.uId == currentAPIUser.userId,
+        rolePermissions: { teacher: {}, admin: {}, user: {} },
+      };
+
+      const user = await this.userDbService.findById({
+        searchQuery: { id: idToSearch },
+        accessOptions,
+      });
       return user;
     }
   };
