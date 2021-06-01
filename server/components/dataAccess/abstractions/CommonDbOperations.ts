@@ -1,6 +1,6 @@
 import { AccessOptions, DbParams, IDbOperations } from './IDbOperations';
 
-type DefaultSelectSettings = {
+type DefaultselectOptions = {
   defaultSettings: {};
   adminSettings?: {};
   isSelfSettings?: {};
@@ -8,27 +8,26 @@ type DefaultSelectSettings = {
 
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   protected dbModel: any;
-  protected defaultSelectSettings!: DefaultSelectSettings;
-  constructor(dbModel: any) {
+  protected defaultselectOptions: DefaultselectOptions;
+  constructor(dbModel: any, defaultselectOptions: DefaultselectOptions) {
     this.dbModel = dbModel;
+    this.defaultselectOptions = JSON.parse(JSON.stringify(defaultselectOptions));
   }
 
   protected _configureSelectOptions = (accessOptions: AccessOptions): {} => {
     const { isSelf, currentAPIUserRole } = accessOptions;
-    const { defaultSettings, adminSettings, isSelfSettings } = this.defaultSelectSettings;
-    let selectSettings: any = JSON.parse(JSON.stringify(defaultSettings));
+    const { defaultSettings, adminSettings, isSelfSettings } = this.defaultselectOptions;
+    let selectOptions: any = defaultSettings;
 
     if (isSelf) {
-      selectSettings = isSelfSettings || defaultSettings;
+      selectOptions = isSelfSettings;
     }
 
     if (currentAPIUserRole == 'admin') {
-      selectSettings = { ...isSelfSettings, ...adminSettings };
+      selectOptions = adminSettings;
     }
 
-    console.log(selectSettings);
-
-    return selectSettings;
+    return selectOptions || defaultSettings;
   };
 
   protected _grantAccess = async (
@@ -45,7 +44,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
         dbResult = await asyncCallback;
         return dbResult;
       } else if (isAccessPermitted && !dbResult) {
-        throw new Error(`${this.dbModel.collection.collectionName} was not found.`);
+        throw new Error(`${this.dbModel.collection.collectionName} was not found`);
       } else {
         throw new Error('Access denied');
       }
@@ -56,22 +55,22 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
 
   public findOne = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findOne(searchQuery, selectSettings).lean();
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
   public findById = async (params: DbParams): Promise<DbDoc> => {
     const { id, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findById(id, selectSettings).lean();
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findById(id, selectOptions).lean();
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
   public find = async (params: DbParams): Promise<[DbDoc]> => {
     const { searchQuery, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.find(searchQuery, selectSettings).lean();
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.find(searchQuery, selectOptions).lean();
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
@@ -83,11 +82,11 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
 
   public update = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, updateParams, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
+    const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel
       .findOneAndUpdate(searchQuery, updateParams, {
-        fields: selectSettings,
-        returnOriginal: false,
+        fields: selectOptions,
+        new: true,
       })
       .lean();
     return await this._grantAccess(accessOptions, asyncCallback);
@@ -99,4 +98,4 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 }
 
-export { DefaultSelectSettings, CommonDbOperations };
+export { DefaultselectOptions, CommonDbOperations };

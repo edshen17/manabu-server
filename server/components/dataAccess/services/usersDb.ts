@@ -16,8 +16,7 @@ class UserDbService
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
   constructor(props: any) {
-    super(props.userDb);
-    this.defaultSelectSettings = {
+    super(props.userDb, {
       defaultSettings: {
         email: 0,
         password: 0,
@@ -27,14 +26,13 @@ class UserDbService
       adminSettings: {
         password: 0,
         verificationToken: 0,
-        settings: 0,
       },
       isSelfSettings: {
         email: 0,
         password: 0,
         verificationToken: 0,
       },
-    };
+    });
   }
 
   private _joinUserTeacherPackage = async (
@@ -74,15 +72,15 @@ class UserDbService
 
   public findOne = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { searchQuery, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findOne(searchQuery, selectSettings);
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions);
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
   public findById = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { id, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findById(id, selectSettings).lean();
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findById(id, selectOptions).lean();
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
@@ -94,11 +92,11 @@ class UserDbService
 
   public update = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { searchQuery, updateParams, accessOptions } = params;
-    const selectSettings = this._configureSelectOptions(accessOptions);
+    const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel
       .findOneAndUpdate(searchQuery, updateParams, {
-        fields: selectSettings,
-        returnOriginal: false,
+        fields: selectOptions,
+        new: true,
       })
       .lean();
     return await this._returnJoinedUser(accessOptions, asyncCallback);

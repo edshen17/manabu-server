@@ -4,13 +4,12 @@ import { TeacherDoc } from '../../../models/Teacher';
 
 class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
   constructor(props: any) {
-    super(props.teacherDb);
-    this.defaultSelectSettings = {
+    super(props.teacherDb, {
       defaultSettings: {
         licensePath: 0,
       },
       adminSettings: {},
-    };
+    });
   }
 
   public findById = async (params: DbParams): Promise<TeacherDoc> => {

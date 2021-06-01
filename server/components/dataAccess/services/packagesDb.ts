@@ -4,10 +4,9 @@ import { PackageDoc } from '../../../models/Package';
 
 class PackageDbService extends CommonDbOperations<PackageDoc> implements IDbOperations<PackageDoc> {
   constructor(props: any) {
-    super(props.packageDb);
-    this.defaultSelectSettings = {
+    super(props.packageDb, {
       defaultSettings: {},
-    };
+    });
   }
 }
 
