@@ -7,7 +7,6 @@ import { TeacherDbService } from './teachersDb';
 import { UserDbService, JoinedUserDoc } from './usersDb';
 
 const expect = chai.expect;
-const assert = chai.assert;
 let userDbService: UserDbService;
 let teacherDbService: TeacherDbService;
 let packageDbService: PackageDbService;

@@ -1,8 +1,10 @@
+import { IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
 import { IUsecase } from './IUsecase';
 
-export interface IUsecaseService<DbDoc> {
-  getUsecase: IUsecase<DbDoc>;
-  postUsecase: IUsecase<DbDoc>;
-  putUsecase: IUsecase<DbDoc>;
-  deleteUsecase?: IUsecase<DbDoc>;
+export interface IUsecaseService {
+  getUsecase: IUsecase;
+  postUsecase: IUsecase;
+  putUsecase: IUsecase;
+  deleteUsecase?: IUsecase;
+  build: (services: any) => Promise<this>;
 }

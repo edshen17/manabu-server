@@ -39,14 +39,13 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
       const { isProtectedResource, isCurrentAPIUserPermitted } = accessOptions;
       const isAccessPermitted =
         (isProtectedResource && isCurrentAPIUserPermitted) || !isProtectedResource;
-
       if (isAccessPermitted) {
         dbResult = await asyncCallback;
         return dbResult;
       } else if (isAccessPermitted && !dbResult) {
-        throw new Error(`${this.dbModel.collection.collectionName} was not found`);
+        throw new Error(`${this.dbModel.collection.collectionName} was not found.`);
       } else {
-        throw new Error('Access denied');
+        throw new Error('Access denied.');
       }
     } catch (err) {
       throw err;

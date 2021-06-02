@@ -1,7 +1,7 @@
 type AccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
-  currentAPIUserRole: string;
+  currentAPIUserRole: string | undefined;
   isSelf: boolean;
 };
 

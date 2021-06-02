@@ -1,20 +1,18 @@
-import { IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
-
 type CurrentAPIUser = {
-  userId: string;
-  role: string;
+  userId: string | undefined;
+  role: string | undefined;
   isVerified: boolean;
 };
 
 type ControllerData = {
   currentAPIUser: CurrentAPIUser;
-  endpointPath: string;
-  routeData: { params: any };
+  endpointPath?: string;
+  routeData: { params: any; body: any };
 };
 
-interface IUsecase<DbDoc> {
-  makeRequest: (controllerData: ControllerData) => Promise<DbDoc>;
-  build: (makeDbService: IDbOperations<DbDoc>) => Promise<this>;
+interface IUsecase {
+  makeRequest: (controllerData: ControllerData) => Promise<any>;
+  build: (services: any) => Promise<this>;
 }
 
 export { CurrentAPIUser, ControllerData, IUsecase };

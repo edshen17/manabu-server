@@ -1,18 +1,43 @@
-import { IUsecase } from '../abstractions/IUsecase';
+import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
+import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
 class PutUserUsecase implements IUsecase {
-  private userDbService: any;
-  constructor(userDbService: any) {
-    this.userDbService = userDbService;
-  }
+  private userDbService!: UserDbService;
 
-  public build = async (controllerData: any): Promise<{} | undefined> => {
-    // if (uId || currentAPIUser.userId) {
-    //   const idToSearch = endpointPath == '/me' ? currentAPIUser.userId : uId;
-    //   const user = await this.userDbService.update(idToSearch, currentAPIUser);
-    //   return user;
-    // }
-    return undefined;
+  public build = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
+    this.userDbService = await services.makeUserDbService;
+    return this;
+  };
+
+  private _isValidBody = (body: JoinedUserDoc): any => {
+    const { role, _id, dateRegistered } = body;
+    return !role && !_id && !dateRegistered;
+  };
+
+  public makeRequest = async (controllerData: ControllerData): Promise<JoinedUserDoc | Error> => {
+    const { routeData, currentAPIUser } = controllerData;
+    const { body, params } = routeData;
+    const isCurrentAPIUserPermitted =
+      params.uId == currentAPIUser.userId || currentAPIUser.role == 'admin';
+    const accessOptions: AccessOptions = {
+      isProtectedResource: true,
+      isCurrentAPIUserPermitted,
+      currentAPIUserRole: currentAPIUser.role,
+      isSelf: params.uId == currentAPIUser.userId,
+    };
+    const isValidUpdate = currentAPIUser.role == 'admin' || this._isValidBody(body);
+
+    if (isValidUpdate) {
+      const user = await this.userDbService.update({
+        searchQuery: { id: params.uId },
+        updateParams: body,
+        accessOptions,
+      });
+      return user;
+    } else {
+      throw new Error('You do not have the permissions to update those properties.');
+    }
   };
 }
 

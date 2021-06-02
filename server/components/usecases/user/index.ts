@@ -1,29 +1,41 @@
 import jwt from 'jsonwebtoken';
-import { userDbService, teacherDbService } from '../../dataAccess/index';
+import { makeUserDbService, makeTeacherDbService } from '../../dataAccess/index';
 import { GetUserUsecase } from './getUserUsecase';
 import { PostUserUsecase } from './postUserUsecase';
 import { PutUserUsecase } from './putUserUsecase';
-import { EmailHandler } from '../../utils/email/emailHandler';
+import { emailHandler } from '../../utils/email/emailHandler';
 import { IUsecaseService } from '../abstractions/IUsecaseService';
 
 class UserUsecaseService implements IUsecaseService {
-  public getUsecase: GetUserUsecase;
-  public postUsecase: PostUserUsecase;
-  public putUsecase: PutUserUsecase;
-  constructor(usecases: any) {
-    this.getUsecase = usecases.getUserUsecase;
-    this.postUsecase = usecases.postUserUsecase;
-    this.putUsecase = usecases.putUserUsecase;
-  }
+  public getUsecase!: GetUserUsecase;
+  public postUsecase!: PostUserUsecase;
+  public putUsecase!: PutUserUsecase;
+
+  public build = async (services: {
+    makeGetUserUsecase: Promise<GetUserUsecase>;
+    makePostUserUsecase: Promise<PostUserUsecase>;
+    makePutUserUsecase: Promise<PutUserUsecase>;
+  }): Promise<this> => {
+    this.getUsecase = await services.makeGetUserUsecase;
+    this.postUsecase = await services.makePostUserUsecase;
+    this.putUsecase = await services.makePutUserUsecase;
+    return this;
+  };
 }
 
-const getUserUsecase = new GetUserUsecase(userDbService);
-const postUserUsecase = new PostUserUsecase(userDbService, teacherDbService, jwt, EmailHandler);
-const putUserUsecase = new PutUserUsecase(userDbService);
-const userUsecaseService = new UserUsecaseService({
-  getUserUsecase,
-  postUserUsecase,
-  putUserUsecase,
+const makeGetUserUsecase = new GetUserUsecase().build({ makeUserDbService });
+const makePostUserUsecase = new PostUserUsecase().build({
+  makeUserDbService,
+  makeTeacherDbService,
+  jwt,
+  emailHandler,
+});
+const makePutUserUsecase = new PutUserUsecase().build({ makeUserDbService });
+
+const userUsecaseService = new UserUsecaseService().build({
+  makeGetUserUsecase,
+  makePostUserUsecase,
+  makePutUserUsecase,
 });
 
 export { userUsecaseService };

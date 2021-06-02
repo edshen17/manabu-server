@@ -67,7 +67,7 @@ class UserDbService
     const user = await this._grantAccess(accessOptions, asyncCallback);
     if (user) {
       return await this._joinUserTeacherPackage(user, accessOptions);
-    } else throw new Error('User not found');
+    }
   };
 
   public findOne = async (params: DbParams): Promise<JoinedUserDoc> => {

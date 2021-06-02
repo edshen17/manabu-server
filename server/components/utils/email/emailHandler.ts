@@ -76,4 +76,6 @@ const readHTMLFile = function (path: string, callback: (...args: any[]) => any) 
   });
 };
 
-export { EmailHandler };
+const emailHandler = new EmailHandler();
+
+export { EmailHandler, emailHandler };

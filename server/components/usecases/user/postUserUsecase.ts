@@ -1,17 +1,24 @@
+import { UserDoc } from '../../../models/User';
+import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { TeacherDbService } from '../../dataAccess/services/teachersDb';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { userEntity, teacherEntity } from '../../entities/user/index';
-import { IUsecase } from '../abstractions/IUsecase';
+import { EmailHandler } from '../../utils/email/emailHandler';
+import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
 class PostUserUsecase implements IUsecase {
-  private userDbService: any;
-  private teacherDbService: any;
-  private jwt: any;
-  private emailHandler: any;
-
-  constructor(userDbService: any, teacherDbService: any, jwt: any, emailHandler: any) {
-    this.userDbService = userDbService;
-    this.teacherDbService = teacherDbService;
-    this.jwt = jwt;
-    this.emailHandler = emailHandler;
+  private userDbService!: UserDbService;
+  private teacherDbService!: TeacherDbService;
+  private jwt!: any;
+  private emailHandler!: EmailHandler;
+  private defaultAccessOptions!: AccessOptions;
+  constructor() {
+    this.defaultAccessOptions = {
+      isProtectedResource: false,
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: 'user',
+      isSelf: true,
+    };
   }
 
   private _sendVerificationEmail = (userInstance: any): void => {
@@ -61,7 +68,10 @@ class PostUserUsecase implements IUsecase {
 
   private _ensureUniqueUser = async (userData: any, isTeacherApp: boolean): Promise<void> => {
     const userInstance = userEntity.build(userData);
-    const exists = await this.userDbService.findOne({ email: userInstance.getEmail() });
+    const exists = await this.userDbService.findOne({
+      searchQuery: { email: userInstance.getEmail() },
+      accessOptions: this.defaultAccessOptions,
+    });
     if (exists && !isTeacherApp) {
       throw new Error(
         'You seem to already have an user account. Log in using the link below to connect that account with your teacher one.'
@@ -70,52 +80,74 @@ class PostUserUsecase implements IUsecase {
   };
 
   private _ensureUniqueTeacher = async (userData: any): Promise<void> => {
-    const exists = await this.teacherDbService.findByUserId(userData._id);
+    const exists = await this.teacherDbService.findById({
+      id: userData._id,
+      accessOptions: this.defaultAccessOptions,
+    });
     if (exists) {
-      throw new Error('Teacher already exists.');
+      throw new Error('A teacher with that id already exists.');
     }
   };
 
   private _insertUserIntoDb = async (userInstance: any): Promise<any> => {
     const savedDbUser = await this.userDbService.insert({
-      name: userInstance.getName(),
-      email: userInstance.getEmail(),
-      password: userInstance.getPassword(),
-      profileImage: userInstance.getProfileImage(),
-      verificationToken: userInstance.getVerificationToken(),
+      modelToInsert: {
+        name: userInstance.getName(),
+        email: userInstance.getEmail(),
+        password: userInstance.getPassword(),
+        profileImage: userInstance.getProfileImage(),
+        verificationToken: userInstance.getVerificationToken(),
+      },
+      accessOptions: this.defaultAccessOptions,
     });
-    this.userDbService.clearCollectionCache();
     return savedDbUser;
   };
 
   private _insertTeacherIntoDb = async (savedDbUser: any): Promise<any> => {
-    const teacherInstance = teacherEntity.build({ userId: savedDbUser._id });
+    const userId = savedDbUser._id;
+    const teacherInstance = teacherEntity.build({ userId });
     const savedDbTeacher = await this.teacherDbService.insert({
-      userId: teacherInstance.getUserId(),
+      modelToInsert: { userId: teacherInstance.getUserId() },
+      accessOptions: this.defaultAccessOptions,
     });
-    this.teacherDbService.clearCollectionCache();
     return savedDbTeacher;
   };
 
-  public build = async (userData: any): Promise<any> => {
-    const isTeacherApp = userData.isTeacherApp;
-    const user = userEntity.build(userData);
+  public makeRequest = async (controllerData: ControllerData): Promise<string | Error> => {
+    const { routeData } = controllerData;
+    const { body } = routeData;
+    const isTeacherApp = body.isTeacherApp;
+    const userInstance = userEntity.build(body);
+
     try {
-      await this._ensureUniqueUser(userData, isTeacherApp);
-      const savedDbUser = await this._insertUserIntoDb(user);
+      await this._ensureUniqueUser(body, isTeacherApp);
+      const savedDbUser = await this._insertUserIntoDb(userInstance);
 
       if (isTeacherApp) {
         await this._ensureUniqueTeacher(savedDbUser);
         await this._insertTeacherIntoDb(savedDbUser);
       }
 
-      this._sendVerificationEmail(user);
-      this._sendInternalEmail(user, isTeacherApp);
+      this._sendVerificationEmail(userInstance);
+      this._sendInternalEmail(userInstance, isTeacherApp);
 
       return this._jwtToClient(this.jwt, savedDbUser);
     } catch (err) {
       throw err;
     }
+  };
+
+  public build = async (services: {
+    makeUserDbService: Promise<UserDbService>;
+    makeTeacherDbService: Promise<TeacherDbService>;
+    jwt: any;
+    emailHandler: EmailHandler;
+  }): Promise<this> => {
+    this.userDbService = await services.makeUserDbService;
+    this.teacherDbService = await services.makeTeacherDbService;
+    this.jwt = services.jwt;
+    this.emailHandler = services.emailHandler;
+    return this;
   };
 }
 
