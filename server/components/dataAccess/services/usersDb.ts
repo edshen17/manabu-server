@@ -16,7 +16,8 @@ class UserDbService
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
   constructor(props: any) {
-    super(props.userDb, {
+    super(props.userDb);
+    this.defaultSelectOptions = {
       defaultSettings: {
         email: 0,
         password: 0,
@@ -32,7 +33,7 @@ class UserDbService
         password: 0,
         verificationToken: 0,
       },
-    });
+    };
   }
 
   private _joinUserTeacherPackage = async (

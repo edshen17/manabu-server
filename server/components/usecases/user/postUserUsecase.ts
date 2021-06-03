@@ -1,5 +1,7 @@
-import { UserDoc } from '../../../models/User';
+import { PackageDoc } from '../../../models/Package';
+import { TeacherDoc } from '../../../models/Teacher';
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { PackageDbService } from '../../dataAccess/services/packagesDb';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { userEntity, teacherEntity } from '../../entities/user/index';
@@ -9,6 +11,7 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 class PostUserUsecase implements IUsecase {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
+  private packageDbService!: PackageDbService;
   private jwt!: any;
   private emailHandler!: EmailHandler;
   private defaultAccessOptions!: AccessOptions;
@@ -66,6 +69,7 @@ class PostUserUsecase implements IUsecase {
     return token;
   };
 
+  // TODO: make schema unique then remove this
   private _ensureUniqueUser = async (userData: any, isTeacherApp: boolean): Promise<void> => {
     const userInstance = userEntity.build(userData);
     const exists = await this.userDbService.findOne({
@@ -73,13 +77,12 @@ class PostUserUsecase implements IUsecase {
       accessOptions: this.defaultAccessOptions,
     });
     if (exists && !isTeacherApp) {
-      throw new Error(
-        'You seem to already have an user account. Log in using the link below to connect that account with your teacher one.'
-      );
+      throw new Error('You seem to already have an account registered with that email.');
     }
   };
 
-  private _ensureUniqueTeacher = async (userData: any): Promise<void> => {
+  // TODO: make schema unique then remove this
+  private _ensureUniqueTeacher = async (userData: JoinedUserDoc): Promise<void> => {
     const exists = await this.teacherDbService.findById({
       id: userData._id,
       accessOptions: this.defaultAccessOptions,
@@ -89,7 +92,7 @@ class PostUserUsecase implements IUsecase {
     }
   };
 
-  private _insertUserIntoDb = async (userInstance: any): Promise<any> => {
+  private _insertUserIntoDb = async (userInstance: any): Promise<JoinedUserDoc> => {
     const savedDbUser = await this.userDbService.insert({
       modelToInsert: {
         name: userInstance.getName(),
@@ -103,7 +106,7 @@ class PostUserUsecase implements IUsecase {
     return savedDbUser;
   };
 
-  private _insertTeacherIntoDb = async (savedDbUser: any): Promise<any> => {
+  private _insertTeacherIntoDb = async (savedDbUser: JoinedUserDoc): Promise<TeacherDoc> => {
     const userId = savedDbUser._id;
     const teacherInstance = teacherEntity.build({ userId });
     const savedDbTeacher = await this.teacherDbService.insert({
@@ -112,6 +115,10 @@ class PostUserUsecase implements IUsecase {
     });
     return savedDbTeacher;
   };
+
+  // private _insertDefaultPackagesIntoDb = async (
+  //   savedDbUser: JoinedUserDoc
+  // ): Promise<PackageDoc> => {};
 
   public makeRequest = async (controllerData: ControllerData): Promise<string | Error> => {
     const { routeData } = controllerData;
@@ -126,10 +133,14 @@ class PostUserUsecase implements IUsecase {
       if (isTeacherApp) {
         await this._ensureUniqueTeacher(savedDbUser);
         await this._insertTeacherIntoDb(savedDbUser);
+        // create 3 default packages, make appointment with admin,
       }
 
       this._sendVerificationEmail(userInstance);
-      this._sendInternalEmail(userInstance, isTeacherApp);
+
+      if (process.env.NODE_ENV == 'production') {
+        this._sendInternalEmail(userInstance, isTeacherApp);
+      }
 
       return this._jwtToClient(this.jwt, savedDbUser);
     } catch (err) {
@@ -140,11 +151,13 @@ class PostUserUsecase implements IUsecase {
   public build = async (services: {
     makeUserDbService: Promise<UserDbService>;
     makeTeacherDbService: Promise<TeacherDbService>;
+    makePackageDbService: Promise<PackageDbService>;
     jwt: any;
     emailHandler: EmailHandler;
   }): Promise<this> => {
     this.userDbService = await services.makeUserDbService;
     this.teacherDbService = await services.makeTeacherDbService;
+    this.packageDbService = await services.makePackageDbService;
     this.jwt = services.jwt;
     this.emailHandler = services.emailHandler;
     return this;

@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { makeUserDbService, makeTeacherDbService } from '../../dataAccess/index';
+import {
+  makeUserDbService,
+  makeTeacherDbService,
+  makePackageDbService,
+} from '../../dataAccess/index';
 import { GetUserUsecase } from './getUserUsecase';
 import { PostUserUsecase } from './postUserUsecase';
 import { PutUserUsecase } from './putUserUsecase';
@@ -27,6 +31,7 @@ const makeGetUserUsecase = new GetUserUsecase().build({ makeUserDbService });
 const makePostUserUsecase = new PostUserUsecase().build({
   makeUserDbService,
   makeTeacherDbService,
+  makePackageDbService,
   jwt,
   emailHandler,
 });

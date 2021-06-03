@@ -31,15 +31,15 @@ class UserEntity implements IEntity {
 
   build(userData: any): any | Error {
     let verificationToken: string;
+    let { name, email, password, profileImage } = userData;
     try {
       this._validateUserInput(userData);
       return Object.freeze({
-        getName: () => userData.name,
-        getEmail: () => userData.email,
-        getPassword: () => (userData.password = this.passwordHasher(userData.password)),
-        getProfileImage: () => userData.profileImage || '',
-        getVerificationToken: () =>
-          (verificationToken = this.randTokenGenerator(userData.name, userData.email)),
+        getName: () => name,
+        getEmail: () => email,
+        getPassword: () => (password = this.passwordHasher(password)),
+        getProfileImage: () => profileImage || '',
+        getVerificationToken: () => (verificationToken = this.randTokenGenerator(name, email)),
       });
     } catch (err) {
       throw err;

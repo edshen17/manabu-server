@@ -1,6 +1,6 @@
 import { AccessOptions, DbParams, IDbOperations } from './IDbOperations';
 
-type DefaultselectOptions = {
+type DefaultSelectOptions = {
   defaultSettings: {};
   adminSettings?: {};
   isSelfSettings?: {};
@@ -8,15 +8,14 @@ type DefaultselectOptions = {
 
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   protected dbModel: any;
-  protected defaultselectOptions: DefaultselectOptions;
-  constructor(dbModel: any, defaultselectOptions: DefaultselectOptions) {
+  protected defaultSelectOptions!: DefaultSelectOptions;
+  constructor(dbModel: any) {
     this.dbModel = dbModel;
-    this.defaultselectOptions = JSON.parse(JSON.stringify(defaultselectOptions));
   }
 
   protected _configureSelectOptions = (accessOptions: AccessOptions): {} => {
     const { isSelf, currentAPIUserRole } = accessOptions;
-    const { defaultSettings, adminSettings, isSelfSettings } = this.defaultselectOptions;
+    const { defaultSettings, adminSettings, isSelfSettings } = this.defaultSelectOptions;
     let selectOptions: any = defaultSettings;
 
     if (isSelf) {
@@ -76,6 +75,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   public insert = async (params: DbParams): Promise<DbDoc> => {
     const { modelToInsert, accessOptions } = params;
     const asyncCallback = this.dbModel.create(modelToInsert);
+    // template method goes here
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
@@ -97,4 +97,4 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 }
 
-export { DefaultselectOptions, CommonDbOperations };
+export { DefaultSelectOptions, CommonDbOperations };
