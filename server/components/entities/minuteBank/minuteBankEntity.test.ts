@@ -12,16 +12,16 @@ context('minuteBank entity', () => {
           reservedBy: 'some reservedBy',
           minuteBank: 5,
         });
-        expect(testMinuteBank.getHostedBy()).to.equal('some hostedBy');
-        expect(testMinuteBank.getReservedBy()).to.equal('some reservedBy');
-        expect(testMinuteBank.getMinuteBank()).to.equal(5);
+        expect(testMinuteBank.hostedBy).to.equal('some hostedBy');
+        expect(testMinuteBank.reservedBy).to.equal('some reservedBy');
+        expect(testMinuteBank.minuteBank).to.equal(5);
       });
     });
 
     describe('given invalid inputs', () => {
       it('should returned undefined if provided no input', () => {
         const testMinuteBank = minuteBankEntity.build({});
-        expect(typeof testMinuteBank.getHostedBy()).to.equal('undefined');
+        expect(typeof testMinuteBank.hostedBy).to.equal('undefined');
       });
     });
   });

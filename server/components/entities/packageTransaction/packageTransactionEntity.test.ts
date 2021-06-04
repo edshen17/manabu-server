@@ -1,37 +1,39 @@
 import chai from 'chai';
-import { packageTransactionEntity } from './index';
+import { createFakeDbUser } from '../../dataAccess/services/usersDb.test';
+import { makePackageTransactionEntity } from './index';
 
 const expect = chai.expect;
 const assert = chai.assert;
+let packageTransactionEntity: any;
 context('packageTransaction entity', () => {
-  describe('build', () => {
+  describe('build', async () => {
+    packageTransactionEntity = await makePackageTransactionEntity;
     describe('given valid inputs', () => {
-      it('should return given inputs', () => {
-        const testPackageTransaction = packageTransactionEntity.build({
-          hostedBy: 'some hostedBy',
-          reservedBy: 'some reservedBy',
-          packageId: 'some packageId',
+      it('should return given inputs', async () => {
+        const fakeUser = await createFakeDbUser(true);
+        const testPackageTransaction = await packageTransactionEntity.build({
+          hostedBy: fakeUser._id,
+          reservedBy: fakeUser._id,
+          packageId: '',
           reservationLength: 60,
           terminationDate: new Date(),
           remainingAppointments: 5,
-          lessonLanguage: 'ja',
-          isSubscription: false,
         });
-        expect(testPackageTransaction.getHostedBy()).to.equal('some hostedBy');
-        expect(testPackageTransaction.getReservedBy()).to.equal('some reservedBy');
-        expect(testPackageTransaction.getPackageId()).to.equal('some packageId');
-        expect(testPackageTransaction.getReservationLength()).to.equal(60);
-        expect(testPackageTransaction.getRemainingAppointments()).to.equal(5);
-        expect(testPackageTransaction.getLessonLanguage()).to.equal('ja');
-        expect(testPackageTransaction.getIsSubscription()).to.equal(false);
-        assert.deepEqual(testPackageTransaction.getTerminationDate(), new Date());
+
+        expect(testPackageTransaction.hostedBy).to.equal(fakeUser._id);
+        expect(testPackageTransaction.reservedBy).to.equal(fakeUser._id);
+        expect(testPackageTransaction).to.have.property('hostedByData');
+        expect(testPackageTransaction.reservationLength).to.equal(60);
+        expect(testPackageTransaction.remainingAppointments).to.equal(5);
+        expect(testPackageTransaction.lessonLanguage).to.equal('ja');
+        expect(testPackageTransaction.isSubscription).to.equal(false);
       });
     });
 
     describe('given invalid inputs', () => {
       it('should returned undefined if provided no input', () => {
         const testPackageTransaction = packageTransactionEntity.build({});
-        expect(typeof testPackageTransaction.getHostedBy()).to.equal('undefined');
+        expect(typeof testPackageTransaction.hostedBy).to.equal('undefined');
       });
     });
   });

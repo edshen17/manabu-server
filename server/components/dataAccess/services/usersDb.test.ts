@@ -22,10 +22,10 @@ const _createNewDbDoc = async (asyncCallback: Promise<any>) => {
   return newDoc;
 };
 
-const createNewDbUser = async () => {
+const createNewDbUser = async (email?: string) => {
   const fakeUser = {
     name: faker.name.findName(),
-    email: faker.internet.email(),
+    email: email || faker.internet.email(),
     password: 'password',
     profileBio: 'test bio',
   };
@@ -188,55 +188,62 @@ describe('userDb service', () => {
         throw err;
       }
     });
-
-    describe('insert', () => {
-      it('given a user, should insert into db', async () => {
-        const newUser = await createFakeDbUser(false);
-        const searchUser = await userDbService.findById({
-          id: newUser._id,
-          accessOptions,
-        });
-        expect(searchUser).to.not.equal(null);
+  });
+  describe('insert', () => {
+    it('given a user, should insert into db', async () => {
+      const newUser = await createFakeDbUser(false);
+      const searchUser = await userDbService.findById({
+        id: newUser._id,
+        accessOptions,
       });
+      expect(searchUser).to.not.equal(null);
+    });
+    it('creating duplicate users should throw an error', async () => {
+      try {
+        const newUser = await createNewDbUser('duplicateEmail@email.com');
+        const dupeUser = await createNewDbUser('duplicateEmail@email.com');
+      } catch (err) {
+        expect(err).be.an('error');
+      }
+    });
+  });
+
+  describe('update', () => {
+    it('should update db document', async () => {
+      const newUser = await createFakeDbUser(false);
+      const searchUser = await userDbService.findById({
+        id: newUser._id,
+        accessOptions,
+      });
+      expect(searchUser.profileBio).to.equal('test bio');
+      const updatedUser = await userDbService.update({
+        searchQuery: { email: newUser.email },
+        updateParams: { profileBio: 'updated bio' },
+        accessOptions,
+      });
+      expect(updatedUser.profileBio).to.equal('updated bio');
     });
 
-    describe('update', () => {
-      it('should update db document', async () => {
-        const newUser = await createFakeDbUser(false);
-        const searchUser = await userDbService.findById({
-          id: newUser._id,
-          accessOptions,
-        });
-        expect(searchUser.profileBio).to.equal('test bio');
-        const updatedUser = await userDbService.update({
-          searchQuery: { email: newUser.email },
-          updateParams: { profileBio: 'updated bio' },
-          accessOptions,
-        });
-        expect(updatedUser.profileBio).to.equal('updated bio');
+    it('should update db document and return additional restricted properties as admin', async () => {
+      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      accessOptionsCopy.currentAPIUserRole = 'admin';
+      const newUser = await createFakeDbUser(true);
+      const searchUser = await userDbService.findById({
+        id: newUser._id,
+        accessOptions: accessOptionsCopy,
       });
-
-      it('should update db document and return additional restricted properties as admin', async () => {
-        const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
-        accessOptionsCopy.currentAPIUserRole = 'admin';
-        const newUser = await createFakeDbUser(true);
-        const searchUser = await userDbService.findById({
-          id: newUser._id,
-          accessOptions: accessOptionsCopy,
-        });
-        expect(searchUser.profileBio).to.equal('test bio');
-        const updatedUser = await userDbService.update({
-          searchQuery: { email: newUser.email },
-          updateParams: { profileBio: 'updated bio' },
-          accessOptions: accessOptionsCopy,
-        });
-        expect(updatedUser.profileBio).to.equal('updated bio');
-        expect(updatedUser.teacherData).to.have.property('licensePath');
-        expect(updatedUser).to.have.property('email');
-        expect(updatedUser).to.have.property('settings');
+      expect(searchUser.profileBio).to.equal('test bio');
+      const updatedUser = await userDbService.update({
+        searchQuery: { email: newUser.email },
+        updateParams: { profileBio: 'updated bio' },
+        accessOptions: accessOptionsCopy,
       });
+      expect(updatedUser.profileBio).to.equal('updated bio');
+      expect(updatedUser.teacherData).to.have.property('licensePath');
+      expect(updatedUser).to.have.property('email');
+      expect(updatedUser).to.have.property('settings');
     });
-
-    // update
   });
 });
+
+export { createFakeDbUser };

@@ -2,7 +2,7 @@ import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 
 const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
-  email: Type.string({ required: true, index: true }),
+  email: Type.string({ required: true, index: true, unique: true }),
   password: Type.string({ required: false }),
   profileImage: Type.string({ default: '' }),
   profileBio: Type.string({ default: '' }),

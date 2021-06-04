@@ -74,7 +74,7 @@ class UserDbService
   public findOne = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions);
+    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
@@ -103,7 +103,7 @@ class UserDbService
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
-  public build = async (makeDb: any, makeTeacherDbService: any, makePackageDbService: any) => {
+  public init = async (makeDb: any, makeTeacherDbService: any, makePackageDbService: any) => {
     await makeDb();
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;

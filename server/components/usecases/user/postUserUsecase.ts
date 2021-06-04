@@ -4,6 +4,7 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { PackageDbService } from '../../dataAccess/services/packagesDb';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
+import { packageEntity } from '../../entities/package';
 import { userEntity, teacherEntity } from '../../entities/user/index';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
@@ -26,40 +27,43 @@ class PostUserUsecase implements IUsecase {
 
   private _sendVerificationEmail = (userInstance: any): void => {
     const host = 'https://manabu.sg';
+    const { name, verificationToken } = userInstance;
     this.emailHandler.sendEmail(
-      userInstance.getEmail(),
+      userInstance.email,
       'NOREPLY',
       'Manabu email verification',
       'verificationEmail',
       {
-        name: userInstance.getName(),
+        name,
         host,
-        verificationToken: userInstance.getVerificationToken(),
+        verificationToken: verificationToken,
       }
     );
   };
 
   private _sendInternalEmail = (userInstance: any, isTeacherApp: boolean): void => {
     const userType = isTeacherApp ? 'teacher' : 'user';
+    const { name, email } = userInstance;
     this.emailHandler.sendEmail(
       'manabulessons@gmail.com',
       'NOREPLY',
       `A new ${userType} signed up`,
       'internalNewSignUpEmail',
       {
-        name: userInstance.getName(),
-        email: userInstance.getEmail(),
+        name,
+        email,
         userType,
       }
     );
   };
 
   private _jwtToClient = (jwt: any, savedDbUser: any): string => {
+    const { role, name } = savedDbUser;
     const token = jwt.sign(
       {
         id: savedDbUser._id,
-        role: savedDbUser.role,
-        name: savedDbUser.name,
+        role,
+        name,
       },
       process.env.JWT_SECRET,
       {
@@ -69,56 +73,52 @@ class PostUserUsecase implements IUsecase {
     return token;
   };
 
-  // TODO: make schema unique then remove this
-  private _ensureUniqueUser = async (userData: any, isTeacherApp: boolean): Promise<void> => {
-    const userInstance = userEntity.build(userData);
-    const exists = await this.userDbService.findOne({
-      searchQuery: { email: userInstance.getEmail() },
-      accessOptions: this.defaultAccessOptions,
-    });
-    if (exists && !isTeacherApp) {
-      throw new Error('You seem to already have an account registered with that email.');
-    }
-  };
-
-  // TODO: make schema unique then remove this
-  private _ensureUniqueTeacher = async (userData: JoinedUserDoc): Promise<void> => {
-    const exists = await this.teacherDbService.findById({
-      id: userData._id,
-      accessOptions: this.defaultAccessOptions,
-    });
-    if (exists) {
-      throw new Error('A teacher with that id already exists.');
-    }
-  };
-
-  private _insertUserIntoDb = async (userInstance: any): Promise<JoinedUserDoc> => {
+  private _insertUser = async (userInstance: any): Promise<JoinedUserDoc> => {
     const savedDbUser = await this.userDbService.insert({
-      modelToInsert: {
-        name: userInstance.getName(),
-        email: userInstance.getEmail(),
-        password: userInstance.getPassword(),
-        profileImage: userInstance.getProfileImage(),
-        verificationToken: userInstance.getVerificationToken(),
-      },
+      modelToInsert: userInstance,
       accessOptions: this.defaultAccessOptions,
     });
     return savedDbUser;
   };
 
-  private _insertTeacherIntoDb = async (savedDbUser: JoinedUserDoc): Promise<TeacherDoc> => {
+  private _insertTeacher = async (savedDbUser: JoinedUserDoc): Promise<TeacherDoc> => {
     const userId = savedDbUser._id;
-    const teacherInstance = teacherEntity.build({ userId });
+    const modelToInsert = teacherEntity.build({ userId });
     const savedDbTeacher = await this.teacherDbService.insert({
-      modelToInsert: { userId: teacherInstance.getUserId() },
+      modelToInsert,
       accessOptions: this.defaultAccessOptions,
     });
     return savedDbTeacher;
   };
 
-  // private _insertDefaultPackagesIntoDb = async (
-  //   savedDbUser: JoinedUserDoc
-  // ): Promise<PackageDoc> => {};
+  private _insertTeacherPackages = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc[]> => {
+    const defaultPackages = [
+      { type: 'mainichi', lessonAmount: 22 },
+      { type: 'moderate', lessonAmount: 12 },
+      { type: 'light', lessonAmount: 5 },
+    ];
+    const savedDbPackages: PackageDoc[] = [];
+
+    defaultPackages.forEach(async (pkg) => {
+      const packageProperties = {
+        hostedBy: savedDbUser._id,
+        lessonAmount: pkg.lessonAmount,
+        packageType: pkg.type,
+      };
+      const modelToInsert = packageEntity.build(packageProperties);
+      const newPackage = await this.packageDbService.insert({
+        modelToInsert,
+        accessOptions: this.defaultAccessOptions,
+      });
+      savedDbPackages.push(newPackage);
+    });
+
+    return savedDbPackages;
+  };
+
+  // private _insertAdminPackageTransaction = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc[]> {
+
+  // };
 
   public makeRequest = async (controllerData: ControllerData): Promise<string | Error> => {
     const { routeData } = controllerData;
@@ -127,13 +127,14 @@ class PostUserUsecase implements IUsecase {
     const userInstance = userEntity.build(body);
 
     try {
-      await this._ensureUniqueUser(body, isTeacherApp);
-      const savedDbUser = await this._insertUserIntoDb(userInstance);
+      const savedDbUser = await this._insertUser(userInstance);
 
       if (isTeacherApp) {
-        await this._ensureUniqueTeacher(savedDbUser);
-        await this._insertTeacherIntoDb(savedDbUser);
-        // create 3 default packages, make appointment with admin,
+        await this._insertTeacher(savedDbUser);
+        await this._insertTeacherPackages(savedDbUser);
+        // await this._insertAdminPackageTransaction(savedDbUser);
+        // await this._insertAdminMinuteBank(savedDbUser);
+        // await this._insertTeacherBalance(savedDbUser);
       }
 
       this._sendVerificationEmail(userInstance);
@@ -144,7 +145,7 @@ class PostUserUsecase implements IUsecase {
 
       return this._jwtToClient(this.jwt, savedDbUser);
     } catch (err) {
-      throw err;
+      throw new Error('An error has occured during user creation.');
     }
   };
 

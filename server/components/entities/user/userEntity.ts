@@ -35,11 +35,11 @@ class UserEntity implements IEntity {
     try {
       this._validateUserInput(userData);
       return Object.freeze({
-        getName: () => name,
-        getEmail: () => email,
-        getPassword: () => (password = this.passwordHasher(password)),
-        getProfileImage: () => profileImage || '',
-        getVerificationToken: () => (verificationToken = this.randTokenGenerator(name, email)),
+        name,
+        email,
+        password: (password = this.passwordHasher(password)),
+        profileImage: profileImage || '',
+        verificationToken: (verificationToken = this.randTokenGenerator(name, email)),
       });
     } catch (err) {
       throw err;

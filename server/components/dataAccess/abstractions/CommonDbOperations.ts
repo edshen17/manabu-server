@@ -8,7 +8,7 @@ type DefaultSelectOptions = {
 
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   protected dbModel: any;
-  protected defaultSelectOptions!: DefaultSelectOptions;
+  public defaultSelectOptions!: DefaultSelectOptions;
   constructor(dbModel: any) {
     this.dbModel = dbModel;
   }
@@ -65,7 +65,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public find = async (params: DbParams): Promise<[DbDoc]> => {
+  public find = async (params: DbParams): Promise<DbDoc[]> => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel.find(searchQuery, selectOptions).lean();
@@ -75,7 +75,6 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   public insert = async (params: DbParams): Promise<DbDoc> => {
     const { modelToInsert, accessOptions } = params;
     const asyncCallback = this.dbModel.create(modelToInsert);
-    // template method goes here
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
@@ -91,7 +90,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public build = async (...args: any): Promise<this> => {
+  public init = async (...args: any): Promise<this> => {
     for (const promise of args) await promise;
     return this;
   };

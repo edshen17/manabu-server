@@ -62,6 +62,7 @@ context('makeRequest', async () => {
       expect(newTeacher).to.have.property('settings');
       expect(newTeacher).to.not.have.property('password');
       expect(newTeacher.teacherData).to.have.property('licensePath');
+      expect(newTeacher.teacherData.packages.length).to.equal(3);
     });
   });
 });

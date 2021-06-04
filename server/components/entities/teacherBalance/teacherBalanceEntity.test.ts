@@ -9,14 +9,14 @@ context('teacherBalance entity', () => {
         const testTeacherBalance = teacherBalanceEntity.build({
           userId: 'some userId',
         });
-        expect(testTeacherBalance.getUserId()).to.equal('some userId');
+        expect(testTeacherBalance.userId).to.equal('some userId');
       });
     });
 
     describe('given invalid inputs', () => {
       it('should returned undefined if provided no input', () => {
         const testTeacherBalance = teacherBalanceEntity.build({});
-        expect(typeof testTeacherBalance.getUserId()).to.equal('undefined');
+        expect(typeof testTeacherBalance.userId).to.equal('undefined');
       });
     });
   });

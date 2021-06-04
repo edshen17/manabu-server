@@ -28,10 +28,10 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   }
 };
 
-const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).build(makeDb);
-const makePackageDbService = new PackageDbService({ packageDb: Package }).build(makeDb);
+const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).init(makeDb);
+const makePackageDbService = new PackageDbService({ packageDb: Package }).init(makeDb);
 const makeUserDbService = new UserDbService({
   userDb: User,
-}).build(makeDb, makeTeacherDbService, makePackageDbService);
+}).init(makeDb, makeTeacherDbService, makePackageDbService);
 
 export { makeTeacherDbService, makePackageDbService, makeUserDbService };
