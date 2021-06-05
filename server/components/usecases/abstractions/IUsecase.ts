@@ -12,7 +12,7 @@ type ControllerData = {
 
 interface IUsecase {
   makeRequest: (controllerData: ControllerData) => Promise<any>;
-  build: (services: any) => Promise<this>;
+  init: (services: any) => Promise<this>;
 }
 
 export { CurrentAPIUser, ControllerData, IUsecase };

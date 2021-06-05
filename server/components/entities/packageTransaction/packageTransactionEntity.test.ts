@@ -14,12 +14,10 @@ context('packageTransaction entity', () => {
         const testPackageTransaction = await packageTransactionEntity.build({
           hostedBy: fakeUser._id,
           reservedBy: fakeUser._id,
-          packageId: '',
+          packageId: fakeUser._id, // change to package id
           reservationLength: 60,
-          terminationDate: new Date(),
           remainingAppointments: 5,
         });
-
         expect(testPackageTransaction.hostedBy).to.equal(fakeUser._id);
         expect(testPackageTransaction.reservedBy).to.equal(fakeUser._id);
         expect(testPackageTransaction).to.have.property('hostedByData');
@@ -27,6 +25,7 @@ context('packageTransaction entity', () => {
         expect(testPackageTransaction.remainingAppointments).to.equal(5);
         expect(testPackageTransaction.lessonLanguage).to.equal('ja');
         expect(testPackageTransaction.isSubscription).to.equal(false);
+        expect(testPackageTransaction.terminationDate).to.be.an('date');
       });
     });
 

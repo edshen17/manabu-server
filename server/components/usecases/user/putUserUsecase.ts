@@ -5,7 +5,7 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 class PutUserUsecase implements IUsecase {
   private userDbService!: UserDbService;
 
-  public build = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
+  public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
     this.userDbService = await services.makeUserDbService;
     return this;
   };
@@ -30,7 +30,7 @@ class PutUserUsecase implements IUsecase {
 
     if (isValidUpdate) {
       const user = await this.userDbService.update({
-        searchQuery: { id: params.uId },
+        searchQuery: { _id: params.uId },
         updateParams: body,
         accessOptions,
       });

@@ -17,7 +17,7 @@ const AppointmentSchema = createSchema({
     enum: ['confirmed', 'pending', 'cancelled'],
   }),
   cancellationReason: Type.string({ required: true }),
-  packageTransactionData: Type.object({ required: false }),
+  packageTransactionData: Type.object({ required: false }).of({}),
   location: Type.object({ default: {} }),
 });
 

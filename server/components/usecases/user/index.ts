@@ -3,6 +3,9 @@ import {
   makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
+  makePackageTransactionDbService,
+  makeMinuteBankDbService,
+  makeTeacherBalanceDbService,
 } from '../../dataAccess/index';
 import { GetUserUsecase } from './getUserUsecase';
 import { PostUserUsecase } from './postUserUsecase';
@@ -15,7 +18,7 @@ class UserUsecaseService implements IUsecaseService {
   public postUsecase!: PostUserUsecase;
   public putUsecase!: PutUserUsecase;
 
-  public build = async (services: {
+  public init = async (services: {
     makeGetUserUsecase: Promise<GetUserUsecase>;
     makePostUserUsecase: Promise<PostUserUsecase>;
     makePutUserUsecase: Promise<PutUserUsecase>;
@@ -27,17 +30,20 @@ class UserUsecaseService implements IUsecaseService {
   };
 }
 
-const makeGetUserUsecase = new GetUserUsecase().build({ makeUserDbService });
-const makePostUserUsecase = new PostUserUsecase().build({
+const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
+const makePostUserUsecase = new PostUserUsecase().init({
   makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
+  makePackageTransactionDbService,
+  makeMinuteBankDbService,
+  makeTeacherBalanceDbService,
   jwt,
   emailHandler,
 });
-const makePutUserUsecase = new PutUserUsecase().build({ makeUserDbService });
+const makePutUserUsecase = new PutUserUsecase().init({ makeUserDbService });
 
-const userUsecaseService = new UserUsecaseService().build({
+const userUsecaseService = new UserUsecaseService().init({
   makeGetUserUsecase,
   makePostUserUsecase,
   makePutUserUsecase,

@@ -3,8 +3,8 @@ import { UserSchema } from './User';
 
 const BalanceTransactionSchema = createSchema({
   userId: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  balanceChange: Type.object({ required: true }),
-  fees: Type.object({ required: true }),
+  balanceChange: Type.object({ required: true }).of({}),
+  fees: Type.object({ required: true }).of({}),
   description: Type.string({ required: true }),
   date: Type.date({ default: Date.now }),
 });

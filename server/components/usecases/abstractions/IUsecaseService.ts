@@ -6,5 +6,5 @@ export interface IUsecaseService {
   postUsecase: IUsecase;
   putUsecase: IUsecase;
   deleteUsecase?: IUsecase;
-  build: (services: any) => Promise<this>;
+  init: (services: any) => Promise<this>;
 }

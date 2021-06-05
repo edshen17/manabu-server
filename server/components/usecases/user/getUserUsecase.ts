@@ -5,7 +5,7 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 class GetUserUsecase implements IUsecase {
   private userDbService!: UserDbService;
 
-  public build = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
+  public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
     this.userDbService = await services.makeUserDbService;
     return this;
   };

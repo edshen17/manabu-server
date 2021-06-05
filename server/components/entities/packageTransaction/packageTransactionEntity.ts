@@ -6,6 +6,12 @@ import { IEntity } from '../abstractions/IEntity';
 class PackageTransactionEntity implements IEntity {
   private userDbService!: UserDbService;
   private packageDbService!: PackageDbService;
+  private dayjs!: any;
+
+  constructor(props: { dayjs: any }) {
+    const { dayjs } = props;
+    this.dayjs = dayjs;
+  }
 
   private _getDbDataById = async (dbService: any, id: string): Promise<JoinedUserDoc> => {
     const accessOptions: AccessOptions = {
@@ -25,6 +31,7 @@ class PackageTransactionEntity implements IEntity {
       packageId,
       reservationLength,
       terminationDate,
+      transactionDetails,
       remainingAppointments,
       lessonLanguage,
       isSubscription,
@@ -37,13 +44,14 @@ class PackageTransactionEntity implements IEntity {
       reservedBy,
       packageId,
       reservationLength,
-      terminationDate,
+      terminationDate: terminationDate || this.dayjs().add(1, 'month').toDate(),
+      transactionDetails,
       remainingAppointments,
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
       hostedByData: hostedByData || (await this._getDbDataById(this.userDbService, hostedBy)),
       reservedByData: reservedByData || (await this._getDbDataById(this.userDbService, reservedBy)),
-      packageData: packageData || (await this._getDbDataById(this.packageDbService, hostedBy)),
+      packageData: packageData || (await this._getDbDataById(this.packageDbService, packageId)),
     });
   };
 

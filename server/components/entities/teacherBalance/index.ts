@@ -1,5 +1,5 @@
 import { TeacherBalanceEntity } from './teacherBalanceEntity';
 
-const teacherBalanceEntity = new TeacherBalanceEntity();
+const makeTeacherBalanceEntity = new TeacherBalanceEntity();
 
-export { teacherBalanceEntity };
+export { makeTeacherBalanceEntity };

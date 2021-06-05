@@ -6,6 +6,12 @@ import { PackageDbService } from './services/packagesDb';
 import { User } from '../../models/User';
 import { Teacher } from '../../models/Teacher';
 import { Package } from '../../models/Package';
+import { PackageTransactionDbService } from './services/packageTransactionDb';
+import { MinuteBank } from '../../models/MinuteBank';
+import { PackageTransaction } from '../../models/PackageTransaction';
+import { MinuteBankDbService } from './services/minuteBankDb';
+import { TeacherBalanceDbService } from './services/teacherBalanceDb';
+import { TeacherBalance } from '../../models/TeacherBalance';
 const mongod = new MongoMemoryServer();
 
 const makeDb = async (): Promise<mongoose.Mongoose | void> => {
@@ -28,10 +34,26 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   }
 };
 
-const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).init(makeDb);
-const makePackageDbService = new PackageDbService({ packageDb: Package }).init(makeDb);
+const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).init({ makeDb });
+const makePackageDbService = new PackageDbService({ packageDb: Package }).init({ makeDb });
 const makeUserDbService = new UserDbService({
   userDb: User,
-}).init(makeDb, makeTeacherDbService, makePackageDbService);
+}).init({ makeDb, makeTeacherDbService, makePackageDbService });
+const makePackageTransactionDbService = new PackageTransactionDbService({
+  packageTransactionDb: PackageTransaction,
+}).init({ makeDb });
+const makeMinuteBankDbService = new MinuteBankDbService({ minuteBankDb: MinuteBank }).init({
+  makeDb,
+});
+const makeTeacherBalanceDbService = new TeacherBalanceDbService({
+  teacherBalanceDb: TeacherBalance,
+}).init({ makeDb });
 
-export { makeTeacherDbService, makePackageDbService, makeUserDbService };
+export {
+  makeTeacherDbService,
+  makePackageDbService,
+  makeUserDbService,
+  makePackageTransactionDbService,
+  makeMinuteBankDbService,
+  makeTeacherBalanceDbService,
+};

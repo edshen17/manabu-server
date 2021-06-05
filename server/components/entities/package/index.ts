@@ -1,5 +1,5 @@
 import { PackageEntity } from './packageEntity';
 
-const packageEntity = new PackageEntity();
+const makePackageEntity = new PackageEntity();
 
-export { packageEntity };
+export { makePackageEntity };

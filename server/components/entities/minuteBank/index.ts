@@ -1,5 +1,5 @@
 import { MinuteBankEntity } from './minuteBankEntity';
 
-const minuteBankEntity = new MinuteBankEntity();
+const makeMinuteBankEntity = new MinuteBankEntity();
 
-export { minuteBankEntity };
+export { makeMinuteBankEntity };

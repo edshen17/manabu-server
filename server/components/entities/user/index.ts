@@ -41,7 +41,12 @@ const passwordHasher = (password: string) => {
   return bcrypt.hashSync(password, 10);
 };
 
-const userEntity = new UserEntity({ sanitize, inputValidator, passwordHasher, randTokenGenerator });
-const teacherEntity = new TeacherEntity();
+const makeUserEntity = new UserEntity({
+  sanitize,
+  inputValidator,
+  passwordHasher,
+  randTokenGenerator,
+});
+const makeTeacherEntity = new TeacherEntity();
 
-export { userEntity, teacherEntity };
+export { makeUserEntity, makeTeacherEntity };

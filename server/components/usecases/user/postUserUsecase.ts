@@ -1,11 +1,19 @@
+import { MinuteBankDoc } from '../../../models/MinuteBank';
 import { PackageDoc } from '../../../models/Package';
 import { TeacherDoc } from '../../../models/Teacher';
+import { TeacherBalanceDoc } from '../../../models/TeacherBalance';
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { MinuteBankDbService } from '../../dataAccess/services/minuteBankDb';
 import { PackageDbService } from '../../dataAccess/services/packagesDb';
+import { PackageTransactionDbService } from '../../dataAccess/services/packageTransactionDb';
+import { TeacherBalanceDbService } from '../../dataAccess/services/teacherBalanceDb';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
-import { packageEntity } from '../../entities/package';
-import { userEntity, teacherEntity } from '../../entities/user/index';
+import { makeMinuteBankEntity } from '../../entities/minuteBank';
+import { makePackageEntity } from '../../entities/package';
+import { makePackageTransactionEntity } from '../../entities/packageTransaction';
+import { makeTeacherBalanceEntity } from '../../entities/teacherBalance';
+import { makeUserEntity, makeTeacherEntity } from '../../entities/user/';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
@@ -13,6 +21,9 @@ class PostUserUsecase implements IUsecase {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
+  private packageTransactionDbService!: PackageTransactionDbService;
+  private minuteBankDbService!: MinuteBankDbService;
+  private teacherBalanceDbService!: TeacherBalanceDbService;
   private jwt!: any;
   private emailHandler!: EmailHandler;
   private defaultAccessOptions!: AccessOptions;
@@ -83,7 +94,7 @@ class PostUserUsecase implements IUsecase {
 
   private _insertTeacher = async (savedDbUser: JoinedUserDoc): Promise<TeacherDoc> => {
     const userId = savedDbUser._id;
-    const modelToInsert = teacherEntity.build({ userId });
+    const modelToInsert = makeTeacherEntity.build({ userId });
     const savedDbTeacher = await this.teacherDbService.insert({
       modelToInsert,
       accessOptions: this.defaultAccessOptions,
@@ -105,7 +116,7 @@ class PostUserUsecase implements IUsecase {
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,
       };
-      const modelToInsert = packageEntity.build(packageProperties);
+      const modelToInsert = makePackageEntity.build(packageProperties);
       const newPackage = await this.packageDbService.insert({
         modelToInsert,
         accessOptions: this.defaultAccessOptions,
@@ -116,25 +127,71 @@ class PostUserUsecase implements IUsecase {
     return savedDbPackages;
   };
 
-  // private _insertAdminPackageTransaction = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc[]> {
+  private _insertAdminPackageTransaction = async (
+    savedDbUser: JoinedUserDoc
+  ): Promise<PackageDoc> => {
+    const packageTransactionEntity = await makePackageTransactionEntity;
+    const modelToInsert = await packageTransactionEntity.build({
+      hostedBy: process.env.MANABU_ADMIN_ID,
+      reservedBy: savedDbUser._id,
+      packageId: process.env.MANABU_ADMIN_PKG_ID,
+      reservationLength: 60,
+      remainingAppointments: 1,
+      transactionDetails: {
+        currency: 'SGD',
+        subTotal: '0',
+        total: '0',
+      },
+    });
+    const newPackageTransaction = this.packageTransactionDbService.insert({
+      modelToInsert,
+      accessOptions: this.defaultAccessOptions,
+    });
+    return newPackageTransaction;
+  };
 
-  // };
+  private _insertAdminMinuteBank = async (savedDbUser: JoinedUserDoc): Promise<MinuteBankDoc> => {
+    const minuteBankEntity = await makeMinuteBankEntity;
+    const modelToInsert = await minuteBankEntity.build({
+      hostedBy: process.env.MANABU_ADMIN_ID,
+      reservedBy: savedDbUser._id,
+    });
+    const newMinuteBank = this.minuteBankDbService.insert({
+      modelToInsert,
+      accessOptions: this.defaultAccessOptions,
+    });
+    return newMinuteBank;
+  };
+
+  private _insertTeacherBalance = async (
+    savedDbUser: JoinedUserDoc
+  ): Promise<TeacherBalanceDoc> => {
+    const teacherBalanceEntity = await makeTeacherBalanceEntity;
+    const modelToInsert = await teacherBalanceEntity.build({
+      userId: savedDbUser._id,
+    });
+    const newTeacherBalance = this.teacherBalanceDbService.insert({
+      modelToInsert,
+      accessOptions: this.defaultAccessOptions,
+    });
+    return newTeacherBalance;
+  };
 
   public makeRequest = async (controllerData: ControllerData): Promise<string | Error> => {
     const { routeData } = controllerData;
     const { body } = routeData;
     const isTeacherApp = body.isTeacherApp;
-    const userInstance = userEntity.build(body);
 
     try {
+      const userInstance = makeUserEntity.build(body);
       const savedDbUser = await this._insertUser(userInstance);
 
       if (isTeacherApp) {
         await this._insertTeacher(savedDbUser);
         await this._insertTeacherPackages(savedDbUser);
-        // await this._insertAdminPackageTransaction(savedDbUser);
-        // await this._insertAdminMinuteBank(savedDbUser);
-        // await this._insertTeacherBalance(savedDbUser);
+        await this._insertAdminPackageTransaction(savedDbUser);
+        await this._insertAdminMinuteBank(savedDbUser);
+        await this._insertTeacherBalance(savedDbUser);
       }
 
       this._sendVerificationEmail(userInstance);
@@ -145,22 +202,39 @@ class PostUserUsecase implements IUsecase {
 
       return this._jwtToClient(this.jwt, savedDbUser);
     } catch (err) {
-      throw new Error('An error has occured during user creation.');
+      console.log(err.message);
+      throw err;
     }
   };
 
-  public build = async (services: {
+  public init = async (services: {
     makeUserDbService: Promise<UserDbService>;
     makeTeacherDbService: Promise<TeacherDbService>;
     makePackageDbService: Promise<PackageDbService>;
+    makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+    makeMinuteBankDbService: Promise<MinuteBankDbService>;
+    makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
     jwt: any;
     emailHandler: EmailHandler;
   }): Promise<this> => {
-    this.userDbService = await services.makeUserDbService;
-    this.teacherDbService = await services.makeTeacherDbService;
-    this.packageDbService = await services.makePackageDbService;
-    this.jwt = services.jwt;
-    this.emailHandler = services.emailHandler;
+    const {
+      makeUserDbService,
+      makeTeacherDbService,
+      makePackageDbService,
+      makePackageTransactionDbService,
+      makeMinuteBankDbService,
+      makeTeacherBalanceDbService,
+      jwt,
+      emailHandler,
+    } = services;
+    this.userDbService = await makeUserDbService;
+    this.teacherDbService = await makeTeacherDbService;
+    this.packageDbService = await makePackageDbService;
+    this.packageTransactionDbService = await makePackageTransactionDbService;
+    this.minuteBankDbService = await makeMinuteBankDbService;
+    this.teacherBalanceDbService = await makeTeacherBalanceDbService;
+    this.jwt = jwt;
+    this.emailHandler = emailHandler;
     return this;
   };
 }

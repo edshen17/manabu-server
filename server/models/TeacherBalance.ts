@@ -8,7 +8,7 @@ const TeacherBalanceSchema = createSchema({
       balance: 0,
       currency: 'SGD',
     },
-  }),
+  }).of({}),
 });
 
 const TeacherBalance = typedModel('TeacherBalance', TeacherBalanceSchema);

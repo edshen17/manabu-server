@@ -90,8 +90,8 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public init = async (...args: any): Promise<this> => {
-    for (const promise of args) await promise;
+  public init = async (props: any): Promise<this> => {
+    await props.makeDb();
     return this;
   };
 }

@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { packageEntity } from './index';
+import { makePackageEntity } from './index';
 
 const expect = chai.expect;
 const assert = chai.assert;
@@ -19,7 +19,7 @@ context('package entity', () => {
   describe('build', () => {
     describe('given valid inputs', () => {
       it('should return given inputs', () => {
-        const testPackage = packageEntity.build(testPackageEntityProperties);
+        const testPackage = makePackageEntity.build(testPackageEntityProperties);
         expect(testPackage.hostedBy).to.equal('some hostedBy');
         expect(testPackage.lessonAmount).to.equal(5);
         expect(testPackage.isOffering).to.equal(true);
@@ -30,7 +30,7 @@ context('package entity', () => {
       it('should return given inputs and default values if not given', () => {
         testPackageEntityProperties.isOffering = undefined;
         testPackageEntityProperties.packageDurations = undefined;
-        const testPackage = packageEntity.build(testPackageEntityProperties);
+        const testPackage = makePackageEntity.build(testPackageEntityProperties);
         expect(testPackage.packageDurations.length).to.equal(2);
         expect(testPackage.isOffering).to.equal(true);
       });
@@ -38,7 +38,7 @@ context('package entity', () => {
 
     describe('given invalid inputs', () => {
       it('should returned undefined if provided no input', () => {
-        const testPackage = packageEntity.build({});
+        const testPackage = makePackageEntity.build({});
         expect(typeof testPackage.hostedBy).to.equal('undefined');
       });
     });

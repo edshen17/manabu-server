@@ -103,7 +103,8 @@ class UserDbService
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
-  public init = async (makeDb: any, makeTeacherDbService: any, makePackageDbService: any) => {
+  public init = async (props: any) => {
+    const { makeDb, makeTeacherDbService, makePackageDbService } = props;
     await makeDb();
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;
