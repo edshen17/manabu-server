@@ -19,7 +19,8 @@ context('minuteBank entity', () => {
         expect(testMinuteBank.hostedBy).to.equal(fakeHostedBy._id);
         expect(testMinuteBank.reservedBy).to.equal(fakeReservedBy._id);
         expect(testMinuteBank.minuteBank).to.equal(5);
-        assert.deepEqual(fakeHostedBy, testMinuteBank.hostedByData);
+        expect(testMinuteBank).to.have.property('hostedByData');
+        expect(testMinuteBank).to.have.property('reservedByData');
       });
     });
   });

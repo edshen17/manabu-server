@@ -71,37 +71,10 @@ class UserDbService
     }
   };
 
-  public findOne = async (params: DbParams): Promise<JoinedUserDoc> => {
-    const { searchQuery, accessOptions } = params;
-    const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
-    return await this._returnJoinedUser(accessOptions, asyncCallback);
-  };
-
-  public findById = async (params: DbParams): Promise<JoinedUserDoc> => {
-    const { id, accessOptions } = params;
-    const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findById(id, selectOptions).lean();
-    return await this._returnJoinedUser(accessOptions, asyncCallback);
-  };
-
-  public insert = async (params: DbParams): Promise<JoinedUserDoc> => {
-    const { modelToInsert, accessOptions } = params;
-    const selectOptions = this._configureSelectOptions(accessOptions);
-    const insertedModel = await this.dbModel.create(modelToInsert);
-    const asyncCallback = await this.dbModel.findById(insertedModel._id, selectOptions).lean();
-    return await this._returnJoinedUser(accessOptions, asyncCallback);
-  };
-
-  public update = async (params: DbParams): Promise<JoinedUserDoc> => {
-    const { searchQuery, updateParams, accessOptions } = params;
-    const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel
-      .findOneAndUpdate(searchQuery, updateParams, {
-        fields: selectOptions,
-        new: true,
-      })
-      .lean();
+  protected _dbReturnTemplate = async (
+    accessOptions: AccessOptions,
+    asyncCallback: any
+  ): Promise<any> => {
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 

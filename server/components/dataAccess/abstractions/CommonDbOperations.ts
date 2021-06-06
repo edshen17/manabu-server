@@ -51,36 +51,63 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     }
   };
 
-  public findOne = async (params: DbParams): Promise<DbDoc> => {
+  protected _findOneTemplate = (params: DbParams): any => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
+    return { accessOptions, asyncCallback };
+  };
+
+  protected _dbReturnTemplate = async (
+    accessOptions: AccessOptions,
+    asyncCallback: any
+  ): Promise<any> => {
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 
-  public findById = async (params: DbParams): Promise<DbDoc> => {
+  public findOne = async (params: DbParams): Promise<DbDoc> => {
+    const { accessOptions, asyncCallback } = this._findOneTemplate(params);
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
+  };
+
+  protected _findByIdTemplate = (params: DbParams): any => {
     const { id, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel.findById(id, selectOptions).lean();
-    return await this._grantAccess(accessOptions, asyncCallback);
+    return { accessOptions, asyncCallback };
   };
 
-  public find = async (params: DbParams): Promise<DbDoc[]> => {
+  public findById = async (params: DbParams): Promise<DbDoc> => {
+    const { accessOptions, asyncCallback } = this._findByIdTemplate(params);
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
+  };
+
+  protected _findTemplate = (params: DbParams): any => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel.find(searchQuery, selectOptions).lean();
-    return await this._grantAccess(accessOptions, asyncCallback);
+    return { accessOptions, asyncCallback };
   };
 
-  public insert = async (params: DbParams): Promise<DbDoc> => {
+  public find = async (params: DbParams): Promise<DbDoc[]> => {
+    const { accessOptions, asyncCallback } = this._findTemplate(params);
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
+  };
+
+  protected _insertTemplate = async (params: DbParams): Promise<any> => {
     const { modelToInsert, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const insertedModel = await this.dbModel.create(modelToInsert);
     const asyncCallback = await this.dbModel.findById(insertedModel._id, selectOptions).lean();
-    return await this._grantAccess(accessOptions, asyncCallback);
+    return { accessOptions, asyncCallback };
   };
 
-  public update = async (params: DbParams): Promise<DbDoc> => {
+  public insert = async (params: DbParams): Promise<DbDoc> => {
+    const { accessOptions, asyncCallback } = await this._insertTemplate(params);
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
+  };
+
+  protected _updateTemplate = async (params: DbParams): Promise<any> => {
     const { searchQuery, updateParams, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel
@@ -89,7 +116,12 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
         new: true,
       })
       .lean();
-    return await this._grantAccess(accessOptions, asyncCallback);
+    return { accessOptions, asyncCallback };
+  };
+
+  public update = async (params: DbParams): Promise<DbDoc> => {
+    const { accessOptions, asyncCallback } = await this._updateTemplate(params);
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   public init = async (props: any): Promise<this> => {
