@@ -8,24 +8,24 @@ const PackageTransactionSchema = createSchema({
   packageId: Type.ref(Type.objectId({ required: true, index: true })).to('Package', PackageSchema),
   transactionDate: Type.date({ default: Date.now }),
   reservationLength: Type.number({ required: true }),
-  transactionDetails: Type.object({ required: false }).of({
+  transactionDetails: Type.object({ required: true }).of({
     currency: Type.string(),
     subTotal: Type.string(),
     total: Type.string(),
   }),
   terminationDate: Type.date({ required: true }),
-  isTerminated: Type.boolean({ default: false }),
+  isTerminated: Type.boolean({ required: true }),
   remainingAppointments: Type.number({ required: true }),
-  remainingReschedules: Type.number({ required: false, default: 5 }),
+  remainingReschedules: Type.number({ required: true }),
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
-  methodData: Type.object({ required: false }).of({
+  methodData: Type.object({ required: true }).of({
     method: Type.string(),
     paymentId: Type.string(),
   }),
-  packageData: Type.object({ required: false }).of({}),
-  hostedByData: Type.object({ required: false }).of({}),
-  reservedByData: Type.object({ required: false }).of({}),
+  packageData: Type.object({ required: true }).of({}),
+  hostedByData: Type.object({ required: true }).of({}),
+  reservedByData: Type.object({ required: true }).of({}),
 });
 
 const PackageTransaction = typedModel('PackageTransaction', PackageTransactionSchema);

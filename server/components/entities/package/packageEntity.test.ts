@@ -35,12 +35,5 @@ context('package entity', () => {
         expect(testPackage.isOffering).to.equal(true);
       });
     });
-
-    describe('given invalid inputs', () => {
-      it('should returned undefined if provided no input', () => {
-        const testPackage = makePackageEntity.build({});
-        expect(typeof testPackage.hostedBy).to.equal('undefined');
-      });
-    });
   });
 });

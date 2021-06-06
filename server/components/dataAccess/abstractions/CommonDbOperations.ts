@@ -74,7 +74,9 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
 
   public insert = async (params: DbParams): Promise<DbDoc> => {
     const { modelToInsert, accessOptions } = params;
-    const asyncCallback = this.dbModel.create(modelToInsert);
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const insertedModel = await this.dbModel.create(modelToInsert);
+    const asyncCallback = await this.dbModel.findById(insertedModel._id, selectOptions).lean();
     return await this._grantAccess(accessOptions, asyncCallback);
   };
 

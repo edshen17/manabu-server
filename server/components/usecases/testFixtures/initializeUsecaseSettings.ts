@@ -24,7 +24,7 @@ const initializeUsecaseSettings = async () => {
   };
   const initUserParams = {
     viewingAs: 'user',
-    endpointPath: 'not relevant',
+    endpointPath: undefined,
     isSelf: true,
     controllerData,
     getUserUsecase,

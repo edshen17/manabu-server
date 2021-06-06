@@ -1,5 +1,7 @@
 import chai from 'chai';
 import faker from 'faker';
+import { makePackageEntity } from '../../entities/package';
+import { makeTeacherEntity, makeUserEntity } from '../../entities/user';
 import { AccessOptions } from '../abstractions/IDbOperations';
 import { makeUserDbService, makeTeacherDbService, makePackageDbService } from '../index';
 import { PackageDbService } from './packagesDb';
@@ -23,14 +25,15 @@ const _createNewDbDoc = async (asyncCallback: Promise<any>) => {
 };
 
 const createNewDbUser = async (email?: string) => {
-  const fakeUser = {
+  const fakeUserEntity = makeUserEntity.build({
     name: faker.name.findName(),
     email: email || faker.internet.email(),
     password: 'password',
-    profileBio: 'test bio',
-  };
+    profileImage: 'test image',
+  });
+
   let newUserCallback = userDbService.insert({
-    modelToInsert: fakeUser,
+    modelToInsert: fakeUserEntity,
     accessOptions,
   });
 
@@ -38,21 +41,23 @@ const createNewDbUser = async (email?: string) => {
 };
 
 const createNewDbTeacher = async (dbUser: JoinedUserDoc) => {
+  const fakeTeacherEntity = makeTeacherEntity.build({ userId: dbUser._id });
   const newTeacherCallback = teacherDbService.insert({
-    modelToInsert: { userId: dbUser._id },
+    modelToInsert: fakeTeacherEntity,
     accessOptions,
   });
   return await _createNewDbDoc(newTeacherCallback);
 };
 
 const createNewDbPackage = async (dbUser: JoinedUserDoc) => {
+  const fakePackageEntity = makePackageEntity.build({
+    hostedBy: dbUser._id,
+    lessonAmount: 5,
+    isOffering: true,
+    packageType: 'light',
+  });
   const newPackageCallback = packageDbService.insert({
-    modelToInsert: {
-      hostedBy: dbUser._id,
-      lessonAmount: 5,
-      isOffering: true,
-      packageType: 'light',
-    },
+    modelToInsert: fakePackageEntity,
     accessOptions,
   });
   return await _createNewDbDoc(newPackageCallback);
@@ -215,7 +220,7 @@ describe('userDb service', () => {
         id: newUser._id,
         accessOptions,
       });
-      expect(searchUser.profileBio).to.equal('test bio');
+      expect(searchUser.profileBio).to.equal('');
       const updatedUser = await userDbService.update({
         searchQuery: { email: newUser.email },
         updateParams: { profileBio: 'updated bio' },
@@ -232,7 +237,7 @@ describe('userDb service', () => {
         id: newUser._id,
         accessOptions: accessOptionsCopy,
       });
-      expect(searchUser.profileBio).to.equal('test bio');
+      expect(searchUser.profileBio).to.equal('');
       const updatedUser = await userDbService.update({
         searchQuery: { email: newUser.email },
         updateParams: { profileBio: 'updated bio' },

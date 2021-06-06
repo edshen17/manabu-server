@@ -8,29 +8,29 @@ const TeacherSchema = createSchema({
     UserSchema
   ),
   dateApproved: Type.date({ required: false }),
-  teachingLanguages: Type.array({ default: [] }).of({
+  teachingLanguages: Type.array({ required: true }).of({
     language: Type.string(),
     level: Type.string(),
   }),
-  alsoSpeaks: Type.array({ default: [] }).of({
+  alsoSpeaks: Type.array({ required: true }).of({
     language: Type.string(),
     level: Type.string(),
   }),
-  introductionVideo: Type.string({ default: '' }),
+  introductionVideo: Type.string({ required: false }),
   isApproved: Type.boolean({ default: false }),
   isHidden: Type.boolean({ default: false }),
   teacherType: Type.string({
-    default: 'unlicensed',
+    required: true,
     enum: ['licensed', 'unlicensed'],
     index: true,
   }),
-  licensePath: Type.string({ default: '' }),
-  hourlyRate: Type.object({ required: false, default: { amount: '35', currency: 'SGD' } }).of({
+  licensePath: Type.string({ required: false }),
+  hourlyRate: Type.object({ required: true }).of({
     amount: Type.string(),
     currency: Type.string(),
   }),
-  lessonCount: Type.number({ default: 0 }),
-  studentCount: Type.number({ default: 0 }),
+  lessonCount: Type.number({ required: true }),
+  studentCount: Type.number({ required: true }),
 });
 
 TeacherSchema.plugin(aggregatePaginate);

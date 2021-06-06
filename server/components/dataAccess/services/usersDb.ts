@@ -87,7 +87,9 @@ class UserDbService
 
   public insert = async (params: DbParams): Promise<JoinedUserDoc> => {
     const { modelToInsert, accessOptions } = params;
-    const asyncCallback = this.dbModel.create(modelToInsert);
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const insertedModel = await this.dbModel.create(modelToInsert);
+    const asyncCallback = await this.dbModel.findById(insertedModel._id, selectOptions).lean();
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 

@@ -14,8 +14,6 @@ beforeEach(async () => {
 context('makeRequest', async () => {
   describe('creating a new user should return the correct properties', () => {
     it('should create a new user in the db', async () => {
-      initUserParams.viewingAs = undefined;
-      initUserParams.endpointPath = undefined;
       const newUser: any = await initializeUser(initUserParams);
       expect(newUser.profileBio).to.equal('');
     });

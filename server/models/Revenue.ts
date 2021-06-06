@@ -1,7 +1,7 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 
 const RevenueSchema = createSchema({
-  revenue: Type.object({ required: false }),
+  revenue: Type.object({ required: true }),
   date: Type.string({ required: true }),
 });
 

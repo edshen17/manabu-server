@@ -111,7 +111,7 @@ class PostUserUsecase implements IUsecase {
     const savedDbPackages: PackageDoc[] = [];
 
     defaultPackages.forEach(async (pkg) => {
-      const packageProperties = {
+      const packageProperties: { hostedBy: string; lessonAmount: number; packageType: string } = {
         hostedBy: savedDbUser._id,
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,

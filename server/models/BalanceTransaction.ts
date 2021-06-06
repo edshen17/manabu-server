@@ -6,7 +6,7 @@ const BalanceTransactionSchema = createSchema({
   balanceChange: Type.object({ required: true }).of({}),
   fees: Type.object({ required: true }).of({}),
   description: Type.string({ required: true }),
-  date: Type.date({ default: Date.now }),
+  date: Type.date({ required: true }),
 });
 
 const BalanceTransaction = typedModel('BalanceTransaction', BalanceTransactionSchema);

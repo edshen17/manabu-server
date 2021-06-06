@@ -4,31 +4,30 @@ const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
   email: Type.string({ required: true, index: true, unique: true }),
   password: Type.string({ required: false }),
-  profileImage: Type.string({ default: '' }),
-  profileBio: Type.string({ default: '' }),
+  profileImage: Type.string({ required: false }),
+  profileBio: Type.string({ required: false }),
   dateRegistered: Type.date({ default: Date.now }),
   lastUpdated: Type.date({ default: Date.now }),
-  languages: Type.array({ default: [] }).of({
+  languages: Type.array({ required: true }).of({
     language: Type.string(),
     level: Type.string(),
   }),
-  region: Type.string({ default: '' }),
-  timezone: Type.string({ default: '' }),
+  region: Type.string({ required: false }),
+  timezone: Type.string({ required: false }),
   lastOnline: Type.date({ default: Date.now }),
-  role: Type.string({ default: 'user', enum: ['user', 'teacher', 'admin'], index: true }),
+  role: Type.string({ required: true, enum: ['user', 'teacher', 'admin'], index: true }),
   settings: Type.object({
-    required: false,
-    default: { currency: 'SGD' },
+    required: true,
   }).of({
     currency: Type.string(),
   }),
-  membership: Type.array({ default: [] }).of(Type.string()),
-  commMethods: Type.array({ default: [] }).of({
+  membership: Type.array({ required: true }).of(Type.string()),
+  commMethods: Type.array({ required: true }).of({
     method: Type.string(),
     id: Type.string(),
   }),
-  emailVerified: Type.boolean({ default: false }),
-  verificationToken: Type.string({ default: '' }),
+  emailVerified: Type.boolean({ required: true }),
+  verificationToken: Type.string({ required: true }),
 });
 
 const User = typedModel('User', UserSchema);

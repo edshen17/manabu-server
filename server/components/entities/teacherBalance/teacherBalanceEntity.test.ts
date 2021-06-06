@@ -12,12 +12,5 @@ context('teacherBalance entity', () => {
         expect(testTeacherBalance.userId).to.equal('some userId');
       });
     });
-
-    describe('given invalid inputs', () => {
-      it('should returned undefined if provided no input', () => {
-        const testTeacherBalance = makeTeacherBalanceEntity.build({});
-        expect(typeof testTeacherBalance.userId).to.equal('undefined');
-      });
-    });
   });
 });

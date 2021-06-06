@@ -5,9 +5,9 @@ const MinuteBankSchema = createSchema({
   hostedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   reservedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   minuteBank: Type.number({ default: 0 }),
-  hostedByData: Type.object({ required: false }).of({}),
-  reservedByData: Type.object({ required: false }).of({}),
-  lastUpdated: Type.date({ default: Date.now }),
+  hostedByData: Type.object({ required: true }).of({}),
+  reservedByData: Type.object({ required: true }).of({}),
+  lastUpdated: Type.date({ required: true }),
 });
 
 const MinuteBank = typedModel('MinuteBank', MinuteBankSchema);

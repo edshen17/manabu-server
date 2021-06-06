@@ -1,4 +1,4 @@
 export interface IEntity {
-  build: (...args: any[]) => {};
-  init?: (...args: any[]) => Promise<this>;
+  build: (entityData: any) => any;
+  init?: (props: any) => Promise<this>;
 }

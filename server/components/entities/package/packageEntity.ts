@@ -1,9 +1,17 @@
+import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-class PackageEntity implements IEntity {
-  build(packageData: any): any {
+class PackageEntity extends AbstractEntity implements IEntity {
+  build(entityData: {
+    hostedBy: string;
+    priceDetails?: { hourlyPrice: string; currency: string };
+    lessonAmount: number;
+    isOffering?: boolean;
+    packageType: string;
+    packageDurations?: number[];
+  }): any {
     const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
-      packageData;
+      entityData;
     return Object.freeze({
       hostedBy,
       priceDetails: priceDetails || {

@@ -4,8 +4,7 @@ import { UserSchema } from './User';
 const PackageSchema = createSchema({
   hostedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   priceDetails: Type.object({
-    required: false,
-    default: { hourlyPrice: '35', currency: 'SGD' },
+    required: true,
   }).of({
     hourlyPrice: Type.string(),
     currency: Type.string(),
@@ -13,7 +12,7 @@ const PackageSchema = createSchema({
   lessonAmount: Type.number({ required: true }),
   packageDesc: Type.string({ required: false }),
   packageName: Type.string({ required: false }),
-  isOffering: Type.boolean({ default: true }),
+  isOffering: Type.boolean({ required: true }),
   packageType: Type.string({
     enum: ['mainichi', 'moderate', 'light', 'internal'],
     required: true,

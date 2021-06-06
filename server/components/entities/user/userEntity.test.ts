@@ -4,13 +4,6 @@ import { makeUserEntity } from './index';
 const expect = chai.expect;
 
 describe('user entity', () => {
-  it('should throw an error if no user data is provided', () => {
-    try {
-      const emptyName = makeUserEntity.build({}).getName();
-    } catch (err) {
-      expect(err).to.be.an('error');
-    }
-  });
   it('should get the correct data provided good input', () => {
     const testEntity = makeUserEntity.build({
       name: 'test',

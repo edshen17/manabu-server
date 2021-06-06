@@ -1,12 +1,19 @@
+import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-class UserEntity implements IEntity {
+class UserEntity extends AbstractEntity implements IEntity {
   private sanitize: any;
   private inputValidator: any;
   private passwordHasher: any;
   private randTokenGenerator: any;
 
-  constructor(props: any) {
+  constructor(props: {
+    sanitize: any;
+    inputValidator: any;
+    passwordHasher: any;
+    randTokenGenerator: any;
+  }) {
+    super();
     const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = props;
     this.sanitize = sanitize;
     this.inputValidator = inputValidator;
@@ -29,16 +36,41 @@ class UserEntity implements IEntity {
     }
   };
 
-  build(userData: any): any | Error {
+  private _setPassword = (password?: string) => {
+    if (password) {
+      return this.passwordHasher(password);
+    } else {
+      return undefined;
+    }
+  };
+
+  build(entityData: {
+    name: string;
+    email: string;
+    password?: string;
+    profileImage?: string;
+  }): any | Error {
     let verificationToken: string;
-    let { name, email, password, profileImage } = userData;
+    let { name, email, password, profileImage } = entityData;
     try {
-      this._validateUserInput(userData);
+      this._validateUserInput(entityData);
       return Object.freeze({
         name,
         email,
-        password: (password = this.passwordHasher(password)),
+        password: this._setPassword(password),
         profileImage: profileImage || '',
+        profileBio: '',
+        dateRegistered: new Date(),
+        lastUpdated: new Date(),
+        languages: [],
+        region: '',
+        timezone: '',
+        lastOnline: new Date(),
+        role: 'user',
+        settings: { currency: 'SGD' },
+        membership: [],
+        commMethods: [],
+        emailVerified: false,
         verificationToken: (verificationToken = this.randTokenGenerator(name, email)),
       });
     } catch (err) {
