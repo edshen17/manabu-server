@@ -71,9 +71,9 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 
   protected _findByIdTemplate = (params: DbParams): any => {
-    const { id, accessOptions } = params;
+    const { _id, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findById(id, selectOptions).lean();
+    const asyncCallback = this.dbModel.findById(_id, selectOptions).lean();
     return { accessOptions, asyncCallback };
   };
 

@@ -16,7 +16,7 @@ class GetUserUsecase implements IUsecase {
     const { routeData, currentAPIUser, endpointPath } = controllerData;
     const { params } = routeData;
     if (params.uId || currentAPIUser.userId) {
-      const id: string = endpointPath == '/me' ? currentAPIUser.userId : params.uId;
+      const _id: string = endpointPath == '/me' ? currentAPIUser.userId : params.uId;
       const accessOptions: AccessOptions = {
         isProtectedResource: false,
         isCurrentAPIUserPermitted: true,
@@ -25,7 +25,7 @@ class GetUserUsecase implements IUsecase {
       };
 
       const user = await this.userDbService.findById({
-        id,
+        _id,
         accessOptions,
       });
       return user;

@@ -6,7 +6,7 @@ type AccessOptions = {
 };
 
 type DbParams = {
-  id?: string;
+  _id?: string;
   searchQuery?: {};
   accessOptions: AccessOptions;
   modelToInsert?: {};

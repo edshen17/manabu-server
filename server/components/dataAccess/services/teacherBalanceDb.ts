@@ -6,7 +6,7 @@ class TeacherBalanceDbService
   extends CommonDbOperations<TeacherBalanceDoc>
   implements IDbOperations<TeacherBalanceDoc>
 {
-  constructor(props: any) {
+  constructor(props: { teacherBalanceDb: any }) {
     super(props.teacherBalanceDb);
     this.defaultSelectOptions = {
       defaultSettings: {},

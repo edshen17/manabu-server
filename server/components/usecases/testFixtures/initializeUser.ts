@@ -16,11 +16,11 @@ const initializeUser = async (props: {
   const secret: any = process.env.JWT_SECRET;
   const decoded: any = jwt.verify(authToken, secret);
   const currentAPIUser: CurrentAPIUser = {
-    userId: decoded.id,
+    userId: decoded._id,
     role: props.viewingAs,
     isVerified: true,
   };
-  const routeData = { params: { uId: decoded.id }, body: {} };
+  const routeData = { params: { uId: decoded._id }, body: {} };
   if (!props.isSelf) {
     currentAPIUser.userId = undefined;
   }

@@ -83,7 +83,7 @@ describe('userDb service', () => {
     it('given a bad user id as input, should throw an error', async () => {
       try {
         await userDbService.findById({
-          id: 'undefined',
+          _id: 'undefined',
           accessOptions,
         });
       } catch (err) {
@@ -94,7 +94,7 @@ describe('userDb service', () => {
     it('given a non-existent user id as input, should throw an error', async () => {
       try {
         await userDbService.findById({
-          id: '60979db0bb31ed001589a1ea',
+          _id: '60979db0bb31ed001589a1ea',
           accessOptions,
         });
       } catch (err) {
@@ -107,7 +107,7 @@ describe('userDb service', () => {
       try {
         const newUser = await createFakeDbUser(true);
         const searchUser = await userDbService.findById({
-          id: newUser._id,
+          _id: newUser._id,
           accessOptions,
         });
         expect(searchUser).to.have.property('teacherData');
@@ -123,7 +123,7 @@ describe('userDb service', () => {
       try {
         const newUser = await createFakeDbUser(false);
         const searchUser = await userDbService.findById({
-          id: newUser._id,
+          _id: newUser._id,
           accessOptions,
         });
 
@@ -144,7 +144,7 @@ describe('userDb service', () => {
       try {
         const newUser = await createFakeDbUser(true);
         const searchUser = await userDbService.findById({
-          id: newUser._id,
+          _id: newUser._id,
           accessOptions: accessOptionsCopy,
         });
         expect(searchUser.teacherData).to.have.property('licensePath');
@@ -162,7 +162,7 @@ describe('userDb service', () => {
       try {
         const newUser = await createFakeDbUser(true);
         const searchUser = await userDbService.findById({
-          id: newUser._id,
+          _id: newUser._id,
           accessOptions: accessOptionsCopy,
         });
 
@@ -182,7 +182,7 @@ describe('userDb service', () => {
       try {
         const newUser = await createFakeDbUser(true);
         const searchUser = await userDbService.findById({
-          id: newUser._id,
+          _id: newUser._id,
           accessOptions: accessOptionsCopy,
         });
 
@@ -198,7 +198,7 @@ describe('userDb service', () => {
     it('given a user, should insert into db', async () => {
       const newUser = await createFakeDbUser(false);
       const searchUser = await userDbService.findById({
-        id: newUser._id,
+        _id: newUser._id,
         accessOptions,
       });
       expect(searchUser).to.not.equal(null);
@@ -217,7 +217,7 @@ describe('userDb service', () => {
     it('should update db document', async () => {
       const newUser = await createFakeDbUser(false);
       const searchUser = await userDbService.findById({
-        id: newUser._id,
+        _id: newUser._id,
         accessOptions,
       });
       expect(searchUser.profileBio).to.equal('');
@@ -234,7 +234,7 @@ describe('userDb service', () => {
       accessOptionsCopy.currentAPIUserRole = 'admin';
       const newUser = await createFakeDbUser(true);
       const searchUser = await userDbService.findById({
-        id: newUser._id,
+        _id: newUser._id,
         accessOptions: accessOptionsCopy,
       });
       expect(searchUser.profileBio).to.equal('');

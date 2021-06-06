@@ -41,14 +41,14 @@ class UserDbService
     accessOptions: AccessOptions
   ): Promise<JoinedUserDoc> => {
     const userCopy: any = JSON.parse(JSON.stringify(user));
-    const id: string = user._id;
+    const _id: string = user._id;
     const teacher: TeacherDoc = await this.teacherDbService.findById({
-      id,
+      _id,
       accessOptions,
     });
 
     const packages = await this.packageDbService.find({
-      searchQuery: { hostedBy: id },
+      searchQuery: { hostedBy: _id },
       accessOptions,
     });
 
@@ -78,7 +78,11 @@ class UserDbService
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
-  public init = async (props: any) => {
+  public init = async (props: {
+    makeDb: any;
+    makeTeacherDbService: Promise<TeacherDbService>;
+    makePackageDbService: Promise<PackageDbService>;
+  }) => {
     const { makeDb, makeTeacherDbService, makePackageDbService } = props;
     await makeDb();
     this.teacherDbService = await makeTeacherDbService;

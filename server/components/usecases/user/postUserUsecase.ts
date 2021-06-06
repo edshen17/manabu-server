@@ -72,7 +72,7 @@ class PostUserUsecase implements IUsecase {
     const { role, name } = savedDbUser;
     const token = jwt.sign(
       {
-        id: savedDbUser._id,
+        _id: savedDbUser._id,
         role,
         name,
       },
