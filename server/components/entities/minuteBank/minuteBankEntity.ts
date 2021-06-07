@@ -14,8 +14,8 @@ class MinuteBankEntity extends AbstractEntity implements IEntity {
       hostedBy,
       reservedBy,
       minuteBank: minuteBank || 0,
-      hostedByData: (await this._getDbDataById(this.userDbService, hostedBy)) || {},
-      reservedByData: (await this._getDbDataById(this.userDbService, reservedBy)) || {},
+      hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
+      reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},
       lastUpdated: new Date(),
     });
   };

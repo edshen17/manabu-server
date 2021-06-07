@@ -7,7 +7,7 @@ const verifyToken = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, async function (err, decoded) {
       if (err) return next(err);
       if (decoded) {
-        req.userId = decoded.id;
+        req.userId = decoded._id;
         req.role = decoded.role || 'user';
         req.isVerified = true;
       }

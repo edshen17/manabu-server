@@ -65,57 +65,6 @@ const oauth2Client = new google.auth.OAuth2(
   `${getHost('server')}/api/auth/google`
 );
 
-// Connect to Mongodb
-mongoose
-  .connect(
-    `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?retryWrites=true&w=majority`,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      ignoreUndefined: true,
-      useCreateIndex: true,
-      readPreference: 'nearest',
-    }
-  )
-  .then(() => console.log('connected to MongoDB'))
-  .catch((err) => console.log(err));
-const storeTokenCookie = (res, user) => {
-  const token = jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-      name: user.name,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: 86400 * 7, // expires in 7 days
-    }
-  );
-
-  const tokenArr = token.split('.');
-  res.cookie('hp', `${tokenArr[0]}.${tokenArr[1]}`, {
-    maxAge: 2 * 24 * 60 * 60 * 1000,
-    httpOnly: false,
-    secure: true,
-  });
-  res.cookie('sig', `.${tokenArr[2]}`, {
-    maxAge: 2 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    secure: true,
-  });
-  return token;
-};
-
-// return a valid jwt res
-function returnToken(res, user) {
-  let token = storeTokenCookie(res, user);
-  return res.status(200).send({
-    auth: true,
-    token: token,
-  });
-}
-
 // Making a user in the db
 router.post('/register', makeExpressCallback(userControllerMain.postUserController));
 
@@ -1031,46 +980,6 @@ router.get('/utils/verifyTransactionData', VerifyToken, async (req, res, next) =
       return res.status(500).send('invalid transaction');
     }
   });
-});
-
-// enable router to use middleware
-router.use(async function (user, req, res, next) {
-  user = JSON.parse(JSON.stringify(user));
-  if (!req.role) req.role = 'user';
-  const teacherQuery = {
-    _id: 0,
-    licensePath: 0,
-  };
-  const teacher = JSON.parse(
-    JSON.stringify(
-      await Teacher.findOne(
-        {
-          userId: user._id,
-        },
-        teacherQuery
-      )
-        .lean()
-        .cache()
-    )
-  );
-
-  if (teacher) {
-    const packages = JSON.parse(
-      JSON.stringify(
-        await Package.find({
-          hostedBy: user._id,
-        })
-          .lean()
-          .cache()
-      )
-    );
-    user.teacherAppPending = !teacher.isApproved;
-    user.teacherData = teacher;
-    user.teacherData.packages = packages;
-    return res.status(200).json(user);
-  } else {
-    return res.status(200).json(user);
-  }
 });
 
 router.post('/pay', VerifyToken, (req, res, next) => {

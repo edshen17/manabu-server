@@ -20,7 +20,7 @@ class GetUserUsecase implements IUsecase {
       const accessOptions: AccessOptions = {
         isProtectedResource: false,
         isCurrentAPIUserPermitted: true,
-        currentAPIUserRole: currentAPIUser.role || undefined,
+        currentAPIUserRole: currentAPIUser.role || 'user',
         isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
       };
 

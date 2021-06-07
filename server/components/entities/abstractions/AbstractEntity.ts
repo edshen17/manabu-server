@@ -6,10 +6,10 @@ abstract class AbstractEntity implements IEntity {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,
-    currentAPIUserRole: undefined,
+    currentAPIUserRole: 'user',
   };
   abstract build(entityData: any): any;
-  protected _getDbDataById = async (dbService: IDbOperations<any>, _id?: string): Promise<any> => {
+  public getDbDataById = async (dbService: IDbOperations<any>, _id?: string): Promise<any> => {
     const accessOptions = this.defaultAccessOptions;
     const dbData = await dbService.findById({ _id, accessOptions });
     return dbData;

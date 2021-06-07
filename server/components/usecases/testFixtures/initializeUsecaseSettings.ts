@@ -1,10 +1,10 @@
 import faker from 'faker';
-import { userUsecaseService } from '../user';
+import { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase } from '../user';
 
 const initializeUsecaseSettings = async () => {
-  const getUserUsecase = await (await userUsecaseService).getUsecase;
-  const postUserUsecase = await (await userUsecaseService).postUsecase;
-  const putUserUsecase = await (await userUsecaseService).putUsecase;
+  const getUserUsecase = await makeGetUserUsecase;
+  const postUserUsecase = await makePostUserUsecase;
+  const putUserUsecase = await makePutUserUsecase;
   const currentAPIUser = {
     userId: undefined,
     role: 'user',

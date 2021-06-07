@@ -57,9 +57,9 @@ class PackageTransactionEntity extends AbstractEntity implements IEntity {
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
       methodData: methodData || {},
-      packageData: (await this._getDbDataById(this.packageDbService, packageId)) || {},
-      hostedByData: (await this._getDbDataById(this.userDbService, hostedBy)) || {},
-      reservedByData: (await this._getDbDataById(this.userDbService, reservedBy)) || {},
+      packageData: (await this.getDbDataById(this.packageDbService, packageId)) || {},
+      hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
+      reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},
     });
   };
 

@@ -19,6 +19,7 @@ interface IDbOperations<DbDoc> {
   find: (params: DbParams) => Promise<DbDoc[]>;
   insert: (params: DbParams) => Promise<DbDoc>;
   update: (params: DbParams) => Promise<DbDoc>;
+  updateMany: (params: DbParams) => Promise<DbDoc>;
   init: (props: any) => Promise<this>;
 }
 
