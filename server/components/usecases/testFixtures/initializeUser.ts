@@ -6,7 +6,6 @@ import { PostUserUsecase } from '../user/postUserUsecase';
 
 const initializeUser = async (props: {
   viewingAs: string;
-  endpointPath?: string;
   isSelf: boolean;
   controllerData: ControllerData;
   getUserUsecase: GetUserUsecase;
@@ -28,7 +27,7 @@ const initializeUser = async (props: {
   const newUser = await props.getUserUsecase.makeRequest({
     currentAPIUser,
     routeData,
-    endpointPath: props.endpointPath,
+    endpointPath: props.controllerData.endpointPath,
   });
   return newUser;
 };

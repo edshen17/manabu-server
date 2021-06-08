@@ -6,7 +6,7 @@ type CurrentAPIUser = {
 
 type ControllerData = {
   currentAPIUser: CurrentAPIUser;
-  endpointPath?: string;
+  endpointPath: string;
   routeData: { params: any; body: any };
 };
 

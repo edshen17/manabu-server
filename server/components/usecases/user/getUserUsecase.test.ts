@@ -27,10 +27,10 @@ beforeEach(() => {
         password: 'test password',
       },
     },
+    endpointPath: '/register',
   };
   initUserParams = {
     viewingAs: 'user',
-    endpointPath: 'not relevant',
     isSelf: true,
     controllerData,
     getUserUsecase,

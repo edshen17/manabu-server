@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { ControllerData } from '../abstractions/IUsecase';
 import { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase } from '../user';
 
 const initializeUsecaseSettings = async () => {
@@ -18,13 +19,13 @@ const initializeUsecaseSettings = async () => {
       password: 'test password',
     },
   };
-  const controllerData = {
+  const controllerData: ControllerData = {
     currentAPIUser,
     routeData,
+    endpointPath: '/register',
   };
   const initUserParams = {
     viewingAs: 'user',
-    endpointPath: undefined,
     isSelf: true,
     controllerData,
     getUserUsecase,

@@ -65,44 +65,6 @@ const oauth2Client = new google.auth.OAuth2(
   `${getHost('server')}/api/auth/google`
 );
 
-// Making a user in the db
-router.post('/register', makeExpressCallback(userControllerMain.postUserController));
-
-// route to get access to user's own information
-router.get(
-  '/me',
-  VerifyToken,
-  makeExpressCallback(userControllerMain.getUserController),
-  (req, res, next) => {
-    const updateQuery = {
-      // update last online
-      _id: req.userId,
-    };
-
-    const selectOptions = {
-      email: 0,
-      password: 0,
-      verificationToken: 0,
-    };
-
-    // make sure cache is up to date
-    User.findOneAndUpdate(
-      updateQuery,
-      {
-        lastOnline: new Date(),
-      },
-      {
-        returnOriginal: false,
-        fields: selectOptions,
-      }
-    )
-      .then((updatedUser) => {
-        updateSpecificKey(User.collection.collectionName, updateQuery, updatedUser);
-      })
-      .catch((err) => handleErrors(err, req, res, next));
-  }
-);
-
 // route to get access to user's teachers
 router.get('/myTeachers', VerifyToken, async function (req, res, next) {
   const minuteBanks = await MinuteBank.find({
@@ -113,9 +75,6 @@ router.get('/myTeachers', VerifyToken, async function (req, res, next) {
     .catch((err) => handleErrors(err, req, res, next));
   return res.status(200).json(minuteBanks);
 });
-
-// route to get access to user's public information
-router.get('/user/:uId', VerifyToken, makeExpressCallback(userControllerMain.getUserController));
 
 // route to verify email
 router.get('/user/verify/:verificationToken', VerifyToken, function (req, res, next) {

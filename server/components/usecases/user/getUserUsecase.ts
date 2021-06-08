@@ -1,9 +1,39 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
-import { ControllerData, IUsecase } from '../abstractions/IUsecase';
+import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
 
 class GetUserUsecase implements IUsecase {
   private userDbService!: UserDbService;
+
+  private _getUser = async (
+    currentAPIUser: CurrentAPIUser,
+    endpointPath: string,
+    params: any,
+    accessOptions: AccessOptions
+  ): Promise<JoinedUserDoc> => {
+    const _id: string = endpointPath == '/me' ? currentAPIUser.userId : params.uId;
+
+    const user = await this.userDbService.findById({
+      _id,
+      accessOptions,
+    });
+    return user;
+  };
+
+  private _updateOnlineTimestamp = async (
+    _id: string | undefined,
+    accessOptions: AccessOptions
+  ): Promise<void> => {
+    this.userDbService.update({
+      searchQuery: {
+        _id,
+      },
+      updateParams: {
+        lastOnline: new Date(),
+      },
+      accessOptions,
+    });
+  };
 
   public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
     this.userDbService = await services.makeUserDbService;
@@ -15,19 +45,18 @@ class GetUserUsecase implements IUsecase {
   ): Promise<JoinedUserDoc | undefined> => {
     const { routeData, currentAPIUser, endpointPath } = controllerData;
     const { params } = routeData;
-    if (params.uId || currentAPIUser.userId) {
-      const _id: string = endpointPath == '/me' ? currentAPIUser.userId : params.uId;
-      const accessOptions: AccessOptions = {
-        isProtectedResource: false,
-        isCurrentAPIUserPermitted: true,
-        currentAPIUserRole: currentAPIUser.role || 'user',
-        isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
-      };
-
-      const user = await this.userDbService.findById({
-        _id,
-        accessOptions,
-      });
+    const searchIdExists = params.uId || currentAPIUser.userId;
+    const accessOptions: AccessOptions = {
+      isProtectedResource: false,
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: currentAPIUser.role || 'user',
+      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
+    };
+    if (searchIdExists) {
+      const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
+      if (endpointPath == '/me') {
+        this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
+      }
       return user;
     }
   };
