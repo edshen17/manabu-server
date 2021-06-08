@@ -1,18 +1,19 @@
 import { Request, Response } from 'express';
+import { IController } from '../controllers/abstractions/IController';
 export interface IHttpRequest {
   body: Request['body'];
   path: Request['path'];
   query: Request['query'];
   params: Request['params'];
   currentAPIUser: {
-    userId: Request['userId'];
-    role: Request['role'];
-    isVerified: Request['isVerified'];
+    userId?: string;
+    role: string;
+    isVerified: boolean;
   };
 }
 
-export const makeExpressCallback = (controller: Controller) => {
-  return async (req: Request, res: Response): Promise<void> => {
+export const makeExpressCallback = (makeController: Promise<IController>) => {
+  return async (req: any, res: any): Promise<void> => {
     try {
       const httpRequest = {
         body: req.body,
@@ -23,7 +24,7 @@ export const makeExpressCallback = (controller: Controller) => {
         path: req.path,
         currentAPIUser: {
           userId: req.userId,
-          role: req.role,
+          role: req.role || 'user',
           isVerified: req.isVerified,
         },
         headers: {
@@ -32,7 +33,8 @@ export const makeExpressCallback = (controller: Controller) => {
           'User-Agent': req.get('User-Agent'),
         },
       };
-      const httpResponse: IControllerResponse = await controller(httpRequest);
+      const controller = await makeController;
+      const httpResponse = await controller.makeRequest(httpRequest);
       if (httpResponse.headers) {
         res.set(httpResponse.headers);
       }

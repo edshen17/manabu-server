@@ -5,8 +5,8 @@ import { GetUserUsecase } from '../user/getUserUsecase';
 import { PostUserUsecase } from '../user/postUserUsecase';
 
 const initializeUser = async (props: {
-  viewingAs: string | undefined;
-  endpointPath: string | undefined;
+  viewingAs: string;
+  endpointPath?: string;
   isSelf: boolean;
   controllerData: ControllerData;
   getUserUsecase: GetUserUsecase;
@@ -14,7 +14,7 @@ const initializeUser = async (props: {
 }): Promise<JoinedUserDoc | undefined> => {
   const authToken: any = await props.postUserUsecase.makeRequest(props.controllerData);
   const secret: any = process.env.JWT_SECRET;
-  const decoded: any = jwt.verify(authToken, secret);
+  const decoded: any = jwt.verify(authToken.token, secret);
   const currentAPIUser: CurrentAPIUser = {
     userId: decoded._id,
     role: props.viewingAs,

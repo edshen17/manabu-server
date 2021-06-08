@@ -1,4 +1,3 @@
-import { async } from 'crypto-random-string';
 import { IHttpRequest } from '../../expressCallback';
 import { IUsecase } from '../../usecases/abstractions/IUsecase';
 import { IController } from './IController';
@@ -14,13 +13,15 @@ abstract class AbstractController implements IController {
     this.successStatusCode = successStatusCode;
     this.errorStatusCode = errorStatusCode;
   }
+
   private _awaitUsecaseRes = async (httpRequest: IHttpRequest): Promise<any> => {
     const { currentAPIUser, path, params, body } = httpRequest;
-    const usecaseRes = await this.usecase.makeRequest({
+    const controllerData = {
       currentAPIUser,
       endpointPath: path,
       routeData: { params, body },
-    });
+    };
+    const usecaseRes = await this.usecase.makeRequest(controllerData);
     return usecaseRes;
   };
 
@@ -45,6 +46,7 @@ abstract class AbstractController implements IController {
       };
     }
   };
+
   public init = async (props: { makeUsecase: Promise<IUsecase> }): Promise<this> => {
     const { makeUsecase } = props;
     this.usecase = await makeUsecase;

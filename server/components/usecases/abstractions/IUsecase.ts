@@ -1,6 +1,6 @@
 type CurrentAPIUser = {
-  userId: string | undefined;
-  role: string | undefined;
+  userId?: string;
+  role: string;
   isVerified: boolean;
 };
 

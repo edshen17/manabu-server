@@ -177,7 +177,7 @@ class PostUserUsecase implements IUsecase {
     return newTeacherBalance;
   };
 
-  public makeRequest = async (controllerData: ControllerData): Promise<string | Error> => {
+  public makeRequest = async (controllerData: ControllerData): Promise<{} | Error> => {
     const { routeData } = controllerData;
     const { body } = routeData;
     const isTeacherApp = body.isTeacherApp;
@@ -200,9 +200,11 @@ class PostUserUsecase implements IUsecase {
         this._sendInternalEmail(userInstance, isTeacherApp);
       }
 
-      return this._jwtToClient(this.jwt, savedDbUser);
+      return {
+        token: this._jwtToClient(this.jwt, savedDbUser),
+        user: savedDbUser,
+      };
     } catch (err) {
-      console.log(err.message);
       throw err;
     }
   };

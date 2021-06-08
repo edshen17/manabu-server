@@ -239,7 +239,7 @@ describe('userDb service', () => {
       });
       expect(searchUser.profileBio).to.equal('');
       const updatedUser = await userDbService.update({
-        searchQuery: { email: newUser.email },
+        searchQuery: { _id: newUser._id },
         updateParams: { profileBio: 'updated bio' },
         accessOptions: accessOptionsCopy,
       });
