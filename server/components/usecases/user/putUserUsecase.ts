@@ -6,7 +6,9 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { MinuteBankDoc } from '../../../models/MinuteBank';
 
-class PutUserUsecase implements IUsecase {
+type PutUserUsecaseResponse = JoinedUserDoc | Error;
+
+class PutUserUsecase implements IUsecase<PutUserUsecaseResponse> {
   private userDbService!: UserDbService;
   private packageTransactionDbService!: PackageTransactionDbService;
   private minuteBankDbService!: MinuteBankDbService;
@@ -67,7 +69,7 @@ class PutUserUsecase implements IUsecase {
     return { accessOptions, body, isValidUpdate, params };
   };
 
-  public makeRequest = async (controllerData: ControllerData): Promise<JoinedUserDoc | Error> => {
+  public makeRequest = async (controllerData: ControllerData): Promise<PutUserUsecaseResponse> => {
     const { isValidUpdate, params, body, accessOptions } = this._makeRequestSetup(controllerData);
 
     if (isValidUpdate) {
@@ -79,7 +81,7 @@ class PutUserUsecase implements IUsecase {
 
       //TODO remove await...
       // update minute banks
-      await this._updateDbUserDependencyData({
+      this._updateDbUserDependencyData({
         dbService: this.minuteBankDbService,
         savedDbUser,
         accessOptions,
@@ -88,7 +90,7 @@ class PutUserUsecase implements IUsecase {
       });
 
       // update package transactions
-      await this._updateDbUserDependencyData({
+      this._updateDbUserDependencyData({
         dbService: this.packageTransactionDbService,
         savedDbUser,
         accessOptions,
@@ -106,4 +108,4 @@ class PutUserUsecase implements IUsecase {
   };
 }
 
-export { PutUserUsecase };
+export { PutUserUsecase, PutUserUsecaseResponse };

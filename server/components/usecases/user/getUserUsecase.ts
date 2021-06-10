@@ -2,7 +2,9 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
 
-class GetUserUsecase implements IUsecase {
+type GetUserUsecaseResponse = JoinedUserDoc | undefined;
+
+class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
   private userDbService!: UserDbService;
 
   private _getUser = async (
@@ -40,9 +42,7 @@ class GetUserUsecase implements IUsecase {
     return this;
   };
 
-  public makeRequest = async (
-    controllerData: ControllerData
-  ): Promise<JoinedUserDoc | undefined> => {
+  public makeRequest = async (controllerData: ControllerData): Promise<GetUserUsecaseResponse> => {
     const { routeData, currentAPIUser, endpointPath } = controllerData;
     const { params } = routeData;
     const searchIdExists = params.uId || currentAPIUser.userId;
@@ -62,4 +62,4 @@ class GetUserUsecase implements IUsecase {
   };
 }
 
-export { GetUserUsecase };
+export { GetUserUsecase, GetUserUsecaseResponse };

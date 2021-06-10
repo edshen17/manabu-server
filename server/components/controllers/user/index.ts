@@ -1,7 +1,8 @@
-import { makeGetUserUsecase, makePostUserUsecase } from '../../usecases/user';
+import { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase } from '../../usecases/user';
 import { GetUserController } from './getUserController';
 import { StatusCodes } from 'http-status-codes';
 import { PostUserController } from './postUserController';
+import { PutUserController } from './putUserController';
 
 const makeGetUserController = new GetUserController({
   successStatusCode: StatusCodes.OK,
@@ -13,4 +14,9 @@ const makePostUserController = new PostUserController({
   errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 }).init({ makeUsecase: makePostUserUsecase });
 
-export { makeGetUserController, makePostUserController };
+const makePutUserController = new PutUserController({
+  successStatusCode: StatusCodes.OK,
+  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+}).init({ makeUsecase: makePutUserUsecase });
+
+export { makeGetUserController, makePostUserController, makePutUserController };

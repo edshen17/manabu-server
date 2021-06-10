@@ -17,7 +17,9 @@ import { makeUserEntity, makeTeacherEntity } from '../../entities/user/';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-class PostUserUsecase implements IUsecase {
+type PostUserUsecaseResponse = { token: string; user: JoinedUserDoc };
+
+class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
@@ -177,7 +179,7 @@ class PostUserUsecase implements IUsecase {
     return newTeacherBalance;
   };
 
-  public makeRequest = async (controllerData: ControllerData): Promise<{} | Error> => {
+  public makeRequest = async (controllerData: ControllerData): Promise<PostUserUsecaseResponse> => {
     const { routeData } = controllerData;
     const { body } = routeData;
     const isTeacherApp = body.isTeacherApp;
@@ -241,4 +243,4 @@ class PostUserUsecase implements IUsecase {
   };
 }
 
-export { PostUserUsecase };
+export { PostUserUsecase, PostUserUsecaseResponse };

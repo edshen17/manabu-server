@@ -1,7 +1,11 @@
 import { AbstractController, ControllerParams } from '../abstractions/AbstractController';
 import { IController } from '../abstractions/IController';
+import { GetUserUsecaseResponse } from '../../usecases/user/getUserUsecase';
 
-class GetUserController extends AbstractController implements IController {
+class GetUserController
+  extends AbstractController<GetUserUsecaseResponse>
+  implements IController<GetUserUsecaseResponse>
+{
   constructor(props: ControllerParams) {
     super(props);
   }

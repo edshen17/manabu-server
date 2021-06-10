@@ -10,8 +10,8 @@ type ControllerData = {
   routeData: { params: any; body: any };
 };
 
-interface IUsecase {
-  makeRequest: (controllerData: ControllerData) => Promise<any>;
+interface IUsecase<UsecaseResponse> {
+  makeRequest: (controllerData: ControllerData) => Promise<UsecaseResponse>;
   init: (services: any) => Promise<this>;
 }
 
