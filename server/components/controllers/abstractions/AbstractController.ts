@@ -31,12 +31,20 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
     const headers = {
       'Content-Type': 'application/json',
     };
-    const usecaseRes = await this._awaitUsecaseRes(httpRequest);
-    return {
-      headers,
-      statusCode: this.successStatusCode,
-      body: usecaseRes,
-    };
+    try {
+      const usecaseRes = await this._awaitUsecaseRes(httpRequest);
+      return {
+        headers,
+        statusCode: this.successStatusCode,
+        body: usecaseRes,
+      };
+    } catch (err) {
+      return {
+        headers,
+        statusCode: this.errorStatusCode,
+        body: err.message,
+      };
+    }
   };
 
   public init = async (props: {

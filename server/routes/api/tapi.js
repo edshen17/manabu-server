@@ -242,39 +242,6 @@ router.post('/login', function (req, res, next) {
     .catch((err) => handleErrors(err, req, res, next));
 });
 
-// Route for editing a user's profile information
-router.put('/user/:uId/updateProfile', VerifyToken, (req, res, next) => {
-  if (
-    req.role == 'admin' ||
-    (req.userId == req.params.uId && !req.body.role && !req.body._id && !req.body.dateRegistered)
-  ) {
-    const updateQuery = {
-      _id: req.params.uId,
-    };
-
-    const selectOptions = {
-      email: 0,
-      password: 0,
-      verificationToken: 0,
-    };
-
-    User.findOneAndUpdate(updateQuery, req.body, {
-      returnOriginal: false,
-      fields: selectOptions,
-    })
-      .lean()
-      .then((user) => {
-        updateSpecificKey(User.collection.collectionName, updateQuery, user);
-        next(user);
-      })
-      .catch((err) => {
-        handleErrors(err, req, res, next);
-      });
-  } else {
-    return res.status(401).send('You cannot modify this profile.');
-  }
-});
-
 // route for finding/filtering teachers
 router.get('/teachers', (req, res, next) => {
   let { dateApproved, hourlyRate, teacherType, alsoSpeaks, teachingLanguages, page, pending } =

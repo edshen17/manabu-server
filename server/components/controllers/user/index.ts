@@ -16,7 +16,7 @@ const makePostUserController = new PostUserController({
 
 const makePutUserController = new PutUserController({
   successStatusCode: StatusCodes.OK,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.UNAUTHORIZED,
 }).init({ makeUsecase: makePutUserUsecase });
 
 export { makeGetUserController, makePostUserController, makePutUserController };

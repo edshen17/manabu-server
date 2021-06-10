@@ -41,7 +41,7 @@ export const makeExpressCallback = (makeController: Promise<IController<any>>) =
       res.type('json');
       res.status(httpResponse.statusCode).send(httpResponse.body);
     } catch (err) {
-      res.status(500).send({ error: 'An unknown error occurred.' });
+      res.status(500).send({ error: err.message });
     }
   };
 };
