@@ -12,7 +12,7 @@ export interface IHttpRequest {
   };
 }
 
-export const makeExpressCallback = (makeController: Promise<IController>) => {
+export const makeExpressCallback = (makeController: Promise<IController<any>>) => {
   return async (req: any, res: any): Promise<void> => {
     try {
       const httpRequest = {

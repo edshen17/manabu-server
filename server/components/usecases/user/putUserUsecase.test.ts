@@ -27,10 +27,10 @@ context('makeRequest', async () => {
     it('should update the user in the db and return the correct properties (self)', async () => {
       const newUser: any = await initializeUser(initUserParams);
       expect(newUser.profileBio).to.equal('');
-      const updatedUser = await makeUpdate(newUser, newUser, { profileBio: 'new profile bio' });
-      expect(updatedUser.profileBio).to.equal('new profile bio');
-      expect(updatedUser).to.not.have.property('password');
-      expect(updatedUser).to.have.property('settings');
+      const updatedRes = await makeUpdate(newUser, newUser, { profileBio: 'new profile bio' });
+      expect(updatedRes.user.profileBio).to.equal('new profile bio');
+      expect(updatedRes.user).to.not.have.property('password');
+      expect(updatedRes.user).to.have.property('settings');
     });
     it('should deny access when updating restricted properties (self)', async () => {
       try {
@@ -46,9 +46,9 @@ context('makeRequest', async () => {
     it('should deny access when trying to update restricted properties (not self)', async () => {
       try {
         const updater: any = await initializeUser(initUserParams);
-        const test = await initializeUsecaseSettings(); // reset
+        const originalSettings = await initializeUsecaseSettings(); // reset
         controllerData.routeData.body.isTeacherApp = true;
-        const updatee: any = await initializeUser(test);
+        const updatee: any = await initializeUser(originalSettings);
         expect(updatee.profileBio).to.equal('');
         const updatedUser = await makeUpdate(updatee, updater, {
           profileBio: 'new profile bio',

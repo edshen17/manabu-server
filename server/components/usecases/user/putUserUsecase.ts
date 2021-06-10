@@ -6,7 +6,7 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { MinuteBankDoc } from '../../../models/MinuteBank';
 
-type PutUserUsecaseResponse = JoinedUserDoc | Error;
+type PutUserUsecaseResponse = { user: JoinedUserDoc };
 
 class PutUserUsecase implements IUsecase<PutUserUsecaseResponse> {
   private userDbService!: UserDbService;
@@ -101,7 +101,7 @@ class PutUserUsecase implements IUsecase<PutUserUsecaseResponse> {
       // this._updateAppointments(params.uid);
       // this._updateAvailableTimes(params.uid);
 
-      return savedDbUser;
+      return { user: savedDbUser };
     } else {
       throw new Error('You do not have the permissions to update those properties.');
     }

@@ -2,12 +2,14 @@ import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
 import { IHttpRequest } from '../../expressCallback';
 import { makePutUserController } from '../user/index';
 
-const updateUser = async (updatingDbUser: JoinedUserDoc, currentAPIDbUser: JoinedUserDoc) => {
+const updateUser = async (
+  updatingDbUser: JoinedUserDoc,
+  currentAPIDbUser: JoinedUserDoc,
+  body: any
+) => {
   const putUserController = await makePutUserController;
   const httpRequest: IHttpRequest = {
-    body: {
-      name: 'new name',
-    },
+    body,
     path: `/user/${updatingDbUser._id}/updateProfile`,
     query: {},
     params: {
