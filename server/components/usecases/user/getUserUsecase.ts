@@ -2,7 +2,7 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
 
-type GetUserUsecaseResponse = JoinedUserDoc | undefined;
+type GetUserUsecaseResponse = JoinedUserDoc | undefined | Error;
 
 class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
   private userDbService!: UserDbService;
@@ -13,7 +13,7 @@ class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
     params: any,
     accessOptions: AccessOptions
   ): Promise<JoinedUserDoc> => {
-    const _id: string = endpointPath == '/me' ? currentAPIUser.userId : params.uId;
+    const _id: string = endpointPath == '/self/me' ? currentAPIUser.userId : params.uId;
 
     const user = await this.userDbService.findById({
       _id,
@@ -45,19 +45,24 @@ class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
   public makeRequest = async (controllerData: ControllerData): Promise<GetUserUsecaseResponse> => {
     const { routeData, currentAPIUser, endpointPath } = controllerData;
     const { params } = routeData;
-    const searchIdExists = params.uId || currentAPIUser.userId;
+    const searchIdExists: string = params.uId || currentAPIUser.userId;
     const accessOptions: AccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted: true,
       currentAPIUserRole: currentAPIUser.role || 'user',
       isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
     };
+
     if (searchIdExists) {
       const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
-      if (endpointPath == '/me') {
-        this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
+      if (user) {
+        if (endpointPath == '/self/me') {
+          this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
+        }
+        return user;
+      } else {
+        throw new Error('User not found.');
       }
-      return user;
     }
   };
 }

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
-import { GetUserUsecase } from '../user/getUserUsecase';
+import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase';
 import { PostUserUsecase } from '../user/postUserUsecase';
 
 const initializeUser = async (props: {
@@ -10,7 +10,7 @@ const initializeUser = async (props: {
   controllerData: ControllerData;
   getUserUsecase: GetUserUsecase;
   postUserUsecase: PostUserUsecase;
-}): Promise<JoinedUserDoc | undefined> => {
+}): Promise<GetUserUsecaseResponse> => {
   const authToken: any = await props.postUserUsecase.makeRequest(props.controllerData);
   const secret: any = process.env.JWT_SECRET;
   const decoded: any = jwt.verify(authToken.token, secret);

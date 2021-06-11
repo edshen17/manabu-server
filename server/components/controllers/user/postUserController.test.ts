@@ -7,7 +7,9 @@ describe('postUserController', () => {
     it('should create a new user and return a jwt', async () => {
       const controllerRes = await createUser();
       expect(controllerRes.statusCode).to.equal(201);
-      expect(controllerRes.body.token).to.be.a('string');
+      if ('token' in controllerRes.body) {
+        expect(controllerRes.body.token).to.be.a('string');
+      }
     });
   });
 });

@@ -6,7 +6,7 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { MinuteBankDoc } from '../../../models/MinuteBank';
 
-type PutUserUsecaseResponse = { user: JoinedUserDoc };
+type PutUserUsecaseResponse = { user: JoinedUserDoc } | Error;
 
 class PutUserUsecase implements IUsecase<PutUserUsecaseResponse> {
   private userDbService!: UserDbService;

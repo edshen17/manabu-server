@@ -61,8 +61,8 @@ context('makeRequest', async () => {
       expect(newUser).to.not.have.property('password');
     });
 
-    it('user (self on /me endpoint) should see extra properties as well as default properties', async () => {
-      initUserParams.endpointPath = '/me';
+    it('user (self on /self/me endpoint) should see extra properties as well as default properties', async () => {
+      initUserParams.endpointPath = '/self/me';
       const newUser = await initializeUser(initUserParams);
       expect(newUser).to.have.property('settings');
       expect(newUser).to.not.have.property('password');

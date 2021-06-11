@@ -42,7 +42,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
       return {
         headers,
         statusCode: this.errorStatusCode,
-        body: err.message,
+        body: { err: err.message },
       };
     }
   };

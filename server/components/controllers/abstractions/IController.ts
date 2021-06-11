@@ -4,7 +4,7 @@ import { IUsecase } from '../../usecases/abstractions/IUsecase';
 export type ControllerResponse<UsecaseResponse> = {
   headers: {};
   statusCode: number;
-  body: UsecaseResponse;
+  body: UsecaseResponse | { err: string };
 };
 
 export interface IController<UsecaseResponse> {

@@ -17,7 +17,7 @@ import { makeUserEntity, makeTeacherEntity } from '../../entities/user/';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-type PostUserUsecaseResponse = { token: string; user: JoinedUserDoc };
+type PostUserUsecaseResponse = { token: string; user: JoinedUserDoc } | Error;
 
 class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
   private userDbService!: UserDbService;
