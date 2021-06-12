@@ -16,7 +16,7 @@ class PackageEntity extends AbstractEntity implements IEntity {
       hostedBy,
       priceDetails: priceDetails || {
         currency: 'SGD',
-        hourlyPrice: '30.00',
+        hourlyPrice: '35.00',
       },
       lessonAmount,
       isOffering: isOffering || true,

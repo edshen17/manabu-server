@@ -1,14 +1,8 @@
-import {
-  makeGetUserUsecase,
-  makePostUserUsecase,
-  makePutTeacherUsecase,
-  makePutUserUsecase,
-} from '../../usecases/user';
+import { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase } from '../../usecases/user';
 import { GetUserController } from './getUserController';
 import { StatusCodes } from 'http-status-codes';
 import { PostUserController } from './postUserController';
 import { PutUserController } from './putUserController';
-import { PutTeacherController } from './putTeacherController';
 
 const makeGetUserController = new GetUserController({
   successStatusCode: StatusCodes.OK,
@@ -25,14 +19,4 @@ const makePutUserController = new PutUserController({
   errorStatusCode: StatusCodes.UNAUTHORIZED,
 }).init({ makeUsecase: makePutUserUsecase });
 
-const makePutTeacherController = new PutTeacherController({
-  successStatusCode: StatusCodes.OK,
-  errorStatusCode: StatusCodes.UNAUTHORIZED,
-}).init({ makeUsecase: makePutTeacherUsecase });
-
-export {
-  makeGetUserController,
-  makePostUserController,
-  makePutUserController,
-  makePutTeacherController,
-};
+export { makeGetUserController, makePostUserController, makePutUserController };

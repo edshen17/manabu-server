@@ -3,7 +3,7 @@ import { ControllerData } from '../abstractions/IUsecase';
 import { initializeUser } from '../testFixtures/initializeUser';
 import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
 import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
-import { GetUserUsecaseResponse } from './getUserUsecase';
+import { GetUserUsecaseResponse } from '../user/getUserUsecase';
 const expect = chai.expect;
 let controllerData: ControllerData;
 let initUserParams: any;

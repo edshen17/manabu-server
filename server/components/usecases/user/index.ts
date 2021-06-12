@@ -11,7 +11,6 @@ import { GetUserUsecase } from './getUserUsecase';
 import { PostUserUsecase } from './postUserUsecase';
 import { PutUserUsecase } from './putUserUsecase';
 import { emailHandler } from '../../utils/email/emailHandler';
-import { PutTeacherUsecase } from './putTeacherUsecase';
 
 const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
 
@@ -32,9 +31,4 @@ const makePutUserUsecase = new PutUserUsecase().init({
   makeMinuteBankDbService,
 });
 
-const makePutTeacherUsecase = new PutTeacherUsecase().init({
-  makeUserDbService,
-  makeTeacherDbService,
-});
-
-export { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase, makePutTeacherUsecase };
+export { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase };

@@ -111,8 +111,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
       { type: 'moderate', lessonAmount: 12 },
       { type: 'light', lessonAmount: 5 },
     ];
-    const savedDbPackages: PackageDoc[] = [];
-
+    const packagesToInsert: any[] = [];
     defaultPackages.forEach(async (pkg) => {
       const packageProperties: { hostedBy: string; lessonAmount: number; packageType: string } = {
         hostedBy: savedDbUser._id,
@@ -120,14 +119,13 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
         packageType: pkg.type,
       };
       const modelToInsert = makePackageEntity.build(packageProperties);
-      const newPackage = await this.packageDbService.insert({
-        modelToInsert,
-        accessOptions: this.defaultAccessOptions,
-      });
-      savedDbPackages.push(newPackage);
+      packagesToInsert.push(modelToInsert);
     });
-
-    return savedDbPackages;
+    const newPackages = await this.packageDbService.insertMany({
+      modelToInsert: packagesToInsert,
+      accessOptions: this.defaultAccessOptions,
+    });
+    return newPackages;
   };
 
   private _insertAdminPackageTransaction = async (
@@ -146,7 +144,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
         total: '0',
       },
     });
-    const newPackageTransaction = this.packageTransactionDbService.insert({
+    const newPackageTransaction = await this.packageTransactionDbService.insert({
       modelToInsert,
       accessOptions: this.defaultAccessOptions,
     });
@@ -198,7 +196,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
       const savedDbUser = await this._insertUser(userInstance);
 
       if (isTeacherApp) {
-        this._handleTeacherCreation(savedDbUser);
+        await this._handleTeacherCreation(savedDbUser);
       }
 
       this._sendVerificationEmail(userInstance);
