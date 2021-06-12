@@ -10,24 +10,32 @@ const initializeUser = async (props: {
   controllerData: ControllerData;
   getUserUsecase: GetUserUsecase;
   postUserUsecase: PostUserUsecase;
+  isTeacherApp?: boolean;
 }): Promise<GetUserUsecaseResponse> => {
-  const authToken: any = await props.postUserUsecase.makeRequest(props.controllerData);
+  const { viewingAs, isSelf, controllerData, getUserUsecase, postUserUsecase, isTeacherApp } =
+    props;
+  const { routeData } = controllerData;
+  if (isTeacherApp) {
+    routeData.body.isTeacherApp = true;
+  }
+  const authToken: any = await postUserUsecase.makeRequest(controllerData);
   const secret: any = process.env.JWT_SECRET;
   const decoded: any = jwt.verify(authToken.token, secret);
   const currentAPIUser: CurrentAPIUser = {
     userId: decoded._id,
-    role: props.viewingAs,
+    role: viewingAs,
     isVerified: true,
   };
-  const routeData = { params: { uId: decoded._id }, body: {} };
-  if (!props.isSelf) {
+  const getRouteData = { params: { uId: decoded._id }, body: { isTeacherApp: false } };
+
+  if (!isSelf) {
     currentAPIUser.userId = undefined;
   }
 
-  const newUser = await props.getUserUsecase.makeRequest({
+  const newUser = await getUserUsecase.makeRequest({
     currentAPIUser,
-    routeData,
-    endpointPath: props.controllerData.endpointPath,
+    routeData: getRouteData,
+    endpointPath: controllerData.endpointPath,
   });
   return newUser;
 };

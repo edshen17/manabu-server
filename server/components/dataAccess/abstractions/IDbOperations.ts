@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 type AccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
@@ -6,7 +8,7 @@ type AccessOptions = {
 };
 
 type DbParams = {
-  _id?: string;
+  _id?: any;
   searchQuery?: {};
   accessOptions: AccessOptions;
   modelToInsert?: {};

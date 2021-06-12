@@ -7,7 +7,7 @@ type CurrentAPIUser = {
 type ControllerData = {
   currentAPIUser: CurrentAPIUser;
   endpointPath: string;
-  routeData: { params: any; body: any };
+  routeData: { params: any; body: any; query?: any };
 };
 
 interface IUsecase<UsecaseResponse> {

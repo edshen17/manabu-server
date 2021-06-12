@@ -1,14 +1,13 @@
 import chai from 'chai';
-import faker from 'faker';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase } from './getUserUsecase';
 import { makeGetUserUsecase, makePostUserUsecase } from './index';
 import { PostUserUsecase } from './postUserUsecase';
 import { initializeUser } from '../testFixtures/initializeUser';
+import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
 const expect = chai.expect;
 let getUserUsecase: GetUserUsecase;
 let postUserUsecase: PostUserUsecase;
-let currentAPIUser: CurrentAPIUser;
 let controllerData: ControllerData;
 let initUserParams: any;
 before(async () => {
@@ -16,26 +15,9 @@ before(async () => {
   postUserUsecase = await makePostUserUsecase;
 });
 
-beforeEach(() => {
-  controllerData = {
-    currentAPIUser,
-    routeData: {
-      params: {},
-      body: {
-        email: faker.internet.email(),
-        name: faker.name.findName(),
-        password: 'test password',
-      },
-    },
-    endpointPath: '/register',
-  };
-  initUserParams = {
-    viewingAs: 'user',
-    isSelf: true,
-    controllerData,
-    getUserUsecase,
-    postUserUsecase,
-  };
+beforeEach(async () => {
+  initUserParams = await initializeUsecaseSettings();
+  controllerData = initUserParams.controllerData;
 });
 
 context('makeRequest', async () => {
@@ -61,7 +43,7 @@ context('makeRequest', async () => {
       expect(newUser).to.not.have.property('password');
     });
 
-    it('user (self on /self/me endpoint) should see extra properties as well as default properties', async () => {
+    it('user (on /self/me endpoint) should see extra properties as well as default properties', async () => {
       initUserParams.endpointPath = '/self/me';
       const newUser = await initializeUser(initUserParams);
       expect(newUser).to.have.property('settings');

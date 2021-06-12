@@ -166,7 +166,7 @@ describe('userDb service', () => {
           accessOptions: accessOptionsCopy,
         });
 
-        expect(searchUser.teacherData).to.not.have.property('licensePath');
+        expect(searchUser.teacherData).to.have.property('licensePath');
         expect(searchUser).to.not.have.property('email');
         expect(searchUser).to.have.property('settings');
       } catch (err) {

@@ -40,7 +40,7 @@ context('makeRequest', async () => {
           role: 'admin',
         });
       } catch (err) {
-        expect(err.message).to.equal('You do not have the permissions to update those properties.');
+        expect(err.message).to.equal('Access denied.');
       }
     });
     it('should deny access when trying to update restricted properties (not self)', async () => {

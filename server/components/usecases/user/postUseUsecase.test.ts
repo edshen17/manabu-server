@@ -22,7 +22,7 @@ context('makeRequest', async () => {
       const newTeacher: any = await initializeUser(initUserParams);
       expect(newTeacher).to.have.property('settings');
       expect(newTeacher).to.not.have.property('password');
-      expect(newTeacher.teacherData).to.not.have.property('licensePath');
+      expect(newTeacher.teacherData).to.have.property('licensePath');
     });
 
     it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {

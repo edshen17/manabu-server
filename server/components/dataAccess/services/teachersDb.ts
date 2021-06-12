@@ -10,6 +10,7 @@ class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOper
         licensePath: 0,
       },
       adminSettings: {},
+      isSelfSettings: {},
     };
   }
 
