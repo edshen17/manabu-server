@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { makeTeacherEntity } from './index';
+import { makeTeacherEntity } from '.';
 
 const expect = chai.expect;
 

@@ -5,12 +5,12 @@ import {
   makePutUserController,
 } from '../../../components/controllers/user';
 import { makeExpressCallback } from '../../../components/expressCallback';
-const user = express.Router();
+const users = express.Router();
 const VerifyToken = require('../../../components/VerifyToken'); // TODO: turn into ts + import statement
 
-user.get('/:uId', VerifyToken, makeExpressCallback(makeGetUserController));
-user.get('/self/me', VerifyToken, makeExpressCallback(makeGetUserController));
-user.post('/register', makeExpressCallback(makePostUserController));
-user.put('/:uId/updateProfile', VerifyToken, makeExpressCallback(makePutUserController));
+users.get('/:uId', VerifyToken, makeExpressCallback(makeGetUserController));
+users.get('/self/me', VerifyToken, makeExpressCallback(makeGetUserController));
+users.post('/register', makeExpressCallback(makePostUserController));
+users.put('/:uId', VerifyToken, makeExpressCallback(makePutUserController));
 
-export default user;
+export default users;

@@ -1,7 +1,8 @@
 import chai from 'chai';
 import faker from 'faker';
 import { makePackageEntity } from '../../entities/package';
-import { makeTeacherEntity, makeUserEntity } from '../../entities/user';
+import { makeUserEntity } from '../../entities/user';
+import { makeTeacherEntity } from '../../entities/teacher';
 import { AccessOptions } from '../abstractions/IDbOperations';
 import { makeUserDbService, makeTeacherDbService, makePackageDbService } from '../index';
 import { PackageDbService } from './packagesDb';

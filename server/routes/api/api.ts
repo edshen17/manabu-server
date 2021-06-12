@@ -1,6 +1,8 @@
 import express from 'express';
-import user from './user/index';
+import users from './user/index';
+import teachers from './teacher/index';
 const router = express.Router();
-router.use('/user/', user);
+router.use('/users/', users);
+router.use('/teachers/', teachers);
 
 module.exports = router;

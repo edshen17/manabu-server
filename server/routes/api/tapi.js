@@ -337,29 +337,6 @@ router.get('/teachers', (req, res, next) => {
   }
 });
 
-// Route for editing a teacher's profile information
-router.put('/teacher/:uId/updateProfile', VerifyToken, (req, res, next) => {
-  if (req.role == 'admin' || (req.userId == req.params.uId && !req.body._id && !req.body.userId)) {
-    const updateQuery = {
-      userId: req.params.uId,
-    };
-    Teacher.findOneAndUpdate(updateQuery, req.body, {
-      returnOriginal: false,
-      fields: { _id: 0, licensePath: 0 },
-    })
-      .lean()
-      .then((teacher) => {
-        updateSpecificKey(Teacher.collection.collectionName, updateQuery, teacher);
-        return res.status(200).json(teacher);
-      })
-      .catch((err) => {
-        handleErrors(err, req, res, next);
-      });
-  } else {
-    return res.status(401).send('You cannot modify this profile.');
-  }
-});
-
 router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
   if (req.userId == req.body.hostedBy) {
     const newAvailableTime = {

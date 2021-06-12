@@ -3,7 +3,7 @@ import sanitizeHtml from 'sanitize-html';
 import jwt from 'jsonwebtoken';
 import cryptoRandomString from 'crypto-random-string';
 import { UserEntity } from './userEntity';
-import { TeacherEntity } from './teacherEntity';
+
 import { EnvironmentVariables } from '../../../.env';
 
 const sanitize = (text: string) => {
@@ -47,6 +47,5 @@ const makeUserEntity = new UserEntity({
   passwordHasher,
   randTokenGenerator,
 });
-const makeTeacherEntity = new TeacherEntity();
 
-export { makeUserEntity, makeTeacherEntity };
+export { makeUserEntity };

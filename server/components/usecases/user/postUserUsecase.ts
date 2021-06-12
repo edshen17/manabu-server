@@ -13,7 +13,8 @@ import { makeMinuteBankEntity } from '../../entities/minuteBank';
 import { makePackageEntity } from '../../entities/package';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { makeTeacherBalanceEntity } from '../../entities/teacherBalance';
-import { makeUserEntity, makeTeacherEntity } from '../../entities/user/';
+import { makeUserEntity } from '../../entities/user/';
+import { makeTeacherEntity } from '../../entities/teacher/';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
@@ -179,6 +180,14 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     return newTeacherBalance;
   };
 
+  private _handleTeacherCreation = async (savedDbUser: JoinedUserDoc) => {
+    await this._insertTeacher(savedDbUser);
+    await this._insertTeacherPackages(savedDbUser);
+    await this._insertAdminPackageTransaction(savedDbUser);
+    await this._insertAdminMinuteBank(savedDbUser);
+    await this._insertTeacherBalance(savedDbUser);
+  };
+
   public makeRequest = async (controllerData: ControllerData): Promise<PostUserUsecaseResponse> => {
     const { routeData } = controllerData;
     const { body } = routeData;
@@ -189,11 +198,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
       const savedDbUser = await this._insertUser(userInstance);
 
       if (isTeacherApp) {
-        await this._insertTeacher(savedDbUser);
-        await this._insertTeacherPackages(savedDbUser);
-        await this._insertAdminPackageTransaction(savedDbUser);
-        await this._insertAdminMinuteBank(savedDbUser);
-        await this._insertTeacherBalance(savedDbUser);
+        this._handleTeacherCreation(savedDbUser);
       }
 
       this._sendVerificationEmail(userInstance);
