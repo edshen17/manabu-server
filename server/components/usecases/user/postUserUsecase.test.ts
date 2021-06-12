@@ -15,25 +15,31 @@ context('postUserUsecase', () => {
   describe('makeRequest', async () => {
     describe('creating a new user should return the correct properties', () => {
       it('should create a new user in the db', async () => {
-        const newUser: any = await initializeUser(initUserParams);
-        expect(newUser.profileBio).to.equal('');
+        const newUserRes = await initializeUser(initUserParams);
+        if ('user' in newUserRes!) {
+          expect(newUserRes.user.profileBio).to.equal('');
+        }
       });
       it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {
         controllerData.routeData.body.isTeacherApp = true;
-        const newTeacher: any = await initializeUser(initUserParams);
-        expect(newTeacher).to.have.property('settings');
-        expect(newTeacher).to.not.have.property('password');
-        expect(newTeacher.teacherData).to.have.property('licensePath');
+        const newTeacherRes = await initializeUser(initUserParams);
+        if ('user' in newTeacherRes!) {
+          expect(newTeacherRes.user).to.have.property('settings');
+          expect(newTeacherRes.user).to.not.have.property('password');
+          expect(newTeacherRes.user.teacherData).to.have.property('licensePath');
+        }
       });
 
       it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {
         initUserParams.viewingAs = 'admin';
         controllerData.routeData.body.isTeacherApp = true;
-        const newTeacher: any = await initializeUser(initUserParams);
-        expect(newTeacher).to.have.property('settings');
-        expect(newTeacher).to.not.have.property('password');
-        expect(newTeacher.teacherData).to.have.property('licensePath');
-        expect(newTeacher.teacherData.packages.length).to.equal(3);
+        const newTeacherRes = await initializeUser(initUserParams);
+        if ('user' in newTeacherRes!) {
+          expect(newTeacherRes.user).to.have.property('settings');
+          expect(newTeacherRes.user).to.not.have.property('password');
+          expect(newTeacherRes.user.teacherData).to.have.property('licensePath');
+          expect(newTeacherRes.user.teacherData.packages.length).to.equal(3);
+        }
       });
     });
   });

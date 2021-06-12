@@ -3,7 +3,9 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { MinuteBankDbService } from '../../dataAccess/services/minuteBankDb';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-class GetMinuteBankUsecase implements IUsecase {
+type GetMinuteBankUsecaseResponse = { minuteBank: MinuteBankDoc };
+
+class GetMinuteBankUsecase implements IUsecase<GetMinuteBankUsecaseResponse> {
   private minuteBankDbService!: MinuteBankDbService;
 
   public init = async (services: {
@@ -15,7 +17,7 @@ class GetMinuteBankUsecase implements IUsecase {
 
   public makeRequest = async (
     controllerData: ControllerData
-  ): Promise<MinuteBankDoc | undefined> => {
+  ): Promise<GetMinuteBankUsecaseResponse> => {
     const { routeData, currentAPIUser } = controllerData;
     const { params } = routeData;
     const { hostedBy, reservedBy } = params;
@@ -34,7 +36,7 @@ class GetMinuteBankUsecase implements IUsecase {
       searchQuery,
       accessOptions,
     });
-    return minuteBank;
+    return { minuteBank };
   };
 }
 

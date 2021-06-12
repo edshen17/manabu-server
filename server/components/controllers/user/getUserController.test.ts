@@ -9,10 +9,10 @@ context('getUserController', () => {
       const viewer = await createUser();
       if ('user' in viewer.body) {
         const searchedUserRes = await getUser(viewer.body.user, viewer.body.user);
-        if ('_id' in searchedUserRes.body!) {
-          expect(searchedUserRes.body._id).to.equal(viewer.body.user._id);
-          expect(searchedUserRes.body).to.have.property('settings');
-          expect(searchedUserRes.body).to.not.have.property('password');
+        if ('user' in searchedUserRes!.body!) {
+          expect(searchedUserRes.body.user._id).to.equal(viewer.body.user._id);
+          expect(searchedUserRes.body.user).to.have.property('settings');
+          expect(searchedUserRes.body.user).to.not.have.property('password');
         }
       }
     });
@@ -21,8 +21,8 @@ context('getUserController', () => {
       const viewer = await createUser();
       if ('user' in viewee.body && 'user' in viewer.body) {
         const searchedUserRes = await getUser(viewee.body.user, viewer.body.user);
-        if ('_id' in searchedUserRes.body!) {
-          expect(searchedUserRes.body!._id).to.equal(viewee.body.user._id);
+        if ('user' in searchedUserRes!.body!) {
+          expect(searchedUserRes.body.user._id).to.equal(viewee.body.user._id);
           expect(searchedUserRes.body).to.not.have.property('settings');
           expect(searchedUserRes.body).to.not.have.property('password');
         }

@@ -2,7 +2,7 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
 
-type GetUserUsecaseResponse = JoinedUserDoc | undefined | Error;
+type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 
 class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
   private userDbService!: UserDbService;
@@ -59,7 +59,7 @@ class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
         if (endpointPath == '/self/me') {
           this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
         }
-        return user;
+        return { user };
       } else {
         throw new Error('User not found.');
       }
