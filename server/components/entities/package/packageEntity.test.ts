@@ -16,10 +16,11 @@ beforeEach(() => {
   };
 });
 context('package entity', () => {
-  describe('build', () => {
+  describe('build', async () => {
+    const packageEntity = await makePackageEntity;
     describe('given valid inputs', () => {
-      it('should return given inputs', () => {
-        const testPackage = makePackageEntity.build(testPackageEntityProperties);
+      it('should return given inputs', async () => {
+        const testPackage = await packageEntity.build(testPackageEntityProperties);
         expect(testPackage.hostedBy).to.equal('some hostedBy');
         expect(testPackage.lessonAmount).to.equal(5);
         expect(testPackage.isOffering).to.equal(true);
@@ -27,10 +28,10 @@ context('package entity', () => {
         expect(testPackage.packageType).to.equal('light');
         assert.deepEqual(testPackage.priceDetails, {});
       });
-      it('should return given inputs and default values if not given', () => {
+      it('should return given inputs and default values if not given', async () => {
         testPackageEntityProperties.isOffering = undefined;
         testPackageEntityProperties.packageDurations = undefined;
-        const testPackage = makePackageEntity.build(testPackageEntityProperties);
+        const testPackage = await packageEntity.build(testPackageEntityProperties);
         expect(testPackage.packageDurations.length).to.equal(2);
         expect(testPackage.isOffering).to.equal(true);
       });

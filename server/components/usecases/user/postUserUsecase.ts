@@ -105,7 +105,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     return savedDbTeacher;
   };
 
-  private _insertTeacherPackages = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc[]> => {
+  private _createDefaultTeacherPackages = async (savedDbUser: JoinedUserDoc) => {
     const defaultPackages = [
       { type: 'mainichi', lessonAmount: 22 },
       { type: 'moderate', lessonAmount: 12 },
@@ -118,11 +118,28 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,
       };
-      const modelToInsert = makePackageEntity.build(packageProperties);
-      packagesToInsert.push(modelToInsert);
+      const packageEntity = await makePackageEntity;
+
+      packagesToInsert.push(
+        new Promise(async (resolve, reject) => {
+          const modelToInsert = await packageEntity.build(packageProperties);
+          if (modelToInsert) {
+            resolve(modelToInsert);
+          } else {
+            reject(modelToInsert);
+          }
+        })
+      );
     });
+    return packagesToInsert;
+  };
+
+  private _insertTeacherPackages = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc[]> => {
+    const packagesToInsert = await this._createDefaultTeacherPackages(savedDbUser);
+    const modelToInsert = await Promise.all(packagesToInsert);
+
     const newPackages = await this.packageDbService.insertMany({
-      modelToInsert: packagesToInsert,
+      modelToInsert,
       accessOptions: this.defaultAccessOptions,
     });
     return newPackages;
@@ -157,7 +174,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
       hostedBy: process.env.MANABU_ADMIN_ID,
       reservedBy: savedDbUser._id,
     });
-    const newMinuteBank = this.minuteBankDbService.insert({
+    const newMinuteBank = await this.minuteBankDbService.insert({
       modelToInsert,
       accessOptions: this.defaultAccessOptions,
     });

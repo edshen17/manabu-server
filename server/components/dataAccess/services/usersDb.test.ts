@@ -51,7 +51,8 @@ const createNewDbTeacher = async (dbUser: JoinedUserDoc) => {
 };
 
 const createNewDbPackage = async (dbUser: JoinedUserDoc) => {
-  const fakePackageEntity = makePackageEntity.build({
+  const packageEntity = await makePackageEntity;
+  const fakePackageEntity = await packageEntity.build({
     hostedBy: dbUser._id,
     lessonAmount: 5,
     isOffering: true,
