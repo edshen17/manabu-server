@@ -80,7 +80,7 @@ before(async () => {
   teacherDbService = await makeTeacherDbService;
 });
 
-describe('userDb service', () => {
+context('userDb service', () => {
   describe('findById', () => {
     it('given a bad user id as input, should throw an error', async () => {
       try {

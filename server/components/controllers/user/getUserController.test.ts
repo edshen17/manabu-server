@@ -3,7 +3,7 @@ import { createUser } from '../testFixtures/createUser';
 import { getUser } from '../testFixtures/getUser';
 const expect = chai.expect;
 
-describe('getUserController', () => {
+context('getUserController', () => {
   describe('makeRequest', () => {
     it('should get a fake user with correct properties (self)', async () => {
       const viewer = await createUser();

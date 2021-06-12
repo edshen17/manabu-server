@@ -2,7 +2,7 @@ import chai from 'chai';
 import { createUser } from '../testFixtures/createUser';
 const expect = chai.expect;
 
-describe('postUserController', () => {
+context('postUserController', () => {
   describe('makeRequest', async () => {
     it('should create a new user and return a jwt', async () => {
       const controllerRes = await createUser();
