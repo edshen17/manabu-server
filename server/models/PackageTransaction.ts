@@ -10,8 +10,8 @@ const PackageTransactionSchema = createSchema({
   reservationLength: Type.number({ required: true }),
   transactionDetails: Type.object({ required: true }).of({
     currency: Type.string(),
-    subTotal: Type.string(),
-    total: Type.string(),
+    subTotal: Type.number(),
+    total: Type.number(),
   }),
   terminationDate: Type.date({ required: true }),
   isTerminated: Type.boolean({ required: true }),
@@ -19,7 +19,7 @@ const PackageTransactionSchema = createSchema({
   remainingReschedules: Type.number({ required: true }),
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
-  methodData: Type.object({ required: true }).of({
+  paymentMethodData: Type.object({ required: false }).of({
     method: Type.string(),
     paymentId: Type.string(),
   }),

@@ -1,14 +1,26 @@
-import { UserDbService } from '../../dataAccess/services/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-class MinuteBankEntity extends AbstractEntity implements IEntity {
+type MinuteBankEntityResponse = {
+  hostedBy: string;
+  reservedBy: string;
+  minuteBank: number;
+  hostedByData: JoinedUserDoc;
+  reservedByData: JoinedUserDoc;
+  lastUpdated: Date;
+};
+
+class MinuteBankEntity
+  extends AbstractEntity<MinuteBankEntityResponse>
+  implements IEntity<MinuteBankEntityResponse>
+{
   private userDbService!: UserDbService;
   public build = async (entityData: {
-    hostedBy?: string;
+    hostedBy: string;
     reservedBy: string;
     minuteBank?: number;
-  }): Promise<any> => {
+  }): Promise<MinuteBankEntityResponse> => {
     const { hostedBy, reservedBy, minuteBank } = entityData;
     return Object.freeze({
       hostedBy,

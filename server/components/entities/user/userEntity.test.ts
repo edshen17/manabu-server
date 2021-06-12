@@ -10,10 +10,12 @@ describe('user entity', () => {
       password: 'pass',
       email: 'test@gmail.com',
     });
-    expect(testEntity.name).to.equal('test');
-    expect(testEntity.password).to.not.equal('pass');
-    expect(testEntity.email).to.equal('test@gmail.com');
-    expect(testEntity.profileImage).to.equal('');
-    expect(testEntity.verificationToken).to.not.equal('');
+    if ('password' in testEntity) {
+      expect(testEntity.name).to.equal('test');
+      expect(testEntity.password).to.not.equal('pass');
+      expect(testEntity.email).to.equal('test@gmail.com');
+      expect(testEntity.profileImage).to.equal('');
+      expect(testEntity.verificationToken).to.not.equal('');
+    }
   });
 });

@@ -8,7 +8,7 @@ let testPackageEntityProperties: any;
 beforeEach(() => {
   testPackageEntityProperties = {
     hostedBy: 'some hostedBy',
-    priceDetails: {},
+    priceDetails: { currency: 'SGD', amount: 5 },
     lessonAmount: 5,
     isOffering: true,
     packageDurations: [],
@@ -26,7 +26,7 @@ context('package entity', () => {
         expect(testPackage.isOffering).to.equal(true);
         expect(testPackage.packageDurations.length).to.equal(0);
         expect(testPackage.packageType).to.equal('light');
-        assert.deepEqual(testPackage.priceDetails, {});
+        assert.deepEqual(testPackage.priceDetails, { currency: 'SGD', amount: 5 });
       });
       it('should return given inputs and default values if not given', async () => {
         testPackageEntityProperties.isOffering = undefined;

@@ -2,7 +2,19 @@ import { UserDbService } from '../../dataAccess/services/usersDb';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-class PackageEntity extends AbstractEntity implements IEntity {
+type PackageEntityResponse = {
+  hostedBy: string;
+  priceDetails: { currency: string; amount: number };
+  lessonAmount: number;
+  isOffering: boolean;
+  packageType: string;
+  packageDurations: number[];
+};
+
+class PackageEntity
+  extends AbstractEntity<PackageEntityResponse>
+  implements IEntity<PackageEntityResponse>
+{
   private userDbService!: UserDbService;
 
   private _getPriceDetails = async (hostedBy: string) => {
@@ -12,12 +24,12 @@ class PackageEntity extends AbstractEntity implements IEntity {
 
   public build = async (entityData: {
     hostedBy: string;
-    priceDetails?: { hourlyPrice: string; currency: string };
+    priceDetails?: { hourlyPrice: number; currency: string };
     lessonAmount: number;
     isOffering?: boolean;
     packageType: string;
     packageDurations?: number[];
-  }): Promise<any> => {
+  }): Promise<PackageEntityResponse> => {
     const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
       entityData;
     return Object.freeze({

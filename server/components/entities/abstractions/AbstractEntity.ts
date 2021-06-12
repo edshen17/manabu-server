@@ -1,7 +1,7 @@
 import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
 import { IEntity } from './IEntity';
 
-abstract class AbstractEntity implements IEntity {
+abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse> {
   protected defaultAccessOptions: AccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,

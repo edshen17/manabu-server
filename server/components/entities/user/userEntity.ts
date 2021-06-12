@@ -1,7 +1,29 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-class UserEntity extends AbstractEntity implements IEntity {
+type UserEntityResponse =
+  | {
+      name: string;
+      email: string;
+      password: string;
+      profileImage: string;
+      profileBio: string;
+      dateRegistered: Date;
+      lastUpdated: Date;
+      languages?: { level: string; language: string }[];
+      region: string;
+      timezone: string;
+      lastOnline: Date;
+      role: string;
+      settings: { currency: string };
+      membership: string[];
+      commMethods: { method: string; id: string }[];
+      emailVerified: boolean;
+      verificationToken: string;
+    }
+  | Error;
+
+class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<UserEntityResponse> {
   private sanitize: any;
   private inputValidator: any;
   private passwordHasher: any;
@@ -49,7 +71,7 @@ class UserEntity extends AbstractEntity implements IEntity {
     email: string;
     password?: string;
     profileImage?: string;
-  }): any | Error {
+  }): UserEntityResponse {
     let verificationToken: string;
     let { name, email, password, profileImage } = entityData;
     try {

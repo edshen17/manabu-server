@@ -150,15 +150,15 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
   ): Promise<PackageDoc> => {
     const packageTransactionEntity = await makePackageTransactionEntity;
     const modelToInsert = await packageTransactionEntity.build({
-      hostedBy: process.env.MANABU_ADMIN_ID,
+      hostedBy: process.env.MANABU_ADMIN_ID!,
       reservedBy: savedDbUser._id,
-      packageId: process.env.MANABU_ADMIN_PKG_ID,
+      packageId: process.env.MANABU_ADMIN_PKG_ID!,
       reservationLength: 60,
       remainingAppointments: 1,
       transactionDetails: {
         currency: 'SGD',
-        subTotal: '0',
-        total: '0',
+        subTotal: 0,
+        total: 0,
       },
     });
     const newPackageTransaction = await this.packageTransactionDbService.insert({
@@ -171,7 +171,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
   private _insertAdminMinuteBank = async (savedDbUser: JoinedUserDoc): Promise<MinuteBankDoc> => {
     const minuteBankEntity = await makeMinuteBankEntity;
     const modelToInsert = await minuteBankEntity.build({
-      hostedBy: process.env.MANABU_ADMIN_ID,
+      hostedBy: process.env.MANABU_ADMIN_ID!,
       reservedBy: savedDbUser._id,
     });
     const newMinuteBank = await this.minuteBankDbService.insert({

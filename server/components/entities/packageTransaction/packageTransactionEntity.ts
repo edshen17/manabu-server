@@ -1,11 +1,32 @@
 import { PackageDoc } from '../../../models/Package';
-import { IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
 import { PackageDbService } from '../../dataAccess/services/packagesDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-class PackageTransactionEntity extends AbstractEntity implements IEntity {
+type PackageTransactionEntityResponse = {
+  hostedBy: string;
+  reservedBy: string;
+  packageId: string;
+  transactionDate: Date;
+  reservationLength: number;
+  transactionDetails: { currency: string; subTotal: number; total: number };
+  terminationDate: Date;
+  isTerminated: boolean;
+  remainingAppointments: number;
+  remainingReschedules: number;
+  lessonLanguage: string;
+  isSubscription: boolean;
+  methodData?: { method: string; paymentId?: string };
+  packageData: PackageDoc;
+  hostedByData: JoinedUserDoc;
+  reservedByData: JoinedUserDoc;
+};
+
+class PackageTransactionEntity
+  extends AbstractEntity<PackageTransactionEntityResponse>
+  implements IEntity<PackageTransactionEntityResponse>
+{
   private userDbService!: UserDbService;
   private packageDbService!: PackageDbService;
   private dayjs!: any;
@@ -17,20 +38,20 @@ class PackageTransactionEntity extends AbstractEntity implements IEntity {
   }
 
   public build = async (entityData: {
-    hostedBy?: string;
+    hostedBy: string;
     reservedBy: string;
-    packageId?: string;
+    packageId: string;
     reservationLength: number;
     terminationDate?: Date;
-    transactionDetails: { currency: string; subTotal: string; total: string };
+    transactionDetails: { currency: string; subTotal: number; total: number };
     remainingAppointments: number;
     lessonLanguage?: string;
     isSubscription?: boolean;
     hostedByData?: JoinedUserDoc;
     reservedByData?: JoinedUserDoc;
     packageData?: PackageDoc;
-    methodData?: { method: string; paymentId: string };
-  }): Promise<any> => {
+    paymentMethodData?: { method: string; paymentId?: string };
+  }): Promise<PackageTransactionEntityResponse> => {
     const {
       hostedBy,
       reservedBy,
@@ -41,7 +62,7 @@ class PackageTransactionEntity extends AbstractEntity implements IEntity {
       remainingAppointments,
       lessonLanguage,
       isSubscription,
-      methodData,
+      paymentMethodData,
     } = entityData;
     return Object.freeze({
       hostedBy,
@@ -56,7 +77,7 @@ class PackageTransactionEntity extends AbstractEntity implements IEntity {
       remainingReschedules: 5,
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
-      methodData: methodData || {},
+      paymentMethodData: paymentMethodData,
       packageData: (await this.getDbDataById(this.packageDbService, packageId)) || {},
       hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
       reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},
