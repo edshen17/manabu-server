@@ -24,7 +24,6 @@ const initializeUser = async (props: {
   const currentAPIUser: CurrentAPIUser = {
     userId: decoded._id,
     role: viewingAs,
-    isVerified: true,
   };
   const getRouteData = { params: { uId: decoded._id }, body: { isTeacherApp: false } };
 

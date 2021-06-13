@@ -16,7 +16,6 @@ const getUser = async (savedDbUser: any, viewingUser: any) => {
     currentAPIUser: {
       userId: viewingUser._id,
       role: 'user',
-      isVerified: false,
     },
   };
   return await getUserController.makeRequest(httpRequest);

@@ -169,7 +169,7 @@ context('userDb service', () => {
         });
 
         expect(searchUser.teacherData).to.have.property('licensePath');
-        expect(searchUser).to.not.have.property('email');
+        expect(searchUser).to.have.property('email');
         expect(searchUser).to.have.property('settings');
       } catch (err) {
         throw err;

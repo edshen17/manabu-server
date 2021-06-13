@@ -1,7 +1,6 @@
 type CurrentAPIUser = {
   userId?: string;
   role: string;
-  isVerified: boolean;
 };
 
 type ControllerData = {

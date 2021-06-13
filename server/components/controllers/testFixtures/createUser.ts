@@ -16,7 +16,6 @@ const createUser = async () => {
     currentAPIUser: {
       userId: undefined,
       role: 'user',
-      isVerified: false,
     },
   };
   return await postUserController.makeRequest(httpRequest);

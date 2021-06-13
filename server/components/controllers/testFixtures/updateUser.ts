@@ -18,7 +18,6 @@ const updateUser = async (
     currentAPIUser: {
       userId: currentAPIDbUser._id,
       role: currentAPIDbUser.role,
-      isVerified: true,
     },
   };
   return await putUserController.makeRequest(httpRequest);

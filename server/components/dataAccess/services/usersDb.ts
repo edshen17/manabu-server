@@ -29,7 +29,6 @@ class UserDbService
         verificationToken: 0,
       },
       isSelfSettings: {
-        email: 0,
         password: 0,
         verificationToken: 0,
       },

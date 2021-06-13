@@ -1,9 +1,9 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { AbstractUsecase } from './AbstractUsecase';
 
-abstract class AbstractPutUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {
+abstract class AbstractGetUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {
   constructor() {
-    super('Access denied.');
+    super('Resource not found.');
   }
 
   protected _setAccessOptions = (props: {
@@ -22,4 +22,4 @@ abstract class AbstractPutUsecase<UsecaseResponse> extends AbstractUsecase<Useca
   };
 }
 
-export { AbstractPutUsecase };
+export { AbstractGetUsecase };

@@ -1,5 +1,3 @@
-import { Types } from 'mongoose';
-
 type AccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;

@@ -8,7 +8,6 @@ export interface IHttpRequest {
   currentAPIUser: {
     userId?: string;
     role: string;
-    isVerified: boolean;
   };
 }
 
@@ -23,7 +22,6 @@ const _createHttpRequest = (req: any) => {
     currentAPIUser: {
       userId: req.userId,
       role: req.role || 'user',
-      isVerified: req.isVerified,
     },
     headers: {
       'Content-Type': req.get('Content-Type'),
