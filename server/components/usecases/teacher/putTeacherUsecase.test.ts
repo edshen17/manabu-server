@@ -50,17 +50,17 @@ context('putTeacherUsecase', () => {
         }
       });
       it('should deny access when trying to update restricted properties (not self)', async () => {
-        try {
-          const updatingDbUser: any = newTeacherUser;
-          const originalSettings = await initializeUsecaseSettings();
-          const updaterDbUser: any = await initializeUser(originalSettings);
-          expect(updatingDbUser.teacherData.licensePath).to.equal('');
-          const updatedRes = await makeUpdate(updatingDbUser, updaterDbUser, {
-            licensePath: 'new license path',
-          });
-        } catch (err) {
-          console.log(err);
-          // expect(err.message).to.equal('Access denied.');
+        const originalSettings = await initializeUsecaseSettings();
+        const anotherTeacher = await initializeUser(originalSettings);
+        if ('_id' in newTeacherUser! && '_id' in anotherTeacher!) {
+          try {
+            const updatedRes = await makeUpdate(newTeacherUser, anotherTeacher, {
+              studentCount: 100,
+            });
+          } catch (err) {
+            expect(err).to.be.an('error');
+            expect(err.message).to.equal('Access denied.');
+          }
         }
       });
     });

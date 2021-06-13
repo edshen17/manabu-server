@@ -31,12 +31,12 @@ const initializeUser = async (props: {
     currentAPIUser.userId = undefined;
   }
 
-  const newUser = await getUserUsecase.makeRequest({
+  const newUserRes = await getUserUsecase.makeRequest({
     currentAPIUser,
     routeData: getRouteData,
     endpointPath: controllerData.endpointPath,
   });
-  return newUser;
+  return newUserRes;
 };
 
 export { initializeUser };

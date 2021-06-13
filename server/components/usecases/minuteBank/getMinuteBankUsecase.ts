@@ -30,7 +30,10 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
   }
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    return true;
+    const { endpointPath, routeData } = controllerData;
+    const { params } = routeData;
+    const { hostedBy, reservedBy } = params;
+    return endpointPath == '/self/minuteBanks' || (hostedBy && reservedBy);
   };
 
   protected _setAccessOptionsTemplate = (

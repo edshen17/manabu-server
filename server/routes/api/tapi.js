@@ -65,17 +65,6 @@ const oauth2Client = new google.auth.OAuth2(
   `${getHost('server')}/api/auth/google`
 );
 
-// route to get access to user's teachers
-router.get('/myTeachers', VerifyToken, async function (req, res, next) {
-  const minuteBanks = await MinuteBank.find({
-    reservedBy: req.userId,
-  })
-    .cache()
-    .lean()
-    .catch((err) => handleErrors(err, req, res, next));
-  return res.status(200).json(minuteBanks);
-});
-
 // route to verify email
 router.get('/user/verify/:verificationToken', VerifyToken, function (req, res, next) {
   User.findOne({
@@ -805,23 +794,6 @@ router.get('/transaction/packageTransaction/user/:uId', VerifyToken, (req, res, 
       })
       .catch((err) => handleErrors(err, req, res, next));
   }
-});
-
-// get minutebanks
-router.get('/transaction/minuteBank/:hostedBy/:reservedBy', VerifyToken, (req, res, next) => {
-  MinuteBank.findOne({
-    hostedBy: req.params.hostedBy,
-    reservedBy: req.params.reservedBy,
-  })
-    .lean()
-    .cache()
-    .then((minuteBank) => {
-      if (!minuteBank) return res.status(404).send('404');
-      if (minuteBank.hostedBy == req.userId || minuteBank.reservedBy == req.userId)
-        return res.status(200).json(minuteBank);
-      else return res.status(500).send('unauthorized');
-    })
-    .catch((err) => handleErrors(err, req, res, next));
 });
 
 // Route for editing a package transaction (eg lowering remainingAppointments, etc)
