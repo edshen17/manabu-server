@@ -18,7 +18,9 @@ import { makeTeacherEntity } from '../../entities/teacher/';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-type PostUserUsecaseResponse = { token: string; user: JoinedUserDoc } | Error;
+type PostUserUsecaseResponse =
+  | { token: string; user: JoinedUserDoc; isLoginToken: boolean }
+  | Error;
 
 class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
   private userDbService!: UserDbService;
@@ -225,6 +227,7 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
       return {
         token: this._jwtToClient(this.jwt, savedDbUser),
         user: savedDbUser,
+        isLoginToken: true,
       };
     } catch (err) {
       throw err;
