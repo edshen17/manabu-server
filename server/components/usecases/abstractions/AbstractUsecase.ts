@@ -21,6 +21,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     params: any;
     query?: any;
     currentAPIUser: any;
+    endpointPath: string;
   }): boolean {
     const { params, currentAPIUser } = props;
     return (
@@ -68,6 +69,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       params,
       query,
       currentAPIUser,
+      endpointPath,
     });
 
     const accessOptions: AccessOptions = this._setAccessOptions({

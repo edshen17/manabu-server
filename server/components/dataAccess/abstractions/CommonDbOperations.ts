@@ -38,6 +38,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
       const { isProtectedResource, isCurrentAPIUserPermitted } = accessOptions;
       const isAccessPermitted =
         (isProtectedResource && isCurrentAPIUserPermitted) || !isProtectedResource;
+
       if (isAccessPermitted) {
         dbResult = await asyncCallback;
         return dbResult;
