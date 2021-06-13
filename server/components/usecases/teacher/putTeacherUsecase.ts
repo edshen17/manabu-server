@@ -2,6 +2,7 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
+import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
 type PutTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
@@ -19,12 +20,9 @@ class PutTeacherUsecase
     return !userId && !_id;
   };
 
-  protected _makeRequestTemplate = async (props: {
-    params: any;
-    body: any;
-    accessOptions: AccessOptions;
-    query?: any;
-  }): Promise<PutTeacherUsecaseResponse> => {
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<PutTeacherUsecaseResponse> => {
     const { params, body, accessOptions } = props;
     const updatedDbTeacher = await this.teacherDbService.update({
       searchQuery: { userId: params.uId },

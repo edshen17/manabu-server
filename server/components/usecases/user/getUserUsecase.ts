@@ -1,10 +1,12 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
-import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
+import { AbstractGetUsecase } from '../abstractions/AbstractGetUsecase';
+import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
+import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 
-class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
+class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
   private userDbService!: UserDbService;
 
   private _getUser = async (
@@ -14,7 +16,6 @@ class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
     accessOptions: AccessOptions
   ): Promise<JoinedUserDoc> => {
     const _id: string = endpointPath == '/self/me' ? currentAPIUser.userId : params.uId;
-
     const user = await this.userDbService.findById({
       _id,
       accessOptions,
@@ -37,33 +38,31 @@ class GetUserUsecase implements IUsecase<GetUserUsecaseResponse> {
     });
   };
 
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { routeData, currentAPIUser } = controllerData;
+    const { params } = routeData;
+    const searchIdExists = params.uId || currentAPIUser.userId;
+    return searchIdExists;
+  };
+
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<GetUserUsecaseResponse> => {
+    const { currentAPIUser, endpointPath, params, accessOptions } = props;
+    const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
+    if (user) {
+      if (endpointPath == '/self/me') {
+        this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
+      }
+      return { user };
+    } else {
+      throw new Error('User not found.');
+    }
+  };
+
   public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
     this.userDbService = await services.makeUserDbService;
     return this;
-  };
-
-  public makeRequest = async (controllerData: ControllerData): Promise<GetUserUsecaseResponse> => {
-    const { routeData, currentAPIUser, endpointPath } = controllerData;
-    const { params } = routeData;
-    const searchIdExists: string = params.uId || currentAPIUser.userId;
-    const accessOptions: AccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted: true,
-      currentAPIUserRole: currentAPIUser.role || 'user',
-      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
-    };
-
-    if (searchIdExists) {
-      const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
-      if (user) {
-        if (endpointPath == '/self/me') {
-          this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
-        }
-        return { user };
-      } else {
-        throw new Error('User not found.');
-      }
-    }
   };
 }
 

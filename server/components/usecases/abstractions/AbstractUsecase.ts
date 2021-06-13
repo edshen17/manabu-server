@@ -1,5 +1,16 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { ControllerData, IUsecase } from './IUsecase';
+import { ControllerData, CurrentAPIUser, IUsecase } from './IUsecase';
+
+type MakeRequestTemplateParams = {
+  accessOptions: AccessOptions;
+  body: any;
+  isValidRequest: boolean;
+  isCurrentAPIUserPermitted: boolean;
+  params: any;
+  query: any;
+  endpointPath: string;
+  currentAPIUser: CurrentAPIUser;
+};
 
 abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseResponse> {
   private makeRequestErrorMsg: string;
@@ -12,19 +23,46 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     currentAPIUser: any;
   }): boolean {
     const { params, currentAPIUser } = props;
-    return params.uId == currentAPIUser.userId || currentAPIUser.role == 'admin';
+    return (
+      (params.uId && currentAPIUser.userId && params.uId) == currentAPIUser.userId ||
+      currentAPIUser.role == 'admin'
+    );
   }
 
-  protected abstract _setAccessOptions(props: {
-    currentAPIUser: any;
+  protected _setAccessOptionsTemplate = (
+    currentAPIUser: CurrentAPIUser,
+    isCurrentAPIUserPermitted: boolean,
+    params: any
+  ) => {
+    const accessOptions: AccessOptions = {
+      isProtectedResource: true,
+      isCurrentAPIUserPermitted,
+      currentAPIUserRole: currentAPIUser.role,
+      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
+    };
+    return accessOptions;
+  };
+
+  protected _setAccessOptions = (props: {
+    currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
-  }): AccessOptions;
+  }): AccessOptions => {
+    const { currentAPIUser, isCurrentAPIUserPermitted, params } = props;
+    const accessOptions = this._setAccessOptionsTemplate(
+      currentAPIUser,
+      isCurrentAPIUserPermitted,
+      params
+    );
+    return accessOptions;
+  };
 
   protected abstract _isValidRequest(controllerData: ControllerData): boolean;
 
-  protected _makeRequestSetupTemplate = (controllerData: ControllerData) => {
-    const { routeData, currentAPIUser } = controllerData;
+  protected _makeRequestSetupTemplate = (
+    controllerData: ControllerData
+  ): MakeRequestTemplateParams => {
+    const { routeData, currentAPIUser, endpointPath } = controllerData;
     const { body, params, query } = routeData;
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       params,
@@ -38,22 +76,28 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       params,
     });
     const isValidRequest = this._isValidRequest(controllerData);
-    return { accessOptions, body, isValidRequest, isCurrentAPIUserPermitted, params, query };
+    return {
+      accessOptions,
+      body,
+      isValidRequest,
+      isCurrentAPIUserPermitted,
+      params,
+      query,
+      endpointPath,
+      currentAPIUser,
+    };
   };
 
-  protected abstract _makeRequestTemplate(props: {
-    params: any;
-    body: any;
-    accessOptions: AccessOptions;
-    query?: any;
-  }): Promise<UsecaseResponse>;
+  protected abstract _makeRequestTemplate(
+    props: MakeRequestTemplateParams
+  ): Promise<UsecaseResponse>;
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
-    const { accessOptions, body, isValidRequest, params, query } =
-      this._makeRequestSetupTemplate(controllerData);
+    const setUpProps = this._makeRequestSetupTemplate(controllerData);
+    const { isValidRequest } = setUpProps;
 
     if (isValidRequest) {
-      return await this._makeRequestTemplate({ params, body, accessOptions, query });
+      return await this._makeRequestTemplate(setUpProps);
     } else {
       throw new Error(this.makeRequestErrorMsg);
     }
@@ -61,4 +105,4 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
   abstract init(services: any): Promise<this>;
 }
 
-export { AbstractUsecase };
+export { AbstractUsecase, MakeRequestTemplateParams };

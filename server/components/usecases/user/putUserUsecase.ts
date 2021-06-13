@@ -6,6 +6,7 @@ import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { MinuteBankDoc } from '../../../models/MinuteBank';
 import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
+import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
 type PutUserUsecaseResponse = { user: JoinedUserDoc } | Error;
 
@@ -36,12 +37,9 @@ class PutUserUsecase
     return !role && !_id && !dateRegistered;
   };
 
-  protected _makeRequestTemplate = async (props: {
-    params: any;
-    body: any;
-    accessOptions: AccessOptions;
-    query?: any;
-  }): Promise<PutUserUsecaseResponse> => {
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<PutUserUsecaseResponse> => {
     const { params, body, accessOptions, query } = props;
     const savedDbUser = await this.userDbService.update({
       searchQuery: { _id: params.uId },
