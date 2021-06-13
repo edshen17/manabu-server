@@ -1,35 +1,10 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { AbstractUsecase } from './AbstractUsecase';
 import { ControllerData, IUsecase } from './IUsecase';
 
-abstract class AbstractPutUsecase<UsecaseResponse> implements IUsecase<UsecaseResponse> {
-  protected _isCurrentAPIUserPermitted(props: {
-    params: any;
-    query?: any;
-    currentAPIUser: any;
-  }): boolean {
-    const { params, currentAPIUser } = props;
-    return params.uId == currentAPIUser.userId || currentAPIUser.role == 'admin';
-  }
-
-  protected abstract _isValidBodyTemplate(body: any): boolean;
-
-  protected _makeRequestSetupTemplate(controllerData: ControllerData) {
-    const { routeData, currentAPIUser } = controllerData;
-    const { body, params, query } = routeData;
-    const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
-      params,
-      query,
-      currentAPIUser,
-    });
-
-    const accessOptions: AccessOptions = {
-      isProtectedResource: true,
-      isCurrentAPIUserPermitted,
-      currentAPIUserRole: currentAPIUser.role,
-      isSelf: params.uId == currentAPIUser.userId,
-    };
-    const isValidUpdate = currentAPIUser.role == 'admin' || this._isValidBodyTemplate(body);
-    return { accessOptions, body, isValidUpdate, params, query };
+abstract class AbstractPutUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {
+  constructor() {
+    super('Access denied.');
   }
 
   protected abstract _makeRequestTemplate(props: {
@@ -39,17 +14,20 @@ abstract class AbstractPutUsecase<UsecaseResponse> implements IUsecase<UsecaseRe
     query?: any;
   }): Promise<UsecaseResponse>;
 
-  public async makeRequest(controllerData: ControllerData): Promise<UsecaseResponse> {
-    const { isValidUpdate, params, body, accessOptions, query } =
-      this._makeRequestSetupTemplate(controllerData);
-
-    if (isValidUpdate) {
-      return this._makeRequestTemplate({ params, body, accessOptions, query });
-    } else {
-      throw new Error('Access denied.');
-    }
-  }
-  abstract init(services: any): Promise<this>;
+  protected _setAccessOptions = (props: {
+    currentAPIUser: any;
+    isCurrentAPIUserPermitted: boolean;
+    params: any;
+  }): AccessOptions => {
+    const { currentAPIUser, isCurrentAPIUserPermitted, params } = props;
+    const accessOptions: AccessOptions = {
+      isProtectedResource: true,
+      isCurrentAPIUserPermitted,
+      currentAPIUserRole: currentAPIUser.role,
+      isSelf: params.uId == currentAPIUser.userId,
+    };
+    return accessOptions;
+  };
 }
 
 export { AbstractPutUsecase };

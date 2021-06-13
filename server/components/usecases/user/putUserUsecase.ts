@@ -2,7 +2,7 @@ import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbO
 import { MinuteBankDbService } from '../../dataAccess/services/minuteBankDb';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransactionDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
-import { IUsecase } from '../abstractions/IUsecase';
+import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { MinuteBankDoc } from '../../../models/MinuteBank';
 import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
@@ -30,7 +30,8 @@ class PutUserUsecase
     return this;
   };
 
-  protected _isValidBodyTemplate = (body: JoinedUserDoc): any => {
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { body } = controllerData.routeData;
     const { role, _id, dateRegistered } = body;
     return !role && !_id && !dateRegistered;
   };

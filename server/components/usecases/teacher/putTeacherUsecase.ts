@@ -2,7 +2,7 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
-import { IUsecase } from '../abstractions/IUsecase';
+import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
 type PutTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
 
@@ -13,7 +13,8 @@ class PutTeacherUsecase
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
 
-  protected _isValidBodyTemplate = (body: any) => {
+  protected _isValidRequest = (controllerData: ControllerData) => {
+    const { body } = controllerData.routeData.body;
     const { userId, _id } = body;
     return !userId && !_id;
   };
