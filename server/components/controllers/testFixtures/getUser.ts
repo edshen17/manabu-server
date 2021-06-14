@@ -1,4 +1,4 @@
-import { IHttpRequest } from '../../expressCallback';
+import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
 import { makeGetUserController } from '../user';
 
 const getUser = async (savedDbUser: any, viewingUser: any) => {

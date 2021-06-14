@@ -1,5 +1,5 @@
 import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
-import { IHttpRequest } from '../../expressCallback';
+import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
 import { makePutUserController } from '../user/index';
 
 const updateUser = async (

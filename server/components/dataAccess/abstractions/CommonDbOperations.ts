@@ -42,8 +42,6 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
       if (isAccessPermitted) {
         dbResult = await asyncCallback;
         return dbResult;
-      } else if (isAccessPermitted && !dbResult) {
-        throw new Error(`${this.dbModel.collection.collectionName} was not found.`);
       } else {
         throw new Error('Access denied.');
       }

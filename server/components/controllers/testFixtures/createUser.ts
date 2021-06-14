@@ -1,5 +1,5 @@
 import faker from 'faker';
-import { IHttpRequest } from '../../expressCallback';
+import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
 import { makePostUserController } from '../user/index';
 
 const createUser = async () => {

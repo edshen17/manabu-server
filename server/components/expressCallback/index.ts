@@ -1,15 +1,4 @@
-import { Request } from 'express';
 import { IController } from '../controllers/abstractions/IController';
-export interface IHttpRequest {
-  body: Request['body'];
-  path: Request['path'];
-  query: Request['query'];
-  params: Request['params'];
-  currentAPIUser: {
-    userId?: string;
-    role: string;
-  };
-}
 
 const _createHttpRequest = (req: any) => {
   const httpRequest = {
@@ -78,12 +67,12 @@ export const makeExpressCallback = (makeController: Promise<IController<any>>) =
       const controller = await makeController;
       const httpResponse = await controller.makeRequest(httpRequest);
       const { headers, statusCode, body } = httpResponse;
-      const { token, user, isLoginToken } = body;
       if (headers) {
         res.set(headers);
       }
       res.type('json');
-      if (token && user && isLoginToken) {
+      if (body && 'isLoginToken' in body) {
+        const { token } = body;
         const loginCookies = _splitLoginCookies(token);
         const { hp, sig } = loginCookies;
         res.cookie('hp', hp.value, hp.options);
