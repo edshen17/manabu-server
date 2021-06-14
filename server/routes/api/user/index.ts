@@ -8,6 +8,8 @@ import {
 import { makeGetVerifyEmailTokenController } from '../../../components/controllers/user/auth';
 import { makeExpressCallback } from '../../../components/expressCallback/callbacks';
 import { makeAuthCookieExpressCallback } from '../../../components/expressCallback/callbacks/cookieCallbacks';
+import { makeRedirectExpressCallbackDashboard } from '../../../components/expressCallback/callbacks/redirectCallbacks';
+
 const users = express.Router();
 const VerifyToken = require('../../../components/VerifyToken'); // TODO: turn into ts + import statement
 
@@ -25,7 +27,7 @@ users.put('/:uId', VerifyToken, makeExpressCallback.consume(makePutUserControlle
 users.get(
   '/auth/emailToken/:verificationToken/verify',
   VerifyToken,
-  makeExpressCallback.consume(makeGetVerifyEmailTokenController)
+  makeRedirectExpressCallbackDashboard.consume(makeGetVerifyEmailTokenController)
 );
 
 export default users;
