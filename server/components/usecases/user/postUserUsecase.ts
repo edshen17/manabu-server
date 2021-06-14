@@ -13,16 +13,21 @@ import { makeMinuteBankEntity } from '../../entities/minuteBank';
 import { makePackageEntity } from '../../entities/package';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { makeTeacherBalanceEntity } from '../../entities/teacherBalance';
-import { makeUserEntity } from '../../entities/user/';
-import { makeTeacherEntity } from '../../entities/teacher/';
+import { makeUserEntity } from '../../entities/user';
+import { makeTeacherEntity } from '../../entities/teacher';
 import { EmailHandler } from '../../utils/email/emailHandler';
-import { ControllerData, IUsecase } from '../abstractions/IUsecase';
+import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
+import { AbstractPostUsecase } from '../abstractions/AbstractPostUsecase';
+import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
 type PostUserUsecaseResponse =
   | { token: string; user: JoinedUserDoc; isLoginToken: boolean }
   | Error;
 
-class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
+class PostUserUsecase
+  extends AbstractPostUsecase<PostUserUsecaseResponse>
+  implements IUsecase<PostUserUsecaseResponse>
+{
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
@@ -31,15 +36,35 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
   private teacherBalanceDbService!: TeacherBalanceDbService;
   private jwt!: any;
   private emailHandler!: EmailHandler;
-  private defaultAccessOptions!: AccessOptions;
-  constructor() {
-    this.defaultAccessOptions = {
+
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { body } = controllerData.routeData;
+    const { role, _id, dateRegistered } = body || {};
+    return !role && !_id && !dateRegistered;
+  };
+
+  protected _isCurrentAPIUserPermitted(props: {
+    params: any;
+    query?: any;
+    currentAPIUser: any;
+    endpointPath: string;
+  }): boolean {
+    return true;
+  }
+
+  protected _setAccessOptionsTemplate = (
+    currentAPIUser: CurrentAPIUser,
+    isCurrentAPIUserPermitted: boolean,
+    params: any
+  ) => {
+    const accessOptions: AccessOptions = {
       isProtectedResource: false,
-      isCurrentAPIUserPermitted: true,
-      currentAPIUserRole: 'user',
+      isCurrentAPIUserPermitted,
+      currentAPIUserRole: currentAPIUser.role,
       isSelf: true,
     };
-  }
+    return accessOptions;
+  };
 
   private _sendVerificationEmail = (userInstance: any): void => {
     const host = 'https://manabu.sg';
@@ -89,20 +114,26 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     return token;
   };
 
-  private _insertUser = async (userInstance: any): Promise<JoinedUserDoc> => {
+  private _insertUser = async (
+    userInstance: any,
+    accessOptions: AccessOptions
+  ): Promise<JoinedUserDoc> => {
     const savedDbUser = await this.userDbService.insert({
       modelToInsert: userInstance,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions,
     });
     return savedDbUser;
   };
 
-  private _insertTeacher = async (savedDbUser: JoinedUserDoc): Promise<TeacherDoc> => {
+  private _insertTeacher = async (
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ): Promise<TeacherDoc> => {
     const userId = savedDbUser._id;
     const modelToInsert = makeTeacherEntity.build({ userId });
     const savedDbTeacher = await this.teacherDbService.insert({
       modelToInsert,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions,
     });
     return savedDbTeacher;
   };
@@ -136,19 +167,23 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     return packagesToInsert;
   };
 
-  private _insertTeacherPackages = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc[]> => {
+  private _insertTeacherPackages = async (
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ): Promise<PackageDoc[]> => {
     const packagesToInsert = await this._createDefaultTeacherPackages(savedDbUser);
     const modelToInsert = await Promise.all(packagesToInsert);
 
     const newPackages = await this.packageDbService.insertMany({
       modelToInsert,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions,
     });
     return newPackages;
   };
 
   private _insertAdminPackageTransaction = async (
-    savedDbUser: JoinedUserDoc
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
   ): Promise<PackageDoc> => {
     const packageTransactionEntity = await makePackageTransactionEntity;
     const modelToInsert = await packageTransactionEntity.build({
@@ -165,12 +200,15 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     });
     const newPackageTransaction = await this.packageTransactionDbService.insert({
       modelToInsert,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions,
     });
     return newPackageTransaction;
   };
 
-  private _insertAdminMinuteBank = async (savedDbUser: JoinedUserDoc): Promise<MinuteBankDoc> => {
+  private _insertAdminMinuteBank = async (
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ): Promise<MinuteBankDoc> => {
     const minuteBankEntity = await makeMinuteBankEntity;
     const modelToInsert = await minuteBankEntity.build({
       hostedBy: process.env.MANABU_ADMIN_ID!,
@@ -178,13 +216,14 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     });
     const newMinuteBank = await this.minuteBankDbService.insert({
       modelToInsert,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions,
     });
     return newMinuteBank;
   };
 
   private _insertTeacherBalance = async (
-    savedDbUser: JoinedUserDoc
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
   ): Promise<TeacherBalanceDoc> => {
     const teacherBalanceEntity = await makeTeacherBalanceEntity;
     const modelToInsert = await teacherBalanceEntity.build({
@@ -192,30 +231,34 @@ class PostUserUsecase implements IUsecase<PostUserUsecaseResponse> {
     });
     const newTeacherBalance = this.teacherBalanceDbService.insert({
       modelToInsert,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions,
     });
     return newTeacherBalance;
   };
 
-  private _handleTeacherCreation = async (savedDbUser: JoinedUserDoc) => {
-    await this._insertTeacher(savedDbUser);
-    await this._insertTeacherPackages(savedDbUser);
-    await this._insertAdminPackageTransaction(savedDbUser);
-    await this._insertAdminMinuteBank(savedDbUser);
-    await this._insertTeacherBalance(savedDbUser);
+  private _handleTeacherCreation = async (
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ) => {
+    await this._insertTeacher(savedDbUser, accessOptions);
+    await this._insertTeacherPackages(savedDbUser, accessOptions);
+    await this._insertAdminPackageTransaction(savedDbUser, accessOptions);
+    await this._insertAdminMinuteBank(savedDbUser, accessOptions);
+    await this._insertTeacherBalance(savedDbUser, accessOptions);
   };
 
-  public makeRequest = async (controllerData: ControllerData): Promise<PostUserUsecaseResponse> => {
-    const { routeData } = controllerData;
-    const { body } = routeData;
-    const isTeacherApp = body.isTeacherApp;
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<PostUserUsecaseResponse> => {
+    const { body, accessOptions } = props;
+    const { isTeacherApp } = body || {};
 
     try {
       const userInstance = makeUserEntity.build(body);
-      const savedDbUser = await this._insertUser(userInstance);
+      const savedDbUser = await this._insertUser(userInstance, accessOptions);
 
       if (isTeacherApp) {
-        await this._handleTeacherCreation(savedDbUser);
+        await this._handleTeacherCreation(savedDbUser, accessOptions);
       }
 
       this._sendVerificationEmail(userInstance);

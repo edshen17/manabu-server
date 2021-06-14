@@ -65,28 +65,6 @@ const oauth2Client = new google.auth.OAuth2(
   `${getHost('server')}/api/auth/google`
 );
 
-// route to verify email
-router.get('/user/verify/:verificationToken', VerifyToken, function (req, res, next) {
-  User.findOne({
-    verificationToken: req.params.verificationToken,
-  })
-    .select({ emailVerified: 1 })
-    .cache()
-    .then(async function (user) {
-      if (user) {
-        user.emailVerified = true;
-        await user.save().catch((err) => {
-          console.log(err);
-        });
-
-        return res.status(200).redirect(`${getHost('client')}/dashboard`);
-      } else {
-        return res.status(404).send('no user found');
-      }
-    })
-    .catch((err) => handleErrors(err, req, res, next));
-});
-
 // route for google logins
 router.get('/auth/google', async (req, res, next) => {
   const code = req.query.code;
