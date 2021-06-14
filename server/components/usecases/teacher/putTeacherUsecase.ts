@@ -16,7 +16,7 @@ class PutTeacherUsecase
 
   protected _isValidRequest = (controllerData: ControllerData) => {
     const { body } = controllerData.routeData.body;
-    const { userId, _id } = body;
+    const { userId, _id } = body || {};
     return !userId && !_id;
   };
 
@@ -30,12 +30,16 @@ class PutTeacherUsecase
       accessOptions,
     });
 
-    const _id = updatedDbTeacher.userId;
-    const savedDbUser = await this.userDbService.findById({
-      _id,
-      accessOptions,
-    });
-    return { user: savedDbUser };
+    if (updatedDbTeacher) {
+      const _id = updatedDbTeacher.userId;
+      const savedDbUser = await this.userDbService.findById({
+        _id,
+        accessOptions,
+      });
+      return { user: savedDbUser };
+    } else {
+      throw new Error('Access denied.');
+    }
   };
 
   public init = async (services: {

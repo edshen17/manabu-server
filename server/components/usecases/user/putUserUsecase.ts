@@ -33,7 +33,7 @@ class PutUserUsecase
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
-    const { role, _id, dateRegistered } = body;
+    const { role, _id, dateRegistered } = body || {};
     return !role && !_id && !dateRegistered;
   };
 

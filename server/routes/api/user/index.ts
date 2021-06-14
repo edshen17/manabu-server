@@ -6,7 +6,6 @@ import {
   makePutUserController,
 } from '../../../components/controllers/user';
 import { makeGetVerifyEmailTokenController } from '../../../components/controllers/user/auth';
-// import { makeExpressCallback } from '../../../components/expressCallback';
 import { makeExpressCallback } from '../../../components/expressCallback/callbacks';
 import { makeAuthCookieExpressCallback } from '../../../components/expressCallback/callbacks/cookieCallbacks';
 const users = express.Router();
