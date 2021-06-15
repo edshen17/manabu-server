@@ -1,9 +1,9 @@
 import faker from 'faker';
 import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
-import { makePostUserController } from '../user/index';
+import { makePostCreateUserController } from '../user/index';
 
 const createUser = async () => {
-  const postUserController = await makePostUserController;
+  const postUserController = await makePostCreateUserController;
   const httpRequest: IHttpRequest = {
     body: {
       name: faker.name.findName(),

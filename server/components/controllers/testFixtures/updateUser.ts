@@ -1,13 +1,13 @@
 import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
 import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
-import { makePutUserController } from '../user/index';
+import { makePutEditUserController } from '../user/index';
 
 const updateUser = async (
   updatingDbUser: JoinedUserDoc,
   currentAPIDbUser: JoinedUserDoc,
   body: any
 ) => {
-  const putUserController = await makePutUserController;
+  const putEditUserController = await makePutEditUserController;
   const httpRequest: IHttpRequest = {
     body,
     path: `/user/${updatingDbUser._id}/updateProfile`,
@@ -20,7 +20,7 @@ const updateUser = async (
       role: currentAPIDbUser.role,
     },
   };
-  return await putUserController.makeRequest(httpRequest);
+  return await putEditUserController.makeRequest(httpRequest);
 };
 
 export { updateUser };

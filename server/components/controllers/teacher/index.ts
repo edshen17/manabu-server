@@ -1,10 +1,10 @@
-import { makePutTeacherUsecase } from '../../usecases/teacher';
+import { makePutEditTeacherUsecase } from '../../usecases/teacher';
 import { StatusCodes } from 'http-status-codes';
-import { PutTeacherController } from './putTeacherController';
+import { PutEditTeacherController } from './putEditTeacherController';
 
-const makePutTeacherController = new PutTeacherController({
+const makePutEditTeacherController = new PutEditTeacherController({
   successStatusCode: StatusCodes.OK,
   errorStatusCode: StatusCodes.UNAUTHORIZED,
-}).init({ makeUsecase: makePutTeacherUsecase });
+}).init({ makeUsecase: makePutEditTeacherUsecase });
 
-export { makePutTeacherController };
+export { makePutEditTeacherController };

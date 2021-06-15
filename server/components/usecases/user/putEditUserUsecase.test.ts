@@ -11,7 +11,7 @@ beforeEach(async () => {
   controllerData = initUserParams.controllerData;
 });
 
-context('putUserUsecase', () => {
+context('putEditUserUsecase', () => {
   describe('makeRequest', async () => {
     const makeUpdate = async (
       updatingDbUser: JoinedUserDoc,
@@ -21,7 +21,7 @@ context('putUserUsecase', () => {
       controllerData.currentAPIUser.userId = updaterDbUser._id;
       controllerData.routeData.body = updateParams;
       controllerData.routeData.params = { uId: updatingDbUser._id };
-      return await initUserParams.putUserUsecase.makeRequest(initUserParams.controllerData);
+      return await initUserParams.putEditUserUsecase.makeRequest(initUserParams.controllerData);
     };
 
     describe('editing user data', () => {

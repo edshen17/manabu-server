@@ -5,11 +5,11 @@ import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-type PutTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
+type PutEditTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
 
-class PutTeacherUsecase
-  extends AbstractPutUsecase<PutTeacherUsecaseResponse>
-  implements IUsecase<PutTeacherUsecaseResponse>
+class PutEditTeacherUsecase
+  extends AbstractPutUsecase<PutEditTeacherUsecaseResponse>
+  implements IUsecase<PutEditTeacherUsecaseResponse>
 {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
@@ -22,7 +22,7 @@ class PutTeacherUsecase
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
-  ): Promise<PutTeacherUsecaseResponse> => {
+  ): Promise<PutEditTeacherUsecaseResponse> => {
     const { params, body, accessOptions } = props;
     const updatedDbTeacher = await this.teacherDbService.update({
       searchQuery: { userId: params.uId },
@@ -53,4 +53,4 @@ class PutTeacherUsecase
   };
 }
 
-export { PutTeacherUsecase, PutTeacherUsecaseResponse };
+export { PutEditTeacherUsecase, PutEditTeacherUsecaseResponse };

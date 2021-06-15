@@ -11,7 +11,7 @@ beforeEach(async () => {
   controllerData = initUserParams.controllerData;
 });
 
-context('postUserUsecase', () => {
+context('postCreateUserUsecase', () => {
   describe('makeRequest', async () => {
     describe('creating a new user should return the correct properties', () => {
       it('should create a new user in the db', async () => {

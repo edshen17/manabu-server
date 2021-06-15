@@ -8,13 +8,13 @@ import {
   makeTeacherBalanceDbService,
 } from '../../dataAccess/index';
 import { GetUserUsecase } from './getUserUsecase';
-import { PostUserUsecase } from './postUserUsecase';
-import { PutUserUsecase } from './putUserUsecase';
+import { PostCreateUserUsecase } from './postCreateUserUsecase';
+import { PutEditUserUsecase } from './putEditUserUsecase';
 import { emailHandler } from '../../utils/email/emailHandler';
 
 const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
 
-const makePostUserUsecase = new PostUserUsecase().init({
+const makePostCreateUserUsecase = new PostCreateUserUsecase().init({
   makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
@@ -25,10 +25,10 @@ const makePostUserUsecase = new PostUserUsecase().init({
   emailHandler,
 });
 
-const makePutUserUsecase = new PutUserUsecase().init({
+const makePutEditUserUsecase = new PutEditUserUsecase().init({
   makeUserDbService,
   makePackageTransactionDbService,
   makeMinuteBankDbService,
 });
 
-export { makeGetUserUsecase, makePostUserUsecase, makePutUserUsecase };
+export { makeGetUserUsecase, makePostCreateUserUsecase, makePutEditUserUsecase };

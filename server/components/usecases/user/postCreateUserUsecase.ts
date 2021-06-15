@@ -20,13 +20,13 @@ import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUseca
 import { AbstractPostUsecase } from '../abstractions/AbstractPostUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
-type PostUserUsecaseResponse =
+type PostCreateUserUsecaseResponse =
   | { token: string; user: JoinedUserDoc; isLoginToken: boolean }
   | Error;
 
-class PostUserUsecase
-  extends AbstractPostUsecase<PostUserUsecaseResponse>
-  implements IUsecase<PostUserUsecaseResponse>
+class PostCreateUserUsecase
+  extends AbstractPostUsecase<PostCreateUserUsecaseResponse>
+  implements IUsecase<PostCreateUserUsecaseResponse>
 {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
@@ -42,15 +42,6 @@ class PostUserUsecase
     const { role, _id, dateRegistered } = body || {};
     return !role && !_id && !dateRegistered;
   };
-
-  protected _isCurrentAPIUserPermitted(props: {
-    params: any;
-    query?: any;
-    currentAPIUser: any;
-    endpointPath: string;
-  }): boolean {
-    return true;
-  }
 
   protected _setAccessOptionsTemplate = (
     currentAPIUser: CurrentAPIUser,
@@ -249,7 +240,7 @@ class PostUserUsecase
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
-  ): Promise<PostUserUsecaseResponse> => {
+  ): Promise<PostCreateUserUsecaseResponse> => {
     const { body, accessOptions } = props;
     const { isTeacherApp } = body || {};
 
@@ -309,4 +300,4 @@ class PostUserUsecase
   };
 }
 
-export { PostUserUsecase, PostUserUsecaseResponse };
+export { PostCreateUserUsecase, PostCreateUserUsecaseResponse };

@@ -1,9 +1,9 @@
 import { makeUserDbService, makeTeacherDbService } from '../../dataAccess/index';
-import { PutTeacherUsecase } from './putTeacherUsecase';
+import { PutEditTeacherUsecase } from './putEditTeacherUsecase';
 
-const makePutTeacherUsecase = new PutTeacherUsecase().init({
+const makePutEditTeacherUsecase = new PutEditTeacherUsecase().init({
   makeUserDbService,
   makeTeacherDbService,
 });
 
-export { makePutTeacherUsecase };
+export { makePutEditTeacherUsecase };

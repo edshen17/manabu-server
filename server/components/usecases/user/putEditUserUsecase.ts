@@ -8,11 +8,11 @@ import { MinuteBankDoc } from '../../../models/MinuteBank';
 import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
-type PutUserUsecaseResponse = { user: JoinedUserDoc } | Error;
+type PutEditUserUsecaseResponse = { user: JoinedUserDoc } | Error;
 
-class PutUserUsecase
-  extends AbstractPutUsecase<PutUserUsecaseResponse>
-  implements IUsecase<PutUserUsecaseResponse>
+class PutEditUserUsecase
+  extends AbstractPutUsecase<PutEditUserUsecaseResponse>
+  implements IUsecase<PutEditUserUsecaseResponse>
 {
   private userDbService!: UserDbService;
   private packageTransactionDbService!: PackageTransactionDbService;
@@ -39,7 +39,7 @@ class PutUserUsecase
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
-  ): Promise<PutUserUsecaseResponse> => {
+  ): Promise<PutEditUserUsecaseResponse> => {
     const { params, body, accessOptions, query } = props;
     const savedDbUser = await this.userDbService.update({
       searchQuery: { _id: params.uId },
@@ -94,4 +94,4 @@ class PutUserUsecase
   };
 }
 
-export { PutUserUsecase, PutUserUsecaseResponse };
+export { PutEditUserUsecase, PutEditUserUsecaseResponse };

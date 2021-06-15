@@ -2,8 +2,8 @@ import express from 'express';
 import { makeGetMinuteBankController } from '../../../components/controllers/minuteBank';
 import {
   makeGetUserController,
-  makePostUserController,
-  makePutUserController,
+  makePostCreateUserController,
+  makePutEditUserController,
 } from '../../../components/controllers/user';
 import { makeGetVerifyEmailTokenController } from '../../../components/controllers/user/auth';
 import { makeExpressCallback } from '../../../components/expressCallback/callbacks';
@@ -21,8 +21,8 @@ users.get(
 );
 
 users.get('/:uId', VerifyToken, makeExpressCallback.consume(makeGetUserController));
-users.post('/register', makeAuthCookieExpressCallback.consume(makePostUserController));
-users.put('/:uId', VerifyToken, makeExpressCallback.consume(makePutUserController));
+users.post('/register', makeAuthCookieExpressCallback.consume(makePostCreateUserController));
+users.put('/:uId', VerifyToken, makeExpressCallback.consume(makePutEditUserController));
 
 users.get(
   '/auth/emailToken/:verificationToken/verify',

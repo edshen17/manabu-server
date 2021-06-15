@@ -15,7 +15,7 @@ beforeEach(async () => {
   newTeacherUser = await initializeUser(initUserParams);
 });
 
-context('putTeacherUsecase', () => {
+context('putEditTeacherUsecase', () => {
   describe('makeRequest', async () => {
     const makeUpdate = async (
       updatingDbUser: JoinedUserDoc,

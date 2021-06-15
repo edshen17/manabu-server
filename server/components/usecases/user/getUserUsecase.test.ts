@@ -1,18 +1,18 @@
 import chai from 'chai';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase } from './getUserUsecase';
-import { makeGetUserUsecase, makePostUserUsecase } from './index';
-import { PostUserUsecase } from './postUserUsecase';
+import { makeGetUserUsecase, makePostCreateUserUsecase } from './index';
+import { PostCreateUserUsecase } from './postCreateUserUsecase';
 import { initializeUser } from '../testFixtures/initializeUser';
 import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
 const expect = chai.expect;
 let getUserUsecase: GetUserUsecase;
-let postUserUsecase: PostUserUsecase;
+let postCreateUserUsecase: PostCreateUserUsecase;
 let controllerData: ControllerData;
 let initUserParams: any;
 before(async () => {
   getUserUsecase = await makeGetUserUsecase;
-  postUserUsecase = await makePostUserUsecase;
+  postCreateUserUsecase = await makePostCreateUserUsecase;
 });
 
 beforeEach(async () => {

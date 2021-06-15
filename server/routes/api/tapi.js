@@ -186,7 +186,7 @@ router.post('/login', function (req, res, next) {
         return res
           .status(401)
           .send(
-            'Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, a number, and a special character.'
+            'Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, number, and special character.'
           );
       else {
         const isTeacherApp = req.body.isTeacherApp;
