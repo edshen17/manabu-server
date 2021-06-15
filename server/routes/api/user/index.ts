@@ -2,10 +2,10 @@ import express from 'express';
 import { makeGetMinuteBankController } from '../../../components/controllers/minuteBank';
 import {
   makeGetUserController,
-  makePostCreateUserController,
-  makePutEditUserController,
+  makeCreateUserController,
+  makeEditUserController,
 } from '../../../components/controllers/user';
-import { makeGetVerifyEmailTokenController } from '../../../components/controllers/user/auth';
+import { makeVerifyEmailTokenController } from '../../../components/controllers/user/auth';
 import { makeExpressCallback } from '../../../components/expressCallback/callbacks';
 import { makeAuthCookieExpressCallback } from '../../../components/expressCallback/callbacks/cookieCallbacks';
 import { makeRedirectExpressCallbackDashboard } from '../../../components/expressCallback/callbacks/redirectCallbacks';
@@ -21,13 +21,13 @@ users.get(
 );
 
 users.get('/:uId', VerifyToken, makeExpressCallback.consume(makeGetUserController));
-users.post('/register', makeAuthCookieExpressCallback.consume(makePostCreateUserController));
-users.put('/:uId', VerifyToken, makeExpressCallback.consume(makePutEditUserController));
+users.post('/register', makeAuthCookieExpressCallback.consume(makeCreateUserController));
+users.put('/:uId', VerifyToken, makeExpressCallback.consume(makeEditUserController));
 
 users.get(
   '/auth/emailToken/:verificationToken/verify',
   VerifyToken,
-  makeRedirectExpressCallbackDashboard.consume(makeGetVerifyEmailTokenController)
+  makeRedirectExpressCallbackDashboard.consume(makeVerifyEmailTokenController)
 );
 
 export default users;

@@ -4,7 +4,7 @@ import { updateUser } from '../testFixtures/updateUser';
 
 const expect = chai.expect;
 
-context('putUserController', () => {
+context('editUserController', () => {
   describe('makeRequest', async () => {
     it('should update the user', async () => {
       const controllerRes = await createUser();

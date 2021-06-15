@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
-import { GetVerifyEmailTokenController } from './getVerifyEmailTokenController';
+import { VerifyEmailTokenController } from './verifyEmailTokenController';
 import { makeVerifyEmailTokenUsecase } from '../../../usecases/user/auth';
 
-const makeGetVerifyEmailTokenController = new GetVerifyEmailTokenController({
+const makeVerifyEmailTokenController = new VerifyEmailTokenController({
   successStatusCode: StatusCodes.OK,
   errorStatusCode: StatusCodes.NOT_FOUND,
 }).init({ makeUsecase: makeVerifyEmailTokenUsecase });
 
-export { makeGetVerifyEmailTokenController };
+export { makeVerifyEmailTokenController };

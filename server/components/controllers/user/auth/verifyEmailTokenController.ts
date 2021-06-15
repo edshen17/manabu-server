@@ -2,7 +2,7 @@ import { VerifyEmailTokenUsecaseResponse } from '../../../usecases/user/auth/ver
 import { AbstractController, ControllerParams } from '../../abstractions/AbstractController';
 import { IController } from '../../abstractions/IController';
 
-class GetVerifyEmailTokenController
+class VerifyEmailTokenController
   extends AbstractController<VerifyEmailTokenUsecaseResponse>
   implements IController<VerifyEmailTokenUsecaseResponse>
 {
@@ -11,4 +11,4 @@ class GetVerifyEmailTokenController
   }
 }
 
-export { GetVerifyEmailTokenController };
+export { VerifyEmailTokenController };

@@ -2,7 +2,7 @@ import { EditUserUsecaseResponse } from '../../usecases/user/editUserUsecase';
 import { AbstractController, ControllerParams } from '../abstractions/AbstractController';
 import { IController } from '../abstractions/IController';
 
-class PutEditUserController
+class EditUserController
   extends AbstractController<EditUserUsecaseResponse>
   implements IController<EditUserUsecaseResponse>
 {
@@ -11,4 +11,4 @@ class PutEditUserController
   }
 }
 
-export { PutEditUserController };
+export { EditUserController };
