@@ -1,10 +1,10 @@
-import { PostCreateUserUsecaseResponse } from '../../usecases/user/postCreateUserUsecase';
+import { CreateUserUsecaseResponse } from '../../usecases/user/createUserUsecase';
 import { AbstractController, ControllerParams } from '../abstractions/AbstractController';
 import { IController } from '../abstractions/IController';
 
 class PostCreateUserController
-  extends AbstractController<PostCreateUserUsecaseResponse>
-  implements IController<PostCreateUserUsecaseResponse>
+  extends AbstractController<CreateUserUsecaseResponse>
+  implements IController<CreateUserUsecaseResponse>
 {
   constructor(props: ControllerParams) {
     super(props);

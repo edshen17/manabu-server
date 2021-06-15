@@ -4,9 +4,9 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
-type GetVerifyEmailTokenUsecaseResponse = void;
+type VerifyEmailTokenUsecaseResponse = void;
 
-class GetVerifyEmailTokenUsecase extends AbstractGetUsecase<GetVerifyEmailTokenUsecaseResponse> {
+class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecaseResponse> {
   private userDbService!: UserDbService;
 
   protected _isCurrentAPIUserPermitted(props: {
@@ -62,4 +62,4 @@ class GetVerifyEmailTokenUsecase extends AbstractGetUsecase<GetVerifyEmailTokenU
   };
 }
 
-export { GetVerifyEmailTokenUsecase, GetVerifyEmailTokenUsecaseResponse };
+export { VerifyEmailTokenUsecase, VerifyEmailTokenUsecaseResponse };

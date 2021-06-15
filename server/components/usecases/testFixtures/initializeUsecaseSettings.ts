@@ -1,14 +1,14 @@
 import faker from 'faker';
 import { ControllerData } from '../abstractions/IUsecase';
-import { makeGetUserUsecase, makePostCreateUserUsecase, makePutEditUserUsecase } from '../user';
+import { makeGetUserUsecase, makeCreateUserUsecase, makeEditUserUsecase } from '../user';
 
-import { makePutEditTeacherUsecase } from '../teacher';
+import { makeEditTeacherUsecase } from '../teacher';
 
 const initializeUsecaseSettings = async () => {
   const getUserUsecase = await makeGetUserUsecase;
-  const postCreateUserUsecase = await makePostCreateUserUsecase;
-  const putEditUserUsecase = await makePutEditUserUsecase;
-  const putEditTeacherUsecase = await makePutEditTeacherUsecase;
+  const createUserUsecase = await makeCreateUserUsecase;
+  const editUserUsecase = await makeEditUserUsecase;
+  const editTeacherUsecase = await makeEditTeacherUsecase;
   const currentAPIUser = {
     userId: undefined,
     role: 'user',
@@ -32,9 +32,9 @@ const initializeUsecaseSettings = async () => {
     isSelf: true,
     controllerData,
     getUserUsecase,
-    postCreateUserUsecase,
-    putEditUserUsecase,
-    putEditTeacherUsecase,
+    createUserUsecase,
+    editUserUsecase,
+    editTeacherUsecase,
   };
 
   return initUserParams;

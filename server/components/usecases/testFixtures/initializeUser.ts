@@ -2,23 +2,23 @@ import jwt from 'jsonwebtoken';
 import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase';
-import { PostCreateUserUsecase } from '../user/postCreateUserUsecase';
+import { CreateUserUsecase } from '../user/createUserUsecase';
 
 const initializeUser = async (props: {
   viewingAs: string;
   isSelf: boolean;
   controllerData: ControllerData;
   getUserUsecase: GetUserUsecase;
-  postCreateUserUsecase: PostCreateUserUsecase;
+  createUserUsecase: CreateUserUsecase;
   isTeacherApp?: boolean;
 }): Promise<GetUserUsecaseResponse> => {
-  const { viewingAs, isSelf, controllerData, getUserUsecase, postCreateUserUsecase, isTeacherApp } =
+  const { viewingAs, isSelf, controllerData, getUserUsecase, createUserUsecase, isTeacherApp } =
     props;
   const { routeData } = controllerData;
   if (isTeacherApp) {
     routeData.body.isTeacherApp = true;
   }
-  const authToken: any = await postCreateUserUsecase.makeRequest(controllerData);
+  const authToken: any = await createUserUsecase.makeRequest(controllerData);
   const secret: any = process.env.JWT_SECRET;
   const decoded: any = jwt.verify(authToken.token, secret);
   const currentAPIUser: CurrentAPIUser = {

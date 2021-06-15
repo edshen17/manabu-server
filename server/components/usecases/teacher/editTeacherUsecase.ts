@@ -1,15 +1,15 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
-import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
+import { AbstractEditUsecase } from '../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 
-type PutEditTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
+type EditTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
 
-class PutEditTeacherUsecase
-  extends AbstractPutUsecase<PutEditTeacherUsecaseResponse>
-  implements IUsecase<PutEditTeacherUsecaseResponse>
+class EditTeacherUsecase
+  extends AbstractEditUsecase<EditTeacherUsecaseResponse>
+  implements IUsecase<EditTeacherUsecaseResponse>
 {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
@@ -22,7 +22,7 @@ class PutEditTeacherUsecase
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
-  ): Promise<PutEditTeacherUsecaseResponse> => {
+  ): Promise<EditTeacherUsecaseResponse> => {
     const { params, body, accessOptions } = props;
     const updatedDbTeacher = await this.teacherDbService.update({
       searchQuery: { userId: params.uId },
@@ -53,4 +53,4 @@ class PutEditTeacherUsecase
   };
 }
 
-export { PutEditTeacherUsecase, PutEditTeacherUsecaseResponse };
+export { EditTeacherUsecase, EditTeacherUsecaseResponse };

@@ -17,16 +17,16 @@ import { makeUserEntity } from '../../entities/user';
 import { makeTeacherEntity } from '../../entities/teacher';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
-import { AbstractPostUsecase } from '../abstractions/AbstractPostUsecase';
+import { AbstractCreateUsecase } from '../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
-type PostCreateUserUsecaseResponse =
+type CreateUserUsecaseResponse =
   | { token: string; user: JoinedUserDoc; isLoginToken: boolean }
   | Error;
 
-class PostCreateUserUsecase
-  extends AbstractPostUsecase<PostCreateUserUsecaseResponse>
-  implements IUsecase<PostCreateUserUsecaseResponse>
+class CreateUserUsecase
+  extends AbstractCreateUsecase<CreateUserUsecaseResponse>
+  implements IUsecase<CreateUserUsecaseResponse>
 {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
@@ -240,7 +240,7 @@ class PostCreateUserUsecase
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
-  ): Promise<PostCreateUserUsecaseResponse> => {
+  ): Promise<CreateUserUsecaseResponse> => {
     const { body, accessOptions } = props;
     const { isTeacherApp } = body || {};
 
@@ -300,4 +300,4 @@ class PostCreateUserUsecase
   };
 }
 
-export { PostCreateUserUsecase, PostCreateUserUsecaseResponse };
+export { CreateUserUsecase, CreateUserUsecaseResponse };

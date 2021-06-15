@@ -2,7 +2,7 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { AbstractUsecase } from './AbstractUsecase';
 import { CurrentAPIUser } from './IUsecase';
 
-abstract class AbstractPostUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {
+abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {
   constructor() {
     super('Access denied.');
   }
@@ -31,4 +31,4 @@ abstract class AbstractPostUsecase<UsecaseResponse> extends AbstractUsecase<Usec
   };
 }
 
-export { AbstractPostUsecase };
+export { AbstractCreateUsecase };

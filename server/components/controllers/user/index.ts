@@ -1,7 +1,7 @@
 import {
   makeGetUserUsecase,
-  makePostCreateUserUsecase,
-  makePutEditUserUsecase,
+  makeCreateUserUsecase,
+  makeEditUserUsecase,
 } from '../../usecases/user';
 import { GetUserController } from './getUserController';
 import { StatusCodes } from 'http-status-codes';
@@ -16,11 +16,11 @@ const makeGetUserController = new GetUserController({
 const makePostCreateUserController = new PostCreateUserController({
   successStatusCode: StatusCodes.CREATED,
   errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-}).init({ makeUsecase: makePostCreateUserUsecase });
+}).init({ makeUsecase: makeCreateUserUsecase });
 
 const makePutEditUserController = new PutEditUserController({
   successStatusCode: StatusCodes.OK,
   errorStatusCode: StatusCodes.UNAUTHORIZED,
-}).init({ makeUsecase: makePutEditUserUsecase });
+}).init({ makeUsecase: makeEditUserUsecase });
 
 export { makeGetUserController, makePostCreateUserController, makePutEditUserController };

@@ -5,14 +5,14 @@ import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb'
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { MinuteBankDoc } from '../../../models/MinuteBank';
-import { AbstractPutUsecase } from '../abstractions/AbstractPutUsecase';
+import { AbstractEditUsecase } from '../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
-type PutEditUserUsecaseResponse = { user: JoinedUserDoc } | Error;
+type EditUserUsecaseResponse = { user: JoinedUserDoc } | Error;
 
-class PutEditUserUsecase
-  extends AbstractPutUsecase<PutEditUserUsecaseResponse>
-  implements IUsecase<PutEditUserUsecaseResponse>
+class EditUserUsecase
+  extends AbstractEditUsecase<EditUserUsecaseResponse>
+  implements IUsecase<EditUserUsecaseResponse>
 {
   private userDbService!: UserDbService;
   private packageTransactionDbService!: PackageTransactionDbService;
@@ -39,7 +39,7 @@ class PutEditUserUsecase
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
-  ): Promise<PutEditUserUsecaseResponse> => {
+  ): Promise<EditUserUsecaseResponse> => {
     const { params, body, accessOptions, query } = props;
     const savedDbUser = await this.userDbService.update({
       searchQuery: { _id: params.uId },
@@ -94,4 +94,4 @@ class PutEditUserUsecase
   };
 }
 
-export { PutEditUserUsecase, PutEditUserUsecaseResponse };
+export { EditUserUsecase, EditUserUsecaseResponse };

@@ -1,8 +1,8 @@
 import { makeUserDbService } from '../../../dataAccess';
-import { GetVerifyEmailTokenUsecase } from './getVerifyEmailTokenUsecase';
+import { VerifyEmailTokenUsecase } from './verifyEmailTokenUsecase';
 
-const makeGetVerifyEmailTokenUsecase = new GetVerifyEmailTokenUsecase().init({
+const makeVerifyEmailTokenUsecase = new VerifyEmailTokenUsecase().init({
   makeUserDbService,
 });
 
-export { makeGetVerifyEmailTokenUsecase };
+export { makeVerifyEmailTokenUsecase };
