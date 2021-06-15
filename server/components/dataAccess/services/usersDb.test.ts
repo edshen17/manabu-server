@@ -195,6 +195,23 @@ context('userDb service', () => {
         throw err;
       }
     });
+
+    it('given an existing user id, overriding select options should return an user with the password field', async () => {
+      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      accessOptionsCopy.isOverridingSelectOptions = true;
+
+      try {
+        const newUser = await createFakeDbUser(true);
+        const searchUser = await userDbService.findById({
+          _id: newUser._id,
+          accessOptions: accessOptionsCopy,
+        });
+
+        expect(searchUser).to.have.property('password');
+      } catch (err) {
+        throw err;
+      }
+    });
   });
   describe('insert', () => {
     it('given a user, should insert into db', async () => {

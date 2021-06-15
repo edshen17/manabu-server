@@ -3,6 +3,7 @@ type AccessOptions = {
   isCurrentAPIUserPermitted: boolean;
   currentAPIUserRole: string | undefined;
   isSelf: boolean;
+  isOverridingSelectOptions?: boolean;
 };
 
 type DbParams = {

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { UserDbService } from './services/usersDb';
 import { TeacherDbService } from './services/teachersDb';
@@ -12,6 +13,7 @@ import { PackageTransaction } from '../../models/PackageTransaction';
 import { MinuteBankDbService } from './services/minuteBankDb';
 import { TeacherBalanceDbService } from './services/teacherBalanceDb';
 import { TeacherBalance } from '../../models/TeacherBalance';
+
 const mongod = new MongoMemoryServer();
 
 const makeDb = async (): Promise<mongoose.Mongoose | void> => {
@@ -38,7 +40,7 @@ const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).init({
 const makePackageDbService = new PackageDbService({ packageDb: Package }).init({ makeDb });
 const makeUserDbService = new UserDbService({
   userDb: User,
-}).init({ makeDb, makeTeacherDbService, makePackageDbService });
+}).init({ makeDb, makeTeacherDbService, makePackageDbService, passwordLib: bcrypt });
 const makePackageTransactionDbService = new PackageTransactionDbService({
   packageTransactionDb: PackageTransaction,
 }).init({ makeDb });

@@ -15,6 +15,7 @@ class UserDbService
 {
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
+  private passwordLib!: any;
   constructor(props: any) {
     super(props.userDb);
     this.defaultSelectOptions = {
@@ -30,6 +31,9 @@ class UserDbService
       },
       isSelfSettings: {
         password: 0,
+        verificationToken: 0,
+      },
+      overrideSettings: {
         verificationToken: 0,
       },
     };
@@ -77,15 +81,37 @@ class UserDbService
     return await this._returnJoinedUser(accessOptions, asyncCallback);
   };
 
+  public authenticateUser = async (params: DbParams, inputtedPassword: string): Promise<any> => {
+    const user = await this.findOne(params);
+    if (!user) {
+      return null;
+    }
+    if (!user.password) {
+      throw new Error(
+        'It seems that you signed up previously through a third-party service like Google.'
+      );
+    }
+
+    const passwordIsValid = this.passwordLib.compareSync(inputtedPassword, user.password);
+    if (passwordIsValid) {
+      const { password, ...partialUserWithoutPassword } = user;
+      return partialUserWithoutPassword;
+    } else {
+      throw new Error('Username or password incorrect.');
+    }
+  };
+
   public init = async (props: {
     makeDb: any;
     makeTeacherDbService: Promise<TeacherDbService>;
     makePackageDbService: Promise<PackageDbService>;
+    passwordLib: any;
   }) => {
-    const { makeDb, makeTeacherDbService, makePackageDbService } = props;
+    const { makeDb, makeTeacherDbService, makePackageDbService, passwordLib } = props;
     await makeDb();
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;
+    this.passwordLib = passwordLib;
     return this;
   };
 }

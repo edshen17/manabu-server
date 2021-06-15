@@ -43,20 +43,6 @@ class CreateUserUsecase
     return !role && !_id && !dateRegistered;
   };
 
-  protected _setAccessOptionsTemplate = (
-    currentAPIUser: CurrentAPIUser,
-    isCurrentAPIUserPermitted: boolean,
-    params: any
-  ) => {
-    const accessOptions: AccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted,
-      currentAPIUserRole: currentAPIUser.role,
-      isSelf: true,
-    };
-    return accessOptions;
-  };
-
   private _sendVerificationEmail = (userInstance: any): void => {
     const host = 'https://manabu.sg';
     const { name, verificationToken } = userInstance;
@@ -89,9 +75,9 @@ class CreateUserUsecase
     );
   };
 
-  private _jwtToClient = (jwt: any, savedDbUser: any): string => {
+  public jwtToClient = (savedDbUser: any): string => {
     const { role, name } = savedDbUser;
-    const token = jwt.sign(
+    const token = this.jwt.sign(
       {
         _id: savedDbUser._id,
         role,
@@ -227,15 +213,22 @@ class CreateUserUsecase
     return newTeacherBalance;
   };
 
-  private _handleTeacherCreation = async (
+  public handleTeacherCreation = async (
     savedDbUser: JoinedUserDoc,
     accessOptions: AccessOptions
-  ) => {
-    await this._insertTeacher(savedDbUser, accessOptions);
-    await this._insertTeacherPackages(savedDbUser, accessOptions);
+  ): Promise<JoinedUserDoc> => {
+    const joinedUserData = JSON.parse(JSON.stringify(savedDbUser));
+    const teacherData: any = await this._insertTeacher(savedDbUser, accessOptions);
+    const packages = await this._insertTeacherPackages(savedDbUser, accessOptions);
+
     await this._insertAdminPackageTransaction(savedDbUser, accessOptions);
     await this._insertAdminMinuteBank(savedDbUser, accessOptions);
     await this._insertTeacherBalance(savedDbUser, accessOptions);
+
+    teacherData.packages = packages;
+    joinedUserData.teacherData = teacherData;
+    joinedUserData.teacherAppPending = true;
+    return joinedUserData;
   };
 
   protected _makeRequestTemplate = async (
@@ -246,10 +239,9 @@ class CreateUserUsecase
 
     try {
       const userInstance = makeUserEntity.build(body);
-      const savedDbUser = await this._insertUser(userInstance, accessOptions);
-
+      let savedDbUser = await this._insertUser(userInstance, accessOptions);
       if (isTeacherApp) {
-        await this._handleTeacherCreation(savedDbUser, accessOptions);
+        savedDbUser = await this.handleTeacherCreation(savedDbUser, accessOptions);
       }
 
       this._sendVerificationEmail(userInstance);
@@ -259,7 +251,7 @@ class CreateUserUsecase
       }
 
       return {
-        token: this._jwtToClient(this.jwt, savedDbUser),
+        token: this.jwtToClient(savedDbUser),
         user: savedDbUser,
         isLoginToken: true,
       };

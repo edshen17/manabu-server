@@ -4,6 +4,7 @@ type DefaultSelectOptions = {
   defaultSettings: {};
   adminSettings?: {};
   isSelfSettings?: {};
+  overrideSettings?: {};
 };
 
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
@@ -14,8 +15,9 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   }
 
   protected _configureSelectOptions = (accessOptions: AccessOptions): {} => {
-    const { isSelf, currentAPIUserRole } = accessOptions;
-    const { defaultSettings, adminSettings, isSelfSettings } = this.defaultSelectOptions;
+    const { isSelf, currentAPIUserRole, isOverridingSelectOptions } = accessOptions || {};
+    const { defaultSettings, adminSettings, isSelfSettings, overrideSettings } =
+      this.defaultSelectOptions;
     let selectOptions: any = defaultSettings;
 
     if (isSelf) {
@@ -26,6 +28,9 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
       selectOptions = adminSettings;
     }
 
+    if (isOverridingSelectOptions) {
+      selectOptions = overrideSettings;
+    }
     return selectOptions || defaultSettings;
   };
 

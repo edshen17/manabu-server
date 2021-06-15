@@ -10,6 +10,7 @@ type MakeRequestTemplateParams = {
   query: any;
   endpointPath: string;
   currentAPIUser: CurrentAPIUser;
+  controllerData: ControllerData;
 };
 
 abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseResponse> {
@@ -87,6 +88,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       query,
       endpointPath,
       currentAPIUser,
+      controllerData,
     };
   };
 

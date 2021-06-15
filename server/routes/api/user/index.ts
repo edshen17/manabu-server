@@ -5,7 +5,10 @@ import {
   makeCreateUserController,
   makeEditUserController,
 } from '../../../components/controllers/user';
-import { makeVerifyEmailTokenController } from '../../../components/controllers/user/auth';
+import {
+  makeLoginUserController,
+  makeVerifyEmailTokenController,
+} from '../../../components/controllers/user/auth';
 import { makeExpressCallback } from '../../../components/expressCallback/callbacks';
 import { makeAuthCookieExpressCallback } from '../../../components/expressCallback/callbacks/cookieCallbacks';
 import { makeRedirectExpressCallbackDashboard } from '../../../components/expressCallback/callbacks/redirectCallbacks';
@@ -29,5 +32,7 @@ users.get(
   VerifyToken,
   makeRedirectExpressCallbackDashboard.consume(makeVerifyEmailTokenController)
 );
+
+users.post('/auth/login', makeExpressCallback.consume(makeLoginUserController));
 
 export default users;

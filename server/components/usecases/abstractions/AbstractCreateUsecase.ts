@@ -22,10 +22,10 @@ abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<Us
     params: any
   ) => {
     const accessOptions: AccessOptions = {
-      isProtectedResource: true,
+      isProtectedResource: false,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
-      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
+      isSelf: true,
     };
     return accessOptions;
   };
