@@ -17,20 +17,23 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   };
 
   private _handleUserToTeacher = async (props: {
-    user: JoinedUserDoc;
+    savedDbUser: JoinedUserDoc;
     accessOptions: AccessOptions;
     isTeacherApp: boolean;
-    callbackTemplate: any;
+    handleUserToTeacherTemplate: any;
   }): Promise<JoinedUserDoc> => {
-    const { accessOptions, isTeacherApp, callbackTemplate } = props || {};
-    let { user } = props;
-    if (user) {
-      if (!(user.teacherAppPending || user.role == 'teacher') && isTeacherApp) {
-        user = await this.createUserUsecase.handleTeacherCreation(user, accessOptions);
+    const { accessOptions, isTeacherApp, handleUserToTeacherTemplate } = props || {};
+    let { savedDbUser } = props;
+    if (savedDbUser) {
+      if (!(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp) {
+        savedDbUser = await this.createUserUsecase.handleTeacherCreation(
+          savedDbUser,
+          accessOptions
+        );
       }
-      return user;
+      return savedDbUser;
     } else {
-      return await callbackTemplate();
+      return await handleUserToTeacherTemplate();
     }
   };
 
@@ -43,18 +46,23 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     const { email, password, isTeacherApp } = body || {};
     const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
     accessOptionsCopy.isOverridingSelectOptions = true;
-    let user = await this.userDbService.authenticateUser(
+    let savedDbUser = await this.userDbService.authenticateUser(
       {
         searchQuery: { email },
         accessOptions: accessOptionsCopy,
       },
       password
     );
-    const callbackTemplate = () => {
+    const handleUserToTeacherTemplate = () => {
       throw new Error('Username or password incorrect.');
     };
-    user = await this._handleUserToTeacher({ user, accessOptions, isTeacherApp, callbackTemplate });
-    return user;
+    savedDbUser = await this._handleUserToTeacher({
+      savedDbUser,
+      accessOptions,
+      isTeacherApp,
+      handleUserToTeacherTemplate,
+    });
+    return savedDbUser;
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {
@@ -86,20 +94,32 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     return googleRes.data;
   };
 
-  private _handleGoogleLogin = async (props: { query: any; accessOptions: AccessOptions }) => {
-    const { query, accessOptions } = props;
+  private _handleGoogleLogin = async (props: {
+    query: any;
+    accessOptions: AccessOptions;
+    body: any;
+    controllerData: ControllerData;
+  }) => {
+    const { accessOptions, body, controllerData, query } = props;
     const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
     const { tokens } = await this.oauth2Client.getToken(code);
     const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
-    let user = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
-    if (user) {
-      if (isTeacherApp) {
-        user = await this.createUserUsecase.handleTeacherCreation(user, accessOptions);
-      }
-      return user;
-    } else {
-      // user = await this.createUserUsecase.makeRequest();
-    }
+    let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
+
+    const handleUserToTeacherTemplate = async () => {
+      body.name = name;
+      body.email = email;
+      body.profilePicture = picture;
+      const savedDbUser = await this.createUserUsecase.makeRequest(controllerData);
+      return savedDbUser;
+    };
+
+    return await this._handleUserToTeacher({
+      savedDbUser,
+      accessOptions,
+      isTeacherApp,
+      handleUserToTeacherTemplate,
+    });
   };
 
   protected _isCurrentAPIUserPermitted(props: {
@@ -114,7 +134,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
-    const { body, accessOptions, query, endpointPath } = props;
+    const { body, accessOptions, query, endpointPath, controllerData } = props;
     let savedDbUser: any;
     if (endpointPath == '/auth/login') {
       savedDbUser = await this._handleBaseLogin({
@@ -123,7 +143,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
         accessOptions,
       });
     } else if (endpointPath == '/auth/google') {
-      savedDbUser = await this._handleGoogleLogin({ query, accessOptions });
+      savedDbUser = await this._handleGoogleLogin({ query, accessOptions, body, controllerData });
     } else {
       throw new Error('Unsupported authentication endpoint.');
     }
