@@ -15,11 +15,11 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   }
 
   private _awaitUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
-    const { currentAPIUser, path, params, body } = httpRequest;
+    const { currentAPIUser, path, params, body, query } = httpRequest;
     const controllerData = {
       currentAPIUser,
       endpointPath: path,
-      routeData: { params, body },
+      routeData: { params, body, query },
     };
     const usecaseRes = await this.usecase.makeRequest(controllerData);
     return usecaseRes;

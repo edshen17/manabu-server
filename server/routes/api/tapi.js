@@ -168,47 +168,6 @@ router.get('/auth/google', async (req, res, next) => {
   });
 });
 
-// POST login
-// logging users in
-router.post('/login', function (req, res, next) {
-  User.findOne({
-    email: req.body.email,
-  })
-    .lean()
-    .select({ _id: 1, email: 1, role: 1, password: 1 })
-    .cache()
-    .then(async function (user) {
-      if (!user) return res.status(404).send('An account with that email was not found.');
-      if (!user.password)
-        return res.status(500).send('You already signed up with Google or Facebook.');
-      const passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-      if (!passwordIsValid)
-        return res
-          .status(401)
-          .send(
-            'Incorrect username or password. Passwords requirements were: a minimum of 8 characters with at least one capital letter, number, and special character.'
-          );
-      else {
-        const isTeacherApp = req.body.isTeacherApp;
-        if (isTeacherApp) {
-          const newTeacher = new Teacher({
-            userId: user._id,
-          });
-          newTeacher
-            .save()
-            .then(() => {
-              clearKey(Teacher.collection.collectionName);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-        returnToken(res, user);
-      }
-    })
-    .catch((err) => handleErrors(err, req, res, next));
-});
-
 // route for finding/filtering teachers
 router.get('/teachers', (req, res, next) => {
   let { dateApproved, hourlyRate, teacherType, alsoSpeaks, teachingLanguages, page, pending } =

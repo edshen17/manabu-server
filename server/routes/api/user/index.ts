@@ -33,6 +33,7 @@ users.get(
   makeRedirectExpressCallbackDashboard.consume(makeVerifyEmailTokenController)
 );
 
-users.post('/auth/login', makeExpressCallback.consume(makeLoginUserController));
+users.post('/auth/login', makeAuthCookieExpressCallback.consume(makeLoginUserController));
+users.get('/auth/google', makeAuthCookieExpressCallback.consume(makeLoginUserController));
 
 export default users;
