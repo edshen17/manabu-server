@@ -21,11 +21,13 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     accessOptions: AccessOptions;
     isTeacherApp: boolean;
     handleUserToTeacherTemplate: any;
-  }): Promise<JoinedUserDoc> => {
+  }): Promise<any> => {
     const { accessOptions, isTeacherApp, handleUserToTeacherTemplate } = props || {};
     let { savedDbUser } = props;
     if (savedDbUser) {
-      if (!(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp) {
+      const shouldCreateNewTeacher =
+        !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
+      if (shouldCreateNewTeacher) {
         savedDbUser = await this.createUserUsecase.handleTeacherCreation(
           savedDbUser,
           accessOptions
@@ -44,12 +46,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   }): Promise<JoinedUserDoc> => {
     const { body, accessOptions } = props;
     const { email, password, isTeacherApp } = body || {};
-    const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
-    accessOptionsCopy.isOverridingSelectOptions = true;
+    accessOptions.isOverridingSelectOptions = true;
     let savedDbUser = await this.userDbService.authenticateUser(
       {
         searchQuery: { email },
-        accessOptions: accessOptionsCopy,
+        accessOptions,
       },
       password
     );
@@ -94,6 +95,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     return googleRes.data;
   };
 
+  // Opportunity to refactor: makeRequest returns a token so it's redundant to get only the user property
+  // and have _makeRequestTemplate return a new token...
   private _handleGoogleLogin = async (props: {
     query: any;
     accessOptions: AccessOptions;
@@ -110,8 +113,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       body.name = name;
       body.email = email;
       body.profilePicture = picture;
-      const savedDbUser = await this.createUserUsecase.makeRequest(controllerData);
-      return savedDbUser;
+      body.isTeacherApp = isTeacherApp;
+      const userRes = await this.createUserUsecase.makeRequest(controllerData);
+      if ('user' in userRes) {
+        return userRes.user;
+      }
     };
 
     return await this._handleUserToTeacher({
@@ -135,7 +141,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
     const { body, accessOptions, query, endpointPath, controllerData } = props;
-    let savedDbUser: any;
+    let savedDbUser;
     if (endpointPath == '/auth/login') {
       savedDbUser = await this._handleBaseLogin({
         body,
@@ -147,6 +153,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     } else {
       throw new Error('Unsupported authentication endpoint.');
     }
+
     const token = this.createUserUsecase.jwtToClient(savedDbUser);
     return { user: savedDbUser, token, isLoginToken: true };
   };
