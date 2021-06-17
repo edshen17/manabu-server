@@ -1,10 +1,10 @@
 import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
-import { UserDbService } from '../../../dataAccess/services/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/usersDb';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
-type VerifyEmailTokenUsecaseResponse = void;
+type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: string };
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecaseResponse> {
   private userDbService!: UserDbService;
@@ -46,11 +46,15 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
       accessOptions,
     });
     if (user) {
-      await this.userDbService.update({
+      const updatedDbUser = await this.userDbService.update({
         searchQuery: { _id: user._id },
         updateParams: { emailVerified: true },
         accessOptions,
       });
+      return {
+        redirectURI: 'www.google.com',
+        user: updatedDbUser,
+      };
     } else {
       throw new Error('Resource not found.');
     }

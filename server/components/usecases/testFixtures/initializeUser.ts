@@ -18,14 +18,13 @@ const initializeUser = async (props: {
   if (isTeacherApp) {
     routeData.body.isTeacherApp = true;
   }
-  const authToken: any = await createUserUsecase.makeRequest(controllerData);
-  const secret: any = process.env.JWT_SECRET;
-  const decoded: any = jwt.verify(authToken.token, secret);
+  const userRes: any = await createUserUsecase.makeRequest(controllerData);
+  const savedDbUser = userRes.user;
   const currentAPIUser: CurrentAPIUser = {
-    userId: decoded._id,
+    userId: savedDbUser._id,
     role: viewingAs,
   };
-  const getRouteData = { params: { uId: decoded._id }, body: { isTeacherApp: false } };
+  const getRouteData = { params: { uId: savedDbUser._id }, body: { isTeacherApp: false } };
 
   if (!isSelf) {
     currentAPIUser.userId = undefined;

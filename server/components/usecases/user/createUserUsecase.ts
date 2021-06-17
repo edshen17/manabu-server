@@ -16,13 +16,21 @@ import { makeTeacherBalanceEntity } from '../../entities/teacherBalance';
 import { makeUserEntity } from '../../entities/user';
 import { makeTeacherEntity } from '../../entities/teacher';
 import { EmailHandler } from '../../utils/email/emailHandler';
-import { ControllerData, CurrentAPIUser, IUsecase } from '../abstractions/IUsecase';
+import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 
-type CreateUserUsecaseResponse =
-  | { token: string; user: JoinedUserDoc; isLoginToken: boolean }
-  | Error;
+type CookieData = {
+  name: string;
+  value: string;
+  options: {
+    maxAge: number;
+    httpOnly: boolean;
+    secure: boolean;
+  };
+};
+
+type CreateUserUsecaseResponse = { user: JoinedUserDoc; cookies: CookieData[] } | Error;
 
 class CreateUserUsecase
   extends AbstractCreateUsecase<CreateUserUsecaseResponse>
@@ -36,6 +44,37 @@ class CreateUserUsecase
   private teacherBalanceDbService!: TeacherBalanceDbService;
   private jwt!: any;
   private emailHandler!: EmailHandler;
+
+  private _setCookieOptions = (): CookieData['options'] => {
+    const cookieOptions = {
+      maxAge: 2 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: true,
+    };
+
+    if (process.env.NODE_ENV != 'production') {
+      cookieOptions.httpOnly = false;
+      cookieOptions.secure = false;
+    }
+    return cookieOptions;
+  };
+
+  public splitLoginCookies = (savedDbUser: JoinedUserDoc): CookieData[] => {
+    const token = this._jwtToClient(savedDbUser);
+    const tokenArr: string[] = token.split('.');
+    const hpCookie = {
+      name: 'hp',
+      value: `${tokenArr[0]}.${tokenArr[1]}`,
+      options: this._setCookieOptions(),
+    };
+    const sigCookie = {
+      name: 'sig',
+      value: `.${tokenArr[2]}`,
+      options: this._setCookieOptions(),
+    };
+    const loginCookies = [hpCookie, sigCookie];
+    return loginCookies;
+  };
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -75,7 +114,7 @@ class CreateUserUsecase
     );
   };
 
-  public jwtToClient = (savedDbUser: any): string => {
+  private _jwtToClient = (savedDbUser: any): string => {
     const { role, name } = savedDbUser;
     const token = this.jwt.sign(
       {
@@ -249,11 +288,10 @@ class CreateUserUsecase
       if (process.env.NODE_ENV == 'production') {
         this._sendInternalEmail(userInstance, isTeacherApp);
       }
-
+      const cookies = this.splitLoginCookies(savedDbUser);
       return {
-        token: this.jwtToClient(savedDbUser),
         user: savedDbUser,
-        isLoginToken: true,
+        cookies,
       };
     } catch (err) {
       throw err;

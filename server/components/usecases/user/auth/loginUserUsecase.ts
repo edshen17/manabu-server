@@ -95,8 +95,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     return googleRes.data;
   };
 
-  // Opportunity to refactor: makeRequest returns a token so it's redundant to get only the user property
-  // and have _makeRequestTemplate return a new token...
   private _handleGoogleLogin = async (props: {
     query: any;
     accessOptions: AccessOptions;
@@ -109,6 +107,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
     let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
 
+    // Opportunity to refactor, since makeRequest already signs a jwt token...
     const handleUserToTeacherTemplate = async () => {
       body.name = name;
       body.email = email;
@@ -153,9 +152,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     } else {
       throw new Error('Unsupported authentication endpoint.');
     }
-
-    const token = this.createUserUsecase.jwtToClient(savedDbUser);
-    return { user: savedDbUser, token, isLoginToken: true };
+    const cookies = this.createUserUsecase.splitLoginCookies(savedDbUser);
+    return { user: savedDbUser, cookies };
   };
 
   public init = async (props: {

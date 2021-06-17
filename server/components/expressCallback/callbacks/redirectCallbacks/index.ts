@@ -1,13 +1,13 @@
-import { getServerHostURI } from '../../utils/getHost';
-import { RedirectExpressCallbackBuilder } from './builders/redirectExpressCallbackBuilder';
+// import { getServerHostURI } from '../../utils/getHost';
+// import { RedirectExpressCallbackBuilder } from './builders/redirectExpressCallbackBuilder';
 
-const clientHostURI = getServerHostURI('client')!;
-const apiHostURI = getServerHostURI('server')!;
+// const clientHostURI = getServerHostURI('client')!;
+// const apiHostURI = getServerHostURI('server')!;
 
-const makeRedirectExpressCallbackBuilder = new RedirectExpressCallbackBuilder();
-const makeRedirectExpressCallbackDashboard = makeRedirectExpressCallbackBuilder
-  .host(clientHostURI)
-  .endpointPath('/dashboard')
-  .build();
+// const makeRedirectExpressCallbackBuilder = new RedirectExpressCallbackBuilder();
+// const makeRedirectExpressCallbackDashboard = makeRedirectExpressCallbackBuilder
+//   .host(clientHostURI)
+//   .endpointPath('/dashboard')
+//   .build();
 
-export { makeRedirectExpressCallbackDashboard };
+// export { makeRedirectExpressCallbackDashboard };

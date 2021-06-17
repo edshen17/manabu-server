@@ -1,7 +1,7 @@
 import { IController } from '../../controllers/abstractions/IController';
 import { IExpressCallback } from './IExpressCallback';
 abstract class AbstractExpressCallback implements IExpressCallback {
-  protected abstract _consumeTemplate(res: any, body: any): void;
+  public abstract consumeTemplate(res: any, body: any): void;
   private _createHttpRequest = (req: any) => {
     const httpRequest = {
       body: req.body,
@@ -34,9 +34,12 @@ abstract class AbstractExpressCallback implements IExpressCallback {
         if (headers) {
           res.set(headers);
         }
-        res.type('json');
-        this._consumeTemplate(res, body);
-        res.status(statusCode).send(body);
+        res.status(statusCode);
+        if (body.err) {
+          res.json(body);
+        } else {
+          this.consumeTemplate(res, body);
+        }
       } catch (err) {
         res.status(500).send({ err: err.message });
       }
