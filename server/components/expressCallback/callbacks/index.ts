@@ -11,7 +11,6 @@ const makeJSONExpressCallback = new JSONCallbackDecorator(makeExpressCallback);
 const makeJSONCookieExpressCallback = new JSONCallbackDecorator(makeCookieExpressCallback);
 
 export {
-  makeExpressCallback,
   makeCookieExpressCallback,
   makeRedirectExpressCallback,
   makeCookieRedirectExpressCallback,

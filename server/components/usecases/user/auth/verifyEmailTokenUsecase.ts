@@ -1,5 +1,6 @@
 import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/usersDb';
+import { RedirectPathBuilder } from '../../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
@@ -8,7 +9,7 @@ type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: strin
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecaseResponse> {
   private userDbService!: UserDbService;
-
+  private redirectPathBuilder!: RedirectPathBuilder;
   protected _isCurrentAPIUserPermitted(props: {
     params: any;
     query?: any;
@@ -51,8 +52,12 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
         updateParams: { emailVerified: true },
         accessOptions,
       });
+      const redirectURI = this.redirectPathBuilder
+        .host('client')
+        .endpointPath('/dashboard')
+        .build();
       return {
-        redirectURI: 'www.google.com',
+        redirectURI,
         user: updatedDbUser,
       };
     } else {
@@ -60,8 +65,13 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
     }
   };
 
-  public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
-    this.userDbService = await services.makeUserDbService;
+  public init = async (props: {
+    makeUserDbService: Promise<UserDbService>;
+    makeRedirectPathBuilder: RedirectPathBuilder;
+  }): Promise<this> => {
+    const { makeUserDbService, makeRedirectPathBuilder } = props;
+    this.userDbService = await makeUserDbService;
+    this.redirectPathBuilder = makeRedirectPathBuilder;
     return this;
   };
 }
