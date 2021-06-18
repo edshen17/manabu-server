@@ -10,8 +10,6 @@ const oauthRedirectURI = makeRedirectPathBuilder
   .endpointPath('/users/auth/google')
   .build();
 
-console.log(oauthRedirectURI, 'redirect uri');
-
 const oauth2Client = new google.auth.OAuth2(
   process.env.G_CLIENTID,
   process.env.GOOGLE_CLIENT_SECRET,

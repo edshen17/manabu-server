@@ -10,6 +10,7 @@ import {
   makeVerifyEmailTokenController,
 } from '../../../components/controllers/user/auth';
 import {
+  makeCookieRedirectExpressCallback,
   makeJSONCookieExpressCallback,
   makeJSONExpressCallback,
   makeRedirectExpressCallback,
@@ -34,6 +35,6 @@ users.get(
 );
 
 users.post('/auth/login', makeJSONCookieExpressCallback.consume(makeLoginUserController));
-users.get('/auth/google', makeJSONCookieExpressCallback.consume(makeLoginUserController));
+users.get('/auth/google', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
 
 export default users;

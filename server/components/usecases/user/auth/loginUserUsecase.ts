@@ -4,7 +4,7 @@ import { RedirectPathBuilder } from '../../../utils/redirectPathBuilder/redirect
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
-import { CookieData, CreateUserUsecase, CreateUserUsecaseResponse } from '../createUserUsecase';
+import { CreateUserUsecase, CreateUserUsecaseResponse } from '../createUserUsecase';
 
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
@@ -14,46 +14,27 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   private oauth2Client!: any;
   private google!: any;
   private redirectPathBuilder!: RedirectPathBuilder;
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    return true;
-  };
+  private MANABU_DASHBOARD_URI!: string;
 
-  private _createLoginUserUsecaseResponse = (
-    savedDbUser: JoinedUserDoc,
-    hasRedirectURI: boolean
-  ): LoginUserUsecaseResponse => {
-    const MANABU_DASHBOARD_URI = this.redirectPathBuilder
-      .host('client')
-      .endpointPath('/dashboard')
-      .build();
-    const redirectURI = hasRedirectURI ? MANABU_DASHBOARD_URI : undefined;
-    return {
-      user: savedDbUser,
-      cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
-      redirectURI,
-    };
-  };
-
-  private _handleUserToTeacher = async (props: {
-    savedDbUser: JoinedUserDoc;
-    accessOptions: AccessOptions;
-    isTeacherApp: boolean;
-    handleUserToTeacherTemplate: () => any;
-  }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, isTeacherApp, handleUserToTeacherTemplate } = props || {};
-    let { savedDbUser } = props;
-    if (savedDbUser) {
-      const shouldCreateNewTeacher =
-        !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
-      if (shouldCreateNewTeacher) {
-        savedDbUser = await this.createUserUsecase.handleTeacherCreation(
-          savedDbUser,
-          accessOptions
-        );
-      }
-      return this._createLoginUserUsecaseResponse(savedDbUser, false);
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<LoginUserUsecaseResponse> => {
+    const { body, accessOptions, query, endpointPath, controllerData } = props;
+    if (endpointPath == '/auth/login') {
+      return await this._handleBaseLogin({
+        body,
+        query,
+        accessOptions,
+      });
+    } else if (endpointPath == '/auth/google') {
+      return await this._handleGoogleLogin({
+        query,
+        accessOptions,
+        body,
+        controllerData,
+      });
     } else {
-      return await handleUserToTeacherTemplate();
+      throw new Error('Unsupported authentication endpoint.');
     }
   };
 
@@ -72,16 +53,49 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       },
       password
     );
-    const handleUserToTeacherTemplate = () => {
+    const handleNewUser = () => {
       throw new Error('Username or password incorrect.');
     };
     savedDbUser = await this._handleUserToTeacher({
       savedDbUser,
       accessOptions,
       isTeacherApp,
-      handleUserToTeacherTemplate,
+      handleNewUser,
     });
     return this._createLoginUserUsecaseResponse(savedDbUser, false);
+  };
+
+  private _handleGoogleLogin = async (props: {
+    query: any;
+    accessOptions: AccessOptions;
+    body: any;
+    controllerData: ControllerData;
+  }): Promise<LoginUserUsecaseResponse> => {
+    const { accessOptions, body, controllerData, query } = props;
+    const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
+    const { tokens } = await this.oauth2Client.getToken(code);
+    const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
+
+    let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
+
+    const handleNewUser = async () => {
+      body.name = name;
+      body.email = email;
+      body.profilePicture = picture;
+      body.isTeacherApp = isTeacherApp;
+      const userRes = await this.createUserUsecase.makeRequest(controllerData);
+      if ('user' in userRes) {
+        userRes.redirectURI = this.MANABU_DASHBOARD_URI;
+      }
+      return userRes;
+    };
+
+    return await this._handleUserToTeacher({
+      savedDbUser,
+      accessOptions,
+      isTeacherApp,
+      handleNewUser,
+    });
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {
@@ -113,37 +127,43 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     return googleRes.data;
   };
 
-  private _handleGoogleLogin = async (props: {
-    query: any;
+  private _handleUserToTeacher = async (props: {
+    savedDbUser: JoinedUserDoc;
     accessOptions: AccessOptions;
-    body: any;
-    controllerData: ControllerData;
+    isTeacherApp: boolean;
+    handleNewUser: () => any;
   }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, body, controllerData, query } = props;
-    const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
-    const { tokens } = await this.oauth2Client.getToken(code);
-    const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
-
-    let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
-
-    const handleUserToTeacherTemplate = async () => {
-      body.name = name;
-      body.email = email;
-      body.profilePicture = picture;
-      body.isTeacherApp = isTeacherApp;
-      const userRes = await this.createUserUsecase.makeRequest(controllerData);
-      if ('user' in userRes) {
-        userRes.redirectURI = 'test';
+    const { accessOptions, isTeacherApp, handleNewUser } = props || {};
+    let { savedDbUser } = props;
+    if (savedDbUser) {
+      const shouldCreateNewTeacher =
+        !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
+      if (shouldCreateNewTeacher) {
+        savedDbUser = await this.createUserUsecase.handleTeacherCreation(
+          savedDbUser,
+          accessOptions
+        );
       }
-      return userRes;
-    };
+      return this._createLoginUserUsecaseResponse(savedDbUser, false);
+    } else {
+      return await handleNewUser();
+    }
+  };
 
-    return await this._handleUserToTeacher({
-      savedDbUser,
-      accessOptions,
-      isTeacherApp,
-      handleUserToTeacherTemplate,
-    });
+  private _createLoginUserUsecaseResponse = (
+    savedDbUser: JoinedUserDoc,
+    hasRedirectURI: boolean
+  ): LoginUserUsecaseResponse => {
+    const redirectURI = hasRedirectURI ? this.MANABU_DASHBOARD_URI : undefined;
+    return {
+      user: savedDbUser,
+      cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
+      redirectURI,
+    };
+  };
+
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    return true;
   };
 
   protected _isCurrentAPIUserPermitted(props: {
@@ -154,28 +174,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   }): boolean {
     return true;
   }
-
-  protected _makeRequestTemplate = async (
-    props: MakeRequestTemplateParams
-  ): Promise<LoginUserUsecaseResponse> => {
-    const { body, accessOptions, query, endpointPath, controllerData } = props;
-    if (endpointPath == '/auth/login') {
-      return await this._handleBaseLogin({
-        body,
-        query,
-        accessOptions,
-      });
-    } else if (endpointPath == '/auth/google') {
-      return await this._handleGoogleLogin({
-        query,
-        accessOptions,
-        body,
-        controllerData,
-      });
-    } else {
-      throw new Error('Unsupported authentication endpoint.');
-    }
-  };
 
   public init = async (props: {
     makeUserDbService: Promise<UserDbService>;
@@ -196,6 +194,10 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     this.oauth2Client = oauth2Client;
     this.google = google;
     this.redirectPathBuilder = makeRedirectPathBuilder;
+    this.MANABU_DASHBOARD_URI = this.redirectPathBuilder
+      .host('client')
+      .endpointPath('/dashboard')
+      .build();
     return this;
   };
 }
