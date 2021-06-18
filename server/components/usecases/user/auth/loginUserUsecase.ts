@@ -8,25 +8,30 @@ import { CreateUserUsecase, CreateUserUsecaseResponse } from '../createUserUseca
 
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
+enum SERVER_LOGIN_ENDPOINTS {
+  BASE_LOGIN = '/auth/login',
+  GOOGLE_LOGIN = '/auth/google',
+}
+
 class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   private userDbService!: UserDbService;
   private createUserUsecase!: CreateUserUsecase;
   private oauth2Client!: any;
   private google!: any;
   private redirectPathBuilder!: RedirectPathBuilder;
-  private MANABU_DASHBOARD_URI!: string;
+  private CLIENT_DASHBOARD_URI!: string;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
     const { body, accessOptions, query, endpointPath, controllerData } = props;
-    if (endpointPath == '/auth/login') {
+    if (endpointPath == SERVER_LOGIN_ENDPOINTS.BASE_LOGIN) {
       return await this._handleBaseLogin({
         body,
         query,
         accessOptions,
       });
-    } else if (endpointPath == '/auth/google') {
+    } else if (endpointPath == SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN) {
       return await this._handleGoogleLogin({
         query,
         accessOptions,
@@ -85,7 +90,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       body.isTeacherApp = isTeacherApp;
       const userRes = await this.createUserUsecase.makeRequest(controllerData);
       if ('user' in userRes) {
-        userRes.redirectURI = this.MANABU_DASHBOARD_URI;
+        userRes.redirectURI = this.CLIENT_DASHBOARD_URI;
       }
       return userRes;
     };
@@ -154,7 +159,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     savedDbUser: JoinedUserDoc,
     hasRedirectURI: boolean
   ): LoginUserUsecaseResponse => {
-    const redirectURI = hasRedirectURI ? this.MANABU_DASHBOARD_URI : undefined;
+    const redirectURI = hasRedirectURI ? this.CLIENT_DASHBOARD_URI : undefined;
     return {
       user: savedDbUser,
       cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
@@ -194,7 +199,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     this.oauth2Client = oauth2Client;
     this.google = google;
     this.redirectPathBuilder = makeRedirectPathBuilder;
-    this.MANABU_DASHBOARD_URI = this.redirectPathBuilder
+    this.CLIENT_DASHBOARD_URI = this.redirectPathBuilder
       .host('client')
       .endpointPath('/dashboard')
       .build();

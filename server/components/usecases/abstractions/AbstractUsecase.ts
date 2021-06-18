@@ -18,6 +18,49 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
   constructor(makeRequestErrorMsg: string) {
     this.makeRequestErrorMsg = makeRequestErrorMsg;
   }
+
+  public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
+    const setUpProps = this._makeRequestSetupTemplate(controllerData);
+    const { isValidRequest } = setUpProps;
+
+    if (isValidRequest) {
+      return await this._makeRequestTemplate(setUpProps);
+    } else {
+      throw new Error(this.makeRequestErrorMsg);
+    }
+  };
+
+  protected _makeRequestSetupTemplate = (
+    controllerData: ControllerData
+  ): MakeRequestTemplateParams => {
+    const { routeData, currentAPIUser, endpointPath } = controllerData;
+    const { body, params, query } = routeData;
+    const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
+      params,
+      query,
+      currentAPIUser,
+      endpointPath,
+    });
+
+    const accessOptions: AccessOptions = this._setAccessOptions({
+      isCurrentAPIUserPermitted,
+      currentAPIUser,
+      params,
+    });
+    const isValidRequest = this._isValidRequest(controllerData);
+    return {
+      accessOptions,
+      body,
+      isValidRequest,
+      isCurrentAPIUserPermitted,
+      params,
+      query,
+      endpointPath,
+      currentAPIUser,
+      controllerData,
+    };
+  };
+
   protected _isCurrentAPIUserPermitted(props: {
     params: any;
     query?: any;
@@ -61,51 +104,10 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
 
   protected abstract _isValidRequest(controllerData: ControllerData): boolean;
 
-  protected _makeRequestSetupTemplate = (
-    controllerData: ControllerData
-  ): MakeRequestTemplateParams => {
-    const { routeData, currentAPIUser, endpointPath } = controllerData;
-    const { body, params, query } = routeData;
-    const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
-      params,
-      query,
-      currentAPIUser,
-      endpointPath,
-    });
-
-    const accessOptions: AccessOptions = this._setAccessOptions({
-      isCurrentAPIUserPermitted,
-      currentAPIUser,
-      params,
-    });
-    const isValidRequest = this._isValidRequest(controllerData);
-    return {
-      accessOptions,
-      body,
-      isValidRequest,
-      isCurrentAPIUserPermitted,
-      params,
-      query,
-      endpointPath,
-      currentAPIUser,
-      controllerData,
-    };
-  };
-
   protected abstract _makeRequestTemplate(
     props: MakeRequestTemplateParams
   ): Promise<UsecaseResponse>;
 
-  public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
-    const setUpProps = this._makeRequestSetupTemplate(controllerData);
-    const { isValidRequest } = setUpProps;
-
-    if (isValidRequest) {
-      return await this._makeRequestTemplate(setUpProps);
-    } else {
-      throw new Error(this.makeRequestErrorMsg);
-    }
-  };
   abstract init(services: any): Promise<this>;
 }
 
