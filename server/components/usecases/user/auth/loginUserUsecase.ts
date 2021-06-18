@@ -53,14 +53,14 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       },
       password
     );
-    const handleNewUser = () => {
+    const handleNoSavedDbUser = () => {
       throw new Error('Username or password incorrect.');
     };
     savedDbUser = await this._handleUserToTeacher({
       savedDbUser,
       accessOptions,
       isTeacherApp,
-      handleNewUser,
+      handleNoSavedDbUser,
     });
     return this._createLoginUserUsecaseResponse(savedDbUser, false);
   };
@@ -78,7 +78,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
 
     let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
 
-    const handleNewUser = async () => {
+    const handleNoSavedDbUser = async () => {
       body.name = name;
       body.email = email;
       body.profilePicture = picture;
@@ -94,7 +94,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       savedDbUser,
       accessOptions,
       isTeacherApp,
-      handleNewUser,
+      handleNoSavedDbUser,
     });
   };
 
@@ -131,9 +131,9 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     savedDbUser: JoinedUserDoc;
     accessOptions: AccessOptions;
     isTeacherApp: boolean;
-    handleNewUser: () => any;
+    handleNoSavedDbUser: () => any;
   }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, isTeacherApp, handleNewUser } = props || {};
+    const { accessOptions, isTeacherApp, handleNoSavedDbUser } = props || {};
     let { savedDbUser } = props;
     if (savedDbUser) {
       const shouldCreateNewTeacher =
@@ -146,7 +146,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       }
       return this._createLoginUserUsecaseResponse(savedDbUser, false);
     } else {
-      return await handleNewUser();
+      return await handleNoSavedDbUser();
     }
   };
 
