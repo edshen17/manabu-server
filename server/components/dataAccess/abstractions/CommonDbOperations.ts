@@ -111,7 +111,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     return t;
   };
 
-  public updateMany = async (params: DbParams): Promise<DbDoc> => {
+  public updateMany = async (params: DbParams): Promise<DbDoc[]> => {
     const { searchQuery, updateParams, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel

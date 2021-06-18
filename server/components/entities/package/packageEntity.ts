@@ -49,4 +49,4 @@ class PackageEntity
   };
 }
 
-export { PackageEntity };
+export { PackageEntity, PackageEntityResponse };

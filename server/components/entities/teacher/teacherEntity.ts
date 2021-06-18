@@ -1,6 +1,19 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
+const TEACHER_ENTITY_DEFAULT_VALUES = Object.freeze({
+  teachingLanguages: [],
+  alsoSpeaks: [],
+  introductionVideo: '',
+  isApproved: false,
+  isHidden: false,
+  teacherType: 'unlicensed',
+  licensePath: '',
+  hourlyRate: { amount: 35, currency: 'SGD' },
+  lessonCount: 0,
+  studentCount: 0,
+});
+
 type TeacherEntityResponse = {
   userId: string;
   teachingLanguages: { language: string; level: string }[];
@@ -23,16 +36,7 @@ class TeacherEntity
     const { userId } = entityData;
     return Object.freeze({
       userId,
-      teachingLanguages: [],
-      alsoSpeaks: [],
-      introductionVideo: '',
-      isApproved: false,
-      isHidden: false,
-      teacherType: 'unlicensed',
-      licensePath: '',
-      hourlyRate: { amount: 35, currency: 'SGD' },
-      lessonCount: 0,
-      studentCount: 0,
+      ...TEACHER_ENTITY_DEFAULT_VALUES,
     });
   }
 }

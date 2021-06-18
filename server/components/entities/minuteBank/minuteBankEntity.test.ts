@@ -3,7 +3,6 @@ import { createFakeDbUser } from '../../dataAccess/services/usersDb.test';
 import { makeMinuteBankEntity } from './index';
 
 const expect = chai.expect;
-const assert = chai.assert;
 context('minuteBank entity', () => {
   describe('build', () => {
     describe('given valid inputs', () => {
