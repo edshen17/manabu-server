@@ -30,7 +30,9 @@ type CookieData = {
   };
 };
 
-type CreateUserUsecaseResponse = { user: JoinedUserDoc; cookies: CookieData[] } | Error;
+type CreateUserUsecaseResponse =
+  | { user: JoinedUserDoc; cookies: CookieData[]; redirectURI?: string }
+  | Error;
 
 class CreateUserUsecase
   extends AbstractCreateUsecase<CreateUserUsecaseResponse>
@@ -330,4 +332,4 @@ class CreateUserUsecase
   };
 }
 
-export { CreateUserUsecase, CreateUserUsecaseResponse };
+export { CreateUserUsecase, CreateUserUsecaseResponse, CookieData };

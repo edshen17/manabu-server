@@ -22,7 +22,7 @@ class RedirectPathBuilder {
   };
 
   public host = (host: string): this => {
-    this._redirectExpressCallbackOptions.endpointPath = this._getHost(host);
+    this._redirectExpressCallbackOptions.host = this._getHost(host);
     return this;
   };
 

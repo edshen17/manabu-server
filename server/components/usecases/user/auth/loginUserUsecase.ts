@@ -1,9 +1,10 @@
 import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/usersDb';
+import { RedirectPathBuilder } from '../../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
-import { CreateUserUsecase, CreateUserUsecaseResponse } from '../createUserUsecase';
+import { CookieData, CreateUserUsecase, CreateUserUsecaseResponse } from '../createUserUsecase';
 
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
@@ -12,16 +13,33 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   private createUserUsecase!: CreateUserUsecase;
   private oauth2Client!: any;
   private google!: any;
+  private redirectPathBuilder!: RedirectPathBuilder;
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     return true;
+  };
+
+  private _createLoginUserUsecaseResponse = (
+    savedDbUser: JoinedUserDoc,
+    hasRedirectURI: boolean
+  ): LoginUserUsecaseResponse => {
+    const MANABU_DASHBOARD_URI = this.redirectPathBuilder
+      .host('client')
+      .endpointPath('/dashboard')
+      .build();
+    const redirectURI = hasRedirectURI ? MANABU_DASHBOARD_URI : undefined;
+    return {
+      user: savedDbUser,
+      cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
+      redirectURI,
+    };
   };
 
   private _handleUserToTeacher = async (props: {
     savedDbUser: JoinedUserDoc;
     accessOptions: AccessOptions;
     isTeacherApp: boolean;
-    handleUserToTeacherTemplate: any;
-  }): Promise<any> => {
+    handleUserToTeacherTemplate: () => any;
+  }): Promise<LoginUserUsecaseResponse> => {
     const { accessOptions, isTeacherApp, handleUserToTeacherTemplate } = props || {};
     let { savedDbUser } = props;
     if (savedDbUser) {
@@ -33,7 +51,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
           accessOptions
         );
       }
-      return savedDbUser;
+      return this._createLoginUserUsecaseResponse(savedDbUser, false);
     } else {
       return await handleUserToTeacherTemplate();
     }
@@ -43,7 +61,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     body: any;
     query: any;
     accessOptions: AccessOptions;
-  }): Promise<JoinedUserDoc> => {
+  }): Promise<LoginUserUsecaseResponse> => {
     const { body, accessOptions } = props;
     const { email, password, isTeacherApp } = body || {};
     accessOptions.isOverridingSelectOptions = true;
@@ -63,7 +81,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       isTeacherApp,
       handleUserToTeacherTemplate,
     });
-    return savedDbUser;
+    return this._createLoginUserUsecaseResponse(savedDbUser, false);
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {
@@ -100,14 +118,14 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     accessOptions: AccessOptions;
     body: any;
     controllerData: ControllerData;
-  }) => {
+  }): Promise<LoginUserUsecaseResponse> => {
     const { accessOptions, body, controllerData, query } = props;
     const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
     const { tokens } = await this.oauth2Client.getToken(code);
     const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
+
     let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
 
-    // Opportunity to refactor, since makeRequest already signs a jwt token...
     const handleUserToTeacherTemplate = async () => {
       body.name = name;
       body.email = email;
@@ -115,8 +133,9 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       body.isTeacherApp = isTeacherApp;
       const userRes = await this.createUserUsecase.makeRequest(controllerData);
       if ('user' in userRes) {
-        return userRes.user;
+        userRes.redirectURI = 'test';
       }
+      return userRes;
     };
 
     return await this._handleUserToTeacher({
@@ -140,20 +159,22 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
     const { body, accessOptions, query, endpointPath, controllerData } = props;
-    let savedDbUser;
     if (endpointPath == '/auth/login') {
-      savedDbUser = await this._handleBaseLogin({
+      return await this._handleBaseLogin({
         body,
         query,
         accessOptions,
       });
     } else if (endpointPath == '/auth/google') {
-      savedDbUser = await this._handleGoogleLogin({ query, accessOptions, body, controllerData });
+      return await this._handleGoogleLogin({
+        query,
+        accessOptions,
+        body,
+        controllerData,
+      });
     } else {
       throw new Error('Unsupported authentication endpoint.');
     }
-    const cookies = this.createUserUsecase.splitLoginCookies(savedDbUser);
-    return { user: savedDbUser, cookies };
   };
 
   public init = async (props: {
@@ -161,12 +182,20 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     makeCreateUserUsecase: Promise<CreateUserUsecase>;
     oauth2Client: any;
     google: any;
+    makeRedirectPathBuilder: RedirectPathBuilder;
   }): Promise<this> => {
-    const { makeUserDbService, makeCreateUserUsecase, oauth2Client, google } = props;
+    const {
+      makeUserDbService,
+      makeCreateUserUsecase,
+      oauth2Client,
+      google,
+      makeRedirectPathBuilder,
+    } = props;
     this.userDbService = await makeUserDbService;
     this.createUserUsecase = await makeCreateUserUsecase;
     this.oauth2Client = oauth2Client;
     this.google = google;
+    this.redirectPathBuilder = makeRedirectPathBuilder;
     return this;
   };
 }
