@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { createFakeDbUser } from '../../dataAccess/services/usersDb.test';
+import { createFakeDbUser } from '../../dataAccess/services/usersDb/usersDb.test';
 import { makeMinuteBankEntity } from './index';
 
 const expect = chai.expect;

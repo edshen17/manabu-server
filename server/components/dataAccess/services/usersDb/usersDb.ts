@@ -1,10 +1,10 @@
-import { AccessOptions, DbParams, IDbOperations } from '../abstractions/IDbOperations';
-import { CommonDbOperations } from '../abstractions/CommonDbOperations';
-import { TeacherDbService } from './teachersDb';
-import { PackageDbService } from './packagesDb';
-import { UserDoc } from '../../../models/User';
-import { TeacherDoc } from '../../../models/Teacher';
-import { PackageDoc } from '../../../models/Package';
+import { AccessOptions, DbParams, IDbOperations } from '../../abstractions/IDbOperations';
+import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
+import { TeacherDbService } from '../teachersDb';
+import { PackageDbService } from '../packagesDb';
+import { UserDoc } from '../../../../models/User';
+import { TeacherDoc } from '../../../../models/Teacher';
+import { PackageDoc } from '../../../../models/Package';
 
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
@@ -39,6 +39,43 @@ class UserDbService
     };
   }
 
+  public authenticateUser = async (dbParams: DbParams, inputtedPassword: string): Promise<any> => {
+    const user = await this.findOne(dbParams);
+    if (!user) {
+      return null;
+    }
+    if (!user.password) {
+      throw new Error(
+        'It seems that you signed up previously through a third-party service like Google.'
+      );
+    }
+
+    const passwordIsValid = this.passwordLib.compareSync(inputtedPassword, user.password);
+    if (passwordIsValid) {
+      const { password, ...partialUserWithoutPassword } = user;
+      return partialUserWithoutPassword;
+    } else {
+      throw new Error('Username or password incorrect.');
+    }
+  };
+
+  protected _dbReturnTemplate = async (
+    accessOptions: AccessOptions,
+    asyncCallback: any
+  ): Promise<any> => {
+    return await this._returnJoinedUser(accessOptions, asyncCallback);
+  };
+
+  private _returnJoinedUser = async (
+    accessOptions: AccessOptions,
+    asyncCallback: Promise<JoinedUserDoc>
+  ): Promise<any> => {
+    const user = await this._grantAccess(accessOptions, asyncCallback);
+    if (user) {
+      return await this._joinUserTeacherPackage(user, accessOptions);
+    }
+  };
+
   private _joinUserTeacherPackage = async (
     user: JoinedUserDoc,
     accessOptions: AccessOptions
@@ -62,43 +99,6 @@ class UserDbService
     }
 
     return userCopy;
-  };
-
-  private _returnJoinedUser = async (
-    accessOptions: AccessOptions,
-    asyncCallback: Promise<JoinedUserDoc>
-  ): Promise<any> => {
-    const user = await this._grantAccess(accessOptions, asyncCallback);
-    if (user) {
-      return await this._joinUserTeacherPackage(user, accessOptions);
-    }
-  };
-
-  protected _dbReturnTemplate = async (
-    accessOptions: AccessOptions,
-    asyncCallback: any
-  ): Promise<any> => {
-    return await this._returnJoinedUser(accessOptions, asyncCallback);
-  };
-
-  public authenticateUser = async (params: DbParams, inputtedPassword: string): Promise<any> => {
-    const user = await this.findOne(params);
-    if (!user) {
-      return null;
-    }
-    if (!user.password) {
-      throw new Error(
-        'It seems that you signed up previously through a third-party service like Google.'
-      );
-    }
-
-    const passwordIsValid = this.passwordLib.compareSync(inputtedPassword, user.password);
-    if (passwordIsValid) {
-      const { password, ...partialUserWithoutPassword } = user;
-      return partialUserWithoutPassword;
-    } else {
-      throw new Error('Username or password incorrect.');
-    }
   };
 
   public init = async (props: {

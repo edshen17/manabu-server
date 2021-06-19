@@ -6,7 +6,7 @@ import { UserEntity, UserEntityResponse } from '../../../entities/user/userEntit
 import { AccessOptions } from '../../abstractions/IDbOperations';
 import { PackageDbService } from '../../services/packagesDb';
 import { TeacherDbService } from '../../services/teachersDb';
-import { JoinedUserDoc, UserDbService } from '../../services/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../services/usersDb/usersDb';
 
 class FakeDBUserGenerator {
   private faker!: any;

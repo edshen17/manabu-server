@@ -1,4 +1,5 @@
-import { makeUserDbService, makeTeacherDbService } from '../../dataAccess/index';
+import { makeTeacherDbService } from '../../dataAccess/index';
+import { makeUserDbService } from '../../dataAccess/services/usersDb';
 import { EditTeacherUsecase } from './editTeacherUsecase';
 
 const makeEditTeacherUsecase = new EditTeacherUsecase().init({

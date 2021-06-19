@@ -14,6 +14,13 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     this.dbModel = dbModel;
   }
 
+  public findOne = async (params: DbParams): Promise<DbDoc> => {
+    const { searchQuery, accessOptions } = params;
+    const selectOptions = this._configureSelectOptions(accessOptions);
+    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
+  };
+
   protected _configureSelectOptions = (accessOptions: AccessOptions): {} => {
     const { isSelf, currentAPIUserRole, isOverridingSelectOptions } = accessOptions || {};
     const { defaultSettings, adminSettings, isSelfSettings, overrideSettings } =
@@ -32,6 +39,13 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
       selectOptions = overrideSettings;
     }
     return selectOptions || defaultSettings;
+  };
+
+  protected _dbReturnTemplate = async (
+    accessOptions: AccessOptions,
+    asyncCallback: any
+  ): Promise<any> => {
+    return await this._grantAccess(accessOptions, asyncCallback);
   };
 
   protected _grantAccess = async (
@@ -53,20 +67,6 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     } catch (err) {
       throw err;
     }
-  };
-
-  protected _dbReturnTemplate = async (
-    accessOptions: AccessOptions,
-    asyncCallback: any
-  ): Promise<any> => {
-    return await this._grantAccess(accessOptions, asyncCallback);
-  };
-
-  public findOne = async (params: DbParams): Promise<DbDoc> => {
-    const { searchQuery, accessOptions } = params;
-    const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
-    return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   public findById = async (params: DbParams): Promise<DbDoc> => {
@@ -124,7 +124,8 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 
   public init = async (props: any): Promise<this> => {
-    await props.makeDb();
+    const { makeDb } = props;
+    await makeDb();
     return this;
   };
 }

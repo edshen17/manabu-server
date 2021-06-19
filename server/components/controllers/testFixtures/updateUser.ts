@@ -1,4 +1,4 @@
-import { JoinedUserDoc } from '../../dataAccess/services/usersDb';
+import { JoinedUserDoc } from '../../dataAccess/services/usersDb/usersDb';
 import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
 import { makeEditUserController } from '../user/index';
 

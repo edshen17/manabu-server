@@ -1,4 +1,4 @@
-import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb/usersDb';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 

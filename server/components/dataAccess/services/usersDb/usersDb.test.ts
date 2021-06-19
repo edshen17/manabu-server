@@ -1,13 +1,14 @@
 import chai from 'chai';
 import faker from 'faker';
-import { makePackageEntity } from '../../entities/package';
-import { makeUserEntity } from '../../entities/user';
-import { makeTeacherEntity } from '../../entities/teacher';
-import { AccessOptions } from '../abstractions/IDbOperations';
-import { makeUserDbService, makeTeacherDbService, makePackageDbService } from '../index';
-import { PackageDbService } from './packagesDb';
-import { TeacherDbService } from './teachersDb';
+import { makePackageEntity } from '../../../entities/package';
+import { makeUserEntity } from '../../../entities/user';
+import { makeTeacherEntity } from '../../../entities/teacher';
+import { AccessOptions } from '../../abstractions/IDbOperations';
+import { makeTeacherDbService, makePackageDbService } from '../../index';
+import { PackageDbService } from '../packagesDb';
+import { TeacherDbService } from '../teachersDb';
 import { UserDbService, JoinedUserDoc } from './usersDb';
+import { makeUserDbService } from '.';
 
 const expect = chai.expect;
 let userDbService: UserDbService;

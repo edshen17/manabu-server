@@ -1,5 +1,5 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb/usersDb';
 import { AbstractGetUsecase } from '../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
