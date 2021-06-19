@@ -38,8 +38,8 @@ class FakeDBUserGenerator {
     });
   };
 
-  public createFakeDbUser = async (): Promise<JoinedUserDoc> => {
-    const fakeUserEntity = this._createFakeUserEntity();
+  public createFakeDbUser = async (email?: string): Promise<JoinedUserDoc> => {
+    const fakeUserEntity = this._createFakeUserEntity(email);
     let newUserCallback = this.userDbService.insert({
       modelToInsert: fakeUserEntity,
       accessOptions: this.defaultAccessOptions,
@@ -48,10 +48,10 @@ class FakeDBUserGenerator {
     return fakeDbUser;
   };
 
-  private _createFakeUserEntity = (): UserEntityResponse => {
+  private _createFakeUserEntity = (email?: string): UserEntityResponse => {
     const fakeUserEntity = this.userEntity.build({
       name: this.faker.name.findName(),
-      email: this.faker.internet.email(),
+      email: email || this.faker.internet.email(),
       password: this.faker.internet.password(),
       profileImage: this.faker.image.imageUrl(),
     });

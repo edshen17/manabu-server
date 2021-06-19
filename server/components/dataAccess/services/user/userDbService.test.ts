@@ -1,20 +1,13 @@
 import chai from 'chai';
-import faker from 'faker';
-import { makePackageEntity } from '../../../entities/package';
-import { makeUserEntity } from '../../../entities/user';
-import { makeTeacherEntity } from '../../../entities/teacher';
 import { AccessOptions } from '../../abstractions/IDbOperations';
-import { PackageDbService } from '../package/packageDbService';
-import { TeacherDbService } from '../teacher/teacherDbService';
-import { UserDbService, JoinedUserDoc } from './userDbService';
+import { UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
-import { makePackageDbService } from '../package';
-import { makeTeacherDbService } from '../teacher';
+import { makeFakeDbUserGenerator } from '../../testFixtures/fakeDbUserGenerator';
+import { FakeDBUserGenerator } from '../../testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
 
 const expect = chai.expect;
 let userDbService: UserDbService;
-let teacherDbService: TeacherDbService;
-let packageDbService: PackageDbService;
+let fakeDbUserGenerator: FakeDBUserGenerator;
 const accessOptions: AccessOptions = {
   isProtectedResource: false,
   isCurrentAPIUserPermitted: true,
@@ -22,64 +15,9 @@ const accessOptions: AccessOptions = {
   isSelf: false,
 };
 
-const _createNewDbDoc = async (asyncCallback: Promise<any>) => {
-  const newDoc = await asyncCallback;
-  return newDoc;
-};
-
-const createNewDbUser = async (email?: string) => {
-  const fakeUserEntity = makeUserEntity.build({
-    name: faker.name.findName(),
-    email: email || faker.internet.email(),
-    password: 'password',
-    profileImage: 'test image',
-  });
-
-  let newUserCallback = userDbService.insert({
-    modelToInsert: fakeUserEntity,
-    accessOptions,
-  });
-
-  return await _createNewDbDoc(newUserCallback);
-};
-
-const createNewDbTeacher = async (dbUser: JoinedUserDoc) => {
-  const fakeTeacherEntity = makeTeacherEntity.build({ userId: dbUser._id });
-  const newTeacherCallback = teacherDbService.insert({
-    modelToInsert: fakeTeacherEntity,
-    accessOptions,
-  });
-  return await _createNewDbDoc(newTeacherCallback);
-};
-
-const createNewDbPackage = async (dbUser: JoinedUserDoc) => {
-  const packageEntity = await makePackageEntity;
-  const fakePackageEntity = await packageEntity.build({
-    hostedBy: dbUser._id,
-    lessonAmount: 5,
-    isOffering: true,
-    packageType: 'light',
-  });
-  const newPackageCallback = packageDbService.insert({
-    modelToInsert: fakePackageEntity,
-    accessOptions,
-  });
-  return await _createNewDbDoc(newPackageCallback);
-};
-
-const createFakeDbUser = async (isTeacher: boolean): Promise<JoinedUserDoc> => {
-  const newUser = await createNewDbUser();
-  if (isTeacher) {
-    await createNewDbTeacher(newUser);
-    await createNewDbPackage(newUser);
-  }
-  return newUser;
-};
-
 before(async () => {
   userDbService = await makeUserDbService;
-  packageDbService = await makePackageDbService;
-  teacherDbService = await makeTeacherDbService;
+  fakeDbUserGenerator = await makeFakeDbUserGenerator;
 });
 
 context('userDb service', () => {
@@ -87,7 +25,7 @@ context('userDb service', () => {
     it('given a bad user id as input, should throw an error', async () => {
       try {
         await userDbService.findById({
-          _id: 'undefined',
+          _id: undefined,
           accessOptions,
         });
       } catch (err) {
@@ -109,7 +47,7 @@ context('userDb service', () => {
 
     it('given an existing user id as input, should return a join of the user, teacher, and package models', async () => {
       try {
-        const newUser = await createFakeDbUser(true);
+        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions,
@@ -117,7 +55,7 @@ context('userDb service', () => {
         expect(searchUser).to.have.property('teacherData');
         expect(searchUser).to.have.property('teacherAppPending');
         expect(searchUser.teacherAppPending).to.equal(true);
-        expect(searchUser.teacherData.packages.length).to.equal(1);
+        expect(searchUser.teacherData.packages.length).to.equal(3);
       } catch (err) {
         throw err;
       }
@@ -125,7 +63,7 @@ context('userDb service', () => {
 
     it('given an existing user id (user) as input, should return only relevant user data', async () => {
       try {
-        const newUser = await createFakeDbUser(false);
+        const newUser = await fakeDbUserGenerator.createFakeDbUser();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions,
@@ -146,7 +84,7 @@ context('userDb service', () => {
       const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
       accessOptionsCopy.currentAPIUserRole = 'admin';
       try {
-        const newUser = await createFakeDbUser(true);
+        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -164,7 +102,7 @@ context('userDb service', () => {
       accessOptionsCopy.isSelf = true;
 
       try {
-        const newUser = await createFakeDbUser(true);
+        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -184,7 +122,7 @@ context('userDb service', () => {
       accessOptionsCopy.isSelf = true;
 
       try {
-        const newUser = await createFakeDbUser(true);
+        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -203,7 +141,7 @@ context('userDb service', () => {
       accessOptionsCopy.isOverridingSelectOptions = true;
 
       try {
-        const newUser = await createFakeDbUser(true);
+        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -217,7 +155,7 @@ context('userDb service', () => {
   });
   describe('insert', () => {
     it('given a user, should insert into db', async () => {
-      const newUser = await createFakeDbUser(false);
+      const newUser = await fakeDbUserGenerator.createFakeDbUser();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
         accessOptions,
@@ -226,8 +164,8 @@ context('userDb service', () => {
     });
     it('creating duplicate users should throw an error', async () => {
       try {
-        const newUser = await createNewDbUser('duplicateEmail@email.com');
-        const dupeUser = await createNewDbUser('duplicateEmail@email.com');
+        const newUser = await fakeDbUserGenerator.createFakeDbUser('duplicateEmail@email.com');
+        const dupeUser = await fakeDbUserGenerator.createFakeDbUser('duplicateEmail@email.com');
       } catch (err) {
         expect(err).be.an('error');
       }
@@ -236,7 +174,7 @@ context('userDb service', () => {
 
   describe('update', () => {
     it('should update db document', async () => {
-      const newUser = await createFakeDbUser(false);
+      const newUser = await fakeDbUserGenerator.createFakeDbUser();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
         accessOptions,
@@ -253,7 +191,7 @@ context('userDb service', () => {
     it('should update db document and return additional restricted properties as admin', async () => {
       const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
       accessOptionsCopy.currentAPIUserRole = 'admin';
-      const newUser = await createFakeDbUser(true);
+      const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
         accessOptions: accessOptionsCopy,
@@ -271,5 +209,3 @@ context('userDb service', () => {
     });
   });
 });
-
-export { createFakeDbUser };

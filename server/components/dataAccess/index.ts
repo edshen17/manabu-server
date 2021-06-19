@@ -1,8 +1,5 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { TeacherDbService } from './services/teacher/teacherDbService';
-import { Teacher } from '../../models/Teacher';
-
 const mongod = new MongoMemoryServer();
 
 export const makeDb = async (): Promise<mongoose.Mongoose | void> => {
