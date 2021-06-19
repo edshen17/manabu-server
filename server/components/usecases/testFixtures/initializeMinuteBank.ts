@@ -1,5 +1,5 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBanksDb';
+import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBank';
 import { makeMinuteBankEntity } from '../../entities/minuteBank';
 
 const initializeMinuteBank = async (hostedBy: any, reservedBy: any) => {

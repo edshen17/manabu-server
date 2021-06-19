@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
-
 import {
   makeTeacherDbService,
-  makePackageDbService,
   makePackageTransactionDbService,
   makeTeacherBalanceDbService,
 } from '../../dataAccess/index';
@@ -11,7 +9,8 @@ import { CreateUserUsecase } from './createUserUsecase';
 import { EditUserUsecase } from './editUserUsecase';
 import { emailHandler } from '../../utils/email/emailHandler';
 import { makeUserDbService } from '../../dataAccess/services/usersDb';
-import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBanksDb';
+import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBank';
+import { makePackageDbService } from '../../dataAccess/services/package';
 
 const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
 

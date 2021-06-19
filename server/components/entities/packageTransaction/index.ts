@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { makePackageDbService } from '../../dataAccess';
+import { makePackageDbService } from '../../dataAccess/services/package';
 import { makeUserDbService } from '../../dataAccess/services/usersDb';
 import { PackageTransactionEntity } from './packageTransactionEntity';
 

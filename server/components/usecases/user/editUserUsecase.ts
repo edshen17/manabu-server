@@ -1,5 +1,5 @@
 import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
-import { MinuteBankDbService } from '../../dataAccess/services/minuteBanksDb/minuteBanksDb';
+import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minuteBankService';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransactionDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb/usersDb';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';

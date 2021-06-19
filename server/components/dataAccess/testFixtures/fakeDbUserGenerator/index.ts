@@ -1,8 +1,9 @@
 import faker from 'faker';
-import { makePackageDbService, makeTeacherDbService } from '../..';
+import { makeTeacherDbService } from '../..';
 import { makePackageEntity } from '../../../entities/package';
 import { makeTeacherEntity } from '../../../entities/teacher';
 import { makeUserEntity } from '../../../entities/user';
+import { makePackageDbService } from '../../services/package';
 import { makeUserDbService } from '../../services/usersDb';
 import { FakeDBUserGenerator } from './fakeDbUserGenerator';
 

@@ -4,7 +4,7 @@ import { PackageEntity, PackageEntityResponse } from '../../../entities/package/
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { UserEntity, UserEntityResponse } from '../../../entities/user/userEntity';
 import { AccessOptions } from '../../abstractions/IDbOperations';
-import { PackageDbService } from '../../services/packagesDb';
+import { PackageDbService } from '../../services/package/packageDbService';
 import { TeacherDbService } from '../../services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../services/usersDb/usersDb';
 

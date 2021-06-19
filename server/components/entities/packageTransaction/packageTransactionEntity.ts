@@ -1,5 +1,5 @@
 import { PackageDoc } from '../../../models/Package';
-import { PackageDbService } from '../../dataAccess/services/packagesDb';
+import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb/usersDb';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';

@@ -1,4 +1,4 @@
-import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBanksDb';
+import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBank';
 import { GetMinuteBankUsecase } from './getMinuteBankUsecase';
 
 const makeGetMinuteBankUsecase = new GetMinuteBankUsecase().init({

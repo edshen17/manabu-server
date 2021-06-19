@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
-import { makeDb, makePackageDbService, makeTeacherDbService } from '../..';
+import { makeDb, makeTeacherDbService } from '../..';
 import { User } from '../../../../models/User';
+import { makePackageDbService } from '../package';
 import { UserDbService } from './usersDb';
 
 const makeUserDbService = new UserDbService({
