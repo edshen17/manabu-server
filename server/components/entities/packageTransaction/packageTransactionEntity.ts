@@ -82,7 +82,7 @@ class PackageTransactionEntity
       remainingReschedules: 5,
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
-      paymentMethodData: paymentMethodData,
+      paymentMethodData: paymentMethodData || {},
       packageData: (await this.getDbDataById(this.packageDbService, packageId)) || {},
       hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
       reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},

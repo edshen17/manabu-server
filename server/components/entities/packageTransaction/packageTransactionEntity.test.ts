@@ -11,12 +11,12 @@ let packageTransactionEntity: PackageTransactionEntity;
 
 before(async () => {
   fakeDbUserGenerator = await makeFakeDbUserGenerator;
+  packageTransactionEntity = await makePackageTransactionEntity;
 });
 
 context('packageTransaction entity', () => {
   describe('build', async () => {
-    packageTransactionEntity = await makePackageTransactionEntity;
-    context('given valid inputs', () => {
+    describe('given valid inputs', () => {
       it("should return a package transaction with the teacher's data", async () => {
         const fakeTeacher = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
         const testPackageTransaction = await packageTransactionEntity.build({
