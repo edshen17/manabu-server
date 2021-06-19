@@ -5,7 +5,7 @@ import { TeacherBalanceDoc } from '../../../models/TeacherBalance';
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minuteBankService';
 import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
-import { PackageTransactionDbService } from '../../dataAccess/services/packageTransactionDb';
+import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../dataAccess/services/teacherBalanceDb';
 import { TeacherDbService } from '../../dataAccess/services/teachersDb';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb/usersDb';

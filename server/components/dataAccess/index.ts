@@ -2,8 +2,6 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TeacherDbService } from './services/teachersDb';
 import { Teacher } from '../../models/Teacher';
-import { PackageTransactionDbService } from './services/packageTransactionDb';
-import { PackageTransaction } from '../../models/PackageTransaction';
 import { TeacherBalanceDbService } from './services/teacherBalanceDb';
 import { TeacherBalance } from '../../models/TeacherBalance';
 
@@ -31,12 +29,8 @@ export const makeDb = async (): Promise<mongoose.Mongoose | void> => {
 
 const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).init({ makeDb });
 
-const makePackageTransactionDbService = new PackageTransactionDbService({
-  packageTransactionDb: PackageTransaction,
-}).init({ makeDb });
-
 const makeTeacherBalanceDbService = new TeacherBalanceDbService({
   teacherBalanceDb: TeacherBalance,
 }).init({ makeDb });
 
-export { makeTeacherDbService, makePackageTransactionDbService, makeTeacherBalanceDbService };
+export { makeTeacherDbService, makeTeacherBalanceDbService };
