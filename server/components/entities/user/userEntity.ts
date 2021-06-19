@@ -24,24 +24,25 @@ type UserEntityResponse =
   | Error;
 
 class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<UserEntityResponse> {
-  private sanitize: any;
-  private inputValidator: any;
-  private passwordHasher: any;
-  private randTokenGenerator: any;
+  private sanitize!: any;
+  private inputValidator!: any;
+  private passwordHasher!: any;
+  private randTokenGenerator!: any;
 
-  constructor(props: {
-    sanitize: any;
-    inputValidator: any;
-    passwordHasher: any;
-    randTokenGenerator: any;
-  }) {
-    super();
-    const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = props;
-    this.sanitize = sanitize;
-    this.inputValidator = inputValidator;
-    this.passwordHasher = passwordHasher;
-    this.randTokenGenerator = randTokenGenerator;
-  }
+  public build = (entityData: {
+    name: string;
+    email: string;
+    password?: string;
+    profileImage?: string;
+  }): UserEntityResponse => {
+    try {
+      this._validateUserInput(entityData);
+      const newUserEntity = this._buildUserEntity(entityData);
+      return newUserEntity;
+    } catch (err) {
+      throw err;
+    }
+  };
 
   private _validateUserInput = (userData: any): void => {
     const { name, email, password, profileImage } = userData;
@@ -58,7 +59,51 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     }
   };
 
-  private _setPassword = (password?: string) => {
+  private _buildUserEntity = (entityData: {
+    name: string;
+    email: string;
+    password?: string;
+    profileImage?: string;
+  }): UserEntityResponse => {
+    let { name, email, password, profileImage } = entityData;
+    const USER_ENTITY_DEFAULT_OPTIONAL_VALUES = this._USER_ENTITY_DEFAULT_OPTIONAL_VALUES();
+    const USER_ENTITY_DEFAULT_REQUIRED_VALUES = this._USER_ENTITY_DEFAULT_REQUIRED_VALUES();
+    const verificationToken = this._generateVerificationToken(name, email);
+
+    return Object.freeze({
+      name,
+      email,
+      password: this._encryptPassword(password),
+      profileImage: profileImage || USER_ENTITY_DEFAULT_OPTIONAL_VALUES.profileImage,
+      verificationToken,
+      ...USER_ENTITY_DEFAULT_REQUIRED_VALUES,
+    });
+  };
+
+  private _USER_ENTITY_DEFAULT_OPTIONAL_VALUES = () => {
+    return Object.freeze({
+      profileImage: '',
+    });
+  };
+
+  private _USER_ENTITY_DEFAULT_REQUIRED_VALUES = () => {
+    return Object.freeze({
+      profileBio: '',
+      dateRegistered: new Date(),
+      lastUpdated: new Date(),
+      languages: [],
+      region: '',
+      timezone: '',
+      lastOnline: new Date(),
+      role: 'user',
+      settings: { currency: 'SGD' },
+      membership: [],
+      commMethods: [],
+      emailVerified: false,
+    });
+  };
+
+  private _encryptPassword = (password?: string) => {
     if (password) {
       return this.passwordHasher(password);
     } else {
@@ -66,39 +111,23 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     }
   };
 
-  build(entityData: {
-    name: string;
-    email: string;
-    password?: string;
-    profileImage?: string;
-  }): UserEntityResponse {
-    let verificationToken: string;
-    let { name, email, password, profileImage } = entityData;
-    try {
-      this._validateUserInput(entityData);
-      return Object.freeze({
-        name,
-        email,
-        password: this._setPassword(password),
-        profileImage: profileImage || '',
-        profileBio: '',
-        dateRegistered: new Date(),
-        lastUpdated: new Date(),
-        languages: [],
-        region: '',
-        timezone: '',
-        lastOnline: new Date(),
-        role: 'user',
-        settings: { currency: 'SGD' },
-        membership: [],
-        commMethods: [],
-        emailVerified: false,
-        verificationToken: (verificationToken = this.randTokenGenerator(name, email)),
-      });
-    } catch (err) {
-      throw err;
-    }
-  }
+  private _generateVerificationToken = (name: string, email: string) => {
+    return this.randTokenGenerator(name, email);
+  };
+
+  public init = (props: {
+    sanitize: any;
+    inputValidator: any;
+    passwordHasher: any;
+    randTokenGenerator: any;
+  }) => {
+    const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = props;
+    this.sanitize = sanitize;
+    this.inputValidator = inputValidator;
+    this.passwordHasher = passwordHasher;
+    this.randTokenGenerator = randTokenGenerator;
+    return this;
+  };
 }
 
 export { UserEntity, UserEntityResponse };

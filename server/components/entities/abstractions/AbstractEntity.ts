@@ -8,12 +8,14 @@ abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse>
     isSelf: false,
     currentAPIUserRole: 'user',
   };
-  abstract build(entityData: any): any;
+
   public getDbDataById = async (dbService: IDbOperations<any>, _id?: string): Promise<any> => {
     const accessOptions = this.defaultAccessOptions;
     const dbData = await dbService.findById({ _id, accessOptions });
     return dbData;
   };
+
+  abstract build(entityData: any): any;
 }
 
 export { AbstractEntity };

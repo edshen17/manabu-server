@@ -1,19 +1,6 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-const TEACHER_ENTITY_DEFAULT_VALUES = Object.freeze({
-  teachingLanguages: [],
-  alsoSpeaks: [],
-  introductionVideo: '',
-  isApproved: false,
-  isHidden: false,
-  teacherType: 'unlicensed',
-  licensePath: '',
-  hourlyRate: { amount: 35, currency: 'SGD' },
-  lessonCount: 0,
-  studentCount: 0,
-});
-
 type TeacherEntityResponse = {
   userId: string;
   teachingLanguages: { language: string; level: string }[];
@@ -32,13 +19,29 @@ class TeacherEntity
   extends AbstractEntity<TeacherEntityResponse>
   implements IEntity<TeacherEntityResponse>
 {
-  build(entityData: { userId: string }): TeacherEntityResponse {
+  public build = (entityData: { userId: string }): TeacherEntityResponse => {
     const { userId } = entityData;
+    const TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES = this._TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES();
     return Object.freeze({
       userId,
-      ...TEACHER_ENTITY_DEFAULT_VALUES,
+      ...TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES,
     });
-  }
+  };
+
+  private _TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES = () => {
+    return Object.freeze({
+      teachingLanguages: [],
+      alsoSpeaks: [],
+      introductionVideo: '',
+      isApproved: false,
+      isHidden: false,
+      teacherType: 'unlicensed',
+      licensePath: '',
+      hourlyRate: { amount: 35, currency: 'SGD' },
+      lessonCount: 0,
+      studentCount: 0,
+    });
+  };
 }
 
 export { TeacherEntity };

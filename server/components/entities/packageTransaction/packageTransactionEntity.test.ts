@@ -1,38 +1,37 @@
 import chai from 'chai';
-import { createFakeDbUser } from '../../dataAccess/services/usersDb.test';
+import { makeFakeDbUserGenerator } from '../../dataAccess/testFixtures';
+import { FakeDBUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
 import { makePackageTransactionEntity } from './index';
+import { PackageTransactionEntity } from './packageTransactionEntity';
 
 const expect = chai.expect;
-const assert = chai.assert;
-let packageTransactionEntity: any;
+let fakeDbUserGenerator: FakeDBUserGenerator;
+let packageTransactionEntity: PackageTransactionEntity;
+
+before(async () => {
+  fakeDbUserGenerator = await makeFakeDbUserGenerator;
+});
+
 context('packageTransaction entity', () => {
   describe('build', async () => {
     packageTransactionEntity = await makePackageTransactionEntity;
-    describe('given valid inputs', () => {
-      it('should return given inputs', async () => {
-        const fakeUser = await createFakeDbUser(true);
-        const testPackageTransaction = await packageTransactionEntity.build({
-          hostedBy: fakeUser._id,
-          reservedBy: fakeUser._id,
-          packageId: fakeUser._id, // change to package id
-          reservationLength: 60,
-          remainingAppointments: 5,
-        });
-        expect(testPackageTransaction.hostedBy).to.equal(fakeUser._id);
-        expect(testPackageTransaction.reservedBy).to.equal(fakeUser._id);
-        expect(testPackageTransaction).to.have.property('hostedByData');
-        expect(testPackageTransaction.reservationLength).to.equal(60);
-        expect(testPackageTransaction.remainingAppointments).to.equal(5);
-        expect(testPackageTransaction.lessonLanguage).to.equal('ja');
-        expect(testPackageTransaction.isSubscription).to.equal(false);
-        expect(testPackageTransaction.terminationDate).to.be.an('date');
-      });
-    });
-
-    describe('given invalid inputs', () => {
-      it('should returned undefined if provided no input', () => {
-        const testPackageTransaction = packageTransactionEntity.build({});
-        expect(typeof testPackageTransaction.hostedBy).to.equal('undefined');
+    context('given valid inputs', () => {
+      it('should return given inputs asdsada', async () => {
+        const fakeTeacher = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        console.log(fakeTeacher, 'hereeee');
+        // const testPackageTransaction = await packageTransactionEntity.build({
+        //   hostedBy: fakeTeacher._id,
+        //   reservedBy: fakeTeacher._id,
+        //   packageId: fakeTeacher.teacherData.packages[0]._id,
+        //   reservationLength: 60,
+        //   remainingAppointments: 5,
+        //   transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+        // });
+        // console.log(testPackageTransaction, 'here');
+        // expect(testPackageTransaction.hostedBy).to.equal(fakeTeacher._id);
+        // expect(testPackageTransaction.reservedBy).to.equal(fakeTeacher._id);
+        // expect(testPackageTransaction).to.have.property('hostedByData');
+        // console.log(testPackageTransaction);
       });
     });
   });

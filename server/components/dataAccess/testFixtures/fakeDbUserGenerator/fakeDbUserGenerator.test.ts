@@ -1,7 +1,7 @@
 import chai from 'chai';
-import { makeFakeDbUserGenerator } from '.';
-import { makeUserDbService } from '..';
-import { UserDbService } from '../services/usersDb';
+import { makeFakeDbUserGenerator } from '..';
+import { makeUserDbService } from '../..';
+import { UserDbService } from '../../services/usersDb';
 import { FakeDBUserGenerator } from './fakeDbUserGenerator';
 
 const expect = chai.expect;

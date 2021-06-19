@@ -285,9 +285,8 @@ class CreateUserUsecase
         savedDbUser = await this.handleTeacherCreation(savedDbUser, accessOptions);
       }
 
-      this._sendVerificationEmail(userInstance);
-
       if (process.env.NODE_ENV == 'production') {
+        this._sendVerificationEmail(userInstance);
         this._sendInternalEmail(userInstance, isTeacherApp);
       }
       const cookies = this.splitLoginCookies(savedDbUser);

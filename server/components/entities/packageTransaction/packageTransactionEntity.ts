@@ -31,12 +31,6 @@ class PackageTransactionEntity
   private packageDbService!: PackageDbService;
   private dayjs!: any;
 
-  constructor(props: { dayjs: any }) {
-    super();
-    const { dayjs } = props;
-    this.dayjs = dayjs;
-  }
-
   public build = async (entityData: {
     hostedBy: string;
     reservedBy: string;
@@ -47,9 +41,6 @@ class PackageTransactionEntity
     remainingAppointments: number;
     lessonLanguage?: string;
     isSubscription?: boolean;
-    hostedByData?: JoinedUserDoc;
-    reservedByData?: JoinedUserDoc;
-    packageData?: PackageDoc;
     paymentMethodData?: { method: string; paymentId?: string };
   }): Promise<PackageTransactionEntityResponse> => {
     const {
@@ -64,33 +55,119 @@ class PackageTransactionEntity
       isSubscription,
       paymentMethodData,
     } = entityData;
+
+    const optionalEntityValues = await this._processPackageEntityOptionalValues({
+      hostedBy,
+      reservedBy,
+      packageId,
+      terminationDate,
+      lessonLanguage,
+      isSubscription,
+    });
+
+    const PACKAGE_ENTITY_DEFAULT_REQUIRED_VALUES = this._PACKAGE_ENTITY_DEFAULT_REQUIRED_VALUES();
+
     return Object.freeze({
       hostedBy,
       reservedBy,
       packageId,
-      transactionDate: new Date(),
       reservationLength,
       transactionDetails,
-      terminationDate: terminationDate || this.dayjs().add(1, 'month').toDate(),
-      isTerminated: false,
       remainingAppointments,
-      remainingReschedules: 5,
-      lessonLanguage: lessonLanguage || 'ja',
-      isSubscription: isSubscription || false,
-      paymentMethodData: paymentMethodData,
-      packageData: (await this.getDbDataById(this.packageDbService, packageId)) || {},
-      hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
-      reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},
+      paymentMethodData,
+      ...optionalEntityValues,
+      ...PACKAGE_ENTITY_DEFAULT_REQUIRED_VALUES,
     });
+  };
+
+  private _processPackageEntityOptionalValues = async (props: {
+    hostedBy: string;
+    reservedBy: string;
+    packageId: string;
+    terminationDate?: Date;
+    lessonLanguage?: string;
+    isSubscription?: boolean;
+  }) => {
+    const { hostedBy, reservedBy, packageId, terminationDate, lessonLanguage, isSubscription } =
+      props;
+    const PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES = this._PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES();
+    return {
+      hostedByData: await this._getHostedByData(hostedBy),
+      reservedByData: await this._getReservedByData(reservedBy),
+      packageData: await this._getPackageData(packageId),
+      terminationDate: terminationDate || PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES.terminationDate,
+      lessonLanguage: lessonLanguage || PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES.lessonLanguage,
+      isSubscription: isSubscription || PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES.isSubscription,
+    };
+  };
+
+  private _PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES = () => {
+    const defaultValues: Record<string, any> = Object.freeze({
+      terminationDate: this.dayjs().add(1, 'month').toDate(),
+      lessonLanguage: 'ja',
+      isSubscription: false,
+      packageData: {},
+      hostedByData: {},
+      reservedByData: {},
+    });
+    return defaultValues;
+  };
+
+  private _PACKAGE_ENTITY_DEFAULT_REQUIRED_VALUES = () => {
+    return Object.freeze({
+      transactionDate: new Date(),
+      remainingReschedules: 5,
+      isTerminated: false,
+    });
+  };
+
+  private _getHostedByData = async (userId: string) => {
+    return await this._getEntityDependencyData({
+      dbService: this.userDbService,
+      _id: userId,
+      optionalFieldName: 'hostedByData',
+    });
+  };
+
+  private _getReservedByData = async (packageId: string) => {
+    return await this._getEntityDependencyData({
+      dbService: this.packageDbService,
+      _id: packageId,
+      optionalFieldName: 'reservedByData',
+    });
+  };
+
+  private _getPackageData = async (packageId: string) => {
+    return await this._getEntityDependencyData({
+      dbService: this.packageDbService,
+      _id: packageId,
+      optionalFieldName: 'packageData',
+    });
+  };
+
+  private _getEntityDependencyData = async (props: {
+    dbService: any;
+    _id: string;
+    optionalFieldName: string;
+  }) => {
+    const { dbService, _id, optionalFieldName } = props;
+    const PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES = this._PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES();
+
+    const dependencyData =
+      (await this.getDbDataById(dbService, _id)) ||
+      PACKAGE_ENTITY_DEFAULT_OPTIONAL_VALUES[optionalFieldName];
+    return dependencyData;
   };
 
   public init = async (props: {
     makeUserDbService: Promise<UserDbService>;
     makePackageDbService: Promise<PackageDbService>;
+    dayjs: any;
   }): Promise<this> => {
-    const { makeUserDbService, makePackageDbService } = props;
+    const { makeUserDbService, makePackageDbService, dayjs } = props;
     this.userDbService = await makeUserDbService;
     this.packageDbService = await makePackageDbService;
+    this.dayjs = dayjs;
     return this;
   };
 }

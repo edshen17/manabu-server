@@ -1,12 +1,12 @@
-import { PackageDoc } from '../../../models/Package';
-import { TeacherDoc } from '../../../models/Teacher';
-import { PackageEntity, PackageEntityResponse } from '../../entities/package/packageEntity';
-import { TeacherEntity } from '../../entities/teacher/teacherEntity';
-import { UserEntity, UserEntityResponse } from '../../entities/user/userEntity';
-import { AccessOptions } from '../abstractions/IDbOperations';
-import { PackageDbService } from '../services/packagesDb';
-import { TeacherDbService } from '../services/teachersDb';
-import { JoinedUserDoc, UserDbService } from '../services/usersDb';
+import { PackageDoc } from '../../../../models/Package';
+import { TeacherDoc } from '../../../../models/Teacher';
+import { PackageEntity, PackageEntityResponse } from '../../../entities/package/packageEntity';
+import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
+import { UserEntity, UserEntityResponse } from '../../../entities/user/userEntity';
+import { AccessOptions } from '../../abstractions/IDbOperations';
+import { PackageDbService } from '../../services/packagesDb';
+import { TeacherDbService } from '../../services/teachersDb';
+import { JoinedUserDoc, UserDbService } from '../../services/usersDb';
 
 class FakeDBUserGenerator {
   private faker!: any;
@@ -27,12 +27,15 @@ class FakeDBUserGenerator {
     };
   }
 
-  public createFakeDbTeacherWithDefaultPackages = async (): Promise<TeacherDoc> => {
+  public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbUser();
     const fakeDbTeacher = await this._createFakeDbTeacher(fakeDbUser);
     const fakeDbPackages = await this._createFakeDbPackages(fakeDbUser);
 
-    return fakeDbTeacher;
+    return this.userDbService.findById({
+      _id: fakeDbUser._id,
+      accessOptions: this.defaultAccessOptions,
+    });
   };
 
   public createFakeDbUser = async (): Promise<JoinedUserDoc> => {
@@ -76,7 +79,7 @@ class FakeDBUserGenerator {
   };
 
   private _createFakeDbPackages = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc> => {
-    const fakePackageEntities = this._createFakePackageEntities(savedDbUser);
+    const fakePackageEntities = await this._createFakePackageEntities(savedDbUser);
     const newPackageCallback = this.packageDbService.insert({
       modelToInsert: fakePackageEntities,
       accessOptions: this.defaultAccessOptions,

@@ -41,7 +41,7 @@ const passwordHasher = (password: string) => {
   return bcrypt.hashSync(password, 10);
 };
 
-const makeUserEntity = new UserEntity({
+const makeUserEntity = new UserEntity().init({
   sanitize,
   inputValidator,
   passwordHasher,
