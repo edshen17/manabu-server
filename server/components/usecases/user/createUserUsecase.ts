@@ -7,7 +7,7 @@ import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minute
 import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../dataAccess/services/teacherBalance/teacherBalanceDbService';
-import { TeacherDbService } from '../../dataAccess/services/teachersDb';
+import { TeacherDbService } from '../../dataAccess/services/teacher/teacherDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { makeMinuteBankEntity } from '../../entities/minuteBank';
 import { makePackageEntity } from '../../entities/package';

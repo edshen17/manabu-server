@@ -1,5 +1,5 @@
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { TeacherDbService } from '../../dataAccess/services/teachersDb';
+import { TeacherDbService } from '../../dataAccess/services/teacher/teacherDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEditUsecase } from '../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';

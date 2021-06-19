@@ -4,12 +4,12 @@ import { makePackageEntity } from '../../../entities/package';
 import { makeUserEntity } from '../../../entities/user';
 import { makeTeacherEntity } from '../../../entities/teacher';
 import { AccessOptions } from '../../abstractions/IDbOperations';
-import { makeTeacherDbService } from '../../index';
 import { PackageDbService } from '../package/packageDbService';
-import { TeacherDbService } from '../teachersDb';
+import { TeacherDbService } from '../teacher/teacherDbService';
 import { UserDbService, JoinedUserDoc } from './userDbService';
 import { makeUserDbService } from '.';
 import { makePackageDbService } from '../package';
+import { makeTeacherDbService } from '../teacher';
 
 const expect = chai.expect;
 let userDbService: UserDbService;

@@ -1,6 +1,6 @@
-import { DbParams, IDbOperations } from '../abstractions/IDbOperations';
-import { CommonDbOperations } from '../abstractions/CommonDbOperations';
-import { TeacherDoc } from '../../../models/Teacher';
+import { DbParams, IDbOperations } from '../../abstractions/IDbOperations';
+import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
+import { TeacherDoc } from '../../../../models/Teacher';
 
 class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
   constructor(props: { teacherDb: any }) {

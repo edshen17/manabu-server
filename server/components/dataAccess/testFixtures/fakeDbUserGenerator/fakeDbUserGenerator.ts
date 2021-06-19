@@ -5,7 +5,7 @@ import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { UserEntity, UserEntityResponse } from '../../../entities/user/userEntity';
 import { AccessOptions } from '../../abstractions/IDbOperations';
 import { PackageDbService } from '../../services/package/packageDbService';
-import { TeacherDbService } from '../../services/teachersDb';
+import { TeacherDbService } from '../../services/teacher/teacherDbService';
 import { JoinedUserDoc, UserDbService } from '../../services/user/userDbService';
 
 class FakeDBUserGenerator {
