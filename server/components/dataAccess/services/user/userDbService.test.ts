@@ -7,7 +7,7 @@ import { AccessOptions } from '../../abstractions/IDbOperations';
 import { makeTeacherDbService } from '../../index';
 import { PackageDbService } from '../package/packageDbService';
 import { TeacherDbService } from '../teachersDb';
-import { UserDbService, JoinedUserDoc } from './usersDb';
+import { UserDbService, JoinedUserDoc } from './userDbService';
 import { makeUserDbService } from '.';
 import { makePackageDbService } from '../package';
 

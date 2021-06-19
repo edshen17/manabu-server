@@ -1,5 +1,5 @@
 import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
-import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/usersDb/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectPathBuilder } from '../../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';

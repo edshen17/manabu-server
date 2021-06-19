@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { JoinedUserDoc } from '../../dataAccess/services/usersDb/usersDb';
+import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase';
 import { CreateUserUsecase } from '../user/createUserUsecase';

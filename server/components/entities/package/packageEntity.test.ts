@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { JoinedUserDoc } from '../../dataAccess/services/usersDb/usersDb';
+import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
 import { makeFakeDbUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator';
 import { FakeDBUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
 import { makePackageEntity } from './index';

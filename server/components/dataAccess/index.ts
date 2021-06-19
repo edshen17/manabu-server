@@ -2,8 +2,6 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TeacherDbService } from './services/teachersDb';
 import { Teacher } from '../../models/Teacher';
-import { TeacherBalanceDbService } from './services/teacherBalanceDb';
-import { TeacherBalance } from '../../models/TeacherBalance';
 
 const mongod = new MongoMemoryServer();
 
@@ -29,8 +27,4 @@ export const makeDb = async (): Promise<mongoose.Mongoose | void> => {
 
 const makeTeacherDbService = new TeacherDbService({ teacherDb: Teacher }).init({ makeDb });
 
-const makeTeacherBalanceDbService = new TeacherBalanceDbService({
-  teacherBalanceDb: TeacherBalance,
-}).init({ makeDb });
-
-export { makeTeacherDbService, makeTeacherBalanceDbService };
+export { makeTeacherDbService };

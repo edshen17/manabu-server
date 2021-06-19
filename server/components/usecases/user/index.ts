@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken';
-import { makeTeacherDbService, makeTeacherBalanceDbService } from '../../dataAccess/index';
+import { makeTeacherDbService } from '../../dataAccess/index';
 import { GetUserUsecase } from './getUserUsecase';
 import { CreateUserUsecase } from './createUserUsecase';
 import { EditUserUsecase } from './editUserUsecase';
 import { emailHandler } from '../../utils/email/emailHandler';
-import { makeUserDbService } from '../../dataAccess/services/usersDb';
+import { makeUserDbService } from '../../dataAccess/services/user';
 import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBank';
 import { makePackageDbService } from '../../dataAccess/services/package';
 import { makePackageTransactionDbService } from '../../dataAccess/services/packageTransaction';
+import { makeTeacherBalanceDbService } from '../../dataAccess/services/teacherBalance';
 
 const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
 
