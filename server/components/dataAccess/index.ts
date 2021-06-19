@@ -1,16 +1,11 @@
 import mongoose from 'mongoose';
-
 import { MongoMemoryServer } from 'mongodb-memory-server';
-
 import { TeacherDbService } from './services/teachersDb';
 import { PackageDbService } from './services/packagesDb';
-
 import { Teacher } from '../../models/Teacher';
 import { Package } from '../../models/Package';
 import { PackageTransactionDbService } from './services/packageTransactionDb';
-import { MinuteBank } from '../../models/MinuteBank';
 import { PackageTransaction } from '../../models/PackageTransaction';
-import { MinuteBankDbService } from './services/minuteBankDb';
 import { TeacherBalanceDbService } from './services/teacherBalanceDb';
 import { TeacherBalance } from '../../models/TeacherBalance';
 
@@ -42,9 +37,7 @@ const makePackageDbService = new PackageDbService({ packageDb: Package }).init({
 const makePackageTransactionDbService = new PackageTransactionDbService({
   packageTransactionDb: PackageTransaction,
 }).init({ makeDb });
-const makeMinuteBankDbService = new MinuteBankDbService({ minuteBankDb: MinuteBank }).init({
-  makeDb,
-});
+
 const makeTeacherBalanceDbService = new TeacherBalanceDbService({
   teacherBalanceDb: TeacherBalance,
 }).init({ makeDb });
@@ -53,6 +46,5 @@ export {
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,
-  makeMinuteBankDbService,
   makeTeacherBalanceDbService,
 };

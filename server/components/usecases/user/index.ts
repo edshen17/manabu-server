@@ -4,7 +4,6 @@ import {
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,
-  makeMinuteBankDbService,
   makeTeacherBalanceDbService,
 } from '../../dataAccess/index';
 import { GetUserUsecase } from './getUserUsecase';
@@ -12,6 +11,7 @@ import { CreateUserUsecase } from './createUserUsecase';
 import { EditUserUsecase } from './editUserUsecase';
 import { emailHandler } from '../../utils/email/emailHandler';
 import { makeUserDbService } from '../../dataAccess/services/usersDb';
+import { makeMinuteBankDbService } from '../../dataAccess/services/minuteBanksDb';
 
 const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
 
