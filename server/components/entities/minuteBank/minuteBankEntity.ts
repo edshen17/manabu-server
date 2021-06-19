@@ -2,6 +2,12 @@ import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb'
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
+type MinuteBankEntityData = {
+  hostedBy: string;
+  reservedBy: string;
+  minuteBank?: number;
+};
+
 type MinuteBankEntityResponse = {
   hostedBy: string;
   reservedBy: string;
@@ -16,12 +22,17 @@ class MinuteBankEntity
   implements IEntity<MinuteBankEntityResponse>
 {
   private userDbService!: UserDbService;
-  public build = async (entityData: {
-    hostedBy: string;
-    reservedBy: string;
-    minuteBank?: number;
-  }): Promise<MinuteBankEntityResponse> => {
-    const { hostedBy, reservedBy, minuteBank } = entityData;
+  public build = async (
+    minuteBankData: MinuteBankEntityData
+  ): Promise<MinuteBankEntityResponse> => {
+    const minuteBank = this._buildMinuteBankEntity(minuteBankData);
+    return minuteBank;
+  };
+
+  private _buildMinuteBankEntity = async (
+    minuteBankData: MinuteBankEntityData
+  ): Promise<MinuteBankEntityResponse> => {
+    const { hostedBy, reservedBy, minuteBank } = minuteBankData;
     return Object.freeze({
       hostedBy,
       reservedBy,

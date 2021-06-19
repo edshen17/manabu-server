@@ -1,10 +1,19 @@
-import { UserDbService } from '../../dataAccess/services/usersDb';
+import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/usersDb';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
+type PackageEntityData = {
+  hostedBy: string;
+  priceDetails?: { hourlyPrice: number; currency: string };
+  lessonAmount: number;
+  isOffering?: boolean;
+  packageType: string;
+  packageDurations?: number[];
+};
+
 type PackageEntityResponse = {
   hostedBy: string;
-  priceDetails: { currency: string; amount: number };
+  priceDetails: { hourlyPrice: number; currency: string };
   lessonAmount: number;
   isOffering: boolean;
   packageType: string;
@@ -17,21 +26,16 @@ class PackageEntity
 {
   private userDbService!: UserDbService;
 
-  private _getPriceDetails = async (hostedBy: string) => {
-    const savedDbTeacher = await this.getDbDataById(this.userDbService, hostedBy);
-    return savedDbTeacher.teacherData.hourlyRate;
+  public build = async (packageEntityData: PackageEntityData): Promise<PackageEntityResponse> => {
+    const packageEntity = await this._buildPackageEntity(packageEntityData);
+    return packageEntity;
   };
 
-  public build = async (entityData: {
-    hostedBy: string;
-    priceDetails?: { hourlyPrice: number; currency: string };
-    lessonAmount: number;
-    isOffering?: boolean;
-    packageType: string;
-    packageDurations?: number[];
-  }): Promise<PackageEntityResponse> => {
+  private _buildPackageEntity = async (
+    packageEntityData: PackageEntityData
+  ): Promise<PackageEntityResponse> => {
     const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
-      entityData;
+      packageEntityData;
     return Object.freeze({
       hostedBy,
       priceDetails: priceDetails || (await this._getPriceDetails(hostedBy)) || {},
@@ -40,6 +44,16 @@ class PackageEntity
       packageType,
       packageDurations: packageDurations || [30, 60],
     });
+  };
+
+  private _getPriceDetails = async (hostedBy: string) => {
+    const savedDbTeacher: JoinedUserDoc = await this.getDbDataById(this.userDbService, hostedBy);
+    const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
+    const priceDetails = {
+      currency: teacherHourlyRate.currency!,
+      hourlyPrice: teacherHourlyRate.amount!,
+    };
+    return priceDetails;
   };
 
   public init = async (props: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {

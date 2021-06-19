@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { makeFakeDbUserGenerator } from '..';
+import { makeFakeDbUserGenerator } from '.';
 import { makeUserDbService } from '../..';
 import { UserDbService } from '../../services/usersDb';
 import { FakeDBUserGenerator } from './fakeDbUserGenerator';

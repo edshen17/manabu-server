@@ -20,16 +20,14 @@ class TeacherEntity
   implements IEntity<TeacherEntityResponse>
 {
   public build = (entityData: { userId: string }): TeacherEntityResponse => {
-    const { userId } = entityData;
-    const TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES = this._TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES();
-    return Object.freeze({
-      userId,
-      ...TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES,
-    });
+    const teacherEntity = this._buildTeacherEntity(entityData);
+    return teacherEntity;
   };
 
-  private _TEACHER_ENTITY_DEFAULT_REQUIRED_VALUES = () => {
+  private _buildTeacherEntity = (entityData: { userId: string }): TeacherEntityResponse => {
+    const { userId } = entityData;
     return Object.freeze({
+      userId,
       teachingLanguages: [],
       alsoSpeaks: [],
       introductionVideo: '',
