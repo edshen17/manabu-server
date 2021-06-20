@@ -1,3 +1,5 @@
+import { DefaultSelectOptions } from './CommonDbOperations';
+
 type AccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
@@ -23,6 +25,7 @@ interface IDbOperations<DbDoc> {
   update: (params: DbParams) => Promise<DbDoc>;
   updateMany: (params: DbParams) => Promise<DbDoc[]>;
   init: (props: any) => Promise<this>;
+  getDefaultSelectOptions: () => DefaultSelectOptions;
 }
 
 export { AccessOptions, DbParams, IDbOperations };

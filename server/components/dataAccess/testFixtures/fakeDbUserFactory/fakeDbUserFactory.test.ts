@@ -25,7 +25,7 @@ describe('fakeDbUserFactory', () => {
 
   describe('createFakeDbTeacherWithDefaultPackages', async () => {
     const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-    const accessOptions = fakeDbUserFactory.defaultAccessOptions;
+    const accessOptions = fakeDbUserFactory.getDefaultAccessOptions();
     const joinedTeacher = await userDbService.findById({ _id: fakeDbTeacher._id, accessOptions });
     expect(joinedTeacher.teacherAppPending).to.equal(true);
     expect(joinedTeacher.teacherData.packages.length).to.equal(3);

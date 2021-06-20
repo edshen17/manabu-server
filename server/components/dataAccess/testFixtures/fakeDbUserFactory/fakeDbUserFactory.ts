@@ -3,13 +3,12 @@ import { TeacherDoc } from '../../../../models/Teacher';
 import { PackageEntity, PackageEntityResponse } from '../../../entities/package/packageEntity';
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { UserEntity, UserEntityResponse } from '../../../entities/user/userEntity';
-import { AccessOptions } from '../../abstractions/IDbOperations';
 import { PackageDbService } from '../../services/package/packageDbService';
 import { TeacherDbService } from '../../services/teacher/teacherDbService';
 import { JoinedUserDoc, UserDbService } from '../../services/user/userDbService';
-import { IFakeDbDataFactory } from '../abstractions/IFakeDbDataFactory';
+import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
 
-class FakeDbUserFactory implements IFakeDbDataFactory<JoinedUserDoc> {
+class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityResponse> {
   private faker!: any;
   private userEntity!: UserEntity;
   private teacherEntity!: TeacherEntity;
@@ -17,16 +16,6 @@ class FakeDbUserFactory implements IFakeDbDataFactory<JoinedUserDoc> {
   private userDbService!: UserDbService;
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
-
-  public defaultAccessOptions: AccessOptions;
-  constructor() {
-    this.defaultAccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted: true,
-      currentAPIUserRole: 'user',
-      isSelf: false,
-    };
-  }
 
   public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbUser();
@@ -39,8 +28,8 @@ class FakeDbUserFactory implements IFakeDbDataFactory<JoinedUserDoc> {
     });
   };
 
-  public createFakeDbUser = async (email?: string): Promise<JoinedUserDoc> => {
-    const fakeUserEntity = this._createFakeUserEntity(email);
+  public createFakeDbUser = async (entityData?: { email: string }): Promise<JoinedUserDoc> => {
+    const fakeUserEntity = this._createFakeEntity(entityData);
     let newUserCallback = this.userDbService.insert({
       modelToInsert: fakeUserEntity,
       accessOptions: this.defaultAccessOptions,
@@ -49,7 +38,8 @@ class FakeDbUserFactory implements IFakeDbDataFactory<JoinedUserDoc> {
     return fakeDbUser;
   };
 
-  private _createFakeUserEntity = (email?: string): UserEntityResponse => {
+  protected _createFakeEntity = (entityData?: { email: string }): UserEntityResponse => {
+    const { email } = entityData || {};
     const fakeUserEntity = this.userEntity.build({
       name: this.faker.name.findName(),
       email: email || this.faker.internet.email(),
@@ -57,11 +47,6 @@ class FakeDbUserFactory implements IFakeDbDataFactory<JoinedUserDoc> {
       profileImage: this.faker.image.imageUrl(),
     });
     return fakeUserEntity;
-  };
-
-  private _awaitDbInsert = async (newUserCallback: Promise<any>) => {
-    const newUserDoc = await newUserCallback;
-    return newUserDoc;
   };
 
   private _createFakeDbTeacher = async (savedDbUser: JoinedUserDoc): Promise<TeacherDoc> => {

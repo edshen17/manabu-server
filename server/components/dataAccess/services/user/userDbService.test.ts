@@ -164,8 +164,11 @@ context('userDbService', () => {
     });
     it('creating duplicate users should throw an error', async () => {
       try {
-        const newUser = await fakeDbUserFactory.createFakeDbUser('duplicateEmail@email.com');
-        const dupeUser = await fakeDbUserFactory.createFakeDbUser('duplicateEmail@email.com');
+        const dupeEntityData = {
+          email: 'duplicateEmail@email.com',
+        };
+        const newUser = await fakeDbUserFactory.createFakeDbUser(dupeEntityData);
+        const dupeUser = await fakeDbUserFactory.createFakeDbUser(dupeEntityData);
       } catch (err) {
         expect(err).be.an('error');
       }

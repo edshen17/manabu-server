@@ -128,6 +128,10 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     await makeDb();
     return this;
   };
+
+  public getDefaultSelectOptions = () => {
+    return { ...this.defaultSelectOptions };
+  };
 }
 
 export { DefaultSelectOptions, CommonDbOperations };
