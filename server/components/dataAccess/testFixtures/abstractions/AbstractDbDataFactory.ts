@@ -16,7 +16,7 @@ abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDa
     };
   }
 
-  public createFakeDbData = async (entityData: any): Promise<IDbOperations<DbDoc>> => {
+  public createFakeDbData = async (entityData: any): Promise<DbDoc> => {
     const fakeEntity = await this._createFakeEntity(entityData);
     let newDbDocCallback = this.dbService.insert({
       modelToInsert: fakeEntity,
@@ -33,7 +33,9 @@ abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDa
     return newDbDoc;
   };
 
-  public init = async (props: any): Promise<this> => {
+  public init = async (
+    props: { makeEntity: any; makeDbService: any; cloneDeep: any } | any
+  ): Promise<this> => {
     const { makeEntity, makeDbService, cloneDeep } = props;
     this.entity = await makeEntity;
     this.dbService = await makeDbService;
