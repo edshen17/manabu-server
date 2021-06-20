@@ -104,15 +104,18 @@ class UserDbService
   public init = async (props: {
     makeDb: any;
     dbModel: any;
+    cloneDeep: any;
     makeTeacherDbService: Promise<TeacherDbService>;
     makePackageDbService: Promise<PackageDbService>;
     passwordLib: any;
   }) => {
-    const { makeDb, dbModel, makeTeacherDbService, makePackageDbService, passwordLib } = props;
+    const { makeDb, dbModel, cloneDeep, makeTeacherDbService, makePackageDbService, passwordLib } =
+      props;
     await makeDb();
     this.dbModel = dbModel;
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;
+    this.cloneDeep = cloneDeep;
     this.passwordLib = passwordLib;
     return this;
   };

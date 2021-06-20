@@ -6,6 +6,7 @@ abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDa
   protected entity!: IEntity<EntityResponse>;
   protected dbService!: IDbOperations<DbDoc>;
   protected defaultAccessOptions: AccessOptions;
+  protected cloneDeep!: any;
   constructor() {
     this.defaultAccessOptions = {
       isProtectedResource: false,
@@ -33,14 +34,15 @@ abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDa
   };
 
   public init = async (props: any): Promise<this> => {
-    const { makeEntity, makeDbService } = props;
+    const { makeEntity, makeDbService, cloneDeep } = props;
     this.entity = await makeEntity;
     this.dbService = await makeDbService;
+    this.cloneDeep = cloneDeep;
     return this;
   };
 
   public getDefaultAccessOptions = () => {
-    return { ...this.defaultAccessOptions };
+    return this.cloneDeep(this.defaultAccessOptions);
   };
 }
 

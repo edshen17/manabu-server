@@ -6,9 +6,11 @@ import { makePackageDbService } from '../../services/package';
 import { makeTeacherDbService } from '../../services/teacher';
 import { makeUserDbService } from '../../services/user';
 import { FakeDbUserFactory } from './fakeDbUserFactory';
+import cloneDeep from 'clone-deep';
 
 const makeFakeDbUserFactory = new FakeDbUserFactory().init({
   faker,
+  cloneDeep,
   makeUserEntity,
   makeTeacherEntity,
   makePackageEntity,

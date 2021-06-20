@@ -10,7 +10,7 @@ type DefaultSelectOptions = {
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   protected dbModel!: any;
   protected cloneDeep!: any;
-  public defaultSelectOptions!: DefaultSelectOptions;
+  protected defaultSelectOptions!: DefaultSelectOptions;
 
   public findOne = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, accessOptions } = params;
@@ -130,7 +130,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 
   public getDefaultSelectOptions = () => {
-    return { ...this.defaultSelectOptions };
+    return this.cloneDeep(this.defaultSelectOptions);
   };
 }
 

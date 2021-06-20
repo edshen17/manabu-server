@@ -99,6 +99,7 @@ class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityR
 
   public init = async (props: {
     faker: any;
+    cloneDeep: any;
     makeUserEntity: UserEntity;
     makeTeacherEntity: TeacherEntity;
     makePackageEntity: Promise<PackageEntity>;
@@ -108,6 +109,7 @@ class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityR
   }) => {
     const {
       faker,
+      cloneDeep,
       makeUserEntity,
       makeTeacherEntity,
       makePackageEntity,
@@ -116,6 +118,7 @@ class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityR
       makePackageDbService,
     } = props;
     this.faker = faker;
+    this.cloneDeep = cloneDeep;
     this.userEntity = makeUserEntity;
     this.teacherEntity = makeTeacherEntity;
     this.packageEntity = await makePackageEntity;
