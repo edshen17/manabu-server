@@ -1,20 +1,20 @@
 import chai from 'chai';
 import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
-import { makeFakeDbUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator';
-import { FakeDBUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
+import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makePackageEntity } from './index';
 import { PackageEntity } from './packageEntity';
 
 const expect = chai.expect;
 const assert = chai.assert;
-let fakeDbUserGenerator: FakeDBUserGenerator;
+let fakeDbUserFactory: FakeDbUserFactory;
 let packageEntity: PackageEntity;
 let fakeUser: JoinedUserDoc;
 
 before(async () => {
-  fakeDbUserGenerator = await makeFakeDbUserGenerator;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
   packageEntity = await makePackageEntity;
-  fakeUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+  fakeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
 });
 
 context('package entity', () => {

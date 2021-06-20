@@ -2,12 +2,12 @@ import chai from 'chai';
 import { AccessOptions } from '../../abstractions/IDbOperations';
 import { UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
-import { makeFakeDbUserGenerator } from '../../testFixtures/fakeDbUserGenerator';
-import { FakeDBUserGenerator } from '../../testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
+import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 
 const expect = chai.expect;
 let userDbService: UserDbService;
-let fakeDbUserGenerator: FakeDBUserGenerator;
+let fakeDbUserFactory: FakeDbUserFactory;
 const accessOptions: AccessOptions = {
   isProtectedResource: false,
   isCurrentAPIUserPermitted: true,
@@ -17,10 +17,10 @@ const accessOptions: AccessOptions = {
 
 before(async () => {
   userDbService = await makeUserDbService;
-  fakeDbUserGenerator = await makeFakeDbUserGenerator;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
 });
 
-context('userDb service', () => {
+context('userDbService', () => {
   describe('findById', () => {
     it('given a bad user id as input, should throw an error', async () => {
       try {
@@ -47,7 +47,7 @@ context('userDb service', () => {
 
     it('given an existing user id as input, should return a join of the user, teacher, and package models', async () => {
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions,
@@ -63,7 +63,7 @@ context('userDb service', () => {
 
     it('given an existing user id (user) as input, should return only relevant user data', async () => {
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbUser();
+        const newUser = await fakeDbUserFactory.createFakeDbUser();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions,
@@ -84,7 +84,7 @@ context('userDb service', () => {
       const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
       accessOptionsCopy.currentAPIUserRole = 'admin';
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -102,7 +102,7 @@ context('userDb service', () => {
       accessOptionsCopy.isSelf = true;
 
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -122,7 +122,7 @@ context('userDb service', () => {
       accessOptionsCopy.isSelf = true;
 
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -141,7 +141,7 @@ context('userDb service', () => {
       accessOptionsCopy.isOverridingSelectOptions = true;
 
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
           accessOptions: accessOptionsCopy,
@@ -155,7 +155,7 @@ context('userDb service', () => {
   });
   describe('insert', () => {
     it('given a user, should insert into db', async () => {
-      const newUser = await fakeDbUserGenerator.createFakeDbUser();
+      const newUser = await fakeDbUserFactory.createFakeDbUser();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
         accessOptions,
@@ -164,8 +164,8 @@ context('userDb service', () => {
     });
     it('creating duplicate users should throw an error', async () => {
       try {
-        const newUser = await fakeDbUserGenerator.createFakeDbUser('duplicateEmail@email.com');
-        const dupeUser = await fakeDbUserGenerator.createFakeDbUser('duplicateEmail@email.com');
+        const newUser = await fakeDbUserFactory.createFakeDbUser('duplicateEmail@email.com');
+        const dupeUser = await fakeDbUserFactory.createFakeDbUser('duplicateEmail@email.com');
       } catch (err) {
         expect(err).be.an('error');
       }
@@ -174,7 +174,7 @@ context('userDb service', () => {
 
   describe('update', () => {
     it('should update db document', async () => {
-      const newUser = await fakeDbUserGenerator.createFakeDbUser();
+      const newUser = await fakeDbUserFactory.createFakeDbUser();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
         accessOptions,
@@ -191,7 +191,7 @@ context('userDb service', () => {
     it('should update db document and return additional restricted properties as admin', async () => {
       const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
       accessOptionsCopy.currentAPIUserRole = 'admin';
-      const newUser = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+      const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
         accessOptions: accessOptionsCopy,

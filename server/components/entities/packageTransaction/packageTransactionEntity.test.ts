@@ -1,16 +1,16 @@
 import chai from 'chai';
 import equal from 'deep-equal';
-import { makeFakeDbUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator';
-import { FakeDBUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
+import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makePackageTransactionEntity } from './index';
 import { PackageTransactionEntity } from './packageTransactionEntity';
 
 const expect = chai.expect;
-let fakeDbUserGenerator: FakeDBUserGenerator;
+let fakeDbUserFactory: FakeDbUserFactory;
 let packageTransactionEntity: PackageTransactionEntity;
 
 before(async () => {
-  fakeDbUserGenerator = await makeFakeDbUserGenerator;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
   packageTransactionEntity = await makePackageTransactionEntity;
 });
 
@@ -18,7 +18,7 @@ context('packageTransaction entity', () => {
   describe('build', async () => {
     describe('given valid inputs', () => {
       it("should return a package transaction with the teacher's data", async () => {
-        const fakeTeacher = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
+        const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const testPackageTransaction = await packageTransactionEntity.build({
           hostedBy: fakeTeacher._id,
           reservedBy: fakeTeacher._id,

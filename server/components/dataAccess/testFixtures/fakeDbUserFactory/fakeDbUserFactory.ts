@@ -7,8 +7,9 @@ import { AccessOptions } from '../../abstractions/IDbOperations';
 import { PackageDbService } from '../../services/package/packageDbService';
 import { TeacherDbService } from '../../services/teacher/teacherDbService';
 import { JoinedUserDoc, UserDbService } from '../../services/user/userDbService';
+import { IFakeDbDataFactory } from '../abstractions/IFakeDbDataFactory';
 
-class FakeDBUserGenerator {
+class FakeDbUserFactory implements IFakeDbDataFactory<JoinedUserDoc> {
   private faker!: any;
   private userEntity!: UserEntity;
   private teacherEntity!: TeacherEntity;
@@ -140,4 +141,4 @@ class FakeDBUserGenerator {
   };
 }
 
-export { FakeDBUserGenerator };
+export { FakeDbUserFactory };

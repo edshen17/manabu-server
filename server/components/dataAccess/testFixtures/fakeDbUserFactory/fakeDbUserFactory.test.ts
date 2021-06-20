@@ -1,21 +1,21 @@
 import chai from 'chai';
-import { makeFakeDbUserGenerator } from '.';
+import { makeFakeDbUserFactory } from '.';
 import { makeUserDbService } from '../../services/user';
 import { UserDbService } from '../../services/user/userDbService';
-import { FakeDBUserGenerator } from './fakeDbUserGenerator';
+import { FakeDbUserFactory } from './fakeDbUserFactory';
 
 const expect = chai.expect;
-let fakeDbUserGenerator: FakeDBUserGenerator;
+let fakeDbUserFactory: FakeDbUserFactory;
 let userDbService: UserDbService;
 before(async () => {
-  fakeDbUserGenerator = await makeFakeDbUserGenerator;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
   userDbService = await makeUserDbService;
 });
 
-describe('fakeDbUserGenerator', () => {
+describe('fakeDbUserFactory', () => {
   describe('createFakeDbUser', () => {
     it('should create a fake db user with a random name', async () => {
-      const fakeDbUser = await fakeDbUserGenerator.createFakeDbUser();
+      const fakeDbUser = await fakeDbUserFactory.createFakeDbUser();
       expect(fakeDbUser).to.have.property('name');
       expect(fakeDbUser).to.have.property('profileImage');
       expect(fakeDbUser.name).to.not.equal('');
@@ -24,8 +24,8 @@ describe('fakeDbUserGenerator', () => {
   });
 
   describe('createFakeDbTeacherWithDefaultPackages', async () => {
-    const fakeDbTeacher = await fakeDbUserGenerator.createFakeDbTeacherWithDefaultPackages();
-    const accessOptions = fakeDbUserGenerator.defaultAccessOptions;
+    const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const accessOptions = fakeDbUserFactory.defaultAccessOptions;
     const joinedTeacher = await userDbService.findById({ _id: fakeDbTeacher._id, accessOptions });
     expect(joinedTeacher.teacherAppPending).to.equal(true);
     expect(joinedTeacher.teacherData.packages.length).to.equal(3);

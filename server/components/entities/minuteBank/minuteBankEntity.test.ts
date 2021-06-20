@@ -1,13 +1,14 @@
 import chai from 'chai';
-import { makeFakeDbUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator';
-import { FakeDBUserGenerator } from '../../dataAccess/testFixtures/fakeDbUserGenerator/fakeDbUserGenerator';
+import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+
 import { makeMinuteBankEntity } from './index';
 
-let fakeDbUserGenerator: FakeDBUserGenerator;
+let fakeDbUserFactory: FakeDbUserFactory;
 const expect = chai.expect;
 
 before(async () => {
-  fakeDbUserGenerator = await makeFakeDbUserGenerator;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
 });
 
 context('minuteBank entity', () => {
@@ -15,8 +16,8 @@ context('minuteBank entity', () => {
     describe('given valid inputs', () => {
       it('should return given inputs', async () => {
         const minuteBankEntity = await makeMinuteBankEntity;
-        const fakeHostedBy = await fakeDbUserGenerator.createFakeDbUser();
-        const fakeReservedBy = await fakeDbUserGenerator.createFakeDbUser();
+        const fakeHostedBy = await fakeDbUserFactory.createFakeDbUser();
+        const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
         const testMinuteBank = await minuteBankEntity.build({
           hostedBy: fakeHostedBy._id,
           reservedBy: fakeReservedBy._id,

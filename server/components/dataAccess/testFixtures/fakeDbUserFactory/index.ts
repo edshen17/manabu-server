@@ -5,9 +5,9 @@ import { makeUserEntity } from '../../../entities/user';
 import { makePackageDbService } from '../../services/package';
 import { makeTeacherDbService } from '../../services/teacher';
 import { makeUserDbService } from '../../services/user';
-import { FakeDBUserGenerator } from './fakeDbUserGenerator';
+import { FakeDbUserFactory } from './fakeDbUserFactory';
 
-const makeFakeDbUserGenerator = new FakeDBUserGenerator().init({
+const makeFakeDbUserFactory = new FakeDbUserFactory().init({
   faker,
   makeUserEntity,
   makeTeacherEntity,
@@ -17,4 +17,4 @@ const makeFakeDbUserGenerator = new FakeDBUserGenerator().init({
   makePackageDbService,
 });
 
-export { makeFakeDbUserGenerator };
+export { makeFakeDbUserFactory };

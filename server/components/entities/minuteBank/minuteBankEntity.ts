@@ -50,4 +50,4 @@ class MinuteBankEntity
   };
 }
 
-export { MinuteBankEntity };
+export { MinuteBankEntity, MinuteBankEntityResponse };
