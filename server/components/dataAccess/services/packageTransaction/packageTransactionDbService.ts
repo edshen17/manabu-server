@@ -6,8 +6,8 @@ class PackageTransactionDbService
   extends CommonDbOperations<PackageDoc>
   implements IDbOperations<PackageDoc>
 {
-  constructor(props: { packageTransactionDb: any }) {
-    super(props.packageTransactionDb);
+  constructor() {
+    super();
     this.defaultSelectOptions = {
       defaultSettings: {},
     };

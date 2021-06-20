@@ -3,8 +3,8 @@ import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
 import { PackageDoc } from '../../../../models/Package';
 
 class PackageDbService extends CommonDbOperations<PackageDoc> implements IDbOperations<PackageDoc> {
-  constructor(props: { packageDb: any }) {
-    super(props.packageDb);
+  constructor() {
+    super();
     this.defaultSelectOptions = {
       defaultSettings: {},
     };

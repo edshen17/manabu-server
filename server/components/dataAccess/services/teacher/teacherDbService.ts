@@ -3,8 +3,8 @@ import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
 import { TeacherDoc } from '../../../../models/Teacher';
 
 class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
-  constructor(props: { teacherDb: any }) {
-    super(props.teacherDb);
+  constructor() {
+    super();
     this.defaultSelectOptions = {
       defaultSettings: {
         licensePath: 0,

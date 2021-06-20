@@ -6,8 +6,8 @@ class MinuteBankDbService
   extends CommonDbOperations<MinuteBankDoc>
   implements IDbOperations<MinuteBankDoc>
 {
-  constructor(props: { minuteBankDb: any }) {
-    super(props.minuteBankDb);
+  constructor() {
+    super();
     this.defaultSelectOptions = {
       defaultSettings: {},
     };

@@ -8,11 +8,9 @@ type DefaultSelectOptions = {
 };
 
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
-  protected dbModel: any;
+  protected dbModel!: any;
+  protected cloneDeep!: any;
   public defaultSelectOptions!: DefaultSelectOptions;
-  constructor(dbModel: any) {
-    this.dbModel = dbModel;
-  }
 
   public findOne = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, accessOptions } = params;
@@ -124,8 +122,10 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 
   public init = async (props: any): Promise<this> => {
-    const { makeDb } = props;
+    const { makeDb, cloneDeep, dbModel } = props;
     await makeDb();
+    this.cloneDeep = cloneDeep;
+    this.dbModel = dbModel;
     return this;
   };
 

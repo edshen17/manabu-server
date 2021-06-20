@@ -16,8 +16,8 @@ class UserDbService
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
   private passwordLib!: any;
-  constructor(props: any) {
-    super(props.userDb);
+  constructor() {
+    super();
     this.defaultSelectOptions = {
       defaultSettings: {
         email: 0,
@@ -103,12 +103,14 @@ class UserDbService
 
   public init = async (props: {
     makeDb: any;
+    dbModel: any;
     makeTeacherDbService: Promise<TeacherDbService>;
     makePackageDbService: Promise<PackageDbService>;
     passwordLib: any;
   }) => {
-    const { makeDb, makeTeacherDbService, makePackageDbService, passwordLib } = props;
+    const { makeDb, dbModel, makeTeacherDbService, makePackageDbService, passwordLib } = props;
     await makeDb();
+    this.dbModel = dbModel;
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;
     this.passwordLib = passwordLib;
