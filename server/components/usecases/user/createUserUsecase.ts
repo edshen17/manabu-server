@@ -3,7 +3,7 @@ import { PackageDoc } from '../../../models/Package';
 import { TeacherDoc } from '../../../models/Teacher';
 import { TeacherBalanceDoc } from '../../../models/TeacherBalance';
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minuteBankService';
+import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minuteBankDbService';
 import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../dataAccess/services/teacherBalance/teacherBalanceDbService';

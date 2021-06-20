@@ -11,10 +11,10 @@ import cloneDeep from 'clone-deep';
 const makeFakeDbUserFactory = new FakeDbUserFactory().init({
   faker,
   cloneDeep,
-  makeUserEntity,
+  makeEntity: makeUserEntity,
   makeTeacherEntity,
   makePackageEntity,
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
 });

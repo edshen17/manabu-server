@@ -8,16 +8,12 @@ import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUs
 const expect = chai.expect;
 let userDbService: UserDbService;
 let fakeDbUserFactory: FakeDbUserFactory;
-const accessOptions: AccessOptions = {
-  isProtectedResource: false,
-  isCurrentAPIUserPermitted: true,
-  currentAPIUserRole: 'user',
-  isSelf: false,
-};
+let accessOptions: AccessOptions;
 
 before(async () => {
   userDbService = await makeUserDbService;
   fakeDbUserFactory = await makeFakeDbUserFactory;
+  accessOptions = fakeDbUserFactory.getDefaultAccessOptions();
 });
 
 context('userDbService', () => {

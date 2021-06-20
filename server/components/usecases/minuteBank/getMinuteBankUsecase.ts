@@ -1,6 +1,6 @@
 import { MinuteBankDoc } from '../../../models/MinuteBank';
 import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minuteBankService';
+import { MinuteBankDbService } from '../../dataAccess/services/minuteBank/minuteBankDbService';
 import { AbstractGetUsecase } from '../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
