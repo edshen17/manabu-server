@@ -102,4 +102,4 @@ class PackageTransactionEntity
   };
 }
 
-export { PackageTransactionEntity };
+export { PackageTransactionEntity, PackageTransactionEntityResponse };

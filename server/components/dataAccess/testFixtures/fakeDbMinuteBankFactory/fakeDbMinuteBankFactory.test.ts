@@ -35,9 +35,7 @@ describe('fakeDbMinuteBankFactory', () => {
       expect(fakeDbMinutebank.reservedByData).to.deep.equal(fakeUser);
     });
     it('should create a fake db minuteBank with random users if not given a hostedBy or reservedBy', async () => {
-      const fakeDbMinutebank = await fakeDbMinuteBankFactory.createFakeDbData({
-        minuteBank: 5,
-      });
+      const fakeDbMinutebank = await fakeDbMinuteBankFactory.createFakeDbData();
       expect(fakeDbMinutebank).to.have.property('hostedBy');
       expect(fakeDbMinutebank.hostedByData).to.not.equal(undefined);
       expect(fakeDbMinutebank).to.have.property('reservedBy');

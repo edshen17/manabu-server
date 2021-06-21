@@ -42,4 +42,4 @@ class TeacherEntity
   };
 }
 
-export { TeacherEntity };
+export { TeacherEntity, TeacherEntityResponse };

@@ -2,11 +2,10 @@ import { PackageDoc } from '../../../../models/Package';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { PackageEntity, PackageEntityResponse } from '../../../entities/package/packageEntity';
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
-import { UserEntity, UserEntityResponse } from '../../../entities/user/userEntity';
-
+import { UserEntityResponse } from '../../../entities/user/userEntity';
 import { PackageDbService } from '../../services/package/packageDbService';
 import { TeacherDbService } from '../../services/teacher/teacherDbService';
-import { JoinedUserDoc, UserDbService } from '../../services/user/userDbService';
+import { JoinedUserDoc } from '../../services/user/userDbService';
 import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
 
 class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityResponse> {
@@ -98,35 +97,19 @@ class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityR
     return [fakeLightPackageEntity, fakeModeratePackageEntity, fakeMainichiPackageEntity];
   };
 
-  public init = async (props: {
-    faker: any;
-    cloneDeep: any;
-    makeEntity: UserEntity;
-    makeTeacherEntity: TeacherEntity;
-    makePackageEntity: Promise<PackageEntity>;
-    makeDbService: Promise<UserDbService>;
-    makeTeacherDbService: Promise<TeacherDbService>;
-    makePackageDbService: Promise<PackageDbService>;
-  }) => {
+  protected _initTemplate = async (props: any) => {
     const {
       faker,
-      cloneDeep,
-      makeEntity,
       makeTeacherEntity,
       makePackageEntity,
-      makeDbService,
       makeTeacherDbService,
       makePackageDbService,
     } = props;
     this.faker = faker;
-    this.cloneDeep = cloneDeep;
-    this.entity = makeEntity;
     this.teacherEntity = makeTeacherEntity;
     this.packageEntity = await makePackageEntity;
-    this.dbService = await makeDbService;
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;
-    return this;
   };
 }
 
