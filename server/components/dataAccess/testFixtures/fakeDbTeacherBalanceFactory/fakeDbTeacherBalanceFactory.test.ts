@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { makeFakeTeacherBalanceFactory } from '.';
+import { makeFakeDbTeacherBalanceFactory } from '.';
 import { JoinedUserDoc } from '../../services/user/userDbService';
 import { makeFakeDbUserFactory } from '../fakeDbUserFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
@@ -12,7 +12,7 @@ let fakeTeacher: JoinedUserDoc;
 
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
-  fakeDbTeacherBalanceFactory = await makeFakeTeacherBalanceFactory;
+  fakeDbTeacherBalanceFactory = await makeFakeDbTeacherBalanceFactory;
 });
 
 beforeEach(async () => {

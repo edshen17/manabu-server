@@ -5,7 +5,10 @@ const TeacherBalanceSchema = createSchema({
   userId: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   balanceDetails: Type.object({
     required: true,
-  }).of({}),
+  }).of({
+    balance: Type.number(),
+    currency: Type.string(),
+  }),
 });
 
 const TeacherBalance = typedModel('TeacherBalance', TeacherBalanceSchema);
