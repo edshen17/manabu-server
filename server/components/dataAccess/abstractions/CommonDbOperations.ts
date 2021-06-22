@@ -98,7 +98,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
-  public update = async (params: DbParams): Promise<DbDoc> => {
+  public findOneAndUpdate = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, updateParams, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this.dbModel
@@ -119,6 +119,12 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
         new: true,
       })
       .lean();
+    return await this._dbReturnTemplate(accessOptions, asyncCallback);
+  };
+
+  public findByIdAndDelete = async (params: DbParams): Promise<DbDoc> => {
+    const { _id, accessOptions } = params;
+    const asyncCallback = this.dbModel.findByIdAndDelete(_id).lean();
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 

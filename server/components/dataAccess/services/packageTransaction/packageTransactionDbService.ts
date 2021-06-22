@@ -1,10 +1,10 @@
 import { IDbOperations } from '../../abstractions/IDbOperations';
 import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
-import { PackageDoc } from '../../../../models/Package';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 
 class PackageTransactionDbService
-  extends CommonDbOperations<PackageDoc>
-  implements IDbOperations<PackageDoc>
+  extends CommonDbOperations<PackageTransactionDoc>
+  implements IDbOperations<PackageTransactionDoc>
 {
   constructor() {
     super();

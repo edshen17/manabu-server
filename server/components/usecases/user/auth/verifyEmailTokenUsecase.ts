@@ -47,7 +47,7 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
       accessOptions,
     });
     if (user) {
-      const updatedDbUser = await this.userDbService.update({
+      const updatedDbUser = await this.userDbService.findOneAndUpdate({
         searchQuery: { _id: user._id },
         updateParams: { emailVerified: true },
         accessOptions,

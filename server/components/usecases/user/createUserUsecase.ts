@@ -19,6 +19,7 @@ import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
+import { PackageTransactionDoc } from '../../../models/PackageTransaction';
 
 type CookieData = {
   name: string;
@@ -202,7 +203,7 @@ class CreateUserUsecase
   private _insertAdminPackageTransaction = async (
     savedDbUser: JoinedUserDoc,
     accessOptions: AccessOptions
-  ): Promise<PackageDoc> => {
+  ): Promise<PackageTransactionDoc> => {
     const packageTransactionEntity = await makePackageTransactionEntity;
     const modelToInsert = await packageTransactionEntity.build({
       hostedBy: process.env.MANABU_ADMIN_ID!,

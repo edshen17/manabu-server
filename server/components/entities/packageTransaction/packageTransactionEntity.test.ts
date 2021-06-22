@@ -1,5 +1,4 @@
 import chai from 'chai';
-import equal from 'deep-equal';
 import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makePackageTransactionEntity } from './index';
@@ -30,11 +29,9 @@ context('packageTransaction entity', () => {
 
         expect(testPackageTransaction.lessonLanguage).to.equal('ja');
         expect(testPackageTransaction.isSubscription).to.equal(false);
-        expect(
-          equal(testPackageTransaction.packageData, fakeTeacher.teacherData.packages[0])
-        ).to.equal(true);
-        expect(equal(testPackageTransaction.hostedByData, fakeTeacher)).to.equal(true);
-        expect(equal(testPackageTransaction.reservedByData, fakeTeacher)).to.equal(true);
+        expect(testPackageTransaction.packageData).to.deep.equal(fakeTeacher.teacherData.packages[0]);
+        expect(testPackageTransaction.hostedByData).to.deep.equal(fakeTeacher);
+        expect(testPackageTransaction.reservedByData).to.deep.equal(fakeTeacher);
       });
     });
   });

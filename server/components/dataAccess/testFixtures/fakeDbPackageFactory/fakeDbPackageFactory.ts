@@ -17,19 +17,16 @@ class FakeDbPackageFactory extends AbstractDbDataFactory<PackageDoc, PackageEnti
     const lightPackage = await this._createFakeEntity({
       hostedBy,
       lessonAmount: 5,
-      isOffering: true,
       packageType: 'light',
     });
     const moderatePackage = await this._createFakeEntity({
       hostedBy,
       lessonAmount: 12,
-      isOffering: true,
       packageType: 'moderate',
     });
     const mainichiPackage = await this._createFakeEntity({
       hostedBy,
       lessonAmount: 22,
-      isOffering: true,
       packageType: 'mainichi',
     });
     return [lightPackage, moderatePackage, mainichiPackage];

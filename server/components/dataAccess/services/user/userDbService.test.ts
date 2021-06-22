@@ -179,7 +179,7 @@ context('userDbService', () => {
         accessOptions,
       });
       expect(searchUser.profileBio).to.equal('');
-      const updatedUser = await userDbService.update({
+      const updatedUser = await userDbService.findOneAndUpdate({
         searchQuery: { email: newUser.email },
         updateParams: { profileBio: 'updated bio' },
         accessOptions,
@@ -196,7 +196,7 @@ context('userDbService', () => {
         accessOptions: accessOptionsCopy,
       });
       expect(searchUser.profileBio).to.equal('');
-      const updatedUser = await userDbService.update({
+      const updatedUser = await userDbService.findOneAndUpdate({
         searchQuery: { _id: newUser._id },
         updateParams: { profileBio: 'updated bio' },
         accessOptions: accessOptionsCopy,

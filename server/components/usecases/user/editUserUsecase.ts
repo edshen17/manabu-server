@@ -41,7 +41,7 @@ class EditUserUsecase
     props: MakeRequestTemplateParams
   ): Promise<EditUserUsecaseResponse> => {
     const { params, body, accessOptions, query } = props;
-    const savedDbUser = await this.userDbService.update({
+    const savedDbUser = await this.userDbService.findOneAndUpdate({
       searchQuery: { _id: params.uId },
       updateParams: body,
       accessOptions,

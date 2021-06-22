@@ -27,7 +27,7 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
     _id: string | undefined,
     accessOptions: AccessOptions
   ): Promise<void> => {
-    this.userDbService.update({
+    this.userDbService.findOneAndUpdate({
       searchQuery: {
         _id,
       },

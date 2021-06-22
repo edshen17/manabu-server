@@ -24,7 +24,7 @@ class EditTeacherUsecase
     props: MakeRequestTemplateParams
   ): Promise<EditTeacherUsecaseResponse> => {
     const { params, body, accessOptions } = props;
-    const updatedDbTeacher = await this.teacherDbService.update({
+    const updatedDbTeacher = await this.teacherDbService.findOneAndUpdate({
       searchQuery: { userId: params.uId },
       updateParams: body,
       accessOptions,

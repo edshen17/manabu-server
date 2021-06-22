@@ -69,7 +69,7 @@ context('minuteBankDbService', () => {
     });
     describe('update', async () => {
       const newMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({ minuteBank: 0 });
-      const updatedMinuteBank = await minuteBankDbService.update({
+      const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
         updateParams: { minuteBank: 10 },
         accessOptions,
       });
