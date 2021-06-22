@@ -26,7 +26,10 @@ abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDa
     return fakeDbData;
   };
 
-  protected abstract _createFakeEntity(entityData?: any): Promise<EntityResponse> | EntityResponse;
+  protected _createFakeEntity = async (entityData?: any): Promise<EntityResponse> => {
+    const fakeEntity = await this.entity.build(entityData);
+    return fakeEntity;
+  };
 
   protected _awaitDbInsert = async (newDbDocCallback: Promise<any>) => {
     const newDbDoc = await newDbDocCallback;

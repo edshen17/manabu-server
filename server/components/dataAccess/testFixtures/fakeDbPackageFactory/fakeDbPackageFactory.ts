@@ -1,0 +1,39 @@
+import { PackageDoc } from '../../../../models/Package';
+import { PackageEntityResponse } from '../../../entities/package/packageEntity';
+import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+
+class FakeDbPackageFactory extends AbstractDbDataFactory<PackageDoc, PackageEntityResponse> {
+  public createFakePackages = async (entityData: { hostedBy: any }) => {
+    const defaultPackages = await this._createDefaultPackages(entityData);
+    const accessOptions = this.getDefaultAccessOptions();
+    const insertedPackages = await this.dbService.insertMany({
+      modelToInsert: defaultPackages,
+      accessOptions,
+    });
+    return insertedPackages;
+  };
+  private _createDefaultPackages = async (entityData: { hostedBy: any }) => {
+    const { hostedBy } = entityData;
+    const lightPackage = await this._createFakeEntity({
+      hostedBy,
+      lessonAmount: 5,
+      isOffering: true,
+      packageType: 'light',
+    });
+    const moderatePackage = await this._createFakeEntity({
+      hostedBy,
+      lessonAmount: 12,
+      isOffering: true,
+      packageType: 'moderate',
+    });
+    const mainichiPackage = await this._createFakeEntity({
+      hostedBy,
+      lessonAmount: 22,
+      isOffering: true,
+      packageType: 'mainichi',
+    });
+    return [lightPackage, moderatePackage, mainichiPackage];
+  };
+}
+
+export { FakeDbPackageFactory };

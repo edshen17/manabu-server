@@ -29,9 +29,9 @@ class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityR
     return await this.createFakeDbData(entityData);
   };
 
-  protected _createFakeEntity = (entityData?: {
+  protected _createFakeEntity = async (entityData?: {
     email: string;
-  }): UserEntityResponse | Promise<UserEntityResponse> => {
+  }): Promise<UserEntityResponse> => {
     const { email } = entityData || {};
     const fakeUserEntity = this.entity.build({
       name: this.faker.name.findName(),

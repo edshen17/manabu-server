@@ -38,22 +38,26 @@ class PackageEntity
       packageEntityData;
     return Object.freeze({
       hostedBy,
-      priceDetails: priceDetails || (await this._getPriceDetails(hostedBy)) || {},
-      lessonAmount,
+      priceDetails: priceDetails || (await this._getPriceDetails(hostedBy)),
+      lessonAmount: lessonAmount || 5,
       isOffering: isOffering || true,
-      packageType,
+      packageType: packageType || 'light',
       packageDurations: packageDurations || [30, 60],
     });
   };
 
   private _getPriceDetails = async (hostedBy: string) => {
     const savedDbTeacher: JoinedUserDoc = await this.getDbDataById(this.userDbService, hostedBy);
-    const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
-    const priceDetails = {
-      currency: teacherHourlyRate.currency!,
-      hourlyPrice: teacherHourlyRate.amount!,
-    };
-    return priceDetails;
+    if (savedDbTeacher.teacherData) {
+      const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
+      const priceDetails = {
+        currency: teacherHourlyRate.currency!,
+        hourlyPrice: teacherHourlyRate.amount!,
+      };
+      return priceDetails;
+    } else {
+      return { hourlyPrice: 35, currency: 'SGD' };
+    }
   };
 
   public init = async (props: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
@@ -63,4 +67,4 @@ class PackageEntity
   };
 }
 
-export { PackageEntity, PackageEntityResponse };
+export { PackageEntity, PackageEntityResponse, PackageEntityData };
