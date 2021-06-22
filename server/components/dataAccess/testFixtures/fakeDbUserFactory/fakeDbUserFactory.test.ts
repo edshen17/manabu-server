@@ -22,12 +22,15 @@ describe('fakeDbUserFactory', () => {
       expect(fakeDbUser.profileImage).to.not.equal('');
     });
   });
-
-  describe('createFakeDbTeacherWithDefaultPackages', async () => {
-    const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-    const accessOptions = fakeDbUserFactory.getDefaultAccessOptions();
-    const joinedTeacher = await userDbService.findById({ _id: fakeDbTeacher._id, accessOptions });
-    expect(joinedTeacher.teacherAppPending).to.equal(true);
-    expect(joinedTeacher.teacherData.packages.length).to.equal(3);
+  describe('createFakeDbTeacherWithDefaultPackages', () => {
+    it('should create a fake db teacher with default packages', async () => {
+      const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+      const accessOptions = fakeDbUserFactory.getDefaultAccessOptions();
+      const joinedTeacher = await userDbService.findById({
+        _id: fakeDbTeacher._id,
+        accessOptions,
+      });
+      expect(fakeDbTeacher._id.toString()).to.equal(joinedTeacher._id.toString());
+    });
   });
 });

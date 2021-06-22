@@ -25,4 +25,4 @@ class TeacherBalanceEntity
   }
 }
 
-export { TeacherBalanceEntity };
+export { TeacherBalanceEntity, TeacherBalanceEntityResponse };

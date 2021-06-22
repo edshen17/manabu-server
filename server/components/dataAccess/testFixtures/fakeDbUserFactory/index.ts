@@ -1,20 +1,18 @@
 import faker from 'faker';
-import { makePackageEntity } from '../../../entities/package';
+import cloneDeep from 'clone-deep';
 import { makeUserEntity } from '../../../entities/user';
-import { makePackageDbService } from '../../services/package';
 import { makeUserDbService } from '../../services/user';
 import { FakeDbUserFactory } from './fakeDbUserFactory';
-import cloneDeep from 'clone-deep';
 import { makeFakeDbTeacherFactory } from '../fakeDbTeacherFactory';
+import { makeFakeDbPackageFactory } from '../fakeDbPackageFactory';
 
 const makeFakeDbUserFactory = new FakeDbUserFactory().init({
   faker,
   cloneDeep,
   makeEntity: makeUserEntity,
-  makePackageEntity,
   makeDbService: makeUserDbService,
   makeFakeDbTeacherFactory,
-  makePackageDbService,
+  makeFakeDbPackageFactory,
 });
 
 export { makeFakeDbUserFactory };

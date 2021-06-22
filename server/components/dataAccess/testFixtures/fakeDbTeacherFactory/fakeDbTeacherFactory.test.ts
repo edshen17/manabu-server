@@ -22,8 +22,7 @@ describe('fakeDbTeacherFactory', () => {
     it('should create a fake teacher in the db', async () => {
       const newUser = await fakeDbUserFactory.createFakeDbUser();
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: newUser._id });
-      expect(newTeacher).to.have.property('teachingLanguages');
-      expect(newTeacher).to.not.have.property('licensePath');
+      expect(newTeacher.userId.toString()).to.equal(newUser._id.toString());
     });
   });
 });

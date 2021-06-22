@@ -1,23 +1,22 @@
-import { PackageDoc } from '../../../../models/Package';
-import { PackageEntity, PackageEntityResponse } from '../../../entities/package/packageEntity';
 import { UserEntityResponse } from '../../../entities/user/userEntity';
-import { PackageDbService } from '../../services/package/packageDbService';
 import { JoinedUserDoc } from '../../services/user/userDbService';
 import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFactory';
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
 class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityResponse> {
   private faker!: any;
-  private packageEntity!: PackageEntity;
   private fakeDbTeacherFactory!: FakeDbTeacherFactory;
-  private packageDbService!: PackageDbService;
+  private fakeDbPackageFactory!: FakeDbPackageFactory;
 
   public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbUser();
     const fakeDbTeacher = await this.fakeDbTeacherFactory.createFakeDbData({
       userId: fakeDbUser._id,
     });
-    const fakeDbPackages = await this._createFakeDbPackages(fakeDbUser);
+    const fakeDbPackages = await this.fakeDbPackageFactory.createFakePackages({
+      hostedBy: fakeDbUser._id,
+    });
 
     return this.dbService.findById({
       _id: fakeDbUser._id,
@@ -42,45 +41,11 @@ class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityR
     return fakeUserEntity;
   };
 
-  private _createFakeDbPackages = async (savedDbUser: JoinedUserDoc): Promise<PackageDoc> => {
-    const fakePackageEntities = await this._createFakePackageEntities(savedDbUser);
-    const newPackageCallback = this.packageDbService.insert({
-      modelToInsert: fakePackageEntities,
-      accessOptions: this.defaultAccessOptions,
-    });
-    return await this._awaitDbInsert(newPackageCallback);
-  };
-
-  private _createFakePackageEntities = async (
-    savedDbUser: JoinedUserDoc
-  ): Promise<PackageEntityResponse[]> => {
-    const fakeLightPackageEntity = await this.packageEntity.build({
-      hostedBy: savedDbUser._id,
-      lessonAmount: 5,
-      isOffering: true,
-      packageType: 'light',
-    });
-    const fakeModeratePackageEntity = await this.packageEntity.build({
-      hostedBy: savedDbUser._id,
-      lessonAmount: 12,
-      isOffering: true,
-      packageType: 'moderate',
-    });
-    const fakeMainichiPackageEntity = await this.packageEntity.build({
-      hostedBy: savedDbUser._id,
-      lessonAmount: 22,
-      isOffering: true,
-      packageType: 'mainichi',
-    });
-    return [fakeLightPackageEntity, fakeModeratePackageEntity, fakeMainichiPackageEntity];
-  };
-
   protected _initTemplate = async (props: any) => {
-    const { faker, makeFakeDbTeacherFactory, makePackageEntity, makePackageDbService } = props;
+    const { faker, makeFakeDbTeacherFactory, makeFakeDbPackageFactory } = props;
     this.faker = faker;
-    this.packageEntity = await makePackageEntity;
-    this.packageDbService = await makePackageDbService;
     this.fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
+    this.fakeDbPackageFactory = await makeFakeDbPackageFactory;
   };
 }
 
