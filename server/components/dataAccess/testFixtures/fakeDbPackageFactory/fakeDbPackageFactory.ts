@@ -1,8 +1,8 @@
 import { PackageDoc } from '../../../../models/Package';
 import { PackageEntityResponse } from '../../../entities/package/packageEntity';
-import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-class FakeDbPackageFactory extends AbstractDbDataFactory<PackageDoc, PackageEntityResponse> {
+class FakeDbPackageFactory extends AbstractFakeDbDataFactory<PackageDoc, PackageEntityResponse> {
   public createFakePackages = async (entityData: { hostedBy: any }) => {
     const defaultPackages = await this._createDefaultPackages(entityData);
     const accessOptions = this.getDefaultAccessOptions();

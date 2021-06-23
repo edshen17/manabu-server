@@ -2,7 +2,9 @@ import { IEntity } from '../../../entities/abstractions/IEntity';
 import { AccessOptions, IDbOperations } from '../../abstractions/IDbOperations';
 import { IFakeDbDataFactory } from './IFakeDbDataFactory';
 
-abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDataFactory<DbDoc> {
+abstract class AbstractFakeDbDataFactory<DbDoc, EntityResponse>
+  implements IFakeDbDataFactory<DbDoc>
+{
   protected entity!: IEntity<EntityResponse>;
   protected dbService!: IDbOperations<DbDoc>;
   protected defaultAccessOptions: AccessOptions;
@@ -54,4 +56,4 @@ abstract class AbstractDbDataFactory<DbDoc, EntityResponse> implements IFakeDbDa
   };
 }
 
-export { AbstractDbDataFactory };
+export { AbstractFakeDbDataFactory };

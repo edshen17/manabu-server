@@ -1,10 +1,10 @@
 import { UserEntityResponse } from '../../../entities/user/userEntity';
 import { JoinedUserDoc } from '../../services/user/userDbService';
-import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFactory';
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
-class FakeDbUserFactory extends AbstractDbDataFactory<JoinedUserDoc, UserEntityResponse> {
+class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEntityResponse> {
   private faker!: any;
   private fakeDbTeacherFactory!: FakeDbTeacherFactory;
   private fakeDbPackageFactory!: FakeDbPackageFactory;

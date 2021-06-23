@@ -1,9 +1,9 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { MinuteBankEntityResponse } from '../../../entities/minuteBank/minuteBankEntity';
-import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-class FakeDbMinuteBankFactory extends AbstractDbDataFactory<
+class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   MinuteBankDoc,
   MinuteBankEntityResponse
 > {

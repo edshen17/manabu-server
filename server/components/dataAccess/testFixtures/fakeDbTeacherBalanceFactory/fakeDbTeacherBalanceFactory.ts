@@ -1,8 +1,8 @@
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 import { TeacherBalanceEntityResponse } from '../../../entities/teacherBalance/teacherBalanceEntity';
-import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-class FakeDbTeacherBalanceFactory extends AbstractDbDataFactory<
+class FakeDbTeacherBalanceFactory extends AbstractFakeDbDataFactory<
   TeacherBalanceDoc,
   TeacherBalanceEntityResponse
 > {}

@@ -1,7 +1,7 @@
 import { TeacherDoc } from '../../../../models/Teacher';
 import { TeacherEntityResponse } from '../../../entities/teacher/teacherEntity';
-import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-class FakeDbTeacherFactory extends AbstractDbDataFactory<TeacherDoc, TeacherEntityResponse> {}
+class FakeDbTeacherFactory extends AbstractFakeDbDataFactory<TeacherDoc, TeacherEntityResponse> {}
 
 export { FakeDbTeacherFactory };

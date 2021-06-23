@@ -1,9 +1,9 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { PackageTransactionEntityResponse } from '../../../entities/packageTransaction/packageTransactionEntity';
-import { AbstractDbDataFactory } from '../abstractions/AbstractDbDataFactory';
+import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-class FakeDbPackageTransactionFactory extends AbstractDbDataFactory<
+class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
   PackageTransactionDoc,
   PackageTransactionEntityResponse
 > {
