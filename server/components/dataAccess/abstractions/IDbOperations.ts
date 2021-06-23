@@ -16,7 +16,7 @@ type DbParams = {
   updateParams?: {};
 };
 
-interface IDbOperations<DbDoc> {
+interface IDbOperations<DbDoc, DefaultDbInitParams> {
   findById: (params: DbParams) => Promise<DbDoc>;
   findOne: (params: DbParams) => Promise<DbDoc>;
   find: (params: DbParams) => Promise<DbDoc[]>;
@@ -24,8 +24,8 @@ interface IDbOperations<DbDoc> {
   insertMany: (params: DbParams) => Promise<DbDoc[]>;
   findOneAndUpdate: (params: DbParams) => Promise<DbDoc>;
   updateMany: (params: DbParams) => Promise<DbDoc[]>;
-  findByIdAndDelete: (params: DbParams) => Promise<DbDoc>
-  init: (props: any) => Promise<this>;
+  findByIdAndDelete: (params: DbParams) => Promise<DbDoc>;
+  init: (props: DefaultDbInitParams) => Promise<this>;
   getDefaultSelectOptions: () => DefaultSelectOptions;
 }
 
