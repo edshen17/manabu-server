@@ -9,7 +9,7 @@ abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse>
     currentAPIUserRole: 'user',
   };
 
-  public getDbDataById = async (dbService: IDbOperations<any, any>, _id?: string): Promise<any> => {
+  public getDbDataById = async (dbService: IDbOperations<any>, _id?: string): Promise<any> => {
     const accessOptions = this.defaultAccessOptions;
     const dbData = await dbService.findById({ _id, accessOptions });
     return dbData;

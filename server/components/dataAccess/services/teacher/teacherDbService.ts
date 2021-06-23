@@ -1,11 +1,8 @@
 import { DbParams, IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations, DefaultDbInitParams } from '../../abstractions/CommonDbOperations';
+import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
 import { TeacherDoc } from '../../../../models/Teacher';
 
-class TeacherDbService
-  extends CommonDbOperations<TeacherDoc>
-  implements IDbOperations<TeacherDoc, DefaultDbInitParams>
-{
+class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
   constructor() {
     super();
     this.defaultSelectOptions = {
