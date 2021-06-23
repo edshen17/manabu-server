@@ -7,7 +7,13 @@ type DefaultSelectOptions = {
   overrideSettings?: {};
 };
 
-abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
+type DefaultDbInitParams = {
+  makeDb: any;
+  cloneDeep: any;
+  dbModel: any;
+};
+
+abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc, DefaultDbInitParams> {
   protected dbModel!: any;
   protected cloneDeep!: any;
   protected defaultSelectOptions!: DefaultSelectOptions;
@@ -141,4 +147,4 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   };
 }
 
-export { DefaultSelectOptions, CommonDbOperations };
+export { DefaultSelectOptions, CommonDbOperations, DefaultDbInitParams };

@@ -6,7 +6,7 @@ abstract class AbstractFakeDbDataFactory<DbDoc, EntityResponse>
   implements IFakeDbDataFactory<DbDoc>
 {
   protected entity!: IEntity<EntityResponse>;
-  protected dbService!: IDbOperations<DbDoc>;
+  protected dbService!: IDbOperations<DbDoc, any>;
   protected defaultAccessOptions: AccessOptions;
   protected cloneDeep!: any;
   constructor() {

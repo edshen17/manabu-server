@@ -73,7 +73,7 @@ class EditUserUsecase
   };
 
   private _updateDbUserDependencyData = async (props: {
-    dbService: IDbOperations<any>;
+    dbService: IDbOperations<any, any>;
     savedDbUser: JoinedUserDoc;
     accessOptions: AccessOptions;
     hostedBySearchQuery: any;

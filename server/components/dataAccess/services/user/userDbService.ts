@@ -1,5 +1,5 @@
 import { AccessOptions, DbParams, IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
+import { CommonDbOperations, DefaultDbInitParams } from '../../abstractions/CommonDbOperations';
 import { TeacherDbService } from '../teacher/teacherDbService';
 import { PackageDbService } from '../package/packageDbService';
 import { UserDoc } from '../../../../models/User';
@@ -8,10 +8,15 @@ import { PackageDoc } from '../../../../models/Package';
 
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
+type UserDbServiceInitParams = DefaultDbInitParams & {
+  makeTeacherDbService: Promise<TeacherDbService>;
+  makePackageDbService: Promise<PackageDbService>;
+  passwordLib: any;
+};
 
 class UserDbService
   extends CommonDbOperations<JoinedUserDoc>
-  implements IDbOperations<JoinedUserDoc>
+  implements IDbOperations<JoinedUserDoc, UserDbServiceInitParams>
 {
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
@@ -101,14 +106,7 @@ class UserDbService
     return userCopy;
   };
 
-  public init = async (props: {
-    makeDb: any;
-    dbModel: any;
-    cloneDeep: any;
-    makeTeacherDbService: Promise<TeacherDbService>;
-    makePackageDbService: Promise<PackageDbService>;
-    passwordLib: any;
-  }) => {
+  public init = async (props: UserDbServiceInitParams) => {
     const { makeDb, dbModel, cloneDeep, makeTeacherDbService, makePackageDbService, passwordLib } =
       props;
     await makeDb();
