@@ -1,5 +1,5 @@
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
-import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase';
+import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase/getUserUsecase';
 import { CreateUserUsecase } from '../user/createUserUsecase/createUserUsecase';
 
 const initializeUser = async (props: {

@@ -1,4 +1,4 @@
-import { makeGetUserUsecase } from '../../usecases/user';
+import { makeGetUserUsecase } from '../../usecases/user/getUserUsecase';
 import { GetUserController } from './getUserController';
 import { StatusCodes } from 'http-status-codes';
 import { CreateUserController } from './createUserController';

@@ -1,8 +1,8 @@
-import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
-import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
-import { AbstractGetUsecase } from '../abstractions/AbstractGetUsecase';
-import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
-import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
+import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
+import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
+import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 

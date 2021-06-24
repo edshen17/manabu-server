@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes';
 import { VerifyEmailTokenController } from './verifyEmailTokenController';
-import { makeVerifyEmailTokenUsecase } from '../../../usecases/user/auth/verifyEmailTokenUsecase';
+import { makeVerifyEmailTokenUsecase } from '../../../usecases/user/verifyEmailTokenUsecase';
 import { LoginUserController } from './loginUserController';
-import { makeLoginUserUsecase } from '../../../usecases/user/auth/loginUserUsecase';
+import { makeLoginUserUsecase } from '../../../usecases/user/loginUserUsecase';
 
 const makeVerifyEmailTokenController = new VerifyEmailTokenController({
   successStatusCode: StatusCodes.OK,

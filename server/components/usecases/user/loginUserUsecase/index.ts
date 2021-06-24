@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
-import { makeCreateUserUsecase } from '../..';
-import { makeUserDbService } from '../../../../dataAccess/services/user';
-import { makeRedirectPathBuilder } from '../../../../utils/redirectPathBuilder';
+import { makeUserDbService } from '../../../dataAccess/services/user';
+import { makeRedirectPathBuilder } from '../../../utils/redirectPathBuilder';
+import { makeCreateUserUsecase } from '../createUserUsecase';
 import { LoginUserUsecase } from './loginUserUsecase';
 
 const oauthRedirectURI = makeRedirectPathBuilder
