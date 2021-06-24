@@ -9,11 +9,13 @@ import { makePackageDbService } from '../../dataAccess/services/package';
 import { makePackageTransactionDbService } from '../../dataAccess/services/packageTransaction';
 import { makeTeacherBalanceDbService } from '../../dataAccess/services/teacherBalance';
 import { makeTeacherDbService } from '../../dataAccess/services/teacher';
+import { makeUserEntity } from '../../entities/user';
 
 const makeGetUserUsecase = new GetUserUsecase().init({ makeUserDbService });
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserDbService,
+  makeUserEntity,
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,

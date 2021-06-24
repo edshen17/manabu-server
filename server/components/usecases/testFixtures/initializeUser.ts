@@ -1,18 +1,16 @@
-import jwt from 'jsonwebtoken';
-import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase';
 import { CreateUserUsecase } from '../user/createUserUsecase';
 
 const initializeUser = async (props: {
-  viewingAs: string;
+  viewingAsRole: string;
   isSelf: boolean;
   controllerData: ControllerData;
   getUserUsecase: GetUserUsecase;
   createUserUsecase: CreateUserUsecase;
   isTeacherApp?: boolean;
 }): Promise<GetUserUsecaseResponse> => {
-  const { viewingAs, isSelf, controllerData, getUserUsecase, createUserUsecase, isTeacherApp } =
+  const { viewingAsRole, isSelf, controllerData, getUserUsecase, createUserUsecase, isTeacherApp } =
     props;
   const { routeData } = controllerData;
   if (isTeacherApp) {
@@ -22,7 +20,7 @@ const initializeUser = async (props: {
   const savedDbUser = userRes.user;
   const currentAPIUser: CurrentAPIUser = {
     userId: savedDbUser._id,
-    role: viewingAs,
+    role: viewingAsRole,
   };
   const getRouteData = { params: { uId: savedDbUser._id }, body: { isTeacherApp: false } };
 

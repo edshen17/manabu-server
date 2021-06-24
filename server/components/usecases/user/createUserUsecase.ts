@@ -13,13 +13,13 @@ import { makeMinuteBankEntity } from '../../entities/minuteBank';
 import { makePackageEntity } from '../../entities/package';
 import { makePackageTransactionEntity } from '../../entities/packageTransaction';
 import { makeTeacherBalanceEntity } from '../../entities/teacherBalance';
-import { makeUserEntity } from '../../entities/user';
 import { makeTeacherEntity } from '../../entities/teacher';
 import { EmailHandler } from '../../utils/email/emailHandler';
 import { ControllerData, IUsecase } from '../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../models/PackageTransaction';
+import { UserEntity } from '../../entities/user/userEntity';
 
 type CookieData = {
   name: string;
@@ -40,6 +40,7 @@ class CreateUserUsecase
   implements IUsecase<CreateUserUsecaseResponse>
 {
   private userDbService!: UserDbService;
+  private userEntity!: UserEntity;
   private teacherDbService!: TeacherDbService;
   private packageDbService!: PackageDbService;
   private packageTransactionDbService!: PackageTransactionDbService;
@@ -48,89 +49,31 @@ class CreateUserUsecase
   private jwt!: any;
   private emailHandler!: EmailHandler;
 
-  private _setCookieOptions = (): CookieData['options'] => {
-    const cookieOptions = {
-      maxAge: 2 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: true,
-    };
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<CreateUserUsecaseResponse> => {
+    const { body, accessOptions } = props;
+    const { isTeacherApp } = body || {};
 
-    if (process.env.NODE_ENV != 'production') {
-      cookieOptions.httpOnly = false;
-      cookieOptions.secure = false;
+    try {
+      const userInstance = this.userEntity.build(body);
+      let savedDbUser = await this._insertUser(userInstance, accessOptions);
+      if (isTeacherApp) {
+        savedDbUser = await this.handleTeacherCreation(savedDbUser, accessOptions);
+      }
+
+      if (process.env.NODE_ENV == 'production') {
+        this._sendVerificationEmail(userInstance);
+        this._sendInternalEmail(userInstance, isTeacherApp);
+      }
+      const cookies = this.splitLoginCookies(savedDbUser);
+      return {
+        user: savedDbUser,
+        cookies,
+      };
+    } catch (err) {
+      throw err;
     }
-    return cookieOptions;
-  };
-
-  public splitLoginCookies = (savedDbUser: JoinedUserDoc): CookieData[] => {
-    const token = this._jwtToClient(savedDbUser);
-    const tokenArr: string[] = token.split('.');
-    const hpCookie = {
-      name: 'hp',
-      value: `${tokenArr[0]}.${tokenArr[1]}`,
-      options: this._setCookieOptions(),
-    };
-    const sigCookie = {
-      name: 'sig',
-      value: `.${tokenArr[2]}`,
-      options: this._setCookieOptions(),
-    };
-    const loginCookies = [hpCookie, sigCookie];
-    return loginCookies;
-  };
-
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { body } = controllerData.routeData;
-    const { role, _id, dateRegistered } = body || {};
-    return !role && !_id && !dateRegistered;
-  };
-
-  private _sendVerificationEmail = (userInstance: any): void => {
-    const host = 'https://manabu.sg';
-    const { name, verificationToken } = userInstance;
-    this.emailHandler.sendEmail(
-      userInstance.email,
-      'NOREPLY',
-      'Manabu email verification',
-      'verificationEmail',
-      {
-        name,
-        host,
-        verificationToken: verificationToken,
-      }
-    );
-  };
-
-  private _sendInternalEmail = (userInstance: any, isTeacherApp: boolean): void => {
-    const userType = isTeacherApp ? 'teacher' : 'user';
-    const { name, email } = userInstance;
-    this.emailHandler.sendEmail(
-      'manabulessons@gmail.com',
-      'NOREPLY',
-      `A new ${userType} signed up`,
-      'internalNewSignUpEmail',
-      {
-        name,
-        email,
-        userType,
-      }
-    );
-  };
-
-  private _jwtToClient = (savedDbUser: any): string => {
-    const { role, name } = savedDbUser;
-    const token = this.jwt.sign(
-      {
-        _id: savedDbUser._id,
-        role,
-        name,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: 24 * 60 * 60 * 7,
-      }
-    );
-    return token;
   };
 
   private _insertUser = async (
@@ -144,6 +87,24 @@ class CreateUserUsecase
     return savedDbUser;
   };
 
+  public handleTeacherCreation = async (
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ): Promise<JoinedUserDoc> => {
+    const joinedUserData = JSON.parse(JSON.stringify(savedDbUser));
+    const teacherData: any = await this._insertTeacher(savedDbUser, accessOptions);
+    const packages = await this._insertTeacherPackages(savedDbUser, accessOptions);
+
+    await this._insertAdminPackageTransaction(savedDbUser, accessOptions);
+    await this._insertAdminMinuteBank(savedDbUser, accessOptions);
+    await this._insertTeacherBalance(savedDbUser, accessOptions);
+
+    teacherData.packages = packages;
+    joinedUserData.teacherData = teacherData;
+    joinedUserData.teacherAppPending = true;
+    return joinedUserData;
+  };
+
   private _insertTeacher = async (
     savedDbUser: JoinedUserDoc,
     accessOptions: AccessOptions
@@ -155,6 +116,20 @@ class CreateUserUsecase
       accessOptions,
     });
     return savedDbTeacher;
+  };
+
+  private _insertTeacherPackages = async (
+    savedDbUser: JoinedUserDoc,
+    accessOptions: AccessOptions
+  ): Promise<PackageDoc[]> => {
+    const packagesToInsert = await this._createDefaultTeacherPackages(savedDbUser);
+    const modelToInsert = await Promise.all(packagesToInsert);
+
+    const newPackages = await this.packageDbService.insertMany({
+      modelToInsert,
+      accessOptions,
+    });
+    return newPackages;
   };
 
   private _createDefaultTeacherPackages = async (savedDbUser: JoinedUserDoc) => {
@@ -184,20 +159,6 @@ class CreateUserUsecase
       );
     });
     return packagesToInsert;
-  };
-
-  private _insertTeacherPackages = async (
-    savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
-  ): Promise<PackageDoc[]> => {
-    const packagesToInsert = await this._createDefaultTeacherPackages(savedDbUser);
-    const modelToInsert = await Promise.all(packagesToInsert);
-
-    const newPackages = await this.packageDbService.insertMany({
-      modelToInsert,
-      accessOptions,
-    });
-    return newPackages;
   };
 
   private _insertAdminPackageTransaction = async (
@@ -244,7 +205,7 @@ class CreateUserUsecase
     savedDbUser: JoinedUserDoc,
     accessOptions: AccessOptions
   ): Promise<TeacherBalanceDoc> => {
-    const teacherBalanceEntity = await makeTeacherBalanceEntity;
+    const teacherBalanceEntity = makeTeacherBalanceEntity;
     const modelToInsert = await teacherBalanceEntity.build({
       userId: savedDbUser._id,
     });
@@ -255,53 +216,95 @@ class CreateUserUsecase
     return newTeacherBalance;
   };
 
-  public handleTeacherCreation = async (
-    savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
-  ): Promise<JoinedUserDoc> => {
-    const joinedUserData = JSON.parse(JSON.stringify(savedDbUser));
-    const teacherData: any = await this._insertTeacher(savedDbUser, accessOptions);
-    const packages = await this._insertTeacherPackages(savedDbUser, accessOptions);
-
-    await this._insertAdminPackageTransaction(savedDbUser, accessOptions);
-    await this._insertAdminMinuteBank(savedDbUser, accessOptions);
-    await this._insertTeacherBalance(savedDbUser, accessOptions);
-
-    teacherData.packages = packages;
-    joinedUserData.teacherData = teacherData;
-    joinedUserData.teacherAppPending = true;
-    return joinedUserData;
+  private _sendVerificationEmail = (userInstance: any): void => {
+    const host = 'https://manabu.sg';
+    const { name, verificationToken } = userInstance;
+    this.emailHandler.sendEmail(
+      userInstance.email,
+      'NOREPLY',
+      'Manabu email verification',
+      'verificationEmail',
+      {
+        name,
+        host,
+        verificationToken: verificationToken,
+      }
+    );
   };
 
-  protected _makeRequestTemplate = async (
-    props: MakeRequestTemplateParams
-  ): Promise<CreateUserUsecaseResponse> => {
-    const { body, accessOptions } = props;
-    const { isTeacherApp } = body || {};
-
-    try {
-      const userInstance = makeUserEntity.build(body);
-      let savedDbUser = await this._insertUser(userInstance, accessOptions);
-      if (isTeacherApp) {
-        savedDbUser = await this.handleTeacherCreation(savedDbUser, accessOptions);
+  private _sendInternalEmail = (userInstance: any, isTeacherApp: boolean): void => {
+    const userType = isTeacherApp ? 'teacher' : 'user';
+    const { name, email } = userInstance;
+    this.emailHandler.sendEmail(
+      'manabulessons@gmail.com',
+      'NOREPLY',
+      `A new ${userType} signed up`,
+      'internalNewSignUpEmail',
+      {
+        name,
+        email,
+        userType,
       }
+    );
+  };
 
-      if (process.env.NODE_ENV == 'production') {
-        this._sendVerificationEmail(userInstance);
-        this._sendInternalEmail(userInstance, isTeacherApp);
+  public splitLoginCookies = (savedDbUser: JoinedUserDoc): CookieData[] => {
+    const token = this._jwtToClient(savedDbUser);
+    const tokenArr: string[] = token.split('.');
+    const options = this._setCookieOptions();
+    const hpCookie = {
+      name: 'hp',
+      value: `${tokenArr[0]}.${tokenArr[1]}`,
+      options,
+    };
+    const sigCookie = {
+      name: 'sig',
+      value: `.${tokenArr[2]}`,
+      options,
+    };
+    const loginCookies = [hpCookie, sigCookie];
+    return loginCookies;
+  };
+
+  private _jwtToClient = (savedDbUser: any): string => {
+    const { role, name } = savedDbUser;
+    const token = this.jwt.sign(
+      {
+        _id: savedDbUser._id,
+        role,
+        name,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: 24 * 60 * 60 * 7,
       }
-      const cookies = this.splitLoginCookies(savedDbUser);
-      return {
-        user: savedDbUser,
-        cookies,
-      };
-    } catch (err) {
-      throw err;
+    );
+    return token;
+  };
+
+  private _setCookieOptions = (): CookieData['options'] => {
+    const cookieOptions = {
+      maxAge: 2 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: true,
+    };
+
+    if (process.env.NODE_ENV != 'production') {
+      cookieOptions.httpOnly = false;
+      cookieOptions.secure = false;
     }
+    return cookieOptions;
+  };
+
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { body } = controllerData.routeData;
+    const { role, _id, dateRegistered } = body || {};
+    return !role && !_id && !dateRegistered;
   };
 
   public init = async (services: {
     makeUserDbService: Promise<UserDbService>;
+    makeUserEntity: UserEntity;
     makeTeacherDbService: Promise<TeacherDbService>;
     makePackageDbService: Promise<PackageDbService>;
     makePackageTransactionDbService: Promise<PackageTransactionDbService>;
@@ -312,6 +315,7 @@ class CreateUserUsecase
   }): Promise<this> => {
     const {
       makeUserDbService,
+      makeUserEntity,
       makeTeacherDbService,
       makePackageDbService,
       makePackageTransactionDbService,
@@ -321,6 +325,7 @@ class CreateUserUsecase
       emailHandler,
     } = services;
     this.userDbService = await makeUserDbService;
+    this.userEntity = makeUserEntity;
     this.teacherDbService = await makeTeacherDbService;
     this.packageDbService = await makePackageDbService;
     this.packageTransactionDbService = await makePackageTransactionDbService;

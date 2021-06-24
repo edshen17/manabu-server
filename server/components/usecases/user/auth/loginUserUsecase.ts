@@ -61,13 +61,13 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     const handleNoSavedDbUser = () => {
       throw new Error('Username or password incorrect.');
     };
-    savedDbUser = await this._handleUserToTeacher({
+    savedDbUser = await this._loginUser({
       savedDbUser,
       accessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
-    return this._createLoginUserUsecaseResponse(savedDbUser, false);
+    return this._createLoginUserUsecaseResponse(savedDbUser);
   };
 
   private _handleGoogleLogin = async (props: {
@@ -95,12 +95,45 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       return userRes;
     };
 
-    return await this._handleUserToTeacher({
+    return await this._loginUser({
       savedDbUser,
       accessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
+  };
+
+  private _loginUser = async (props: {
+    savedDbUser: JoinedUserDoc;
+    accessOptions: AccessOptions;
+    isTeacherApp: boolean;
+    handleNoSavedDbUser: () => any;
+  }): Promise<LoginUserUsecaseResponse> => {
+    const { accessOptions, isTeacherApp, handleNoSavedDbUser } = props || {};
+    let { savedDbUser } = props;
+    if (savedDbUser) {
+      const shouldCreateNewTeacher =
+        !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
+      if (shouldCreateNewTeacher) {
+        savedDbUser = await this.createUserUsecase.handleTeacherCreation(
+          savedDbUser,
+          accessOptions
+        );
+      }
+      return this._createLoginUserUsecaseResponse(savedDbUser);
+    } else {
+      return await handleNoSavedDbUser();
+    }
+  };
+
+  private _createLoginUserUsecaseResponse = (
+    savedDbUser: JoinedUserDoc
+  ): LoginUserUsecaseResponse => {
+    return {
+      user: savedDbUser,
+      cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
+      redirectURI: this.CLIENT_DASHBOARD_URI,
+    };
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {
@@ -130,41 +163,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     });
     const googleRes = await oauth2.userinfo.get();
     return googleRes.data;
-  };
-
-  private _handleUserToTeacher = async (props: {
-    savedDbUser: JoinedUserDoc;
-    accessOptions: AccessOptions;
-    isTeacherApp: boolean;
-    handleNoSavedDbUser: () => any;
-  }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, isTeacherApp, handleNoSavedDbUser } = props || {};
-    let { savedDbUser } = props;
-    if (savedDbUser) {
-      const shouldCreateNewTeacher =
-        !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
-      if (shouldCreateNewTeacher) {
-        savedDbUser = await this.createUserUsecase.handleTeacherCreation(
-          savedDbUser,
-          accessOptions
-        );
-      }
-      return this._createLoginUserUsecaseResponse(savedDbUser, false);
-    } else {
-      return await handleNoSavedDbUser();
-    }
-  };
-
-  private _createLoginUserUsecaseResponse = (
-    savedDbUser: JoinedUserDoc,
-    hasRedirectURI: boolean
-  ): LoginUserUsecaseResponse => {
-    const redirectURI = hasRedirectURI ? this.CLIENT_DASHBOARD_URI : undefined;
-    return {
-      user: savedDbUser,
-      cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
-      redirectURI,
-    };
   };
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {

@@ -61,6 +61,10 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     };
   };
 
+  protected abstract _makeRequestTemplate(
+    props: MakeRequestTemplateParams
+  ): Promise<UsecaseResponse>;
+
   protected _isCurrentAPIUserPermitted(props: {
     params: any;
     query?: any;
@@ -103,10 +107,6 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
   };
 
   protected abstract _isValidRequest(controllerData: ControllerData): boolean;
-
-  protected abstract _makeRequestTemplate(
-    props: MakeRequestTemplateParams
-  ): Promise<UsecaseResponse>;
 
   abstract init(services: any): Promise<this>;
 }
