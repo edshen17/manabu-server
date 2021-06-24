@@ -1,4 +1,4 @@
-import { LoginUserUsecaseResponse } from '../../../usecases/user/auth/loginUserUsecase';
+import { LoginUserUsecaseResponse } from '../../../usecases/user/auth/loginUserUsecase/loginUserUsecase';
 import { AbstractController, ControllerParams } from '../../abstractions/AbstractController';
 import { IController } from '../../abstractions/IController';
 

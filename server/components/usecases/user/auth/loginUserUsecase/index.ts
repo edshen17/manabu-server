@@ -1,9 +1,8 @@
 import { google } from 'googleapis';
-import { makeCreateUserUsecase } from '..';
-import { makeUserDbService } from '../../../dataAccess/services/user';
-import { makeRedirectPathBuilder } from '../../../utils/redirectPathBuilder';
+import { makeCreateUserUsecase } from '../..';
+import { makeUserDbService } from '../../../../dataAccess/services/user';
+import { makeRedirectPathBuilder } from '../../../../utils/redirectPathBuilder';
 import { LoginUserUsecase } from './loginUserUsecase';
-import { VerifyEmailTokenUsecase } from './verifyEmailTokenUsecase';
 
 const oauthRedirectURI = makeRedirectPathBuilder
   .host('server')
@@ -16,11 +15,6 @@ const oauth2Client = new google.auth.OAuth2(
   oauthRedirectURI
 );
 
-const makeVerifyEmailTokenUsecase = new VerifyEmailTokenUsecase().init({
-  makeUserDbService,
-  makeRedirectPathBuilder,
-});
-
 const makeLoginUserUsecase = new LoginUserUsecase().init({
   makeUserDbService,
   makeCreateUserUsecase,
@@ -29,4 +23,4 @@ const makeLoginUserUsecase = new LoginUserUsecase().init({
   makeRedirectPathBuilder,
 });
 
-export { makeVerifyEmailTokenUsecase, makeLoginUserUsecase };
+export { makeLoginUserUsecase };
