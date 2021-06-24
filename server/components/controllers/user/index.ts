@@ -1,9 +1,10 @@
-import { makeGetUserUsecase, makeEditUserUsecase } from '../../usecases/user';
+import { makeGetUserUsecase } from '../../usecases/user';
 import { GetUserController } from './getUserController';
 import { StatusCodes } from 'http-status-codes';
 import { CreateUserController } from './createUserController';
 import { EditUserController } from './editUserController';
 import { makeCreateUserUsecase } from '../../usecases/user/createUserUsecase';
+import { makeEditUserUsecase } from '../../usecases/user/editUserUsecase';
 
 const makeGetUserController = new GetUserController({
   successStatusCode: StatusCodes.OK,
