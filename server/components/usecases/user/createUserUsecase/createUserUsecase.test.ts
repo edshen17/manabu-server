@@ -1,7 +1,7 @@
 import chai from 'chai';
-import { ControllerData } from '../abstractions/IUsecase';
-import { initializeUser } from '../testFixtures/initializeUser';
-import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
+import { ControllerData } from '../../abstractions/IUsecase';
+import { initializeUser } from '../../testFixtures/initializeUser';
+import { initializeUsecaseSettings } from '../../testFixtures/initializeUsecaseSettings';
 const expect = chai.expect;
 let controllerData: ControllerData;
 let initUserParams: any;

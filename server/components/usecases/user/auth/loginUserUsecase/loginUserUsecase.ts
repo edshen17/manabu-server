@@ -4,7 +4,10 @@ import { RedirectPathBuilder } from '../../../../utils/redirectPathBuilder/redir
 import { AbstractCreateUsecase } from '../../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../../abstractions/IUsecase';
-import { CreateUserUsecase, CreateUserUsecaseResponse } from '../../createUserUsecase';
+import {
+  CreateUserUsecase,
+  CreateUserUsecaseResponse,
+} from '../../createUserUsecase/createUserUsecase';
 
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 

@@ -1,6 +1,6 @@
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase, GetUserUsecaseResponse } from '../user/getUserUsecase';
-import { CreateUserUsecase } from '../user/createUserUsecase';
+import { CreateUserUsecase } from '../user/createUserUsecase/createUserUsecase';
 
 const initializeUser = async (props: {
   viewingAsRole: string;

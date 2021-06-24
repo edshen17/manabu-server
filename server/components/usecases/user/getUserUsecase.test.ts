@@ -1,10 +1,11 @@
 import chai from 'chai';
 import { ControllerData, CurrentAPIUser } from '../abstractions/IUsecase';
 import { GetUserUsecase } from './getUserUsecase';
-import { makeGetUserUsecase, makeCreateUserUsecase } from './index';
-import { CreateUserUsecase } from './createUserUsecase';
+import { makeGetUserUsecase } from './index';
+import { CreateUserUsecase } from './createUserUsecase/createUserUsecase';
 import { initializeUser } from '../testFixtures/initializeUser';
 import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
+import { makeCreateUserUsecase } from './createUserUsecase';
 const expect = chai.expect;
 let getUserUsecase: GetUserUsecase;
 let createUserUsecase: CreateUserUsecase;

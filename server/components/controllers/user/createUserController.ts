@@ -1,4 +1,4 @@
-import { CreateUserUsecaseResponse } from '../../usecases/user/createUserUsecase';
+import { CreateUserUsecaseResponse } from '../../usecases/user/createUserUsecase/createUserUsecase';
 import { AbstractController, ControllerParams } from '../abstractions/AbstractController';
 import { IController } from '../abstractions/IController';
 

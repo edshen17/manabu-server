@@ -1,8 +1,8 @@
 import faker from 'faker';
 import { ControllerData } from '../abstractions/IUsecase';
-import { makeGetUserUsecase, makeCreateUserUsecase, makeEditUserUsecase } from '../user';
-
+import { makeGetUserUsecase, makeEditUserUsecase } from '../user';
 import { makeEditTeacherUsecase } from '../teacher';
+import { makeCreateUserUsecase } from '../user/createUserUsecase';
 
 const initializeUsecaseSettings = async () => {
   const getUserUsecase = await makeGetUserUsecase;
