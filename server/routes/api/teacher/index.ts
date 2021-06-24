@@ -1,5 +1,5 @@
 import express from 'express';
-import { makeEditTeacherController } from '../../../components/controllers/teacher';
+import { makeEditTeacherController } from '../../../components/controllers/teacher/editTeacherController';
 import { makeJSONExpressCallback } from '../../../components/expressCallback/callbacks';
 
 const teachers = express.Router();

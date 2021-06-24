@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { makeGetMinuteBankUsecase } from '../../usecases/minuteBank';
+import { makeGetMinuteBankUsecase } from '../../../usecases/minuteBank/getMinuteBankUsecase';
 import { GetMinuteBankController } from './getMinuteBankController';
 
 const makeGetMinuteBankController = new GetMinuteBankController({

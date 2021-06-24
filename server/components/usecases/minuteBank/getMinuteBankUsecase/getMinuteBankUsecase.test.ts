@@ -1,9 +1,9 @@
 import chai from 'chai';
-import { ControllerData } from '../abstractions/IUsecase';
-import { initializeUser } from '../testFixtures/initializeUser';
-import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
-import { GetUserUsecaseResponse } from '../user/getUserUsecase/getUserUsecase';
-import { initializeMinuteBank } from '../testFixtures/initializeMinuteBank';
+import { ControllerData } from '../../abstractions/IUsecase';
+import { initializeUser } from '../../testFixtures/initializeUser';
+import { initializeUsecaseSettings } from '../../testFixtures/initializeUsecaseSettings';
+import { GetUserUsecaseResponse } from '../../user/getUserUsecase/getUserUsecase';
+import { initializeMinuteBank } from '../../testFixtures/initializeMinuteBank';
 import { GetMinuteBankUsecase } from './getMinuteBankUsecase';
 import { makeGetMinuteBankUsecase } from '.';
 const expect = chai.expect;

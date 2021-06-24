@@ -1,9 +1,9 @@
 import chai from 'chai';
-import { ControllerData } from '../abstractions/IUsecase';
-import { initializeUser } from '../testFixtures/initializeUser';
-import { initializeUsecaseSettings } from '../testFixtures/initializeUsecaseSettings';
-import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
-import { GetUserUsecaseResponse } from '../user/getUserUsecase/getUserUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
+import { initializeUser } from '../../testFixtures/initializeUser';
+import { initializeUsecaseSettings } from '../../testFixtures/initializeUsecaseSettings';
+import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
+import { GetUserUsecaseResponse } from '../../user/getUserUsecase/getUserUsecase';
 const expect = chai.expect;
 let controllerData: ControllerData;
 let initUserParams: any;

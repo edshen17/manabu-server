@@ -1,7 +1,7 @@
 import faker from 'faker';
 import { ControllerData } from '../abstractions/IUsecase';
 import { makeGetUserUsecase } from '../user/getUserUsecase';
-import { makeEditTeacherUsecase } from '../teacher';
+import { makeEditTeacherUsecase } from '../teacher/editTeacherUsecase';
 import { makeCreateUserUsecase } from '../user/createUserUsecase';
 import { makeEditUserUsecase } from '../user/editUserUsecase';
 

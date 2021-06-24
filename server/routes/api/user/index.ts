@@ -1,14 +1,11 @@
 import express from 'express';
-import { makeGetMinuteBankController } from '../../../components/controllers/minuteBank';
-import {
-  makeGetUserController,
-  makeCreateUserController,
-  makeEditUserController,
-} from '../../../components/controllers/user';
-import {
-  makeLoginUserController,
-  makeVerifyEmailTokenController,
-} from '../../../components/controllers/user/auth';
+import { makeGetMinuteBankController } from '../../../components/controllers/minuteBank/getMinuteBankController';
+import { makeCreateUserController } from '../../../components/controllers/user/createUserController';
+import { makeEditUserController } from '../../../components/controllers/user/editUserController';
+import { makeGetUserController } from '../../../components/controllers/user/getUserController';
+import { makeLoginUserController } from '../../../components/controllers/user/loginUserController';
+import { makeVerifyEmailTokenController } from '../../../components/controllers/user/verifyEmailTokenController';
+
 import {
   makeCookieRedirectExpressCallback,
   makeJSONCookieExpressCallback,

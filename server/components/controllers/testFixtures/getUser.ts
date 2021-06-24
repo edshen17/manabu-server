@@ -1,5 +1,5 @@
 import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
-import { makeGetUserController } from '../user';
+import { makeGetUserController } from '../user/getUserController';
 
 const getUser = async (savedDbUser: any, viewingUser: any) => {
   const isSelf = savedDbUser._id == viewingUser._id;

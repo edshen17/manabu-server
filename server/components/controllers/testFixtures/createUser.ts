@@ -1,6 +1,6 @@
 import faker from 'faker';
 import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
-import { makeCreateUserController } from '../user/index';
+import { makeCreateUserController } from '../user/createUserController';
 
 const createUser = async () => {
   const postUserController = await makeCreateUserController;

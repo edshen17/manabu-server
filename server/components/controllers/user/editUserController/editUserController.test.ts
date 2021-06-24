@@ -1,6 +1,6 @@
 import chai from 'chai';
-import { createUser } from '../testFixtures/createUser';
-import { updateUser } from '../testFixtures/updateUser';
+import { createUser } from '../../testFixtures/createUser';
+import { updateUser } from '../../testFixtures/updateUser';
 
 const expect = chai.expect;
 

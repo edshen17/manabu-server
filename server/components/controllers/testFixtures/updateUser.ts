@@ -1,6 +1,6 @@
 import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
 import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
-import { makeEditUserController } from '../user/index';
+import { makeEditUserController } from '../user/editUserController';
 
 const updateUser = async (
   updatingDbUser: JoinedUserDoc,

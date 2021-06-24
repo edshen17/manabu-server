@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { createUser } from '../testFixtures/createUser';
+import { createUser } from '../../testFixtures/createUser';
 const expect = chai.expect;
 
 context('createUserController', () => {

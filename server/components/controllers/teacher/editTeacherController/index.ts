@@ -1,4 +1,4 @@
-import { makeEditTeacherUsecase } from '../../usecases/teacher';
+import { makeEditTeacherUsecase } from '../../../usecases/teacher/editTeacherUsecase';
 import { StatusCodes } from 'http-status-codes';
 import { EditTeacherController } from './editTeacherController';
 
