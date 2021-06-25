@@ -1,4 +1,3 @@
-import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { AbstractUsecase } from './AbstractUsecase';
 
 abstract class AbstractEditUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {

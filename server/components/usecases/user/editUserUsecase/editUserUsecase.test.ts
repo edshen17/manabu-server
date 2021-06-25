@@ -1,70 +1,88 @@
 import chai from 'chai';
-import { ControllerData } from '../../abstractions/IUsecase';
-import { initializeUser } from '../../testFixtures/initializeUser';
-import { initializeUsecaseSettings } from '../../testFixtures/initializeUsecaseSettings';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { EditUserUsecase } from './editUserUsecase';
+import { makeEditUserUsecase } from '.';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+
 const expect = chai.expect;
-let controllerData: ControllerData;
-let initUserParams: any;
-beforeEach(async () => {
-  initUserParams = await initializeUsecaseSettings();
-  controllerData = initUserParams.controllerData;
+let fakeDbUserFactory: FakeDbUserFactory;
+let controllerDataBuilder: ControllerDataBuilder;
+let editUserUsecase: EditUserUsecase;
+
+before(async () => {
+  editUserUsecase = await makeEditUserUsecase;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
+  controllerDataBuilder = makeControllerDataBuilder;
 });
 
-context('editUserUsecase', () => {
+describe('editUserUsecase', () => {
   describe('makeRequest', async () => {
-    const makeUpdate = async (
-      updatingDbUser: JoinedUserDoc,
-      updaterDbUser: JoinedUserDoc,
-      updateParams: {}
-    ) => {
-      controllerData.currentAPIUser.userId = updaterDbUser._id;
-      controllerData.routeData.body = updateParams;
-      controllerData.routeData.params = { uId: updatingDbUser._id };
-      return await initUserParams.editUserUsecase.makeRequest(initUserParams.controllerData);
-    };
-
     describe('editing user data', () => {
       it('should update the user in the db and return the correct properties (self)', async () => {
-        const newUserRes = await initializeUser(initUserParams);
-        if ('user' in newUserRes!) {
-          expect(newUserRes.user.profileBio).to.equal('');
-          const updatedRes = await makeUpdate(newUserRes.user, newUserRes.user, {
-            profileBio: 'new profile bio',
-          });
-          expect(updatedRes.user.profileBio).to.equal('new profile bio');
-          expect(updatedRes.user).to.not.have.property('password');
-          expect(updatedRes.user).to.have.property('settings');
+        const newUser = await fakeDbUserFactory.createFakeDbUser();
+        expect(newUser.profileBio).to.equal('');
+        const buildEditUserControllerData = controllerDataBuilder
+          .currentAPIUser({
+            userId: newUser._id,
+            role: newUser.role,
+          })
+          .routeData({
+            query: {},
+            body: { profileBio: 'new profile bio' },
+            params: { uId: newUser._id },
+          })
+          .build();
+        const updateUserRes = await editUserUsecase.makeRequest(buildEditUserControllerData);
+        if ('user' in updateUserRes) {
+          expect(updateUserRes.user.profileBio).to.equal('new profile bio');
+          expect(updateUserRes.user).to.not.have.property('password');
+          expect(updateUserRes.user).to.have.property('settings');
         }
       });
       it('should deny access when updating restricted properties (self)', async () => {
         try {
-          const newUserRes = await initializeUser(initUserParams);
-          if ('user' in newUserRes!) {
-            const updatedUser = await makeUpdate(newUserRes.user, newUserRes.user, {
-              verificationToken: 'new token',
-              role: 'admin',
-            });
-          }
+          const newUser = await fakeDbUserFactory.createFakeDbUser();
+          const buildEditUserControllerData = controllerDataBuilder
+            .currentAPIUser({
+              userId: newUser._id,
+              role: newUser.role,
+            })
+            .routeData({
+              query: {},
+              body: {
+                verificationToken: 'new token',
+                role: 'admin',
+              },
+              params: { uId: newUser._id },
+            })
+            .build();
+          const updateUserRes = await editUserUsecase.makeRequest(buildEditUserControllerData);
         } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }
       });
+
       it('should deny access when trying to update restricted properties (not self)', async () => {
         try {
-          const updaterRes = await initializeUser(initUserParams);
-          if ('user' in updaterRes!) {
-            const originalSettings = await initializeUsecaseSettings(); // reset
-            controllerData.routeData.body.isTeacherApp = true;
-            const updateeRes = await initializeUser(originalSettings);
-            if ('user' in updateeRes!) {
-              expect(updateeRes.user.profileBio).to.equal('');
-              const updatedUser = await makeUpdate(updateeRes.user, updaterRes.user, {
+          const updaterUser = await fakeDbUserFactory.createFakeDbUser();
+          const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+          expect(updateeUser.profileBio).to.equal('');
+          const buildEditUserControllerData = controllerDataBuilder
+            .currentAPIUser({
+              userId: updaterUser._id,
+              role: updaterUser.role,
+            })
+            .routeData({
+              query: {},
+              body: {
                 profileBio: 'new profile bio',
-              });
-              expect(updateeRes.user.profileBio).to.equal('');
-            }
-          }
+              },
+              params: { uId: updateeUser._id },
+            })
+            .build();
+          const updateUserRes = await editUserUsecase.makeRequest(buildEditUserControllerData);
         } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }

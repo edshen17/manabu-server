@@ -1,62 +1,113 @@
 import chai from 'chai';
-import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 import { GetUserUsecase } from './getUserUsecase';
 import { makeGetUserUsecase } from './index';
-import { CreateUserUsecase } from '../createUserUsecase/createUserUsecase';
-import { initializeUser } from '../../testFixtures/initializeUser';
-import { initializeUsecaseSettings } from '../../testFixtures/initializeUsecaseSettings';
-import { makeCreateUserUsecase } from '../createUserUsecase';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
+
 const expect = chai.expect;
 let getUserUsecase: GetUserUsecase;
-let createUserUsecase: CreateUserUsecase;
-let controllerData: ControllerData;
-let initUserParams: any;
+let fakeDbUserFactory: FakeDbUserFactory;
+let controllerDataBuilder: ControllerDataBuilder;
+let fakeUser: JoinedUserDoc;
+
 before(async () => {
   getUserUsecase = await makeGetUserUsecase;
-  createUserUsecase = await makeCreateUserUsecase;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
+  controllerDataBuilder = makeControllerDataBuilder;
 });
 
 beforeEach(async () => {
-  initUserParams = await initializeUsecaseSettings();
-  controllerData = initUserParams.controllerData;
+  fakeUser = await fakeDbUserFactory.createFakeDbUser();
 });
 
-context('getUserUsecase', () => {
+describe('getUserUsecase', () => {
   describe('makeRequest', async () => {
     describe("given a valid user id, should return the correct user object based on requesting user's permissions", () => {
-      it('admin should see restricted properties', async () => {
-        initUserParams.viewingAs = 'admin';
-        const newUserRes = await initializeUser(initUserParams);
-        if ('user' in newUserRes!) {
-          expect(newUserRes.user).to.have.property('settings');
-          expect(newUserRes.user).to.not.have.property('password');
+      it('should allow admins to see restricted properties', async () => {
+        const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+        const buildGetUserControllerData = controllerDataBuilder
+          .currentAPIUser({
+            userId: fakeUser._id,
+            role: 'admin',
+          })
+          .routeData({
+            query: {},
+            body: {},
+            params: { uId: fakeTeacher._id },
+          })
+          .build();
+        const getUserRes = await getUserUsecase.makeRequest(buildGetUserControllerData);
+
+        if ('user' in getUserRes!) {
+          expect(getUserRes.user).to.have.property('settings');
+          expect(getUserRes.user).to.have.property('email');
+          expect(getUserRes.user).to.not.have.property('password');
+          expect(getUserRes.user.teacherData).to.have.property('licensePath');
         }
       });
 
       it('user (not self) should see default properties', async () => {
-        initUserParams.viewingAs = 'user';
-        initUserParams.isSelf = false;
-        const newUserRes = await initializeUser(initUserParams);
-        if ('user' in newUserRes!) {
-          expect(newUserRes.user).to.not.have.property('settings');
-          expect(newUserRes.user).to.not.have.property('password');
+        const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+        const buildGetUserControllerData = controllerDataBuilder
+          .currentAPIUser({
+            userId: fakeUser._id,
+            role: fakeUser.role,
+          })
+          .routeData({
+            query: {},
+            body: {},
+            params: { uId: fakeTeacher._id },
+          })
+          .build();
+        const getUserRes = await getUserUsecase.makeRequest(buildGetUserControllerData);
+
+        if ('user' in getUserRes!) {
+          expect(getUserRes.user).to.not.have.property('settings');
+          expect(getUserRes.user).to.not.have.property('password');
         }
       });
 
       it('user (self) should see extra properties as well as default properties', async () => {
-        const newUserRes = await initializeUser(initUserParams);
-        if ('user' in newUserRes!) {
-          expect(newUserRes.user).to.have.property('settings');
-          expect(newUserRes.user).to.not.have.property('password');
+        const buildGetUserControllerData = controllerDataBuilder
+          .currentAPIUser({
+            userId: fakeUser._id,
+            role: fakeUser.role,
+          })
+          .routeData({
+            query: {},
+            body: {},
+            params: { uId: fakeUser._id },
+          })
+          .build();
+        const getUserRes = await getUserUsecase.makeRequest(buildGetUserControllerData);
+
+        if ('user' in getUserRes!) {
+          expect(getUserRes.user).to.have.property('settings');
+          expect(getUserRes.user).to.have.property('email');
+          expect(getUserRes.user).to.not.have.property('password');
         }
       });
 
       it('user (on /self/me endpoint) should see extra properties as well as default properties', async () => {
-        initUserParams.endpointPath = '/self/me';
-        const newUserRes = await initializeUser(initUserParams);
-        if ('user' in newUserRes!) {
-          expect(newUserRes.user).to.have.property('settings');
-          expect(newUserRes.user).to.not.have.property('password');
+        const buildGetUserControllerData = controllerDataBuilder
+          .currentAPIUser({
+            userId: fakeUser._id,
+            role: fakeUser.role,
+          })
+          .endpointPath('/self/me')
+          .routeData({
+            query: {},
+            body: {},
+            params: {},
+          })
+          .build();
+        const getUserRes = await getUserUsecase.makeRequest(buildGetUserControllerData);
+        if ('user' in getUserRes!) {
+          expect(getUserRes.user).to.have.property('settings');
+          expect(getUserRes.user).to.not.have.property('password');
         }
       });
     });

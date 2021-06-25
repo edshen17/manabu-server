@@ -1,39 +1,62 @@
 import chai from 'chai';
-import { ControllerData } from '../../abstractions/IUsecase';
-import { initializeUser } from '../../testFixtures/initializeUser';
-import { initializeUsecaseSettings } from '../../testFixtures/initializeUsecaseSettings';
+import faker from 'faker';
+import { RouteData } from '../../abstractions/IUsecase';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { CreateUserUsecase } from './createUserUsecase';
+import { makeCreateUserUsecase } from '.';
+
 const expect = chai.expect;
-let controllerData: ControllerData;
-let initUserParams: any;
+let controllerDataBuilder: ControllerDataBuilder;
+let createUserUsecase: CreateUserUsecase;
+let defaultRouteData: RouteData;
+
+before(async () => {
+  controllerDataBuilder = makeControllerDataBuilder;
+  createUserUsecase = await makeCreateUserUsecase;
+});
 
 beforeEach(async () => {
-  initUserParams = await initializeUsecaseSettings();
-  controllerData = initUserParams.controllerData;
+  defaultRouteData = {
+    params: {},
+    body: { name: faker.name.findName(), email: faker.internet.email() },
+    query: {},
+  };
 });
 
 context('createUserUsecase', () => {
-  describe('makeRequest', async () => {
+  describe('makeRequest', () => {
     describe('creating a new user should return the correct properties', () => {
       it('should create a new user in the db', async () => {
-        const newUserRes = await initializeUser(initUserParams);
+        const buildNewUserControllerData = controllerDataBuilder
+          .routeData(defaultRouteData)
+          .build();
+
+        const newUserRes = await createUserUsecase.makeRequest(buildNewUserControllerData);
         if ('user' in newUserRes!) {
-          expect(newUserRes.user.profileBio).to.equal('');
+          expect(newUserRes.user._id).to.not.equal('');
         }
       });
       it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {
-        controllerData.routeData.body.isTeacherApp = true;
-        const newTeacherRes = await initializeUser(initUserParams);
+        defaultRouteData.body.isTeacherApp = true;
+        const buildNewUserControllerData = controllerDataBuilder
+          .routeData(defaultRouteData)
+          .build();
+        const newTeacherRes = await createUserUsecase.makeRequest(buildNewUserControllerData);
         if ('user' in newTeacherRes!) {
           expect(newTeacherRes.user).to.have.property('settings');
           expect(newTeacherRes.user).to.not.have.property('password');
           expect(newTeacherRes.user.teacherData).to.have.property('licensePath');
         }
       });
-
       it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {
-        initUserParams.viewingAs = 'admin';
-        controllerData.routeData.body.isTeacherApp = true;
-        const newTeacherRes = await initializeUser(initUserParams);
+        defaultRouteData.body.isTeacherApp = true;
+        const buildNewUserControllerData = controllerDataBuilder
+          .routeData(defaultRouteData)
+          .currentAPIUser({ role: 'admin' })
+          .build();
+
+        const newTeacherRes = await createUserUsecase.makeRequest(buildNewUserControllerData);
         if ('user' in newTeacherRes!) {
           expect(newTeacherRes.user).to.have.property('settings');
           expect(newTeacherRes.user).to.not.have.property('password');

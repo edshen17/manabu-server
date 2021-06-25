@@ -29,11 +29,13 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
     }
   };
 
-  protected _setAccessOptionsTemplate = (
-    currentAPIUser: CurrentAPIUser,
-    isCurrentAPIUserPermitted: boolean,
-    params: any
-  ) => {
+  protected _setAccessOptionsTemplate = (props: {
+    currentAPIUser: CurrentAPIUser;
+    isCurrentAPIUserPermitted: boolean;
+    params: any;
+    endpointPath: string;
+  }) => {
+    const { currentAPIUser, isCurrentAPIUserPermitted } = props;
     const accessOptions: AccessOptions = {
       isProtectedResource: true,
       isCurrentAPIUserPermitted,

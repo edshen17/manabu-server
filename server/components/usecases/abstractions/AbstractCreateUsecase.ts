@@ -16,11 +16,13 @@ abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<Us
     return true;
   };
 
-  protected _setAccessOptionsTemplate = (
-    currentAPIUser: CurrentAPIUser,
-    isCurrentAPIUserPermitted: boolean,
-    params: any
-  ) => {
+  protected _setAccessOptionsTemplate = (props: {
+    currentAPIUser: CurrentAPIUser;
+    isCurrentAPIUserPermitted: boolean;
+    params: any;
+    endpointPath: string;
+  }) => {
+    const { currentAPIUser, isCurrentAPIUserPermitted } = props;
     const accessOptions: AccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted,

@@ -46,6 +46,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       isCurrentAPIUserPermitted,
       currentAPIUser,
       params,
+      endpointPath,
     });
     const isValidRequest = this._isValidRequest(controllerData);
     return {
@@ -78,21 +79,19 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
+    endpointPath: string;
   }): AccessOptions => {
-    const { currentAPIUser, isCurrentAPIUserPermitted, params } = props;
-    const accessOptions = this._setAccessOptionsTemplate(
-      currentAPIUser,
-      isCurrentAPIUserPermitted,
-      params
-    );
+    const accessOptions = this._setAccessOptionsTemplate(props);
     return accessOptions;
   };
 
-  protected _setAccessOptionsTemplate = (
-    currentAPIUser: CurrentAPIUser,
-    isCurrentAPIUserPermitted: boolean,
-    params: any
-  ) => {
+  protected _setAccessOptionsTemplate = (props: {
+    currentAPIUser: CurrentAPIUser;
+    isCurrentAPIUserPermitted: boolean;
+    params: any;
+    endpointPath: string;
+  }) => {
+    const { currentAPIUser, isCurrentAPIUserPermitted, params } = props;
     const accessOptions: AccessOptions = {
       isProtectedResource: true,
       isCurrentAPIUserPermitted,
