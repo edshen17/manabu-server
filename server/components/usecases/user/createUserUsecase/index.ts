@@ -6,7 +6,7 @@ import { makePackageTransactionDbService } from '../../../dataAccess/services/pa
 import { makePackageDbService } from '../../../dataAccess/services/package';
 import { makeMinuteBankDbService } from '../../../dataAccess/services/minuteBank';
 import { makeUserDbService } from '../../../dataAccess/services/user';
-import { emailHandler } from '../../../utils/email/emailHandler';
+import { emailHandler } from '../../../utils/emailHandler/emailHandler';
 import { CreateUserUsecase } from './createUserUsecase';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
