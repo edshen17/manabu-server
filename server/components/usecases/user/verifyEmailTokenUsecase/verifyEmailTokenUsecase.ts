@@ -8,8 +8,8 @@ import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: string };
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecaseResponse> {
-  private userDbService!: UserDbService;
-  private redirectPathBuilder!: RedirectPathBuilder;
+  private _userDbService!: UserDbService;
+  private _redirectPathBuilder!: RedirectPathBuilder;
 
   protected _isCurrentAPIUserPermitted = (props: {
     params: any;
@@ -44,17 +44,17 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
   protected _makeRequestTemplate = async (props: MakeRequestTemplateParams) => {
     const { accessOptions, params } = props;
     const { verificationToken } = params;
-    const user = await this.userDbService.findOne({
+    const user = await this._userDbService.findOne({
       searchQuery: { verificationToken },
       accessOptions,
     });
     if (user) {
-      const updatedDbUser = await this.userDbService.findOneAndUpdate({
+      const updatedDbUser = await this._userDbService.findOneAndUpdate({
         searchQuery: { _id: user._id },
         updateParams: { emailVerified: true },
         accessOptions,
       });
-      const redirectURI = this.redirectPathBuilder
+      const redirectURI = this._redirectPathBuilder
         .host('client')
         .endpointPath('/dashboard')
         .build();
@@ -72,8 +72,8 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
     makeRedirectPathBuilder: RedirectPathBuilder;
   }): Promise<this> => {
     const { makeUserDbService, makeRedirectPathBuilder } = props;
-    this.userDbService = await makeUserDbService;
-    this.redirectPathBuilder = makeRedirectPathBuilder;
+    this._userDbService = await makeUserDbService;
+    this._redirectPathBuilder = makeRedirectPathBuilder;
     return this;
   };
 }

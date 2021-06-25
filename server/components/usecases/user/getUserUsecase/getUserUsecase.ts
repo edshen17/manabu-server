@@ -7,7 +7,7 @@ import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 
 class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
-  private userDbService!: UserDbService;
+  private _userDbService!: UserDbService;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { routeData, currentAPIUser } = controllerData;
@@ -38,7 +38,7 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
     accessOptions: AccessOptions
   ): Promise<JoinedUserDoc> => {
     const _id: string = endpointPath == '/self/me' ? currentAPIUser.userId : params.uId;
-    const user = await this.userDbService.findById({
+    const user = await this._userDbService.findById({
       _id,
       accessOptions,
     });
@@ -49,7 +49,7 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
     _id: string | undefined,
     accessOptions: AccessOptions
   ): Promise<void> => {
-    this.userDbService.findOneAndUpdate({
+    this._userDbService.findOneAndUpdate({
       searchQuery: {
         _id,
       },
@@ -61,7 +61,7 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
   };
 
   public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
-    this.userDbService = await services.makeUserDbService;
+    this._userDbService = await services.makeUserDbService;
     return this;
   };
 }

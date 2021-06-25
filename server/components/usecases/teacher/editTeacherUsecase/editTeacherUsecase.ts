@@ -11,8 +11,8 @@ class EditTeacherUsecase
   extends AbstractEditUsecase<EditTeacherUsecaseResponse>
   implements IUsecase<EditTeacherUsecaseResponse>
 {
-  private userDbService!: UserDbService;
-  private teacherDbService!: TeacherDbService;
+  private _userDbService!: UserDbService;
+  private _teacherDbService!: TeacherDbService;
 
   protected _isValidRequest = (controllerData: ControllerData) => {
     const { body } = controllerData.routeData.body;
@@ -24,7 +24,7 @@ class EditTeacherUsecase
     props: MakeRequestTemplateParams
   ): Promise<EditTeacherUsecaseResponse> => {
     const { params, body, accessOptions } = props;
-    const updatedDbTeacher = await this.teacherDbService.findOneAndUpdate({
+    const updatedDbTeacher = await this._teacherDbService.findOneAndUpdate({
       searchQuery: { userId: params.uId },
       updateParams: body,
       accessOptions,
@@ -32,7 +32,7 @@ class EditTeacherUsecase
 
     if (updatedDbTeacher) {
       const _id = updatedDbTeacher.userId;
-      const savedDbUser = await this.userDbService.findById({
+      const savedDbUser = await this._userDbService.findById({
         _id,
         accessOptions,
       });
@@ -47,8 +47,8 @@ class EditTeacherUsecase
     makeTeacherDbService: Promise<TeacherDbService>;
   }): Promise<this> => {
     const { makeUserDbService, makeTeacherDbService } = services;
-    this.userDbService = await makeUserDbService;
-    this.teacherDbService = await makeTeacherDbService;
+    this._userDbService = await makeUserDbService;
+    this._teacherDbService = await makeTeacherDbService;
     return this;
   };
 }

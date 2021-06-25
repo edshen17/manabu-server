@@ -5,13 +5,13 @@ import { ControllerResponse, IController } from './IController';
 type ControllerParams = { successStatusCode: number; errorStatusCode: number };
 
 abstract class AbstractController<UsecaseResponse> implements IController<UsecaseResponse> {
-  protected usecase!: IUsecase<UsecaseResponse>;
-  protected successStatusCode!: number;
-  protected errorStatusCode!: number;
+  protected _usecase!: IUsecase<UsecaseResponse>;
+  protected _successStatusCode!: number;
+  protected _errorStatusCode!: number;
   constructor(props: ControllerParams) {
     const { successStatusCode, errorStatusCode } = props;
-    this.successStatusCode = successStatusCode;
-    this.errorStatusCode = errorStatusCode;
+    this._successStatusCode = successStatusCode;
+    this._errorStatusCode = errorStatusCode;
   }
 
   public makeRequest = async (
@@ -24,13 +24,13 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
       const usecaseRes = await this._awaitUsecaseRes(httpRequest);
       return {
         headers,
-        statusCode: this.successStatusCode,
+        statusCode: this._successStatusCode,
         body: usecaseRes,
       };
     } catch (err) {
       return {
         headers,
-        statusCode: this.errorStatusCode,
+        statusCode: this._errorStatusCode,
         body: { err: err.message },
       };
     }
@@ -43,7 +43,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
       endpointPath: path,
       routeData: { params, body, query },
     };
-    const usecaseRes = await this.usecase.makeRequest(controllerData);
+    const usecaseRes = await this._usecase.makeRequest(controllerData);
     return usecaseRes;
   };
 
@@ -51,7 +51,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
     makeUsecase: Promise<IUsecase<UsecaseResponse>>;
   }): Promise<this> => {
     const { makeUsecase } = props;
-    this.usecase = await makeUsecase;
+    this._usecase = await makeUsecase;
     return this;
   };
 }

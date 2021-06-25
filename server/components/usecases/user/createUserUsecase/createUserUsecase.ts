@@ -39,15 +39,15 @@ class CreateUserUsecase
   extends AbstractCreateUsecase<CreateUserUsecaseResponse>
   implements IUsecase<CreateUserUsecaseResponse>
 {
-  private userDbService!: UserDbService;
-  private userEntity!: UserEntity;
-  private teacherDbService!: TeacherDbService;
-  private packageDbService!: PackageDbService;
-  private packageTransactionDbService!: PackageTransactionDbService;
-  private minuteBankDbService!: MinuteBankDbService;
-  private teacherBalanceDbService!: TeacherBalanceDbService;
-  private jwt!: any;
-  private emailHandler!: EmailHandler;
+  private _userDbService!: UserDbService;
+  private _userEntity!: UserEntity;
+  private _teacherDbService!: TeacherDbService;
+  private _packageDbService!: PackageDbService;
+  private _packageTransactionDbService!: PackageTransactionDbService;
+  private _minuteBankDbService!: MinuteBankDbService;
+  private _teacherBalanceDbService!: TeacherBalanceDbService;
+  private _jwt!: any;
+  private _emailHandler!: EmailHandler;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -62,7 +62,7 @@ class CreateUserUsecase
     const { isTeacherApp } = body || {};
 
     try {
-      const userInstance = this.userEntity.build(body);
+      const userInstance = this._userEntity.build(body);
       let savedDbUser = await this._insertUser(userInstance, accessOptions);
       if (isTeacherApp) {
         savedDbUser = await this.handleTeacherCreation(savedDbUser, accessOptions);
@@ -86,7 +86,7 @@ class CreateUserUsecase
     userInstance: any,
     accessOptions: AccessOptions
   ): Promise<JoinedUserDoc> => {
-    const savedDbUser = await this.userDbService.insert({
+    const savedDbUser = await this._userDbService.insert({
       modelToInsert: userInstance,
       accessOptions,
     });
@@ -117,7 +117,7 @@ class CreateUserUsecase
   ): Promise<TeacherDoc> => {
     const userId = savedDbUser._id;
     const modelToInsert = makeTeacherEntity.build({ userId });
-    const savedDbTeacher = await this.teacherDbService.insert({
+    const savedDbTeacher = await this._teacherDbService.insert({
       modelToInsert,
       accessOptions,
     });
@@ -131,7 +131,7 @@ class CreateUserUsecase
     const packagesToInsert = await this._createDefaultTeacherPackages(savedDbUser);
     const modelToInsert = await Promise.all(packagesToInsert);
 
-    const newPackages = await this.packageDbService.insertMany({
+    const newPackages = await this._packageDbService.insertMany({
       modelToInsert,
       accessOptions,
     });
@@ -184,7 +184,7 @@ class CreateUserUsecase
         total: 0,
       },
     });
-    const newPackageTransaction = await this.packageTransactionDbService.insert({
+    const newPackageTransaction = await this._packageTransactionDbService.insert({
       modelToInsert,
       accessOptions,
     });
@@ -200,7 +200,7 @@ class CreateUserUsecase
       hostedBy: process.env.MANABU_ADMIN_ID!,
       reservedBy: savedDbUser._id,
     });
-    const newMinuteBank = await this.minuteBankDbService.insert({
+    const newMinuteBank = await this._minuteBankDbService.insert({
       modelToInsert,
       accessOptions,
     });
@@ -215,7 +215,7 @@ class CreateUserUsecase
     const modelToInsert = await teacherBalanceEntity.build({
       userId: savedDbUser._id,
     });
-    const newTeacherBalance = this.teacherBalanceDbService.insert({
+    const newTeacherBalance = this._teacherBalanceDbService.insert({
       modelToInsert,
       accessOptions,
     });
@@ -225,7 +225,7 @@ class CreateUserUsecase
   private _sendVerificationEmail = (userInstance: any): void => {
     const host = 'https://manabu.sg';
     const { name, verificationToken } = userInstance;
-    this.emailHandler.sendEmail(
+    this._emailHandler.sendEmail(
       userInstance.email,
       'NOREPLY',
       'Manabu email verification',
@@ -241,7 +241,7 @@ class CreateUserUsecase
   private _sendInternalEmail = (userInstance: any, isTeacherApp: boolean): void => {
     const userType = isTeacherApp ? 'teacher' : 'user';
     const { name, email } = userInstance;
-    this.emailHandler.sendEmail(
+    this._emailHandler.sendEmail(
       'manabulessons@gmail.com',
       'NOREPLY',
       `A new ${userType} signed up`,
@@ -274,7 +274,7 @@ class CreateUserUsecase
 
   private _jwtToClient = (savedDbUser: any): string => {
     const { role, name } = savedDbUser;
-    const token = this.jwt.sign(
+    const token = this._jwt.sign(
       {
         _id: savedDbUser._id,
         role,
@@ -324,15 +324,15 @@ class CreateUserUsecase
       jwt,
       emailHandler,
     } = services;
-    this.userDbService = await makeUserDbService;
-    this.userEntity = makeUserEntity;
-    this.teacherDbService = await makeTeacherDbService;
-    this.packageDbService = await makePackageDbService;
-    this.packageTransactionDbService = await makePackageTransactionDbService;
-    this.minuteBankDbService = await makeMinuteBankDbService;
-    this.teacherBalanceDbService = await makeTeacherBalanceDbService;
-    this.jwt = jwt;
-    this.emailHandler = emailHandler;
+    this._userDbService = await makeUserDbService;
+    this._userEntity = makeUserEntity;
+    this._teacherDbService = await makeTeacherDbService;
+    this._packageDbService = await makePackageDbService;
+    this._packageTransactionDbService = await makePackageTransactionDbService;
+    this._minuteBankDbService = await makeMinuteBankDbService;
+    this._teacherBalanceDbService = await makeTeacherBalanceDbService;
+    this._jwt = jwt;
+    this._emailHandler = emailHandler;
     return this;
   };
 }

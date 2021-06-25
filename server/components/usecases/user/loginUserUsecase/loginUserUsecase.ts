@@ -17,12 +17,12 @@ enum SERVER_LOGIN_ENDPOINTS {
 }
 
 class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
-  private userDbService!: UserDbService;
-  private createUserUsecase!: CreateUserUsecase;
-  private oauth2Client!: any;
-  private google!: any;
-  private redirectPathBuilder!: RedirectPathBuilder;
-  private CLIENT_DASHBOARD_URI!: string;
+  private _userDbService!: UserDbService;
+  private _createUserUsecase!: CreateUserUsecase;
+  private _oauth2Client!: any;
+  private _google!: any;
+  private _redirectPathBuilder!: RedirectPathBuilder;
+  private _CLIENT_DASHBOARD_URI!: string;
 
   protected _isCurrentAPIUserPermitted = (props: {
     params: any;
@@ -67,7 +67,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     const { body, accessOptions } = props;
     const { email, password, isTeacherApp } = body || {};
     accessOptions.isOverridingSelectOptions = true;
-    let savedDbUser = await this.userDbService.authenticateUser(
+    let savedDbUser = await this._userDbService.authenticateUser(
       {
         searchQuery: { email },
         accessOptions,
@@ -98,7 +98,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       const shouldCreateNewTeacher =
         !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
       if (shouldCreateNewTeacher) {
-        savedDbUser = await this.createUserUsecase.handleTeacherCreation(
+        savedDbUser = await this._createUserUsecase.handleTeacherCreation(
           savedDbUser,
           accessOptions
         );
@@ -114,8 +114,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   ): LoginUserUsecaseResponse => {
     return {
       user: savedDbUser,
-      cookies: this.createUserUsecase.splitLoginCookies(savedDbUser),
-      redirectURI: this.CLIENT_DASHBOARD_URI,
+      cookies: this._createUserUsecase.splitLoginCookies(savedDbUser),
+      redirectURI: this._CLIENT_DASHBOARD_URI,
     };
   };
 
@@ -127,19 +127,19 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   }): Promise<LoginUserUsecaseResponse> => {
     const { accessOptions, body, controllerData, query } = props;
     const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
-    const { tokens } = await this.oauth2Client.getToken(code);
+    const { tokens } = await this._oauth2Client.getToken(code);
     const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
 
-    let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
+    let savedDbUser = await this._userDbService.findOne({ searchQuery: { email }, accessOptions });
 
     const handleNoSavedDbUser = async () => {
       body.name = name;
       body.email = email;
       body.profilePicture = picture;
       body.isTeacherApp = isTeacherApp;
-      const userRes = await this.createUserUsecase.makeRequest(controllerData);
+      const userRes = await this._createUserUsecase.makeRequest(controllerData);
       if ('user' in userRes) {
-        userRes.redirectURI = this.CLIENT_DASHBOARD_URI;
+        userRes.redirectURI = this._CLIENT_DASHBOARD_URI;
       }
       return userRes;
     };
@@ -170,11 +170,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   };
 
   private _getGoogleUserData = async (tokens: any): Promise<any> => {
-    this.oauth2Client.setCredentials({
+    this._oauth2Client.setCredentials({
       access_token: tokens.access_token,
     });
-    const oauth2 = this.google.oauth2({
-      auth: this.oauth2Client,
+    const oauth2 = this._google.oauth2({
+      auth: this._oauth2Client,
       version: 'v2',
     });
     const googleRes = await oauth2.userinfo.get();
@@ -195,12 +195,12 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       google,
       makeRedirectPathBuilder,
     } = props;
-    this.userDbService = await makeUserDbService;
-    this.createUserUsecase = await makeCreateUserUsecase;
-    this.oauth2Client = oauth2Client;
-    this.google = google;
-    this.redirectPathBuilder = makeRedirectPathBuilder;
-    this.CLIENT_DASHBOARD_URI = this.redirectPathBuilder
+    this._userDbService = await makeUserDbService;
+    this._createUserUsecase = await makeCreateUserUsecase;
+    this._oauth2Client = oauth2Client;
+    this._google = google;
+    this._redirectPathBuilder = makeRedirectPathBuilder;
+    this._CLIENT_DASHBOARD_URI = this._redirectPathBuilder
       .host('client')
       .endpointPath('/dashboard')
       .build();

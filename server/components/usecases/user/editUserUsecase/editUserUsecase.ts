@@ -14,9 +14,9 @@ class EditUserUsecase
   extends AbstractEditUsecase<EditUserUsecaseResponse>
   implements IUsecase<EditUserUsecaseResponse>
 {
-  private userDbService!: UserDbService;
-  private packageTransactionDbService!: PackageTransactionDbService;
-  private minuteBankDbService!: MinuteBankDbService;
+  private _userDbService!: UserDbService;
+  private _packageTransactionDbService!: PackageTransactionDbService;
+  private _minuteBankDbService!: MinuteBankDbService;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -28,7 +28,7 @@ class EditUserUsecase
     props: MakeRequestTemplateParams
   ): Promise<EditUserUsecaseResponse> => {
     const { params, body, accessOptions } = props;
-    const savedDbUser = await this.userDbService.findOneAndUpdate({
+    const savedDbUser = await this._userDbService.findOneAndUpdate({
       searchQuery: { _id: params.uId },
       updateParams: body,
       accessOptions,
@@ -37,7 +37,7 @@ class EditUserUsecase
     //TODO remove/add await for testing..., make alias for below functions (_updateDbUserDependencyData)
     // update minute banks
     this._updateDbUserDependencyData({
-      dbService: this.minuteBankDbService,
+      dbService: this._minuteBankDbService,
       savedDbUser,
       accessOptions,
       hostedBySearchQuery: { hostedBy: savedDbUser._id },
@@ -46,7 +46,7 @@ class EditUserUsecase
 
     // update package transactions
     this._updateDbUserDependencyData({
-      dbService: this.packageTransactionDbService,
+      dbService: this._packageTransactionDbService,
       savedDbUser,
       accessOptions,
       hostedBySearchQuery: { hostedBy: savedDbUser._id, isPast: false },
@@ -87,9 +87,9 @@ class EditUserUsecase
   }): Promise<this> => {
     const { makeUserDbService, makePackageTransactionDbService, makeMinuteBankDbService } =
       services;
-    this.userDbService = await makeUserDbService;
-    this.packageTransactionDbService = await makePackageTransactionDbService;
-    this.minuteBankDbService = await makeMinuteBankDbService;
+    this._userDbService = await makeUserDbService;
+    this._packageTransactionDbService = await makePackageTransactionDbService;
+    this._minuteBankDbService = await makeMinuteBankDbService;
     return this;
   };
 }

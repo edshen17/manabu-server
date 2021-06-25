@@ -14,9 +14,9 @@ type MakeRequestTemplateParams = {
 };
 
 abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseResponse> {
-  private makeRequestErrorMsg: string;
+  private _makeRequestErrorMsg: string;
   constructor(makeRequestErrorMsg: string) {
-    this.makeRequestErrorMsg = makeRequestErrorMsg;
+    this._makeRequestErrorMsg = makeRequestErrorMsg;
   }
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
@@ -26,7 +26,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     if (isValidRequest) {
       return await this._makeRequestTemplate(setUpProps);
     } else {
-      throw new Error(this.makeRequestErrorMsg);
+      throw new Error(this._makeRequestErrorMsg);
     }
   };
 

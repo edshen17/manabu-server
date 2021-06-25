@@ -10,7 +10,7 @@ type GetMinuteBankUsecaseResponse =
   | { minuteBanks: MinuteBankDoc[] };
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseResponse> {
-  private minuteBankDbService!: MinuteBankDbService;
+  private _minuteBankDbService!: MinuteBankDbService;
 
   protected _isCurrentAPIUserPermitted = (props: {
     params: any;
@@ -65,7 +65,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
           },
         ],
       };
-      const minuteBanks = await this.minuteBankDbService.find({
+      const minuteBanks = await this._minuteBankDbService.find({
         searchQuery,
         accessOptions,
       });
@@ -73,7 +73,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
     } else {
       const { hostedBy, reservedBy } = params;
       const searchQuery = { hostedBy, reservedBy };
-      const minuteBank = await this.minuteBankDbService.findOne({
+      const minuteBank = await this._minuteBankDbService.findOne({
         searchQuery,
         accessOptions,
       });
@@ -85,7 +85,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
     makeMinuteBankDbService: Promise<MinuteBankDbService>;
   }): Promise<this> => {
     const { makeMinuteBankDbService } = services;
-    this.minuteBankDbService = await makeMinuteBankDbService;
+    this._minuteBankDbService = await makeMinuteBankDbService;
     return this;
   };
 }
