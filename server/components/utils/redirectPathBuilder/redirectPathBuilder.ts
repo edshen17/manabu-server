@@ -1,11 +1,16 @@
 class RedirectPathBuilder {
-  private readonly _redirectExpressCallbackOptions!: { host: string; endpointPath: string };
+  private _redirectExpressCallbackOptions!: { host: string; endpointPath: string };
+
   constructor() {
+    this._setDefaultProperties();
+  }
+
+  private _setDefaultProperties = (): void => {
     this._redirectExpressCallbackOptions = {
       host: '',
       endpointPath: '',
     };
-  }
+  };
 
   private _getHost = (host: string): string => {
     const hostOptions: { [key: string]: any } = {
@@ -33,6 +38,7 @@ class RedirectPathBuilder {
   };
   public build = (): string => {
     const { host, endpointPath } = this._redirectExpressCallbackOptions || {};
+    this._setDefaultProperties();
     return `${host}${endpointPath}`;
   };
 }

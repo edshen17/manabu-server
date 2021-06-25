@@ -3,10 +3,12 @@ type CurrentAPIUser = {
   role: string;
 };
 
+type RouteData = { params: any; body: any; query: any };
+
 type ControllerData = {
   currentAPIUser: CurrentAPIUser;
   endpointPath: string;
-  routeData: { params: any; body: any; query?: any };
+  routeData: RouteData;
 };
 
 interface IUsecase<UsecaseResponse> {
@@ -14,4 +16,4 @@ interface IUsecase<UsecaseResponse> {
   init: (services: any) => Promise<this>;
 }
 
-export { CurrentAPIUser, ControllerData, IUsecase };
+export { CurrentAPIUser, ControllerData, IUsecase, RouteData };

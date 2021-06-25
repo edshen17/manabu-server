@@ -13,7 +13,6 @@ const initializeUsecaseSettings = async () => {
   const currentAPIUser = {
     userId: undefined,
     role: 'user',
-    isVerified: true,
   };
   const routeData = {
     params: {},
@@ -22,6 +21,7 @@ const initializeUsecaseSettings = async () => {
       name: faker.name.findName(),
       password: 'test password',
     },
+    query: {},
   };
   const controllerData: ControllerData = {
     currentAPIUser,

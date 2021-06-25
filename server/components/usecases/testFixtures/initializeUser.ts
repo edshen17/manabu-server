@@ -22,7 +22,11 @@ const initializeUser = async (props: {
     userId: savedDbUser._id,
     role: viewingAsRole,
   };
-  const getRouteData = { params: { uId: savedDbUser._id }, body: { isTeacherApp: false } };
+  const getRouteData = {
+    params: { uId: savedDbUser._id },
+    body: { isTeacherApp: false },
+    query: {},
+  };
 
   if (!isSelf) {
     currentAPIUser.userId = undefined;
