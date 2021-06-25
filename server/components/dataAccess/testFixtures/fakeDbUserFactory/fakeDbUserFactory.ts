@@ -5,22 +5,22 @@ import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFacto
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
 class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEntityResponse> {
-  private faker!: any;
-  private fakeDbTeacherFactory!: FakeDbTeacherFactory;
-  private fakeDbPackageFactory!: FakeDbPackageFactory;
+  private _faker!: any;
+  private _fakeDbTeacherFactory!: FakeDbTeacherFactory;
+  private _fakeDbPackageFactory!: FakeDbPackageFactory;
 
   public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbUser();
-    const fakeDbTeacher = await this.fakeDbTeacherFactory.createFakeDbData({
+    const fakeDbTeacher = await this._fakeDbTeacherFactory.createFakeDbData({
       userId: fakeDbUser._id,
     });
-    const fakeDbPackages = await this.fakeDbPackageFactory.createFakePackages({
+    const fakeDbPackages = await this._fakeDbPackageFactory.createFakePackages({
       hostedBy: fakeDbUser._id,
     });
 
-    return this.dbService.findById({
+    return this._dbService.findById({
       _id: fakeDbUser._id,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions: this._defaultAccessOptions,
     });
   };
 
@@ -32,20 +32,20 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEnt
     email: string;
   }): Promise<UserEntityResponse> => {
     const { email } = entityData || {};
-    const fakeUserEntity = this.entity.build({
-      name: this.faker.name.findName(),
-      email: email || this.faker.internet.email(),
-      password: this.faker.internet.password(),
-      profileImage: this.faker.image.imageUrl(),
+    const fakeUserEntity = this._entity.build({
+      name: this._faker.name.findName(),
+      email: email || this._faker.internet.email(),
+      password: this._faker.internet.password(),
+      profileImage: this._faker.image.imageUrl(),
     });
     return fakeUserEntity;
   };
 
   protected _initTemplate = async (props: any) => {
     const { faker, makeFakeDbTeacherFactory, makeFakeDbPackageFactory } = props;
-    this.faker = faker;
-    this.fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
-    this.fakeDbPackageFactory = await makeFakeDbPackageFactory;
+    this._faker = faker;
+    this._fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
+    this._fakeDbPackageFactory = await makeFakeDbPackageFactory;
   };
 }
 

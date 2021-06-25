@@ -13,12 +13,12 @@ class UserDbService
   extends CommonDbOperations<JoinedUserDoc>
   implements IDbOperations<JoinedUserDoc>
 {
-  private teacherDbService!: TeacherDbService;
-  private packageDbService!: PackageDbService;
-  private passwordLib!: any;
+  private _teacherDbService!: TeacherDbService;
+  private _packageDbService!: PackageDbService;
+  private _passwordLib!: any;
   constructor() {
     super();
-    this.defaultSelectOptions = {
+    this._defaultSelectOptions = {
       defaultSettings: {
         email: 0,
         password: 0,
@@ -50,7 +50,7 @@ class UserDbService
       );
     }
 
-    const passwordIsValid = this.passwordLib.compareSync(inputtedPassword, user.password);
+    const passwordIsValid = this._passwordLib.compareSync(inputtedPassword, user.password);
     if (passwordIsValid) {
       const { password, ...partialUserWithoutPassword } = user;
       return partialUserWithoutPassword;
@@ -82,12 +82,12 @@ class UserDbService
   ): Promise<JoinedUserDoc> => {
     const userCopy: any = JSON.parse(JSON.stringify(user));
     const _id: string = user._id;
-    const teacher: TeacherDoc = await this.teacherDbService.findById({
+    const teacher: TeacherDoc = await this._teacherDbService.findById({
       _id,
       accessOptions,
     });
 
-    const packages = await this.packageDbService.find({
+    const packages = await this._packageDbService.find({
       searchQuery: { hostedBy: _id },
       accessOptions,
     });
@@ -105,11 +105,11 @@ class UserDbService
     const { makeDb, dbModel, cloneDeep, makeTeacherDbService, makePackageDbService, passwordLib } =
       props;
     await makeDb();
-    this.dbModel = dbModel;
-    this.teacherDbService = await makeTeacherDbService;
-    this.packageDbService = await makePackageDbService;
-    this.cloneDeep = cloneDeep;
-    this.passwordLib = passwordLib;
+    this._dbModel = dbModel;
+    this._teacherDbService = await makeTeacherDbService;
+    this._packageDbService = await makePackageDbService;
+    this._cloneDeep = cloneDeep;
+    this._passwordLib = passwordLib;
     return this;
   };
 }

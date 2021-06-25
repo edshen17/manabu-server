@@ -8,21 +8,21 @@ type DefaultSelectOptions = {
 };
 
 abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
-  protected dbModel!: any;
-  protected cloneDeep!: any;
-  protected defaultSelectOptions!: DefaultSelectOptions;
+  protected _dbModel!: any;
+  protected _cloneDeep!: any;
+  protected _defaultSelectOptions!: DefaultSelectOptions;
 
   public findOne = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findOne(searchQuery, selectOptions).lean();
+    const asyncCallback = this._dbModel.findOne(searchQuery, selectOptions).lean();
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   protected _configureSelectOptions = (accessOptions: AccessOptions): {} => {
     const { isSelf, currentAPIUserRole, isOverridingSelectOptions } = accessOptions || {};
     const { defaultSettings, adminSettings, isSelfSettings, overrideSettings } =
-      this.defaultSelectOptions;
+      this._defaultSelectOptions;
     let selectOptions: any = defaultSettings;
 
     if (isSelf) {
@@ -70,29 +70,29 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   public findById = async (params: DbParams): Promise<DbDoc> => {
     const { _id, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.findById(_id, selectOptions).lean();
+    const asyncCallback = this._dbModel.findById(_id, selectOptions).lean();
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   public find = async (params: DbParams): Promise<DbDoc[]> => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel.find(searchQuery, selectOptions).lean();
+    const asyncCallback = this._dbModel.find(searchQuery, selectOptions).lean();
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   public insert = async (params: DbParams): Promise<DbDoc> => {
     const { modelToInsert, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const insertedModel = await this.dbModel.create(modelToInsert);
-    const asyncCallback = await this.dbModel.findById(insertedModel._id, selectOptions).lean();
+    const insertedModel = await this._dbModel.create(modelToInsert);
+    const asyncCallback = await this._dbModel.findById(insertedModel._id, selectOptions).lean();
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   public insertMany = async (params: DbParams): Promise<DbDoc[]> => {
     const { modelToInsert, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = await this.dbModel.insertMany(modelToInsert, selectOptions, {
+    const asyncCallback = await this._dbModel.insertMany(modelToInsert, selectOptions, {
       lean: true,
     });
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
@@ -101,7 +101,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   public findOneAndUpdate = async (params: DbParams): Promise<DbDoc> => {
     const { searchQuery, updateParams, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel
+    const asyncCallback = this._dbModel
       .findOneAndUpdate(searchQuery, updateParams, {
         fields: selectOptions,
         new: true,
@@ -113,7 +113,7 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   public updateMany = async (params: DbParams): Promise<DbDoc[]> => {
     const { searchQuery, updateParams, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
-    const asyncCallback = this.dbModel
+    const asyncCallback = this._dbModel
       .updateMany(searchQuery, updateParams, {
         fields: selectOptions,
         new: true,
@@ -124,20 +124,20 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
 
   public findByIdAndDelete = async (params: DbParams): Promise<DbDoc> => {
     const { _id, accessOptions } = params;
-    const asyncCallback = this.dbModel.findByIdAndDelete(_id).lean();
+    const asyncCallback = this._dbModel.findByIdAndDelete(_id).lean();
     return await this._dbReturnTemplate(accessOptions, asyncCallback);
   };
 
   public init = async (props: any): Promise<this> => {
     const { makeDb, cloneDeep, dbModel } = props;
     await makeDb();
-    this.cloneDeep = cloneDeep;
-    this.dbModel = dbModel;
+    this._cloneDeep = cloneDeep;
+    this._dbModel = dbModel;
     return this;
   };
 
   public getDefaultSelectOptions = () => {
-    return this.cloneDeep(this.defaultSelectOptions);
+    return this._cloneDeep(this._defaultSelectOptions);
   };
 }
 

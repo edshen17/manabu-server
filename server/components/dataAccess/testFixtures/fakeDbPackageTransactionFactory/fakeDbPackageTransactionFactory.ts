@@ -7,13 +7,13 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
   PackageTransactionDoc,
   PackageTransactionEntityResponse
 > {
-  private fakeDbUserFactory!: FakeDbUserFactory;
+  private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (
     entityData: any
   ): Promise<PackageTransactionEntityResponse> => {
-    const fakeTeacher = await this.fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-    const fakePackageTransaction = await this.entity.build({
+    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const fakePackageTransaction = await this._entity.build({
       hostedBy: fakeTeacher._id,
       reservedBy: fakeTeacher._id,
       packageId: fakeTeacher.teacherData.packages[0]._id,
@@ -26,7 +26,7 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
 
   protected _initTemplate = async (props: any) => {
     const { makeFakeDbUserFactory } = props;
-    this.fakeDbUserFactory = await makeFakeDbUserFactory;
+    this._fakeDbUserFactory = await makeFakeDbUserFactory;
   };
 }
 

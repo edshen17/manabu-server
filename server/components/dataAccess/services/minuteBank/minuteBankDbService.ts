@@ -8,7 +8,7 @@ class MinuteBankDbService
 {
   constructor() {
     super();
-    this.defaultSelectOptions = {
+    this._defaultSelectOptions = {
       defaultSettings: {},
     };
   }

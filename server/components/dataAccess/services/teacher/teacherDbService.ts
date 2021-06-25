@@ -5,7 +5,7 @@ import { TeacherDoc } from '../../../../models/Teacher';
 class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
   constructor() {
     super();
-    this.defaultSelectOptions = {
+    this._defaultSelectOptions = {
       defaultSettings: {
         licensePath: 0,
       },

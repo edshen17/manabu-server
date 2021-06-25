@@ -5,12 +5,12 @@ import { IFakeDbDataFactory } from './IFakeDbDataFactory';
 abstract class AbstractFakeDbDataFactory<DbDoc, EntityResponse>
   implements IFakeDbDataFactory<DbDoc>
 {
-  protected entity!: IEntity<EntityResponse>;
-  protected dbService!: IDbOperations<DbDoc>;
-  protected defaultAccessOptions: AccessOptions;
-  protected cloneDeep!: any;
+  protected _entity!: IEntity<EntityResponse>;
+  protected _dbService!: IDbOperations<DbDoc>;
+  protected _defaultAccessOptions: AccessOptions;
+  protected _cloneDeep!: any;
   constructor() {
-    this.defaultAccessOptions = {
+    this._defaultAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted: true,
       currentAPIUserRole: 'user',
@@ -20,16 +20,16 @@ abstract class AbstractFakeDbDataFactory<DbDoc, EntityResponse>
 
   public createFakeDbData = async (entityData?: any): Promise<DbDoc> => {
     const fakeEntity = await this._createFakeEntity(entityData);
-    let newDbDocCallback = this.dbService.insert({
+    let newDbDocCallback = this._dbService.insert({
       modelToInsert: fakeEntity,
-      accessOptions: this.defaultAccessOptions,
+      accessOptions: this._defaultAccessOptions,
     });
     const fakeDbData = await this._awaitDbInsert(newDbDocCallback);
     return fakeDbData;
   };
 
   protected _createFakeEntity = async (entityData?: any): Promise<EntityResponse> => {
-    const fakeEntity = await this.entity.build(entityData);
+    const fakeEntity = await this._entity.build(entityData);
     return fakeEntity;
   };
 
@@ -42,9 +42,9 @@ abstract class AbstractFakeDbDataFactory<DbDoc, EntityResponse>
     props: { makeEntity: any; makeDbService: any; cloneDeep: any } | any
   ): Promise<this> => {
     const { makeEntity, makeDbService, cloneDeep } = props;
-    this.entity = await makeEntity;
-    this.dbService = await makeDbService;
-    this.cloneDeep = cloneDeep;
+    this._entity = await makeEntity;
+    this._dbService = await makeDbService;
+    this._cloneDeep = cloneDeep;
     this._initTemplate(props);
     return this;
   };
@@ -52,7 +52,7 @@ abstract class AbstractFakeDbDataFactory<DbDoc, EntityResponse>
   protected _initTemplate = (props: any): void => {};
 
   public getDefaultAccessOptions = () => {
-    return this.cloneDeep(this.defaultAccessOptions);
+    return this._cloneDeep(this._defaultAccessOptions);
   };
 }
 

@@ -6,12 +6,13 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<PackageDoc, Package
   public createFakePackages = async (entityData: { hostedBy: any }) => {
     const defaultPackages = await this._createDefaultPackages(entityData);
     const accessOptions = this.getDefaultAccessOptions();
-    const insertedPackages = await this.dbService.insertMany({
+    const insertedPackages = await this._dbService.insertMany({
       modelToInsert: defaultPackages,
       accessOptions,
     });
     return insertedPackages;
   };
+
   private _createDefaultPackages = async (entityData: { hostedBy: any }) => {
     const { hostedBy } = entityData;
     const lightPackage = await this._createFakeEntity({

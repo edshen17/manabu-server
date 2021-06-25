@@ -7,7 +7,7 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   MinuteBankDoc,
   MinuteBankEntityResponse
 > {
-  private fakeUserDbFactory!: FakeDbUserFactory;
+  private _fakeUserDbFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (entityData?: {
     hostedBy: any;
@@ -16,14 +16,14 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   }): Promise<MinuteBankEntityResponse> => {
     let { hostedBy, reservedBy, minuteBank } = entityData || {};
     if (!hostedBy) {
-      const hostedByData = await this.fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();
+      const hostedByData = await this._fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();
       hostedBy = hostedByData._id;
     }
     if (!reservedBy) {
-      const reservedByData = await this.fakeUserDbFactory.createFakeDbUser();
+      const reservedByData = await this._fakeUserDbFactory.createFakeDbUser();
       reservedBy = reservedByData._id;
     }
-    const fakeMinuteBankEntity = await this.entity.build({
+    const fakeMinuteBankEntity = await this._entity.build({
       hostedBy,
       reservedBy,
       minuteBank: minuteBank || 0,
@@ -33,7 +33,7 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
 
   protected _initTemplate = async (props: any) => {
     const { makeFakeDbUserFactory } = props || {};
-    this.fakeUserDbFactory = await makeFakeDbUserFactory;
+    this._fakeUserDbFactory = await makeFakeDbUserFactory;
   };
 }
 

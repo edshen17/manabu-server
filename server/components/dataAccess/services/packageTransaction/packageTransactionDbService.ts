@@ -8,7 +8,7 @@ class PackageTransactionDbService
 {
   constructor() {
     super();
-    this.defaultSelectOptions = {
+    this._defaultSelectOptions = {
       defaultSettings: {},
     };
   }
