@@ -2,7 +2,7 @@ import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbO
 import { IEntity } from './IEntity';
 
 abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse> {
-  protected defaultAccessOptions: AccessOptions = {
+  protected _defaultAccessOptions: AccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,
@@ -10,7 +10,7 @@ abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse>
   };
 
   public getDbDataById = async (dbService: IDbOperations<any>, _id?: string): Promise<any> => {
-    const accessOptions = this.defaultAccessOptions;
+    const accessOptions = this._defaultAccessOptions;
     const dbData = await dbService.findById({ _id, accessOptions });
     return dbData;
   };

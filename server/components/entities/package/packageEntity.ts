@@ -24,7 +24,7 @@ class PackageEntity
   extends AbstractEntity<PackageEntityResponse>
   implements IEntity<PackageEntityResponse>
 {
-  private userDbService!: UserDbService;
+  private _userDbService!: UserDbService;
 
   public build = async (packageEntityData: PackageEntityData): Promise<PackageEntityResponse> => {
     const packageEntity = await this._buildPackageEntity(packageEntityData);
@@ -47,7 +47,7 @@ class PackageEntity
   };
 
   private _getPriceDetails = async (hostedBy: string) => {
-    const savedDbTeacher: JoinedUserDoc = await this.getDbDataById(this.userDbService, hostedBy);
+    const savedDbTeacher: JoinedUserDoc = await this.getDbDataById(this._userDbService, hostedBy);
     if (savedDbTeacher.teacherData) {
       const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
       const priceDetails = {
@@ -62,7 +62,7 @@ class PackageEntity
 
   public init = async (props: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
     const { makeUserDbService } = props;
-    this.userDbService = await makeUserDbService;
+    this._userDbService = await makeUserDbService;
     return this;
   };
 }

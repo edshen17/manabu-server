@@ -43,9 +43,9 @@ class PackageTransactionEntity
   extends AbstractEntity<PackageTransactionEntityResponse>
   implements IEntity<PackageTransactionEntityResponse>
 {
-  private userDbService!: UserDbService;
-  private packageDbService!: PackageDbService;
-  private dayjs!: any;
+  private _userDbService!: UserDbService;
+  private _packageDbService!: PackageDbService;
+  private _dayjs!: any;
 
   public build = async (
     packageEntityData: PackageTransactionEntityData
@@ -76,16 +76,16 @@ class PackageTransactionEntity
       transactionDate: new Date(),
       reservationLength,
       transactionDetails,
-      terminationDate: terminationDate || this.dayjs().add(1, 'month').toDate(),
+      terminationDate: terminationDate || this._dayjs().add(1, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       remainingReschedules: 5,
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
       paymentMethodData: paymentMethodData || {},
-      packageData: (await this.getDbDataById(this.packageDbService, packageId)) || {},
-      hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
-      reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},
+      packageData: (await this.getDbDataById(this._packageDbService, packageId)) || {},
+      hostedByData: (await this.getDbDataById(this._userDbService, hostedBy)) || {},
+      reservedByData: (await this.getDbDataById(this._userDbService, reservedBy)) || {},
     });
   };
 
@@ -95,9 +95,9 @@ class PackageTransactionEntity
     dayjs: any;
   }): Promise<this> => {
     const { makeUserDbService, makePackageDbService, dayjs } = props;
-    this.userDbService = await makeUserDbService;
-    this.packageDbService = await makePackageDbService;
-    this.dayjs = dayjs;
+    this._userDbService = await makeUserDbService;
+    this._packageDbService = await makePackageDbService;
+    this._dayjs = dayjs;
     return this;
   };
 }

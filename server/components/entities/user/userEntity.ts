@@ -31,10 +31,10 @@ type UserEntityResponse =
   | Error;
 
 class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<UserEntityResponse> {
-  private sanitize!: any;
-  private inputValidator!: any;
-  private passwordHasher!: any;
-  private randTokenGenerator!: any;
+  private _sanitize!: any;
+  private _inputValidator!: any;
+  private _passwordHasher!: any;
+  private _randTokenGenerator!: any;
 
   public build = (userEntityData: UserEntityData): UserEntityResponse => {
     try {
@@ -48,15 +48,15 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
 
   private _validateUserInput = (userEntityData: UserEntityData): void => {
     const { name, email, password, profileImage } = userEntityData;
-    if (!this.inputValidator.isValidName(name)) {
+    if (!this._inputValidator.isValidName(name)) {
       throw new Error('User must have a valid name.');
     }
 
-    if (!this.inputValidator.isValidEmail(email)) {
+    if (!this._inputValidator.isValidEmail(email)) {
       throw new Error('User must have a valid email.');
     }
 
-    if (!this.inputValidator.isValidPassword(password)) {
+    if (!this._inputValidator.isValidPassword(password)) {
       throw new Error('User must have a valid password.');
     }
   };
@@ -86,14 +86,14 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
 
   private _encryptPassword = (password?: string): string | undefined => {
     if (password) {
-      return this.passwordHasher(password);
+      return this._passwordHasher(password);
     } else {
       return undefined;
     }
   };
 
   private _generateVerificationToken = (name: string, email: string): string => {
-    return this.randTokenGenerator(name, email);
+    return this._randTokenGenerator(name, email);
   };
 
   public init = (props: {
@@ -103,10 +103,10 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     randTokenGenerator: any;
   }) => {
     const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = props;
-    this.sanitize = sanitize;
-    this.inputValidator = inputValidator;
-    this.passwordHasher = passwordHasher;
-    this.randTokenGenerator = randTokenGenerator;
+    this._sanitize = sanitize;
+    this._inputValidator = inputValidator;
+    this._passwordHasher = passwordHasher;
+    this._randTokenGenerator = randTokenGenerator;
     return this;
   };
 }

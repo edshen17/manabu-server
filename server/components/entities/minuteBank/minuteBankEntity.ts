@@ -21,7 +21,8 @@ class MinuteBankEntity
   extends AbstractEntity<MinuteBankEntityResponse>
   implements IEntity<MinuteBankEntityResponse>
 {
-  private userDbService!: UserDbService;
+  private _userDbService!: UserDbService;
+
   public build = async (
     minuteBankData: MinuteBankEntityData
   ): Promise<MinuteBankEntityResponse> => {
@@ -37,15 +38,15 @@ class MinuteBankEntity
       hostedBy,
       reservedBy,
       minuteBank: minuteBank || 0,
-      hostedByData: (await this.getDbDataById(this.userDbService, hostedBy)) || {},
-      reservedByData: (await this.getDbDataById(this.userDbService, reservedBy)) || {},
+      hostedByData: (await this.getDbDataById(this._userDbService, hostedBy)) || {},
+      reservedByData: (await this.getDbDataById(this._userDbService, reservedBy)) || {},
       lastUpdated: new Date(),
     });
   };
 
   public init = async (props: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
     const { makeUserDbService } = props;
-    this.userDbService = await makeUserDbService;
+    this._userDbService = await makeUserDbService;
     return this;
   };
 }
