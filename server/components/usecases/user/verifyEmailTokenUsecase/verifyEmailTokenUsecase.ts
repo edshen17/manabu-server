@@ -20,11 +20,13 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
     return true;
   };
 
-  protected _setAccessOptionsTemplate = (
-    currentAPIUser: CurrentAPIUser,
-    isCurrentAPIUserPermitted: boolean,
-    params: any
-  ) => {
+  protected _setAccessOptionsTemplate = (props: {
+    currentAPIUser: CurrentAPIUser;
+    isCurrentAPIUserPermitted: boolean;
+    params: any;
+    endpointPath: string;
+  }) => {
+    const { isCurrentAPIUserPermitted, currentAPIUser } = props;
     const accessOptions: AccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted,

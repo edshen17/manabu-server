@@ -77,13 +77,13 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     const handleNoSavedDbUser = () => {
       throw new Error('Username or password incorrect.');
     };
-    savedDbUser = await this._loginUser({
+    const loginUserUsecaseResponse = await this._loginUser({
       savedDbUser,
       accessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
-    return this._createLoginUserUsecaseResponse(savedDbUser);
+    return loginUserUsecaseResponse;
   };
 
   private _loginUser = async (props: {
@@ -144,12 +144,13 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       return userRes;
     };
 
-    return await this._loginUser({
+    const loginUserUsecaseResponse = await this._loginUser({
       savedDbUser,
       accessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
+    return loginUserUsecaseResponse;
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {
