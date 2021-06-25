@@ -49,6 +49,12 @@ class CreateUserUsecase
   private jwt!: any;
   private emailHandler!: EmailHandler;
 
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { body } = controllerData.routeData;
+    const { role, _id, dateRegistered } = body || {};
+    return !role && !_id && !dateRegistered;
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateUserUsecaseResponse> => {
@@ -294,12 +300,6 @@ class CreateUserUsecase
       cookieOptions.secure = false;
     }
     return cookieOptions;
-  };
-
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { body } = controllerData.routeData;
-    const { role, _id, dateRegistered } = body || {};
-    return !role && !_id && !dateRegistered;
   };
 
   public init = async (services: {

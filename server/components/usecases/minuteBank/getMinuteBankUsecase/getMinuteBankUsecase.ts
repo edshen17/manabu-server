@@ -12,12 +12,12 @@ type GetMinuteBankUsecaseResponse =
 class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseResponse> {
   private minuteBankDbService!: MinuteBankDbService;
 
-  protected _isCurrentAPIUserPermitted(props: {
+  protected _isCurrentAPIUserPermitted = (props: {
     params: any;
     query?: any;
     currentAPIUser: any;
     endpointPath: string;
-  }): boolean {
+  }): boolean => {
     const { params, currentAPIUser, endpointPath } = props;
     if (endpointPath == '/self/minuteBanks') {
       return true;
@@ -27,13 +27,6 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
       const isCurrentAPIUserPermitted = isSelf || currentAPIUser.role == 'admin';
       return isCurrentAPIUserPermitted;
     }
-  }
-
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { endpointPath, routeData } = controllerData;
-    const { params } = routeData;
-    const { hostedBy, reservedBy } = params || {};
-    return endpointPath == '/self/minuteBanks' || (hostedBy && reservedBy);
   };
 
   protected _setAccessOptionsTemplate = (
@@ -48,6 +41,13 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
       isSelf: isCurrentAPIUserPermitted,
     };
     return accessOptions;
+  };
+
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { endpointPath, routeData } = controllerData;
+    const { params } = routeData;
+    const { hostedBy, reservedBy } = params || {};
+    return endpointPath == '/self/minuteBanks' || (hostedBy && reservedBy);
   };
 
   protected _makeRequestTemplate = async (

@@ -10,21 +10,16 @@ type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: strin
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecaseResponse> {
   private userDbService!: UserDbService;
   private redirectPathBuilder!: RedirectPathBuilder;
-  protected _isCurrentAPIUserPermitted(props: {
+
+  protected _isCurrentAPIUserPermitted = (props: {
     params: any;
     query?: any;
     currentAPIUser: any;
     endpointPath: string;
-  }): boolean {
+  }): boolean => {
     return true;
-  }
-
-  protected _isValidRequest = (controllerData: ControllerData) => {
-    const { routeData } = controllerData;
-    const { params } = routeData;
-    const { verificationToken } = params;
-    return verificationToken;
   };
+
   protected _setAccessOptionsTemplate = (
     currentAPIUser: CurrentAPIUser,
     isCurrentAPIUserPermitted: boolean,
@@ -37,6 +32,13 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
       isSelf: true,
     };
     return accessOptions;
+  };
+
+  protected _isValidRequest = (controllerData: ControllerData) => {
+    const { routeData } = controllerData;
+    const { params } = routeData;
+    const { verificationToken } = params;
+    return verificationToken;
   };
 
   protected _makeRequestTemplate = async (props: MakeRequestTemplateParams) => {

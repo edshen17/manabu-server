@@ -14,17 +14,6 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
     this.errorStatusCode = errorStatusCode;
   }
 
-  private _awaitUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
-    const { currentAPIUser, path, params, body, query } = httpRequest;
-    const controllerData = {
-      currentAPIUser,
-      endpointPath: path,
-      routeData: { params, body, query },
-    };
-    const usecaseRes = await this.usecase.makeRequest(controllerData);
-    return usecaseRes;
-  };
-
   public makeRequest = async (
     httpRequest: IHttpRequest
   ): Promise<ControllerResponse<UsecaseResponse>> => {
@@ -45,6 +34,17 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
         body: { err: err.message },
       };
     }
+  };
+
+  private _awaitUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
+    const { currentAPIUser, path, params, body, query } = httpRequest;
+    const controllerData = {
+      currentAPIUser,
+      endpointPath: path,
+      routeData: { params, body, query },
+    };
+    const usecaseRes = await this.usecase.makeRequest(controllerData);
+    return usecaseRes;
   };
 
   public init = async (props: {

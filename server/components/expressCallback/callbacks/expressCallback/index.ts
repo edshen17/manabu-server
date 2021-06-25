@@ -1,6 +1,6 @@
-import { CookieCallbackDecorator } from './decorators/CookieCallbackDecorator';
-import { JSONCallbackDecorator } from './decorators/JSONCallbackDecorator';
-import { RedirectCallbackDecorator } from './decorators/RedirectCallbackDecorator';
+import { CookieCallbackDecorator } from '../decorators/CookieCallbackDecorator';
+import { JSONCallbackDecorator } from '../decorators/JSONCallbackDecorator';
+import { RedirectCallbackDecorator } from '../decorators/RedirectCallbackDecorator';
 import { ExpressCallback } from './expressCallback';
 
 const makeExpressCallback = new ExpressCallback();

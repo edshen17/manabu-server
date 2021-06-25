@@ -2,26 +2,7 @@ import { IController } from '../../controllers/abstractions/IController';
 import { IExpressCallback } from './IExpressCallback';
 abstract class AbstractExpressCallback implements IExpressCallback {
   public abstract consumeTemplate(res: any, body: any): void;
-  private _createHttpRequest = (req: any) => {
-    const httpRequest = {
-      body: req.body,
-      query: req.query,
-      params: req.params,
-      ip: req.ip,
-      method: req.method,
-      path: req.path,
-      currentAPIUser: {
-        userId: req.userId,
-        role: req.role || 'user',
-      },
-      headers: {
-        'Content-Type': req.get('Content-Type'),
-        Referer: req.get('referer'),
-        'User-Agent': req.get('User-Agent'),
-      },
-    };
-    return httpRequest;
-  };
+
   public consume = (
     makeController: Promise<IController<any>>
   ): ((req: any, res: any) => Promise<void>) => {
@@ -44,6 +25,27 @@ abstract class AbstractExpressCallback implements IExpressCallback {
         res.status(500).send({ err: err.message });
       }
     };
+  };
+
+  private _createHttpRequest = (req: any) => {
+    const httpRequest = {
+      body: req.body,
+      query: req.query,
+      params: req.params,
+      ip: req.ip,
+      method: req.method,
+      path: req.path,
+      currentAPIUser: {
+        userId: req.userId,
+        role: req.role || 'user',
+      },
+      headers: {
+        'Content-Type': req.get('Content-Type'),
+        Referer: req.get('referer'),
+        'User-Agent': req.get('User-Agent'),
+      },
+    };
+    return httpRequest;
   };
 }
 

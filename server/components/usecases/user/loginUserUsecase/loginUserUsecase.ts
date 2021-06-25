@@ -24,6 +24,19 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   private redirectPathBuilder!: RedirectPathBuilder;
   private CLIENT_DASHBOARD_URI!: string;
 
+  protected _isCurrentAPIUserPermitted = (props: {
+    params: any;
+    query?: any;
+    currentAPIUser: any;
+    endpointPath: string;
+  }): boolean => {
+    return true;
+  };
+
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    return true;
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
@@ -73,39 +86,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     return this._createLoginUserUsecaseResponse(savedDbUser);
   };
 
-  private _handleGoogleLogin = async (props: {
-    query: any;
-    accessOptions: AccessOptions;
-    body: any;
-    controllerData: ControllerData;
-  }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, body, controllerData, query } = props;
-    const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
-    const { tokens } = await this.oauth2Client.getToken(code);
-    const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
-
-    let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
-
-    const handleNoSavedDbUser = async () => {
-      body.name = name;
-      body.email = email;
-      body.profilePicture = picture;
-      body.isTeacherApp = isTeacherApp;
-      const userRes = await this.createUserUsecase.makeRequest(controllerData);
-      if ('user' in userRes) {
-        userRes.redirectURI = this.CLIENT_DASHBOARD_URI;
-      }
-      return userRes;
-    };
-
-    return await this._loginUser({
-      savedDbUser,
-      accessOptions,
-      isTeacherApp,
-      handleNoSavedDbUser,
-    });
-  };
-
   private _loginUser = async (props: {
     savedDbUser: JoinedUserDoc;
     accessOptions: AccessOptions;
@@ -139,6 +119,39 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     };
   };
 
+  private _handleGoogleLogin = async (props: {
+    query: any;
+    accessOptions: AccessOptions;
+    body: any;
+    controllerData: ControllerData;
+  }): Promise<LoginUserUsecaseResponse> => {
+    const { accessOptions, body, controllerData, query } = props;
+    const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
+    const { tokens } = await this.oauth2Client.getToken(code);
+    const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
+
+    let savedDbUser = await this.userDbService.findOne({ searchQuery: { email }, accessOptions });
+
+    const handleNoSavedDbUser = async () => {
+      body.name = name;
+      body.email = email;
+      body.profilePicture = picture;
+      body.isTeacherApp = isTeacherApp;
+      const userRes = await this.createUserUsecase.makeRequest(controllerData);
+      if ('user' in userRes) {
+        userRes.redirectURI = this.CLIENT_DASHBOARD_URI;
+      }
+      return userRes;
+    };
+
+    return await this._loginUser({
+      savedDbUser,
+      accessOptions,
+      isTeacherApp,
+      handleNoSavedDbUser,
+    });
+  };
+
   private _parseGoogleQuery = (query: { code: string; state: string }) => {
     const { code, state } = query || {};
     let parsedState, isTeacherApp, hostedBy;
@@ -167,19 +180,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     const googleRes = await oauth2.userinfo.get();
     return googleRes.data;
   };
-
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    return true;
-  };
-
-  protected _isCurrentAPIUserPermitted(props: {
-    params: any;
-    query?: any;
-    currentAPIUser: any;
-    endpointPath: string;
-  }): boolean {
-    return true;
-  }
 
   public init = async (props: {
     makeUserDbService: Promise<UserDbService>;

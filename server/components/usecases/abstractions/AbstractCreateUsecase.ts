@@ -7,14 +7,14 @@ abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<Us
     super('Access denied.');
   }
 
-  protected _isCurrentAPIUserPermitted(props: {
+  protected _isCurrentAPIUserPermitted = (props: {
     params: any;
     query?: any;
     currentAPIUser: any;
     endpointPath: string;
-  }): boolean {
+  }): boolean => {
     return true;
-  }
+  };
 
   protected _setAccessOptionsTemplate = (
     currentAPIUser: CurrentAPIUser,

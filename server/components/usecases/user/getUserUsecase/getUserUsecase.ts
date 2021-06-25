@@ -9,6 +9,28 @@ type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
   private userDbService!: UserDbService;
 
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { routeData, currentAPIUser } = controllerData;
+    const { params } = routeData;
+    const searchIdExists = params.uId || currentAPIUser.userId;
+    return searchIdExists;
+  };
+
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<GetUserUsecaseResponse> => {
+    const { currentAPIUser, endpointPath, params, accessOptions } = props;
+    const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
+    if (user) {
+      if (endpointPath == '/self/me') {
+        this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
+      }
+      return { user };
+    } else {
+      throw new Error('User not found.');
+    }
+  };
+
   private _getUser = async (
     currentAPIUser: CurrentAPIUser,
     endpointPath: string,
@@ -36,28 +58,6 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
       },
       accessOptions,
     });
-  };
-
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { routeData, currentAPIUser } = controllerData;
-    const { params } = routeData;
-    const searchIdExists = params.uId || currentAPIUser.userId;
-    return searchIdExists;
-  };
-
-  protected _makeRequestTemplate = async (
-    props: MakeRequestTemplateParams
-  ): Promise<GetUserUsecaseResponse> => {
-    const { currentAPIUser, endpointPath, params, accessOptions } = props;
-    const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
-    if (user) {
-      if (endpointPath == '/self/me') {
-        this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
-      }
-      return { user };
-    } else {
-      throw new Error('User not found.');
-    }
   };
 
   public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {

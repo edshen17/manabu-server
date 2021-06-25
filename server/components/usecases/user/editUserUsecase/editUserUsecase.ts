@@ -18,19 +18,6 @@ class EditUserUsecase
   private packageTransactionDbService!: PackageTransactionDbService;
   private minuteBankDbService!: MinuteBankDbService;
 
-  public init = async (services: {
-    makeUserDbService: Promise<UserDbService>;
-    makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-    makeMinuteBankDbService: Promise<MinuteBankDbService>;
-  }): Promise<this> => {
-    const { makeUserDbService, makePackageTransactionDbService, makeMinuteBankDbService } =
-      services;
-    this.userDbService = await makeUserDbService;
-    this.packageTransactionDbService = await makePackageTransactionDbService;
-    this.minuteBankDbService = await makeMinuteBankDbService;
-    return this;
-  };
-
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
     const { role, _id, dateRegistered } = body || {};
@@ -40,7 +27,7 @@ class EditUserUsecase
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<EditUserUsecaseResponse> => {
-    const { params, body, accessOptions, query } = props;
+    const { params, body, accessOptions } = props;
     const savedDbUser = await this.userDbService.findOneAndUpdate({
       searchQuery: { _id: params.uId },
       updateParams: body,
@@ -91,6 +78,19 @@ class EditUserUsecase
       updateParams: { reservedByData: savedDbUser },
       accessOptions,
     });
+  };
+
+  public init = async (services: {
+    makeUserDbService: Promise<UserDbService>;
+    makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+    makeMinuteBankDbService: Promise<MinuteBankDbService>;
+  }): Promise<this> => {
+    const { makeUserDbService, makePackageTransactionDbService, makeMinuteBankDbService } =
+      services;
+    this.userDbService = await makeUserDbService;
+    this.packageTransactionDbService = await makePackageTransactionDbService;
+    this.minuteBankDbService = await makeMinuteBankDbService;
+    return this;
   };
 }
 

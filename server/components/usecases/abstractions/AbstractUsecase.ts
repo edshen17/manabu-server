@@ -61,35 +61,17 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     };
   };
 
-  protected abstract _makeRequestTemplate(
-    props: MakeRequestTemplateParams
-  ): Promise<UsecaseResponse>;
-
-  protected _isCurrentAPIUserPermitted(props: {
+  protected _isCurrentAPIUserPermitted = (props: {
     params: any;
     query?: any;
     currentAPIUser: any;
     endpointPath: string;
-  }): boolean {
+  }): boolean => {
     const { params, currentAPIUser } = props;
     return (
       (params.uId && currentAPIUser.userId && params.uId) == currentAPIUser.userId ||
       currentAPIUser.role == 'admin'
     );
-  }
-
-  protected _setAccessOptionsTemplate = (
-    currentAPIUser: CurrentAPIUser,
-    isCurrentAPIUserPermitted: boolean,
-    params: any
-  ) => {
-    const accessOptions: AccessOptions = {
-      isProtectedResource: true,
-      isCurrentAPIUserPermitted,
-      currentAPIUserRole: currentAPIUser.role,
-      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
-    };
-    return accessOptions;
   };
 
   protected _setAccessOptions = (props: {
@@ -106,7 +88,25 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     return accessOptions;
   };
 
+  protected _setAccessOptionsTemplate = (
+    currentAPIUser: CurrentAPIUser,
+    isCurrentAPIUserPermitted: boolean,
+    params: any
+  ) => {
+    const accessOptions: AccessOptions = {
+      isProtectedResource: true,
+      isCurrentAPIUserPermitted,
+      currentAPIUserRole: currentAPIUser.role,
+      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
+    };
+    return accessOptions;
+  };
+
   protected abstract _isValidRequest(controllerData: ControllerData): boolean;
+
+  protected abstract _makeRequestTemplate(
+    props: MakeRequestTemplateParams
+  ): Promise<UsecaseResponse>;
 
   abstract init(services: any): Promise<this>;
 }

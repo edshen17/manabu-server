@@ -11,7 +11,7 @@ import {
   makeJSONCookieExpressCallback,
   makeJSONExpressCallback,
   makeRedirectExpressCallback,
-} from '../../../components/expressCallback/callbacks';
+} from '../../../components/expressCallback/callbacks/expressCallback';
 const users = express.Router();
 const VerifyToken = require('../../../components/VerifyToken'); // TODO: turn into ts + import statement
 
