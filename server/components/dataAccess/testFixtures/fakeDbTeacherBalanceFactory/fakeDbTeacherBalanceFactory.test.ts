@@ -1,11 +1,10 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeFakeDbTeacherBalanceFactory } from '.';
 import { JoinedUserDoc } from '../../services/user/userDbService';
 import { makeFakeDbUserFactory } from '../fakeDbUserFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 import { FakeDbTeacherBalanceFactory } from './fakeDbTeacherBalanceFactory';
 
-const expect = chai.expect;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeDbTeacherBalanceFactory: FakeDbTeacherBalanceFactory;
 let fakeTeacher: JoinedUserDoc;

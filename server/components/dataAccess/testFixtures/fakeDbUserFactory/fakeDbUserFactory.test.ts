@@ -1,10 +1,9 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeFakeDbUserFactory } from '.';
 import { makeUserDbService } from '../../services/user';
 import { UserDbService } from '../../services/user/userDbService';
 import { FakeDbUserFactory } from './fakeDbUserFactory';
 
-const expect = chai.expect;
 let fakeDbUserFactory: FakeDbUserFactory;
 let userDbService: UserDbService;
 before(async () => {

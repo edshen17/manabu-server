@@ -1,8 +1,7 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeFakeDbPackageTransactionFactory } from '.';
 import { FakeDbPackageTransactionFactory } from './fakeDbPackageTransactionFactory';
 
-const expect = chai.expect;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 
 before(async () => {

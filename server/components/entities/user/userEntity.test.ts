@@ -1,7 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeUserEntity } from './index';
 
-const expect = chai.expect;
 let defaultTestUserEntityParams: any;
 before(() => {
   defaultTestUserEntityParams = {

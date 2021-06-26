@@ -1,4 +1,4 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeFakeDbPackageFactory } from '.';
 import { makePackageDbService } from '../../services/package';
 import { PackageDbService } from '../../services/package/packageDbService';
@@ -7,7 +7,6 @@ import { makeFakeDbUserFactory } from '../fakeDbUserFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 import { FakeDbPackageFactory } from './fakeDbPackageFactory';
 
-const expect = chai.expect;
 let packageDbService: PackageDbService;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeDbPackageFactory: FakeDbPackageFactory;

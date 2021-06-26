@@ -1,11 +1,10 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { AccessOptions } from '../../abstractions/IDbOperations';
 import { UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 
-const expect = chai.expect;
 let userDbService: UserDbService;
 let fakeDbUserFactory: FakeDbUserFactory;
 let accessOptions: AccessOptions;

@@ -1,26 +1,17 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeMinuteBankDbService } from '.';
 import { AccessOptions } from '../../abstractions/IDbOperations';
 import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
 import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
-import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
-import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeUserDbService } from '../user';
-import { UserDbService } from '../user/userDbService';
 import { MinuteBankDbService } from './minuteBankDbService';
 
-const expect = chai.expect;
 let minuteBankDbService: MinuteBankDbService;
-let userDbService: UserDbService;
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
-let fakeDbUserFactory: FakeDbUserFactory;
 let accessOptions: AccessOptions;
 
 before(async () => {
   minuteBankDbService = await makeMinuteBankDbService;
-  userDbService = await makeUserDbService;
   fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;
-  fakeDbUserFactory = await makeFakeDbUserFactory;
 });
 
 beforeEach(() => {

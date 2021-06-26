@@ -1,10 +1,9 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makePackageTransactionEntity } from './index';
 import { PackageTransactionEntity } from './packageTransactionEntity';
 
-const expect = chai.expect;
 let fakeDbUserFactory: FakeDbUserFactory;
 let packageTransactionEntity: PackageTransactionEntity;
 
@@ -29,7 +28,9 @@ context('packageTransaction entity', () => {
 
         expect(testPackageTransaction.lessonLanguage).to.equal('ja');
         expect(testPackageTransaction.isSubscription).to.equal(false);
-        expect(testPackageTransaction.packageData).to.deep.equal(fakeTeacher.teacherData.packages[0]);
+        expect(testPackageTransaction.packageData).to.deep.equal(
+          fakeTeacher.teacherData.packages[0]
+        );
         expect(testPackageTransaction.hostedByData).to.deep.equal(fakeTeacher);
         expect(testPackageTransaction.reservedByData).to.deep.equal(fakeTeacher);
       });

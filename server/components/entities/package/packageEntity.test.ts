@@ -1,12 +1,10 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { JoinedUserDoc } from '../../dataAccess/services/user/userDbService';
 import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makePackageEntity } from './index';
 import { PackageEntity } from './packageEntity';
 
-const expect = chai.expect;
-const assert = chai.assert;
 let fakeDbUserFactory: FakeDbUserFactory;
 let packageEntity: PackageEntity;
 let fakeUser: JoinedUserDoc;
@@ -34,7 +32,7 @@ context('package entity', () => {
         expect(testPackage.isOffering).to.equal(true);
         expect(testPackage.packageDurations.length).to.equal(0);
         expect(testPackage.packageType).to.equal('light');
-        assert.deepEqual(testPackage.priceDetails, { currency: 'SGD', hourlyPrice: 5 });
+        expect(testPackage.priceDetails).to.deep.equal({ currency: 'SGD', hourlyPrice: 5 });
       });
       it('should return default values if optional parameters are not given', async () => {
         const testPackage = await packageEntity.build({
@@ -42,7 +40,7 @@ context('package entity', () => {
           lessonAmount: 5,
           packageType: 'moderate',
         });
-        assert.deepEqual(testPackage.packageDurations, [30, 60]);
+        expect(testPackage.packageDurations).to.deep.equal([30, 60]);
         expect(testPackage.isOffering).to.equal(true);
       });
     });

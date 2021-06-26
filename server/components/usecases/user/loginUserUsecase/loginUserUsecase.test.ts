@@ -1,4 +1,4 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import faker from 'faker';
 import { makeLoginUserUsecase } from '.';
 import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
@@ -10,7 +10,6 @@ import { makeCreateUserUsecase } from '../createUserUsecase';
 import { CreateUserUsecase } from '../createUserUsecase/createUserUsecase';
 import { LoginUserUsecase } from './loginUserUsecase';
 
-let expect = chai.expect;
 let fakeDbUserFactory: FakeDbUserFactory;
 let loginUserUsecase: LoginUserUsecase;
 let controllerDataBuilder: ControllerDataBuilder;

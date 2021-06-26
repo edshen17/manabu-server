@@ -1,7 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeTeacherBalanceEntity } from './index';
 
-const expect = chai.expect;
 context('teacherBalance entity', () => {
   describe('build', () => {
     describe('given valid inputs', () => {

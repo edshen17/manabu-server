@@ -1,4 +1,4 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { GetMinuteBankUsecase } from './getMinuteBankUsecase';
 import { makeGetMinuteBankUsecase } from '.';
 import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
@@ -10,7 +10,6 @@ import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 
-const expect = chai.expect;
 let getMinuteBankUsecase: GetMinuteBankUsecase;
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
 let fakeDbUserFactory: FakeDbUserFactory;

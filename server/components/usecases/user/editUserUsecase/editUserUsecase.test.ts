@@ -1,4 +1,4 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
@@ -6,7 +6,6 @@ import { EditUserUsecase } from './editUserUsecase';
 import { makeEditUserUsecase } from '.';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 
-const expect = chai.expect;
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;
 let editUserUsecase: EditUserUsecase;

@@ -1,8 +1,5 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeTeacherEntity } from '.';
-
-const expect = chai.expect;
-const assert = chai.assert;
 
 describe('teacher entity', () => {
   describe('build', () => {
@@ -10,7 +7,7 @@ describe('teacher entity', () => {
       const testTeacher = makeTeacherEntity.build({ userId: 'random user id' });
       expect(testTeacher.userId).to.equal('random user id');
       expect(testTeacher.isApproved).to.equal(false);
-      assert.deepEqual(testTeacher.hourlyRate, { amount: 35, currency: 'SGD' });
+      expect(testTeacher.hourlyRate).to.deep.equal({ amount: 35, currency: 'SGD' });
     });
   });
 });

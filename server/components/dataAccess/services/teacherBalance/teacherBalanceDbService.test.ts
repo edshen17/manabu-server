@@ -1,4 +1,4 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeTeacherBalanceDbService } from '.';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 import { AccessOptions } from '../../abstractions/IDbOperations';
@@ -9,7 +9,6 @@ import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUs
 import { JoinedUserDoc } from '../user/userDbService';
 import { TeacherBalanceDbService } from './teacherBalanceDbService';
 
-const expect = chai.expect;
 let teacherBalanceDbService: TeacherBalanceDbService;
 let fakeDbTeacherBalanceFactory: FakeDbTeacherBalanceFactory;
 let fakeDbUserFactory: FakeDbUserFactory;

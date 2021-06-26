@@ -1,12 +1,11 @@
-import chai from 'chai';
 import faker from 'faker';
+import { expect } from 'chai';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { CreateUserUsecase } from './createUserUsecase';
 import { makeCreateUserUsecase } from '.';
 
-const expect = chai.expect;
 let controllerDataBuilder: ControllerDataBuilder;
 let createUserUsecase: CreateUserUsecase;
 let defaultRouteData: RouteData;

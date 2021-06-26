@@ -1,11 +1,10 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 
 import { makeMinuteBankEntity } from './index';
 
 let fakeDbUserFactory: FakeDbUserFactory;
-const expect = chai.expect;
 
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;

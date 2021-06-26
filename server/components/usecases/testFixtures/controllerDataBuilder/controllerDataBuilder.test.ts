@@ -1,10 +1,9 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { makeControllerDataBuilder } from '.';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { ControllerDataBuilder } from './controllerDataBuilder';
 
-const expect = chai.expect;
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbUserFactory: FakeDbUserFactory;
 before(async () => {
