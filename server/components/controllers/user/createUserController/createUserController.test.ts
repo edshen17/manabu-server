@@ -1,15 +1,34 @@
-import chai from 'chai';
-import { createUser } from '../../testFixtures/createUser';
-const expect = chai.expect;
+import faker from 'faker';
+import { expect } from 'chai';
+import { makeCreateUserController } from '.';
+import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
+import { CreateUserController } from './createUserController';
 
-context('createUserController', () => {
+let iHttpRequestBuilder: IHttpRequestBuilder;
+let createUserController: CreateUserController;
+
+before(async () => {
+  iHttpRequestBuilder = makeIHttpRequestBuilder;
+  createUserController = await makeCreateUserController;
+});
+
+describe('createUserController', () => {
   describe('makeRequest', async () => {
     it('should create a new user and return a user as well as cookies to set', async () => {
-      const controllerRes = await createUser();
-      expect(controllerRes.statusCode).to.equal(201);
-      if ('token' in controllerRes.body) {
-        expect(controllerRes.body).to.have.property('user');
-        expect(controllerRes.body).to.have.property('cookies');
+      const createUserHttpRequest = iHttpRequestBuilder
+        .body({
+          name: faker.name.findName(),
+          password: 'password',
+          email: faker.internet.email(),
+        })
+        .path('/register')
+        .build();
+      const createUserRes = await createUserController.makeRequest(createUserHttpRequest);
+      expect(createUserRes.statusCode).to.equal(201);
+      if ('token' in createUserRes.body) {
+        expect(createUserRes.body).to.have.property('user');
+        expect(createUserRes.body).to.have.property('cookies');
       }
     });
   });

@@ -1,7 +1,6 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { createUser } from '../../testFixtures/createUser';
 import { getUser } from '../../testFixtures/getUser';
-const expect = chai.expect;
 
 context('getUserController', () => {
   describe('makeRequest', () => {

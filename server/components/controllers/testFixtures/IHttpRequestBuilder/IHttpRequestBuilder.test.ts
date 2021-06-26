@@ -11,8 +11,8 @@ before(() => {
 describe('IHttpRequestBuilder', () => {
   describe('build', () => {
     it('should build an empty httpRequest from no inputs', () => {
-      const httpRequestData = iHttpRequestBuilder.build();
-      expect(httpRequestData).to.deep.equal({
+      const httpRequest = iHttpRequestBuilder.build();
+      expect(httpRequest).to.deep.equal({
         body: {},
         path: '',
         query: {},
@@ -24,7 +24,7 @@ describe('IHttpRequestBuilder', () => {
       });
     });
     it('should build a valid httpRequest from the given inputs', () => {
-      const httpRequestData = iHttpRequestBuilder
+      const httpRequest = iHttpRequestBuilder
         .body({
           name: 'some name',
         })
@@ -37,7 +37,7 @@ describe('IHttpRequestBuilder', () => {
         })
         .build();
 
-      expect(httpRequestData).to.deep.equal({
+      expect(httpRequest).to.deep.equal({
         body: {
           name: 'some name',
         },

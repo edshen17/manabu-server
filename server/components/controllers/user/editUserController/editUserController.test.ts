@@ -1,33 +1,80 @@
-import chai from 'chai';
-import { createUser } from '../../testFixtures/createUser';
-import { updateUser } from '../../testFixtures/updateUser';
+import { expect } from 'chai';
+import { makeEditUserController } from '.';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
+import { EditUserController } from './editUserController';
 
-const expect = chai.expect;
+let fakeDbUserFactory: FakeDbUserFactory;
+let iHttpRequestBuilder: IHttpRequestBuilder;
+let editUserController: EditUserController;
 
-context('editUserController', () => {
+before(async () => {
+  fakeDbUserFactory = await makeFakeDbUserFactory;
+  iHttpRequestBuilder = makeIHttpRequestBuilder;
+  editUserController = await makeEditUserController;
+});
+
+describe('editUserController', () => {
   describe('makeRequest', async () => {
     it('should update the user', async () => {
-      const controllerRes = await createUser();
-      if ('user' in controllerRes.body) {
-        const updatingUser = controllerRes.body.user;
-        const updatedUserRes = await updateUser(updatingUser, updatingUser, { name: 'new name' });
-        if ('user' in updatedUserRes.body) {
-          expect(updatedUserRes.statusCode).to.equal(200);
-          expect(updatedUserRes.body.user.name).to.equal('new name');
-        }
+      const fakeUser = await fakeDbUserFactory.createFakeDbUser();
+      const editUserHttpRequest = iHttpRequestBuilder
+        .currentAPIUser({
+          userId: fakeUser._id,
+          role: fakeUser.role,
+        })
+        .body({ name: 'new name' })
+        .params({
+          uId: fakeUser._id,
+        })
+        .path(`/user/${fakeUser._id}/updateProfile`)
+        .build();
+      const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
+      if ('user' in updateUserRes.body) {
+        expect(updateUserRes.statusCode).to.equal(200);
+        expect(updateUserRes.body.user.name).to.equal('new name');
       }
     });
-    it('should throw an error when access denied', async () => {
-      const firstUserRes = await createUser();
-      const secondUserRes = await createUser();
-      if ('user' in firstUserRes.body && 'user' in secondUserRes.body) {
-        const updatingUser = firstUserRes.body.user;
-        const currentAPIUser = secondUserRes.body.user;
-        try {
-          await updateUser(updatingUser, currentAPIUser, { name: 'new name' });
-        } catch (err) {
-          expect(err.message).to.equal('Access denied.');
-        }
+    it('should throw an error when access denied (editing as user)', async () => {
+      try {
+        const fakeUpdater = await fakeDbUserFactory.createFakeDbUser();
+        const fakeUpdatee = await fakeDbUserFactory.createFakeDbUser();
+        const editUserHttpRequest = iHttpRequestBuilder
+          .currentAPIUser({
+            userId: fakeUpdater._id,
+            role: fakeUpdater.role,
+          })
+          .body({ name: 'new name' })
+          .params({
+            uId: fakeUpdatee._id,
+          })
+          .path(`/user/${fakeUpdatee._id}/updateProfile`)
+          .build();
+        const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
+      } catch (err) {
+        expect(err.message).to.equal('Access denied.');
+      }
+    });
+    it("should edit the user, even if it's another user (editing as admin)", async () => {
+      const fakeUpdater = await fakeDbUserFactory.createFakeDbUser();
+      const fakeUpdatee = await fakeDbUserFactory.createFakeDbUser();
+      const editUserHttpRequest = iHttpRequestBuilder
+        .currentAPIUser({
+          userId: fakeUpdater._id,
+          role: 'admin',
+        })
+        .body({ name: 'new name' })
+        .params({
+          uId: fakeUpdatee._id,
+        })
+        .path(`/user/${fakeUpdatee._id}/updateProfile`)
+        .build();
+      const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
+      if ('user' in updateUserRes.body) {
+        expect(updateUserRes.statusCode).to.equal(200);
+        expect(updateUserRes.body.user.name).to.equal('new name');
       }
     });
   });

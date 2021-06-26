@@ -48,7 +48,7 @@ class IHttpRequestBuilder {
   };
 
   public build = (): IHttpRequest => {
-    const iHttpRequestData: IHttpRequest = {
+    const iHttpRequest: IHttpRequest = {
       body: this._body,
       path: this._path,
       query: this._query,
@@ -56,7 +56,7 @@ class IHttpRequestBuilder {
       currentAPIUser: this._currentAPIUser,
     };
     this._setDefaultProperties();
-    return iHttpRequestData;
+    return iHttpRequest;
   };
 }
 
