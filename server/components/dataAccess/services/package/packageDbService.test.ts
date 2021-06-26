@@ -31,15 +31,15 @@ describe('packageDbService', () => {
         accessOptions,
       });
       const findOnePackage = await packageDbService.findOne({
-        _id: fakePackages[0]._id,
+        searchQuery: { _id: fakePackages[0]._id },
         accessOptions,
       });
       const findPackages = await packageDbService.find({
         searchQuery: { hostedBy: fakeTeacher._id },
         accessOptions,
       });
-      expect(findByIdPackage).to.deep.equal(fakePackages[0]);
-      expect(findByIdPackage).to.deep.equal(findOnePackage);
+      expect(findByIdPackage._id.toString()).to.deep.equal(fakePackages[0]._id.toString());
+      expect(findByIdPackage._id.toString()).to.deep.equal(findOnePackage._id.toString());
       expect(findPackages).to.deep.equal(fakePackages);
     });
   });

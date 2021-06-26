@@ -12,6 +12,16 @@ before(async () => {
 });
 
 describe('fakeDbUserFactory', () => {
+  describe('createFakeDbData', () => {
+    it('should create a fake db user with the given properties', async () => {
+      const fakeDbUser = await fakeDbUserFactory.createFakeDbData({
+        name: 'test',
+        password: 'password',
+        email: 'test@email.com',
+      });
+      expect(fakeDbUser.name).to.equal('test');
+    });
+  });
   describe('createFakeDbUser', () => {
     it('should create a fake db user with a random name', async () => {
       const fakeDbUser = await fakeDbUserFactory.createFakeDbUser();

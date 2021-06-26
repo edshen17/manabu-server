@@ -29,13 +29,15 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEnt
   };
 
   protected _createFakeEntity = async (entityData?: {
+    name: string;
     email: string;
+    password: string;
   }): Promise<UserEntityResponse> => {
-    const { email } = entityData || {};
+    const { name, email, password } = entityData || {};
     const fakeUserEntity = this._entity.build({
-      name: this._faker.name.findName(),
+      name: name || this._faker.name.findName(),
       email: email || this._faker.internet.email(),
-      password: this._faker.internet.password(),
+      password: password || this._faker.internet.password(),
       profileImage: this._faker.image.imageUrl(),
     });
     return fakeUserEntity;

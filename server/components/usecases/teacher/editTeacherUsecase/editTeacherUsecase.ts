@@ -16,8 +16,8 @@ class EditTeacherUsecase
 
   protected _isValidRequest = (controllerData: ControllerData) => {
     const { body } = controllerData.routeData.body;
-    const { userId, _id } = body || {};
-    return !userId && !_id;
+    const { userId, _id, lessonCount, studentCount } = body || {};
+    return !userId && !_id && !lessonCount && !studentCount;
   };
 
   protected _makeRequestTemplate = async (

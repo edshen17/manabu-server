@@ -1,30 +1,74 @@
 import { expect } from 'chai';
-import { createUser } from '../../testFixtures/createUser';
-import { getUser } from '../../testFixtures/getUser';
+import { makeGetUserController } from '.';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
+import { GetUserController } from './getUserController';
 
-context('getUserController', () => {
+let fakeDbUserFactory: FakeDbUserFactory;
+let iHttpRequestBuilder: IHttpRequestBuilder;
+let getUserController: GetUserController;
+
+before(async () => {
+  fakeDbUserFactory = await makeFakeDbUserFactory;
+  iHttpRequestBuilder = makeIHttpRequestBuilder;
+  getUserController = await makeGetUserController;
+});
+
+describe('getUserController', () => {
   describe('makeRequest', () => {
     it('should get a fake user with correct properties (self)', async () => {
-      const viewer = await createUser();
-      if ('user' in viewer.body) {
-        const searchedUserRes = await getUser(viewer.body.user, viewer.body.user);
-        if ('user' in searchedUserRes!.body!) {
-          expect(searchedUserRes.body.user._id).to.equal(viewer.body.user._id);
-          expect(searchedUserRes.body.user).to.have.property('settings');
-          expect(searchedUserRes.body.user).to.not.have.property('password');
-        }
+      const fakeUser = await fakeDbUserFactory.createFakeDbUser();
+      const getUserHttpRequest = iHttpRequestBuilder
+        .currentAPIUser({
+          userId: fakeUser._id,
+          role: fakeUser.role,
+        })
+        .params({
+          uId: fakeUser._id,
+        })
+        .path('/self/me')
+        .build();
+      const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
+      if ('user' in getUserRes.body!) {
+        expect(getUserRes.statusCode).to.equal(200);
+        expect(getUserRes.body.user).to.have.property('settings');
+        expect(getUserRes.body.user).to.have.property('email');
       }
     });
     it('should get a fake user with correct properties (not self)', async () => {
-      const viewee = await createUser();
-      const viewer = await createUser();
-      if ('user' in viewee.body && 'user' in viewer.body) {
-        const searchedUserRes = await getUser(viewee.body.user, viewer.body.user);
-        if ('user' in searchedUserRes!.body!) {
-          expect(searchedUserRes.body.user._id).to.equal(viewee.body.user._id);
-          expect(searchedUserRes.body).to.not.have.property('settings');
-          expect(searchedUserRes.body).to.not.have.property('password');
-        }
+      const fakeUser = await fakeDbUserFactory.createFakeDbUser();
+      const fakeOtherUser = await fakeDbUserFactory.createFakeDbUser();
+      const getUserHttpRequest = iHttpRequestBuilder
+        .currentAPIUser({
+          userId: fakeUser._id,
+          role: fakeUser.role,
+        })
+        .params({
+          uId: fakeOtherUser._id,
+        })
+        .build();
+      const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
+      if ('user' in getUserRes.body!) {
+        expect(getUserRes.statusCode).to.equal(200);
+        expect(getUserRes.body.user).to.not.have.property('settings');
+        expect(getUserRes.body.user).to.not.have.property('email');
+      }
+    });
+    it('should throw an error if no user is found', async () => {
+      const getUserHttpRequest = iHttpRequestBuilder
+        .currentAPIUser({
+          userId: undefined,
+          role: 'user',
+        })
+        .params({
+          uId: undefined,
+        })
+        .build();
+      const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
+      if ('user' in getUserRes.body!) {
+        expect(getUserRes.statusCode).to.equal(404);
       }
     });
   });
