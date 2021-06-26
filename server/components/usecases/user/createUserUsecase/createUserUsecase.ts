@@ -14,7 +14,7 @@ import { makePackageEntity } from '../../../entities/package';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
 import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
 import { makeTeacherEntity } from '../../../entities/teacher';
-import { EmailHandler } from '../../../utils/emailHandler/emailHandler';
+import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { ControllerData, IUsecase } from '../../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';

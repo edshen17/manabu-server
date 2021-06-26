@@ -1,4 +1,4 @@
-import { DefaultSelectOptions } from './CommonDbOperations';
+import { DefaultSelectOptions } from './AbstractDbOperations';
 
 type AccessOptions = {
   isProtectedResource: boolean;

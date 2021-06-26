@@ -1,5 +1,5 @@
 import { IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
+import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 
 class MinuteBankDbService

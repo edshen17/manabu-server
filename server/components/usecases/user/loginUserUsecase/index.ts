@@ -1,6 +1,6 @@
 import { google } from 'googleapis';
 import { makeUserDbService } from '../../../dataAccess/services/user';
-import { makeRedirectPathBuilder } from '../../../utils/redirectPathBuilder';
+import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
 import { makeCreateUserUsecase } from '../createUserUsecase';
 import { LoginUserUsecase } from './loginUserUsecase';
 

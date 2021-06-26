@@ -1,5 +1,5 @@
 import { AccessOptions, DbParams, IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
+import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
 import { TeacherDbService } from '../teacher/teacherDbService';
 import { PackageDbService } from '../package/packageDbService';
 import { UserDoc } from '../../../../models/User';

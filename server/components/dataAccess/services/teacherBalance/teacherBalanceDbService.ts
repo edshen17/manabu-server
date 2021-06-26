@@ -1,5 +1,5 @@
 import { IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/CommonDbOperations';
+import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 
 class TeacherBalanceDbService
