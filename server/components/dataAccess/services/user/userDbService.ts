@@ -24,6 +24,7 @@ class UserDbService
         password: 0,
         verificationToken: 0,
         settings: 0,
+        commMethods: 0,
       },
       adminSettings: {
         password: 0,

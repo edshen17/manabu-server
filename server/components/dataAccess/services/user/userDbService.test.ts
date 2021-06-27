@@ -70,6 +70,7 @@ context('userDbService', () => {
         expect(searchUser).to.not.have.property('settings');
         expect(searchUser).to.not.have.property('teacherData');
         expect(searchUser).to.not.have.property('teacherAppPending');
+        expect(searchUser).to.not.have.property('commMethods');
       } catch (err) {
         throw err;
       }
@@ -87,6 +88,7 @@ context('userDbService', () => {
         expect(searchUser.teacherData).to.have.property('licensePath');
         expect(searchUser).to.have.property('email');
         expect(searchUser).to.have.property('settings');
+        expect(searchUser).to.have.property('commMethods');
       } catch (err) {
         throw err;
       }
@@ -106,6 +108,7 @@ context('userDbService', () => {
         expect(searchUser.teacherData).to.have.property('licensePath');
         expect(searchUser).to.have.property('email');
         expect(searchUser).to.have.property('settings');
+        expect(searchUser).to.have.property('commMethods');
       } catch (err) {
         throw err;
       }
@@ -126,6 +129,7 @@ context('userDbService', () => {
         expect(searchUser.teacherData).to.have.property('licensePath');
         expect(searchUser).to.have.property('email');
         expect(searchUser).to.have.property('settings');
+        expect(searchUser).to.have.property('commMethods');
       } catch (err) {
         throw err;
       }
