@@ -14,7 +14,6 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
 
   protected _isCurrentAPIUserPermitted = (props: {
     params: any;
-    query?: any;
     currentAPIUser: any;
     endpointPath: string;
   }): boolean => {

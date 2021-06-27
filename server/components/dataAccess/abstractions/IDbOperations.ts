@@ -9,7 +9,7 @@ type AccessOptions = {
 };
 
 type DbParams = {
-  _id?: any;
+  _id?: string;
   searchQuery?: {};
   accessOptions: AccessOptions;
   modelToInsert?: {};

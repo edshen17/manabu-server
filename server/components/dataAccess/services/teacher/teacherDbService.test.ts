@@ -51,7 +51,7 @@ describe('teacherDbService', () => {
       accessOptions.isSelf = true;
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
       const findByIdTeacher = await teacherDbService.findById({
-        _id: newTeacher.userId,
+        _id: newTeacher.userId.toString(),
         accessOptions,
       });
       expect(findByIdTeacher).to.have.property('licensePath');
@@ -60,7 +60,7 @@ describe('teacherDbService', () => {
       accessOptions.currentAPIUserRole = 'admin';
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
       const findByIdTeacher = await teacherDbService.findById({
-        _id: newTeacher.userId,
+        _id: newTeacher.userId.toString(),
         accessOptions,
       });
       expect(findByIdTeacher).to.have.property('licensePath');
