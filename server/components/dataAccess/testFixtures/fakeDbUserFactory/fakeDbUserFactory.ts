@@ -39,6 +39,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEnt
       email: email || this._faker.internet.email(),
       password: password || this._faker.internet.password(),
       profileImage: this._faker.image.imageUrl(),
+      commMethods: [{ method: 'LINE', id: this._faker.internet.userName() }],
     });
     return fakeUserEntity;
   };

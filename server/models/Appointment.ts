@@ -9,16 +9,16 @@ const AppointmentSchema = createSchema({
     'PackageTransaction',
     PackageTransactionSchema
   ),
-  from: Type.string({ required: true }),
-  to: Type.string({ required: true }),
+  from: Type.date({ required: true }),
+  to: Type.date({ required: true }),
   isPast: Type.boolean({ required: true }),
   status: Type.string({
     required: true,
     enum: ['confirmed', 'pending', 'cancelled'],
   }),
-  cancellationReason: Type.string({ required: true }),
+  cancellationReason: Type.string({ required: false }),
   packageTransactionData: Type.object({ required: true }).of({}),
-  location: Type.object({ required: true }).of({}),
+  locationData: Type.object({ required: true }).of({}),
 });
 
 const Appointment = typedModel('Appointment', AppointmentSchema);

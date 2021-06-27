@@ -1,6 +1,8 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
+type TeacherEntityParams = { userId: string };
+
 type TeacherEntityResponse = {
   userId: string;
   teachingLanguages: { language: string; level: string }[];
@@ -19,7 +21,7 @@ class TeacherEntity
   extends AbstractEntity<TeacherEntityResponse>
   implements IEntity<TeacherEntityResponse>
 {
-  public build = (entityData: { userId: string }): TeacherEntityResponse => {
+  public build = (entityData: TeacherEntityParams): TeacherEntityResponse => {
     const teacherEntity = this._buildTeacherEntity(entityData);
     return teacherEntity;
   };

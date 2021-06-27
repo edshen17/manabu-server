@@ -1,11 +1,12 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-type UserEntityData = {
+type UserEntityParams = {
   name: string;
   email: string;
   password?: string;
   profileImage?: string;
+  commMethods?: { method: string; id: string }[];
 };
 
 type UserEntityResponse =
@@ -36,7 +37,7 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
   private _passwordHasher!: any;
   private _randTokenGenerator!: any;
 
-  public build = (userEntityData: UserEntityData): UserEntityResponse => {
+  public build = (userEntityData: UserEntityParams): UserEntityResponse => {
     try {
       this._validateUserInput(userEntityData);
       const newUserEntity = this._buildUserEntity(userEntityData);
@@ -46,7 +47,7 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     }
   };
 
-  private _validateUserInput = (userEntityData: UserEntityData): void => {
+  private _validateUserInput = (userEntityData: UserEntityParams): void => {
     const { name, email, password, profileImage } = userEntityData;
     if (!this._inputValidator.isValidName(name)) {
       throw new Error('User must have a valid name.');
@@ -61,8 +62,8 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     }
   };
 
-  private _buildUserEntity = (userEntityData: UserEntityData): UserEntityResponse => {
-    const { name, email, password, profileImage } = userEntityData || {};
+  private _buildUserEntity = (userEntityData: UserEntityParams): UserEntityResponse => {
+    const { name, email, password, profileImage, commMethods } = userEntityData || {};
     return Object.freeze({
       name,
       email,
@@ -78,7 +79,7 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
       role: 'user',
       settings: { currency: 'SGD' },
       membership: [],
-      commMethods: [],
+      commMethods: commMethods || [],
       emailVerified: false,
       verificationToken: this._generateVerificationToken(name, email),
     });

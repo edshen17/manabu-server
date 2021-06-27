@@ -12,14 +12,22 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
   protected _createFakeEntity = async (
     entityData: any
   ): Promise<PackageTransactionEntityResponse> => {
+    const {
+      hostedBy,
+      reservedBy,
+      packageId,
+      reservationLength,
+      remainingAppointments,
+      transactionDetails,
+    } = entityData || {};
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
     const fakePackageTransaction = await this._entity.build({
-      hostedBy: fakeTeacher._id,
-      reservedBy: fakeTeacher._id,
-      packageId: fakeTeacher.teacherData.packages[0]._id,
-      reservationLength: 60,
-      remainingAppointments: 5,
-      transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+      hostedBy: hostedBy || fakeTeacher._id,
+      reservedBy: reservedBy || fakeTeacher._id,
+      packageId: packageId || fakeTeacher.teacherData.packages[0]._id,
+      reservationLength: reservationLength || 60,
+      remainingAppointments: remainingAppointments || 5,
+      transactionDetails: transactionDetails || { currency: 'SGD', subTotal: 0, total: 0 },
     });
     return fakePackageTransaction;
   };

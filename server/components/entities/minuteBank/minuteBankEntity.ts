@@ -2,7 +2,7 @@ import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/use
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-type MinuteBankEntityData = {
+type MinuteBankEntityParams = {
   hostedBy: string;
   reservedBy: string;
   minuteBank?: number;
@@ -24,14 +24,14 @@ class MinuteBankEntity
   private _userDbService!: UserDbService;
 
   public build = async (
-    minuteBankData: MinuteBankEntityData
+    minuteBankData: MinuteBankEntityParams
   ): Promise<MinuteBankEntityResponse> => {
     const minuteBank = this._buildMinuteBankEntity(minuteBankData);
     return minuteBank;
   };
 
   private _buildMinuteBankEntity = async (
-    minuteBankData: MinuteBankEntityData
+    minuteBankData: MinuteBankEntityParams
   ): Promise<MinuteBankEntityResponse> => {
     const { hostedBy, reservedBy, minuteBank } = minuteBankData;
     return Object.freeze({

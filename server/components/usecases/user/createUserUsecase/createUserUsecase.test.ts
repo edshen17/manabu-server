@@ -18,7 +18,11 @@ before(async () => {
 beforeEach(async () => {
   defaultRouteData = {
     params: {},
-    body: { name: faker.name.findName(), email: faker.internet.email() },
+    body: {
+      name: faker.name.findName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+    },
     query: {},
   };
 });

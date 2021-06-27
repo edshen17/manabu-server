@@ -3,18 +3,20 @@ import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserF
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 
 import { makeMinuteBankEntity } from './index';
+import { MinuteBankEntity } from './minuteBankEntity';
 
 let fakeDbUserFactory: FakeDbUserFactory;
+let minuteBankEntity: MinuteBankEntity;
 
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
+  minuteBankEntity = await makeMinuteBankEntity;
 });
 
-context('minuteBank entity', () => {
+describe('minuteBank entity', () => {
   describe('build', () => {
     describe('given valid inputs', () => {
       it('should return given inputs', async () => {
-        const minuteBankEntity = await makeMinuteBankEntity;
         const fakeHostedBy = await fakeDbUserFactory.createFakeDbUser();
         const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
         const testMinuteBank = await minuteBankEntity.build({

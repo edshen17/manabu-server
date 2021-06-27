@@ -2,7 +2,7 @@ import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/use
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-type PackageEntityData = {
+type PackageEntityParams = {
   hostedBy: string;
   priceDetails?: { hourlyPrice: number; currency: string };
   lessonAmount: number;
@@ -26,13 +26,13 @@ class PackageEntity
 {
   private _userDbService!: UserDbService;
 
-  public build = async (packageEntityData: PackageEntityData): Promise<PackageEntityResponse> => {
+  public build = async (packageEntityData: PackageEntityParams): Promise<PackageEntityResponse> => {
     const packageEntity = await this._buildPackageEntity(packageEntityData);
     return packageEntity;
   };
 
   private _buildPackageEntity = async (
-    packageEntityData: PackageEntityData
+    packageEntityData: PackageEntityParams
   ): Promise<PackageEntityResponse> => {
     const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
       packageEntityData;
@@ -67,4 +67,4 @@ class PackageEntity
   };
 }
 
-export { PackageEntity, PackageEntityResponse, PackageEntityData };
+export { PackageEntity, PackageEntityResponse, PackageEntityParams as PackageEntityData };

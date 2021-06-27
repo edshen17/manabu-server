@@ -3,9 +3,8 @@ import { UserSchema } from './User';
 
 const AvailableTimeSchema = createSchema({
   hostedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  from: Type.string({ required: true }),
-  to: Type.string({ required: true }),
-  hostedByData: Type.object({ required: true }).of({}),
+  to: Type.date({ required: true }),
+  from: Type.date({ required: true }),
 });
 
 const AvailableTime = typedModel('AvailableTime', AvailableTimeSchema);

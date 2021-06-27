@@ -4,7 +4,7 @@ import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/use
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { IEntity } from '../abstractions/IEntity';
 
-type PackageTransactionEntityData = {
+type PackageTransactionEntityParams = {
   hostedBy: string;
   reservedBy: string;
   packageId: string;
@@ -48,14 +48,14 @@ class PackageTransactionEntity
   private _dayjs!: any;
 
   public build = async (
-    packageEntityData: PackageTransactionEntityData
+    packageEntityData: PackageTransactionEntityParams
   ): Promise<PackageTransactionEntityResponse> => {
     const packageEntity = await this._buildPackageTransactionEntity(packageEntityData);
     return packageEntity;
   };
 
   private _buildPackageTransactionEntity = async (
-    packageEntityData: PackageTransactionEntityData
+    packageEntityData: PackageTransactionEntityParams
   ): Promise<PackageTransactionEntityResponse> => {
     const {
       hostedBy,
