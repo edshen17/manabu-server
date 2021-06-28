@@ -4,7 +4,7 @@ import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFac
 import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 
 type FakeDbAppointmentFactoryInitParams = {
-  makeFakeDbPackageTransactionFactory: any;
+  makeFakeDbPackageTransactionFactory: Promise<FakeDbPackageTransactionFactory>;
 };
 
 type FakeAppointmentEntityParams = {

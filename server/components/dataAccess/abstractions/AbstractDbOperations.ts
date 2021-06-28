@@ -12,7 +12,10 @@ abstract class CommonDbOperations<DbDoc> implements IDbOperations<DbDoc> {
   protected _cloneDeep!: any;
   protected _defaultSelectOptions!: DefaultSelectOptions;
 
-  public findOne = async (params: DbParams): Promise<DbDoc> => {
+  public findOne = async (params: {
+    searchQuery?: {};
+    accessOptions: AccessOptions;
+  }): Promise<DbDoc> => {
     const { searchQuery, accessOptions } = params;
     const selectOptions = this._configureSelectOptions(accessOptions);
     const asyncCallback = this._dbModel.findOne(searchQuery, selectOptions).lean();
