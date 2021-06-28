@@ -27,4 +27,4 @@ class TeacherBalanceEntity
   }
 }
 
-export { TeacherBalanceEntity, TeacherBalanceEntityResponse };
+export { TeacherBalanceEntity, TeacherBalanceEntityParams, TeacherBalanceEntityResponse };

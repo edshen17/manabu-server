@@ -3,17 +3,27 @@ import { MinuteBankEntityResponse } from '../../../entities/minuteBank/minuteBan
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
+type FakeDbMinuteBankFactoryInitParams = {
+  makeFakeDbUserFactory: any;
+};
+
+type FakeMinuteBankEntityParams = {
+  hostedBy?: string;
+  reservedBy?: string;
+  minuteBank?: number;
+};
+
 class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
-  MinuteBankDoc,
-  MinuteBankEntityResponse
+  FakeDbMinuteBankFactoryInitParams,
+  FakeMinuteBankEntityParams,
+  MinuteBankEntityResponse,
+  MinuteBankDoc
 > {
   private _fakeUserDbFactory!: FakeDbUserFactory;
 
-  protected _createFakeEntity = async (entityData?: {
-    hostedBy: any;
-    reservedBy: any;
-    minuteBank: number;
-  }): Promise<MinuteBankEntityResponse> => {
+  protected _createFakeEntity = async (
+    entityData?: FakeMinuteBankEntityParams
+  ): Promise<MinuteBankEntityResponse> => {
     let { hostedBy, reservedBy, minuteBank } = entityData || {};
     if (!hostedBy) {
       const hostedByData = await this._fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();

@@ -9,11 +9,12 @@ abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse>
     currentAPIUserRole: 'user',
   };
 
-  public getDbDataById = async (
-    dbService: IDbOperations<any>,
-    _id: string,
-    overideAccessOptions?: AccessOptions
-  ): Promise<any> => {
+  public getDbDataById = async (props: {
+    dbService: IDbOperations<any>;
+    _id: string;
+    overideAccessOptions?: AccessOptions;
+  }): Promise<any> => {
+    const { dbService, _id, overideAccessOptions } = props;
     const accessOptions = overideAccessOptions || this._defaultAccessOptions;
     const dbData = await dbService.findById({ _id, accessOptions });
     return dbData;

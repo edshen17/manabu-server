@@ -83,9 +83,12 @@ class PackageTransactionEntity
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
       paymentMethodData: paymentMethodData || {},
-      packageData: (await this.getDbDataById(this._packageDbService, packageId)) || {},
-      hostedByData: (await this.getDbDataById(this._userDbService, hostedBy)) || {},
-      reservedByData: (await this.getDbDataById(this._userDbService, reservedBy)) || {},
+      packageData:
+        (await this.getDbDataById({ dbService: this._packageDbService, _id: packageId })) || {},
+      hostedByData:
+        (await this.getDbDataById({ dbService: this._userDbService, _id: hostedBy })) || {},
+      reservedByData:
+        (await this.getDbDataById({ dbService: this._userDbService, _id: reservedBy })) || {},
     });
   };
 
@@ -102,4 +105,8 @@ class PackageTransactionEntity
   };
 }
 
-export { PackageTransactionEntity, PackageTransactionEntityResponse };
+export {
+  PackageTransactionEntity,
+  PackageTransactionEntityParams,
+  PackageTransactionEntityResponse,
+};

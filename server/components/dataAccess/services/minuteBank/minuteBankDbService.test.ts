@@ -18,7 +18,7 @@ beforeEach(() => {
   accessOptions = fakeDbMinuteBankFactory.getDefaultAccessOptions();
 });
 
-context('minuteBankDbService', () => {
+describe('minuteBankDbService', () => {
   describe('findById, findOne, find', () => {
     it('should find the correct minuteBank with a restricted view on user data (user, not self)', async () => {
       const newMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({ minuteBank: 0 });

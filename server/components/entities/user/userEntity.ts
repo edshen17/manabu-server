@@ -112,4 +112,4 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
   };
 }
 
-export { UserEntity, UserEntityResponse };
+export { UserEntity, UserEntityParams, UserEntityResponse };

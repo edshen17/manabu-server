@@ -3,14 +3,29 @@ import { PackageTransactionEntityResponse } from '../../../entities/packageTrans
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
+type FakeDbPackageTransactionFactoryInitParams = {
+  makeFakeDbUserFactory: any;
+};
+
+type FakePackageEntityParams = {
+  hostedBy?: string;
+  reservedBy?: string;
+  packageId?: string;
+  reservationLength?: number;
+  remainingAppointments?: number;
+  transactionDetails?: { currency: string; subTotal: number; total: number };
+};
+
 class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
-  PackageTransactionDoc,
-  PackageTransactionEntityResponse
+  FakeDbPackageTransactionFactoryInitParams,
+  FakePackageEntityParams,
+  PackageTransactionEntityResponse,
+  PackageTransactionDoc
 > {
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (
-    entityData: any
+    entityData?: FakePackageEntityParams
   ): Promise<PackageTransactionEntityResponse> => {
     const {
       hostedBy,
@@ -32,7 +47,7 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
     return fakePackageTransaction;
   };
 
-  protected _initTemplate = async (props: any) => {
+  protected _initTemplate = async (props: FakeDbPackageTransactionFactoryInitParams) => {
     const { makeFakeDbUserFactory } = props;
     this._fakeDbUserFactory = await makeFakeDbUserFactory;
   };

@@ -4,7 +4,24 @@ import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFac
 import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFactory';
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
-class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEntityResponse> {
+type FakeDbUserFactoryInitParams = {
+  faker: any;
+  makeFakeDbTeacherFactory: Promise<FakeDbTeacherFactory>;
+  makeFakeDbPackageFactory: Promise<FakeDbPackageFactory>;
+};
+
+type FakeUserEntityParams = {
+  name?: string;
+  email?: string;
+  password?: string;
+};
+
+class FakeDbUserFactory extends AbstractFakeDbDataFactory<
+  FakeDbUserFactoryInitParams,
+  FakeUserEntityParams,
+  UserEntityResponse,
+  JoinedUserDoc
+> {
   private _faker!: any;
   private _fakeDbTeacherFactory!: FakeDbTeacherFactory;
   private _fakeDbPackageFactory!: FakeDbPackageFactory;
@@ -24,15 +41,13 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<JoinedUserDoc, UserEnt
     });
   };
 
-  public createFakeDbUser = async (entityData?: { email: string }): Promise<JoinedUserDoc> => {
+  public createFakeDbUser = async (entityData?: FakeUserEntityParams): Promise<JoinedUserDoc> => {
     return await this.createFakeDbData(entityData);
   };
 
-  protected _createFakeEntity = async (entityData?: {
-    name: string;
-    email: string;
-    password: string;
-  }): Promise<UserEntityResponse> => {
+  protected _createFakeEntity = async (
+    entityData?: FakeUserEntityParams
+  ): Promise<UserEntityResponse> => {
     const { name, email, password } = entityData || {};
     const fakeUserEntity = this._entity.build({
       name: name || this._faker.name.findName(),

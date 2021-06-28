@@ -34,7 +34,6 @@ describe('fakeDbPackageFactory', () => {
       const fakePackage = await fakeDbPackageFactory.createFakeDbData({
         hostedBy: fakeTeacher._id,
         lessonAmount: 5,
-        isOffering: true,
         packageType: 'light',
       });
       expect(fakePackage.packageType).to.equal('light');

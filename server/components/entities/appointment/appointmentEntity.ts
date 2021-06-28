@@ -88,22 +88,22 @@ class AppointmentEntity
     packageTransactionId: string;
   }) => {
     const { hostedBy, reservedBy, packageTransactionId } = props;
-    const overrideHostedByData = await this.getDbDataById(
-      this._userDbService,
-      hostedBy,
-      this._defaultAccessOptions
-    );
-    const overrideReservedByData = await this.getDbDataById(
-      this._userDbService,
-      reservedBy,
-      this._defaultAccessOptions
-    );
+    const overrideHostedByData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: hostedBy,
+      overideAccessOptions: this._defaultAccessOptions,
+    });
+    const overrideReservedByData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: reservedBy,
+      overideAccessOptions: this._defaultAccessOptions,
+    });
     const hostedByData = this._getRestrictedUserData(overrideHostedByData);
     const reservedByData = this._getRestrictedUserData(overrideReservedByData);
-    const packageTransactionData = await this.getDbDataById(
-      this._packageTransactionDbService,
-      packageTransactionId
-    );
+    const packageTransactionData = await this.getDbDataById({
+      dbService: this._packageTransactionDbService,
+      _id: packageTransactionId,
+    });
     const locationData = this._getLocationData(overrideHostedByData, overrideReservedByData);
     const dataDependencies = {
       hostedByData,
@@ -161,4 +161,4 @@ class AppointmentEntity
   };
 }
 
-export { AppointmentEntity };
+export { AppointmentEntity, AppointmentEntityParams, AppointmentEntityResponse };

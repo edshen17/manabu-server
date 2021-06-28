@@ -44,4 +44,4 @@ class TeacherEntity
   };
 }
 
-export { TeacherEntity, TeacherEntityResponse };
+export { TeacherEntity, TeacherEntityParams, TeacherEntityResponse };

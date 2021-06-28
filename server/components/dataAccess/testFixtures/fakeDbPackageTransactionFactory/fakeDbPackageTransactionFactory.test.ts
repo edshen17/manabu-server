@@ -1,17 +1,31 @@
 import { expect } from 'chai';
 import { makeFakeDbPackageTransactionFactory } from '.';
+import { makeFakeDbUserFactory } from '../fakeDbUserFactory';
+import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 import { FakeDbPackageTransactionFactory } from './fakeDbPackageTransactionFactory';
 
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
+let fakeDbUserFactory: FakeDbUserFactory;
 
 before(async () => {
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
 });
 
 describe('fakeDbPackageTransaction', () => {
   describe('createFakeDbData', () => {
     it('should create a fake package transaction using data from a fake teacher', async () => {
       const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+      expect(fakePackageTransaction._id.toString().length).to.equal(24);
+    });
+    it('should create a fake package transaction using data from the given fake users', async () => {
+      const fakeUser = await fakeDbUserFactory.createFakeDbUser();
+      const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+      const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
+        hostedBy: fakeTeacher._id,
+        reservedBy: fakeUser._id,
+        packageId: fakeTeacher.teacherData.packages[0]._id,
+      });
       expect(fakePackageTransaction._id.toString().length).to.equal(24);
     });
   });

@@ -47,7 +47,10 @@ class PackageEntity
   };
 
   private _getPriceDetails = async (hostedBy: string) => {
-    const savedDbTeacher: JoinedUserDoc = await this.getDbDataById(this._userDbService, hostedBy);
+    const savedDbTeacher: JoinedUserDoc = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: hostedBy,
+    });
     if (savedDbTeacher.teacherData) {
       const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
       const priceDetails = {
@@ -67,4 +70,4 @@ class PackageEntity
   };
 }
 
-export { PackageEntity, PackageEntityResponse, PackageEntityParams as PackageEntityData };
+export { PackageEntity, PackageEntityResponse, PackageEntityParams };

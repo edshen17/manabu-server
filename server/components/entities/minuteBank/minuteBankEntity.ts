@@ -38,8 +38,10 @@ class MinuteBankEntity
       hostedBy,
       reservedBy,
       minuteBank: minuteBank || 0,
-      hostedByData: (await this.getDbDataById(this._userDbService, hostedBy)) || {},
-      reservedByData: (await this.getDbDataById(this._userDbService, reservedBy)) || {},
+      hostedByData:
+        (await this.getDbDataById({ dbService: this._userDbService, _id: hostedBy })) || {},
+      reservedByData:
+        (await this.getDbDataById({ dbService: this._userDbService, _id: reservedBy })) || {},
       lastUpdated: new Date(),
     });
   };
@@ -51,4 +53,4 @@ class MinuteBankEntity
   };
 }
 
-export { MinuteBankEntity, MinuteBankEntityResponse };
+export { MinuteBankEntity, MinuteBankEntityParams, MinuteBankEntityResponse };
