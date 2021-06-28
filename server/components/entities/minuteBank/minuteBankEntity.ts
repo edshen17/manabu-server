@@ -1,14 +1,17 @@
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type MinuteBankEntityParams = {
+type MinuteBankEntityInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+};
+
+type MinuteBankEntityBuildParams = {
   hostedBy: string;
   reservedBy: string;
   minuteBank?: number;
 };
 
-type MinuteBankEntityResponse = {
+type MinuteBankEntityBuildResponse = {
   hostedBy: string;
   reservedBy: string;
   minuteBank: number;
@@ -17,24 +20,25 @@ type MinuteBankEntityResponse = {
   lastUpdated: Date;
 };
 
-class MinuteBankEntity
-  extends AbstractEntity<MinuteBankEntityResponse>
-  implements IEntity<MinuteBankEntityResponse>
-{
+class MinuteBankEntity extends AbstractEntity<
+  MinuteBankEntityInitParams,
+  MinuteBankEntityBuildParams,
+  MinuteBankEntityBuildResponse
+> {
   private _userDbService!: UserDbService;
 
   public build = async (
-    minuteBankData: MinuteBankEntityParams
-  ): Promise<MinuteBankEntityResponse> => {
-    const minuteBank = this._buildMinuteBankEntity(minuteBankData);
-    return minuteBank;
+    entityParams: MinuteBankEntityBuildParams
+  ): Promise<MinuteBankEntityBuildResponse> => {
+    const minuteBankEntity = this._buildMinuteBankEntity(entityParams);
+    return minuteBankEntity;
   };
 
   private _buildMinuteBankEntity = async (
-    minuteBankData: MinuteBankEntityParams
-  ): Promise<MinuteBankEntityResponse> => {
-    const { hostedBy, reservedBy, minuteBank } = minuteBankData;
-    return Object.freeze({
+    entityParams: MinuteBankEntityBuildParams
+  ): Promise<MinuteBankEntityBuildResponse> => {
+    const { hostedBy, reservedBy, minuteBank } = entityParams;
+    const minuteBankEntity = Object.freeze({
       hostedBy,
       reservedBy,
       minuteBank: minuteBank || 0,
@@ -44,13 +48,16 @@ class MinuteBankEntity
         (await this.getDbDataById({ dbService: this._userDbService, _id: reservedBy })) || {},
       lastUpdated: new Date(),
     });
+    return minuteBankEntity;
   };
 
-  public init = async (props: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
-    const { makeUserDbService } = props;
+  public init = async (initParams: {
+    makeUserDbService: Promise<UserDbService>;
+  }): Promise<this> => {
+    const { makeUserDbService } = initParams;
     this._userDbService = await makeUserDbService;
     return this;
   };
 }
 
-export { MinuteBankEntity, MinuteBankEntityParams, MinuteBankEntityResponse };
+export { MinuteBankEntity, MinuteBankEntityBuildParams, MinuteBankEntityBuildResponse };

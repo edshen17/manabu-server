@@ -1,7 +1,13 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type UserEntityParams = {
+type UserEntityInitParams = {
+  sanitize: any;
+  inputValidator: any;
+  passwordHasher: any;
+  randTokenGenerator: any;
+};
+
+type UserEntityBuildParams = {
   name: string;
   email: string;
   password?: string;
@@ -9,7 +15,7 @@ type UserEntityParams = {
   commMethods?: { method: string; id: string }[];
 };
 
-type UserEntityResponse =
+type UserEntityBuildResponse =
   | {
       name: string;
       email: string;
@@ -31,24 +37,28 @@ type UserEntityResponse =
     }
   | Error;
 
-class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<UserEntityResponse> {
+class UserEntity extends AbstractEntity<
+  UserEntityInitParams,
+  UserEntityBuildParams,
+  UserEntityBuildResponse
+> {
   private _sanitize!: any;
   private _inputValidator!: any;
   private _passwordHasher!: any;
   private _randTokenGenerator!: any;
 
-  public build = (userEntityData: UserEntityParams): UserEntityResponse => {
+  public build = (entityParams: UserEntityBuildParams): UserEntityBuildResponse => {
     try {
-      this._validateUserInput(userEntityData);
-      const newUserEntity = this._buildUserEntity(userEntityData);
-      return newUserEntity;
+      this._validateUserInput(entityParams);
+      const userEntity = this._buildUserEntity(entityParams);
+      return userEntity;
     } catch (err) {
       throw err;
     }
   };
 
-  private _validateUserInput = (userEntityData: UserEntityParams): void => {
-    const { name, email, password, profileImage } = userEntityData;
+  private _validateUserInput = (entityParams: UserEntityBuildParams): void => {
+    const { name, email, password, profileImage } = entityParams;
     if (!this._inputValidator.isValidName(name)) {
       throw new Error('User must have a valid name.');
     }
@@ -62,9 +72,9 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     }
   };
 
-  private _buildUserEntity = (userEntityData: UserEntityParams): UserEntityResponse => {
-    const { name, email, password, profileImage, commMethods } = userEntityData || {};
-    return Object.freeze({
+  private _buildUserEntity = (entityParams: UserEntityBuildParams): UserEntityBuildResponse => {
+    const { name, email, password, profileImage, commMethods } = entityParams || {};
+    const userEntity = Object.freeze({
       name,
       email,
       password: this._encryptPassword(password),
@@ -83,6 +93,7 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
       emailVerified: false,
       verificationToken: this._generateVerificationToken(name, email),
     });
+    return userEntity;
   };
 
   private _encryptPassword = (password?: string): string | undefined => {
@@ -97,13 +108,8 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
     return this._randTokenGenerator(name, email);
   };
 
-  public init = (props: {
-    sanitize: any;
-    inputValidator: any;
-    passwordHasher: any;
-    randTokenGenerator: any;
-  }) => {
-    const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = props;
+  public init = (initParams: UserEntityInitParams) => {
+    const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = initParams;
     this._sanitize = sanitize;
     this._inputValidator = inputValidator;
     this._passwordHasher = passwordHasher;
@@ -112,4 +118,4 @@ class UserEntity extends AbstractEntity<UserEntityResponse> implements IEntity<U
   };
 }
 
-export { UserEntity, UserEntityParams, UserEntityResponse };
+export { UserEntity, UserEntityBuildParams, UserEntityBuildResponse };

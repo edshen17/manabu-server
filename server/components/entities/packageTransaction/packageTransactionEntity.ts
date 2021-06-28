@@ -2,9 +2,14 @@ import { PackageDoc } from '../../../models/Package';
 import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type PackageTransactionEntityParams = {
+type PackageTransactionEntityInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makePackageDbService: Promise<PackageDbService>;
+  dayjs: any;
+};
+
+type PackageTransactionEntityBuildParams = {
   hostedBy: string;
   reservedBy: string;
   packageId: string;
@@ -20,7 +25,7 @@ type PackageTransactionEntityParams = {
   paymentMethodData?: { method: string; paymentId?: string };
 };
 
-type PackageTransactionEntityResponse = {
+type PackageTransactionEntityBuildResponse = {
   hostedBy: string;
   reservedBy: string;
   packageId: string;
@@ -39,24 +44,25 @@ type PackageTransactionEntityResponse = {
   reservedByData: JoinedUserDoc;
 };
 
-class PackageTransactionEntity
-  extends AbstractEntity<PackageTransactionEntityResponse>
-  implements IEntity<PackageTransactionEntityResponse>
-{
+class PackageTransactionEntity extends AbstractEntity<
+  PackageTransactionEntityInitParams,
+  PackageTransactionEntityBuildParams,
+  PackageTransactionEntityBuildResponse
+> {
   private _userDbService!: UserDbService;
   private _packageDbService!: PackageDbService;
   private _dayjs!: any;
 
   public build = async (
-    packageEntityData: PackageTransactionEntityParams
-  ): Promise<PackageTransactionEntityResponse> => {
-    const packageEntity = await this._buildPackageTransactionEntity(packageEntityData);
-    return packageEntity;
+    entityParams: PackageTransactionEntityBuildParams
+  ): Promise<PackageTransactionEntityBuildResponse> => {
+    const packageTransactionEntity = await this._buildPackageTransactionEntity(entityParams);
+    return packageTransactionEntity;
   };
 
   private _buildPackageTransactionEntity = async (
-    packageEntityData: PackageTransactionEntityParams
-  ): Promise<PackageTransactionEntityResponse> => {
+    entityParams: PackageTransactionEntityBuildParams
+  ): Promise<PackageTransactionEntityBuildResponse> => {
     const {
       hostedBy,
       reservedBy,
@@ -68,8 +74,8 @@ class PackageTransactionEntity
       lessonLanguage,
       isSubscription,
       paymentMethodData,
-    } = packageEntityData;
-    return Object.freeze({
+    } = entityParams;
+    const packageTransactionEntity = Object.freeze({
       hostedBy,
       reservedBy,
       packageId,
@@ -90,14 +96,11 @@ class PackageTransactionEntity
       reservedByData:
         (await this.getDbDataById({ dbService: this._userDbService, _id: reservedBy })) || {},
     });
+    return packageTransactionEntity;
   };
 
-  public init = async (props: {
-    makeUserDbService: Promise<UserDbService>;
-    makePackageDbService: Promise<PackageDbService>;
-    dayjs: any;
-  }): Promise<this> => {
-    const { makeUserDbService, makePackageDbService, dayjs } = props;
+  public init = async (initParams: PackageTransactionEntityInitParams): Promise<this> => {
+    const { makeUserDbService, makePackageDbService, dayjs } = initParams;
     this._userDbService = await makeUserDbService;
     this._packageDbService = await makePackageDbService;
     this._dayjs = dayjs;
@@ -107,6 +110,6 @@ class PackageTransactionEntity
 
 export {
   PackageTransactionEntity,
-  PackageTransactionEntityParams,
-  PackageTransactionEntityResponse,
+  PackageTransactionEntityBuildParams,
+  PackageTransactionEntityBuildResponse,
 };

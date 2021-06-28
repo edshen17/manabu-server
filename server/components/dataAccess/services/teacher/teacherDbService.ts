@@ -14,8 +14,8 @@ class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOper
     };
   }
 
-  public findById = async (params: DbParams): Promise<TeacherDoc> => {
-    const { _id, accessOptions } = params;
+  public findById = async (dbParams: DbParams): Promise<TeacherDoc> => {
+    const { _id, accessOptions } = dbParams;
     const asyncCallback = this.findOne({ searchQuery: { userId: _id }, accessOptions });
     return await this._grantAccess(accessOptions, asyncCallback);
   };

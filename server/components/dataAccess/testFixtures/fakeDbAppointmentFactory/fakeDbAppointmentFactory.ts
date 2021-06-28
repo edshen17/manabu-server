@@ -1,5 +1,5 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { AppointmentEntityResponse } from '../../../entities/appointment/appointmentEntity';
+import { AppointmentEntityBuildResponse } from '../../../entities/appointment/appointmentEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 
@@ -18,13 +18,13 @@ type FakeAppointmentEntityParams = {
 class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
   FakeDbAppointmentFactoryInitParams,
   FakeAppointmentEntityParams,
-  AppointmentEntityResponse,
+  AppointmentEntityBuildResponse,
   AppointmentDoc
 > {
   private _fakeDbPackageTransactionFactory!: FakeDbPackageTransactionFactory;
   protected _createFakeEntity = async (
     entityData?: FakeAppointmentEntityParams
-  ): Promise<AppointmentEntityResponse> => {
+  ): Promise<AppointmentEntityBuildResponse> => {
     let { hostedBy, reservedBy, packageTransactionId, from, to } = entityData || {};
     const fakePackageTransaction = await this._fakeDbPackageTransactionFactory.createFakeDbData();
 

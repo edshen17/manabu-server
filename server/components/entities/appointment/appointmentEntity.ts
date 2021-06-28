@@ -3,9 +3,13 @@ import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type AppointmentEntityParams = {
+type AppointmentEntityInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+};
+
+type AppointmentEntityBuildParams = {
   hostedBy: string;
   reservedBy: string;
   packageTransactionId: string;
@@ -13,7 +17,7 @@ type AppointmentEntityParams = {
   to: Date;
 };
 
-type AppointmentEntityResponse = {
+type AppointmentEntityBuildResponse = {
   hostedBy: string;
   reservedBy: string;
   packageTransactionId: string;
@@ -39,10 +43,11 @@ type LocationData = {
   };
 };
 
-class AppointmentEntity
-  extends AbstractEntity<AppointmentEntityResponse>
-  implements IEntity<AppointmentEntityResponse>
-{
+class AppointmentEntity extends AbstractEntity<
+  AppointmentEntityInitParams,
+  AppointmentEntityBuildParams,
+  AppointmentEntityBuildResponse
+> {
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
   protected _defaultAccessOptions: AccessOptions = {
@@ -54,16 +59,16 @@ class AppointmentEntity
   };
 
   public build = async (
-    appointmentData: AppointmentEntityParams
-  ): Promise<AppointmentEntityResponse> => {
-    const appointment = this._buildAppointmentEntity(appointmentData);
-    return appointment;
+    entityParams: AppointmentEntityBuildParams
+  ): Promise<AppointmentEntityBuildResponse> => {
+    const appointmentEntity = this._buildAppointmentEntity(entityParams);
+    return appointmentEntity;
   };
 
   private _buildAppointmentEntity = async (
-    appointmentData: AppointmentEntityParams
-  ): Promise<AppointmentEntityResponse> => {
-    const { hostedBy, reservedBy, packageTransactionId, from, to } = appointmentData;
+    entityParams: AppointmentEntityBuildParams
+  ): Promise<AppointmentEntityBuildResponse> => {
+    const { hostedBy, reservedBy, packageTransactionId, from, to } = entityParams;
     const { hostedByData, reservedByData, packageTransactionData, locationData } =
       await this._getDbDataDependencies({ hostedBy, reservedBy, packageTransactionId });
     const appointmentEntity = Object.freeze({
@@ -82,12 +87,12 @@ class AppointmentEntity
     return appointmentEntity;
   };
 
-  private _getDbDataDependencies = async (props: {
+  private _getDbDataDependencies = async (initParams: {
     hostedBy: string;
     reservedBy: string;
     packageTransactionId: string;
   }) => {
-    const { hostedBy, reservedBy, packageTransactionId } = props;
+    const { hostedBy, reservedBy, packageTransactionId } = initParams;
     const overrideHostedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: hostedBy,
@@ -150,15 +155,12 @@ class AppointmentEntity
     }
   };
 
-  public init = async (props: {
-    makeUserDbService: Promise<UserDbService>;
-    makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-  }): Promise<this> => {
-    const { makeUserDbService, makePackageTransactionDbService } = props;
+  public init = async (initParams: AppointmentEntityInitParams): Promise<this> => {
+    const { makeUserDbService, makePackageTransactionDbService } = initParams;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     return this;
   };
 }
 
-export { AppointmentEntity, AppointmentEntityParams, AppointmentEntityResponse };
+export { AppointmentEntity, AppointmentEntityBuildParams, AppointmentEntityBuildResponse };

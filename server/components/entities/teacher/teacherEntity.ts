@@ -1,9 +1,10 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type TeacherEntityParams = { userId: string };
+type TeacherEntityInitParams = {};
 
-type TeacherEntityResponse = {
+type TeacherEntityBuildParams = { userId: string };
+
+type TeacherEntityBuildResponse = {
   userId: string;
   teachingLanguages: { language: string; level: string }[];
   alsoSpeaks: { language: string; level: string }[];
@@ -17,18 +18,19 @@ type TeacherEntityResponse = {
   studentCount: number;
 };
 
-class TeacherEntity
-  extends AbstractEntity<TeacherEntityResponse>
-  implements IEntity<TeacherEntityResponse>
-{
-  public build = (entityData: TeacherEntityParams): TeacherEntityResponse => {
-    const teacherEntity = this._buildTeacherEntity(entityData);
+class TeacherEntity extends AbstractEntity<
+  TeacherEntityInitParams,
+  TeacherEntityBuildParams,
+  TeacherEntityBuildResponse
+> {
+  public build = (entityParams: TeacherEntityBuildParams): TeacherEntityBuildResponse => {
+    const teacherEntity = this._buildTeacherEntity(entityParams);
     return teacherEntity;
   };
 
-  private _buildTeacherEntity = (entityData: { userId: string }): TeacherEntityResponse => {
-    const { userId } = entityData;
-    return Object.freeze({
+  private _buildTeacherEntity = (entityParams: { userId: string }): TeacherEntityBuildResponse => {
+    const { userId } = entityParams;
+    const teacherEntity = Object.freeze({
       userId,
       teachingLanguages: [],
       alsoSpeaks: [],
@@ -41,7 +43,8 @@ class TeacherEntity
       lessonCount: 0,
       studentCount: 0,
     });
+    return teacherEntity;
   };
 }
 
-export { TeacherEntity, TeacherEntityParams, TeacherEntityResponse };
+export { TeacherEntity, TeacherEntityBuildParams, TeacherEntityBuildResponse };

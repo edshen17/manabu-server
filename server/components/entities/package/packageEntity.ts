@@ -1,8 +1,11 @@
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type PackageEntityParams = {
+type PackageEntityInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+};
+
+type PackageEntityBuildParams = {
   hostedBy: string;
   priceDetails?: { hourlyPrice: number; currency: string };
   lessonAmount: number;
@@ -11,7 +14,7 @@ type PackageEntityParams = {
   packageDurations?: number[];
 };
 
-type PackageEntityResponse = {
+type PackageEntityBuildResponse = {
   hostedBy: string;
   priceDetails: { hourlyPrice: number; currency: string };
   lessonAmount: number;
@@ -20,23 +23,26 @@ type PackageEntityResponse = {
   packageDurations: number[];
 };
 
-class PackageEntity
-  extends AbstractEntity<PackageEntityResponse>
-  implements IEntity<PackageEntityResponse>
-{
+class PackageEntity extends AbstractEntity<
+  PackageEntityInitParams,
+  PackageEntityBuildParams,
+  PackageEntityBuildResponse
+> {
   private _userDbService!: UserDbService;
 
-  public build = async (packageEntityData: PackageEntityParams): Promise<PackageEntityResponse> => {
-    const packageEntity = await this._buildPackageEntity(packageEntityData);
+  public build = async (
+    entityParams: PackageEntityBuildParams
+  ): Promise<PackageEntityBuildResponse> => {
+    const packageEntity = await this._buildPackageEntity(entityParams);
     return packageEntity;
   };
 
   private _buildPackageEntity = async (
-    packageEntityData: PackageEntityParams
-  ): Promise<PackageEntityResponse> => {
+    entityParams: PackageEntityBuildParams
+  ): Promise<PackageEntityBuildResponse> => {
     const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
-      packageEntityData;
-    return Object.freeze({
+      entityParams;
+    const packageEntity = Object.freeze({
       hostedBy,
       priceDetails: priceDetails || (await this._getPriceDetails(hostedBy)),
       lessonAmount: lessonAmount || 5,
@@ -44,6 +50,7 @@ class PackageEntity
       packageType: packageType || 'light',
       packageDurations: packageDurations || [30, 60],
     });
+    return packageEntity;
   };
 
   private _getPriceDetails = async (hostedBy: string) => {
@@ -63,11 +70,11 @@ class PackageEntity
     }
   };
 
-  public init = async (props: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
-    const { makeUserDbService } = props;
+  public init = async (initParams: PackageEntityInitParams): Promise<this> => {
+    const { makeUserDbService } = initParams;
     this._userDbService = await makeUserDbService;
     return this;
   };
 }
 
-export { PackageEntity, PackageEntityResponse, PackageEntityParams };
+export { PackageEntity, PackageEntityBuildResponse, PackageEntityBuildParams };

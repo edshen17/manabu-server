@@ -1,5 +1,5 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { MinuteBankEntityResponse } from '../../../entities/minuteBank/minuteBankEntity';
+import { MinuteBankEntityBuildResponse } from '../../../entities/minuteBank/minuteBankEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
@@ -16,14 +16,14 @@ type FakeMinuteBankEntityParams = {
 class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   FakeDbMinuteBankFactoryInitParams,
   FakeMinuteBankEntityParams,
-  MinuteBankEntityResponse,
+  MinuteBankEntityBuildResponse,
   MinuteBankDoc
 > {
   private _fakeUserDbFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (
     entityData?: FakeMinuteBankEntityParams
-  ): Promise<MinuteBankEntityResponse> => {
+  ): Promise<MinuteBankEntityBuildResponse> => {
     let { hostedBy, reservedBy, minuteBank } = entityData || {};
     if (!hostedBy) {
       const hostedByData = await this._fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();

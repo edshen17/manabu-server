@@ -1,5 +1,5 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { PackageTransactionEntityResponse } from '../../../entities/packageTransaction/packageTransactionEntity';
+import { PackageTransactionEntityBuildResponse } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
@@ -19,14 +19,14 @@ type FakePackageEntityParams = {
 class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
   FakeDbPackageTransactionFactoryInitParams,
   FakePackageEntityParams,
-  PackageTransactionEntityResponse,
+  PackageTransactionEntityBuildResponse,
   PackageTransactionDoc
 > {
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (
     entityData?: FakePackageEntityParams
-  ): Promise<PackageTransactionEntityResponse> => {
+  ): Promise<PackageTransactionEntityBuildResponse> => {
     const {
       hostedBy,
       reservedBy,

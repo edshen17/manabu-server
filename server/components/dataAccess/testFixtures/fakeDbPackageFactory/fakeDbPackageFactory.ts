@@ -1,5 +1,5 @@
 import { PackageDoc } from '../../../../models/Package';
-import { PackageEntityResponse } from '../../../entities/package/packageEntity';
+import { PackageEntityBuildResponse } from '../../../entities/package/packageEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
 type FakeDbPackageFactoryInitParams = {};
@@ -8,7 +8,7 @@ type FakeEntityParams = { hostedBy: any; lessonAmount?: number; packageType?: st
 class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   FakeDbPackageFactoryInitParams,
   FakeEntityParams,
-  PackageEntityResponse,
+  PackageEntityBuildResponse,
   PackageDoc
 > {
   public createFakePackages = async (entityData: FakeEntityParams) => {

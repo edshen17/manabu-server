@@ -1,7 +1,9 @@
 import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
 import { IEntity } from './IEntity';
 
-abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse> {
+abstract class AbstractEntity<EntityInitParams, EntityBuildParams, EntityBuildResponse>
+  implements IEntity<EntityInitParams, EntityBuildParams, EntityBuildResponse>
+{
   protected _defaultAccessOptions: AccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
@@ -20,7 +22,13 @@ abstract class AbstractEntity<EntityResponse> implements IEntity<EntityResponse>
     return dbData;
   };
 
-  abstract build(entityData: any): any;
+  abstract build(
+    entityParams: EntityBuildParams
+  ): Promise<EntityBuildResponse> | EntityBuildResponse;
+
+  public init = (initParams: EntityInitParams): Promise<this> | this => {
+    return this;
+  };
 }
 
 export { AbstractEntity };

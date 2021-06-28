@@ -2,10 +2,14 @@ import { IEntity } from '../../../entities/abstractions/IEntity';
 import { AccessOptions, IDbOperations } from '../../abstractions/IDbOperations';
 import { IFakeDbDataFactory } from './IFakeDbDataFactory';
 
-abstract class AbstractFakeDbDataFactory<InitParams, FakeEntityParams, EntityResponse, DbDoc>
-  implements IFakeDbDataFactory<InitParams, FakeEntityParams, DbDoc>
+abstract class AbstractFakeDbDataFactory<
+  InitParams,
+  FakeEntityBuildParams,
+  EntityBuildResponse,
+  DbDoc
+> implements IFakeDbDataFactory<InitParams, FakeEntityBuildParams, DbDoc>
 {
-  protected _entity!: IEntity<EntityResponse>;
+  protected _entity!: IEntity<any, any, EntityBuildResponse>;
   protected _dbService!: IDbOperations<DbDoc>;
   protected _defaultAccessOptions: AccessOptions;
   protected _cloneDeep!: any;
@@ -18,7 +22,7 @@ abstract class AbstractFakeDbDataFactory<InitParams, FakeEntityParams, EntityRes
     };
   }
 
-  public createFakeDbData = async (fakeEntityData?: FakeEntityParams): Promise<DbDoc> => {
+  public createFakeDbData = async (fakeEntityData?: FakeEntityBuildParams): Promise<DbDoc> => {
     const fakeEntity = await this._createFakeEntity(fakeEntityData);
     let newDbDocCallback = this._dbService.insert({
       modelToInsert: fakeEntity,
@@ -29,8 +33,8 @@ abstract class AbstractFakeDbDataFactory<InitParams, FakeEntityParams, EntityRes
   };
 
   protected _createFakeEntity = async (
-    fakeEntityData?: FakeEntityParams
-  ): Promise<EntityResponse> => {
+    fakeEntityData?: FakeEntityBuildParams
+  ): Promise<EntityBuildResponse> => {
     const fakeEntity = await this._entity.build(fakeEntityData);
     return fakeEntity;
   };

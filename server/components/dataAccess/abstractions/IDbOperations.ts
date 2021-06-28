@@ -17,14 +17,14 @@ type DbParams = {
 };
 
 interface IDbOperations<DbDoc> {
-  findById: (params: DbParams) => Promise<DbDoc>;
-  findOne: (params: DbParams) => Promise<DbDoc>;
-  find: (params: DbParams) => Promise<DbDoc[]>;
-  insert: (params: DbParams) => Promise<DbDoc>;
-  insertMany: (params: DbParams) => Promise<DbDoc[]>;
-  findOneAndUpdate: (params: DbParams) => Promise<DbDoc>;
-  updateMany: (params: DbParams) => Promise<DbDoc[]>;
-  findByIdAndDelete: (params: DbParams) => Promise<DbDoc>;
+  findById: (dbParams: DbParams) => Promise<DbDoc>;
+  findOne: (dbParams: DbParams) => Promise<DbDoc>;
+  find: (dbParams: DbParams) => Promise<DbDoc[]>;
+  insert: (dbParams: DbParams) => Promise<DbDoc>;
+  insertMany: (dbParams: DbParams) => Promise<DbDoc[]>;
+  findOneAndUpdate: (dbParams: DbParams) => Promise<DbDoc>;
+  updateMany: (dbParams: DbParams) => Promise<DbDoc[]>;
+  findByIdAndDelete: (dbParams: DbParams) => Promise<DbDoc>;
   init: (props: any) => Promise<this>;
   getDefaultSelectOptions: () => DefaultSelectOptions;
 }

@@ -1,9 +1,10 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntity } from '../abstractions/IEntity';
 
-type TeacherBalanceEntityParams = { userId: string };
+type TeacherBalanceEntityInitParams = {};
 
-type TeacherBalanceEntityResponse = {
+type TeacherBalanceEntityBuildParams = { userId: string };
+
+type TeacherBalanceEntityBuildResponse = {
   userId: string;
   balanceDetails: {
     balance: number;
@@ -11,20 +12,22 @@ type TeacherBalanceEntityResponse = {
   };
 };
 
-class TeacherBalanceEntity
-  extends AbstractEntity<TeacherBalanceEntityResponse>
-  implements IEntity<TeacherBalanceEntityResponse>
-{
-  build(entityData: TeacherBalanceEntityParams): any {
-    const { userId } = entityData;
-    return Object.freeze({
+class TeacherBalanceEntity extends AbstractEntity<
+  TeacherBalanceEntityInitParams,
+  TeacherBalanceEntityBuildParams,
+  TeacherBalanceEntityBuildResponse
+> {
+  build(entityParams: TeacherBalanceEntityBuildParams): any {
+    const { userId } = entityParams;
+    const teacherBalanceEntity = Object.freeze({
       userId,
       balanceDetails: {
         balance: 0,
         currency: 'SGD',
       },
     });
+    return teacherBalanceEntity;
   }
 }
 
-export { TeacherBalanceEntity, TeacherBalanceEntityParams, TeacherBalanceEntityResponse };
+export { TeacherBalanceEntity, TeacherBalanceEntityBuildParams, TeacherBalanceEntityBuildResponse };

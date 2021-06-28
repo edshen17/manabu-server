@@ -1,4 +1,4 @@
-import { UserEntityResponse } from '../../../entities/user/userEntity';
+import { UserEntityBuildResponse } from '../../../entities/user/userEntity';
 import { JoinedUserDoc } from '../../services/user/userDbService';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFactory';
@@ -19,7 +19,7 @@ type FakeUserEntityParams = {
 class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   FakeDbUserFactoryInitParams,
   FakeUserEntityParams,
-  UserEntityResponse,
+  UserEntityBuildResponse,
   JoinedUserDoc
 > {
   private _faker!: any;
@@ -47,7 +47,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
 
   protected _createFakeEntity = async (
     entityData?: FakeUserEntityParams
-  ): Promise<UserEntityResponse> => {
+  ): Promise<UserEntityBuildResponse> => {
     const { name, email, password } = entityData || {};
     const fakeUserEntity = this._entity.build({
       name: name || this._faker.name.findName(),
