@@ -3,11 +3,11 @@ import { AppointmentEntityBuildResponse } from '../../../entities/appointment/ap
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 
-type FakeDbAppointmentFactoryInitParams = {
+type PartialFakeDbAppointmentFactoryInitParams = {
   makeFakeDbPackageTransactionFactory: Promise<FakeDbPackageTransactionFactory>;
 };
 
-type FakeAppointmentEntityParams = {
+type FakeAppointmentEntityBuildParams = {
   hostedBy: string;
   reservedBy: string;
   packageTransactionId: string;
@@ -16,16 +16,16 @@ type FakeAppointmentEntityParams = {
 };
 
 class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
-  FakeDbAppointmentFactoryInitParams,
-  FakeAppointmentEntityParams,
+  PartialFakeDbAppointmentFactoryInitParams,
+  FakeAppointmentEntityBuildParams,
   AppointmentEntityBuildResponse,
   AppointmentDoc
 > {
   private _fakeDbPackageTransactionFactory!: FakeDbPackageTransactionFactory;
   protected _createFakeEntity = async (
-    entityData?: FakeAppointmentEntityParams
+    fakeEntityBuildParams?: FakeAppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    let { hostedBy, reservedBy, packageTransactionId, from, to } = entityData || {};
+    let { hostedBy, reservedBy, packageTransactionId, from, to } = fakeEntityBuildParams || {};
     const fakePackageTransaction = await this._fakeDbPackageTransactionFactory.createFakeDbData();
 
     const fakeAppointmentEntity = await this._entity.build({
@@ -37,8 +37,10 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
     });
     return fakeAppointmentEntity;
   };
-  protected _initTemplate = async (props: FakeDbAppointmentFactoryInitParams) => {
-    const { makeFakeDbPackageTransactionFactory } = props;
+  protected _initTemplate = async (
+    partialFakeDbDataFactoryInitParams: PartialFakeDbAppointmentFactoryInitParams
+  ) => {
+    const { makeFakeDbPackageTransactionFactory } = partialFakeDbDataFactoryInitParams;
     this._fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   };
 }

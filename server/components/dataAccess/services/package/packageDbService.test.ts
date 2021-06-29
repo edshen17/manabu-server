@@ -19,7 +19,7 @@ before(async () => {
   fakeDbPackageFactory = await makeFakeDbPackageFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-  dbServiceAccessOptions = fakeDbPackageFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbPackageFactory.getDbServiceAccessOptions();
 });
 
 describe('packageDbService', () => {

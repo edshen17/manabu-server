@@ -3,46 +3,42 @@ import { MinuteBankEntityBuildResponse } from '../../../entities/minuteBank/minu
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-type FakeDbMinuteBankFactoryInitParams = {
+type PartialFakeDbMinuteBankFactoryInitParams = {
   makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
 };
 
-type FakeMinuteBankEntityParams = {
+type FakeMinuteBankEntityBuildParams = {
   hostedBy?: string;
   reservedBy?: string;
   minuteBank?: number;
 };
 
 class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
-  FakeDbMinuteBankFactoryInitParams,
-  FakeMinuteBankEntityParams,
+  PartialFakeDbMinuteBankFactoryInitParams,
+  FakeMinuteBankEntityBuildParams,
   MinuteBankEntityBuildResponse,
   MinuteBankDoc
 > {
   private _fakeUserDbFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (
-    entityData?: FakeMinuteBankEntityParams
+    fakeEntityBuildParams?: FakeMinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
-    let { hostedBy, reservedBy, minuteBank } = entityData || {};
-    if (!hostedBy) {
-      const hostedByData = await this._fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();
-      hostedBy = hostedByData._id;
-    }
-    if (!reservedBy) {
-      const reservedByData = await this._fakeUserDbFactory.createFakeDbUser();
-      reservedBy = reservedByData._id;
-    }
+    let { hostedBy, reservedBy, minuteBank } = fakeEntityBuildParams || {};
+    const fakeHostedByData = await this._fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();
+    const fakeReservedByData = await this._fakeUserDbFactory.createFakeDbUser();
     const fakeMinuteBankEntity = await this._entity.build({
-      hostedBy,
-      reservedBy,
+      hostedBy: hostedBy || fakeHostedByData._id,
+      reservedBy: reservedBy || fakeReservedByData._id,
       minuteBank: minuteBank || 0,
     });
     return fakeMinuteBankEntity;
   };
 
-  protected _initTemplate = async (props: any) => {
-    const { makeFakeDbUserFactory } = props || {};
+  protected _initTemplate = async (
+    partialFakeDbDataFactoryInitParams: PartialFakeDbMinuteBankFactoryInitParams
+  ) => {
+    const { makeFakeDbUserFactory } = partialFakeDbDataFactoryInitParams || {};
     this._fakeUserDbFactory = await makeFakeDbUserFactory;
   };
 }

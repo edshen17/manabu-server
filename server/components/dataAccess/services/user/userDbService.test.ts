@@ -12,7 +12,7 @@ let dbServiceAccessOptions: DbServiceAccessOptions;
 before(async () => {
   userDbService = await makeUserDbService;
   fakeDbUserFactory = await makeFakeDbUserFactory;
-  dbServiceAccessOptions = fakeDbUserFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbUserFactory.getDbServiceAccessOptions();
 });
 
 context('userDbService', () => {

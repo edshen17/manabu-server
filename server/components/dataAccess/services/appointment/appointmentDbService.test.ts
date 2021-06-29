@@ -23,7 +23,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = fakeDbAppointmentFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbAppointmentFactory.getDbServiceAccessOptions();
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedBy: fakePackageTransaction.hostedBy.toString(),

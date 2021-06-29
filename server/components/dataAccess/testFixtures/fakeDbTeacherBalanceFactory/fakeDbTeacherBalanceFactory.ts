@@ -2,12 +2,12 @@ import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 import { TeacherBalanceEntityBuildResponse } from '../../../entities/teacherBalance/teacherBalanceEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-type FakeDbTeacherBalanceFactoryInitParams = {};
-type FakeTeacherBalanceEntityParams = {};
+type PartialFakeDbTeacherBalanceFactoryInitParams = {};
+type FakeTeacherBalanceEntityBuildParams = {};
 
 class FakeDbTeacherBalanceFactory extends AbstractFakeDbDataFactory<
-  FakeDbTeacherBalanceFactoryInitParams,
-  FakeTeacherBalanceEntityParams,
+  PartialFakeDbTeacherBalanceFactoryInitParams,
+  FakeTeacherBalanceEntityBuildParams,
   TeacherBalanceEntityBuildResponse,
   TeacherBalanceDoc
 > {}

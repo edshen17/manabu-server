@@ -51,9 +51,7 @@ class MinuteBankEntity extends AbstractEntity<
     return minuteBankEntity;
   };
 
-  public init = async (initParams: {
-    makeUserDbService: Promise<UserDbService>;
-  }): Promise<this> => {
+  public init = async (initParams: MinuteBankEntityInitParams): Promise<this> => {
     const { makeUserDbService } = initParams;
     this._userDbService = await makeUserDbService;
     return this;

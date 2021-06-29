@@ -4,7 +4,7 @@ import { IEntity } from './IEntity';
 abstract class AbstractEntity<EntityInitParams, EntityBuildParams, EntityBuildResponse>
   implements IEntity<EntityInitParams, EntityBuildParams, EntityBuildResponse>
 {
-  protected _defaultDbServiceAccessOptions: DbServiceAccessOptions = {
+  protected _dbServiceAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,
@@ -14,19 +14,19 @@ abstract class AbstractEntity<EntityInitParams, EntityBuildParams, EntityBuildRe
   public getDbDataById = async (props: {
     dbService: IDbService<any, any>;
     _id: string;
-    overideAccessOptions?: DbServiceAccessOptions;
+    overrideDbServiceAccessOptions?: DbServiceAccessOptions;
   }): Promise<any> => {
-    const { dbService, _id, overideAccessOptions } = props;
-    const dbServiceAccessOptions = overideAccessOptions || this._defaultDbServiceAccessOptions;
+    const { dbService, _id, overrideDbServiceAccessOptions } = props;
+    const dbServiceAccessOptions = overrideDbServiceAccessOptions || this._dbServiceAccessOptions;
     const dbData = await dbService.findById({ _id, dbServiceAccessOptions });
     return dbData;
   };
 
   abstract build(
-    entityParams: EntityBuildParams
+    entityBuildParams: EntityBuildParams
   ): Promise<EntityBuildResponse> | EntityBuildResponse;
 
-  public init = (initParams: EntityInitParams): Promise<this> | this => {
+  public init = (entityInitParams: EntityInitParams): Promise<this> | this => {
     return this;
   };
 }

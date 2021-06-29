@@ -15,7 +15,7 @@ before(async () => {
 });
 
 beforeEach(() => {
-  dbServiceAccessOptions = fakeDbMinuteBankFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbMinuteBankFactory.getDbServiceAccessOptions();
 });
 
 describe('minuteBankDbService', () => {

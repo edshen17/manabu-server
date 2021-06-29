@@ -3,11 +3,11 @@ import { PackageTransactionEntityBuildResponse } from '../../../entities/package
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-type FakeDbPackageTransactionFactoryInitParams = {
+type PartialFakeDbPackageTransactionFactoryInitParams = {
   makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
 };
 
-type FakePackageEntityParams = {
+type FakePackageEntityBuildParams = {
   hostedBy?: string;
   reservedBy?: string;
   packageId?: string;
@@ -17,15 +17,15 @@ type FakePackageEntityParams = {
 };
 
 class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
-  FakeDbPackageTransactionFactoryInitParams,
-  FakePackageEntityParams,
+  PartialFakeDbPackageTransactionFactoryInitParams,
+  FakePackageEntityBuildParams,
   PackageTransactionEntityBuildResponse,
   PackageTransactionDoc
 > {
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeEntity = async (
-    entityData?: FakePackageEntityParams
+    fakeEntityBuildParams?: FakePackageEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
     const {
       hostedBy,
@@ -34,7 +34,7 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
       reservationLength,
       remainingAppointments,
       transactionDetails,
-    } = entityData || {};
+    } = fakeEntityBuildParams || {};
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
     const fakePackageTransaction = await this._entity.build({
       hostedBy: hostedBy || fakeTeacher._id,
@@ -47,8 +47,10 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
     return fakePackageTransaction;
   };
 
-  protected _initTemplate = async (props: FakeDbPackageTransactionFactoryInitParams) => {
-    const { makeFakeDbUserFactory } = props;
+  protected _initTemplate = async (
+    partialFakeDbDataFactoryInitParams: PartialFakeDbPackageTransactionFactoryInitParams
+  ) => {
+    const { makeFakeDbUserFactory } = partialFakeDbDataFactoryInitParams;
     this._fakeDbUserFactory = await makeFakeDbUserFactory;
   };
 }

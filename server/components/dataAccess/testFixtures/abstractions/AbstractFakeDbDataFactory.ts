@@ -3,18 +3,18 @@ import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbServic
 import { IFakeDbDataFactory } from './IFakeDbDataFactory';
 
 abstract class AbstractFakeDbDataFactory<
-  FakeDbDataFactoryInitParams,
+  PartialFakeDbDataFactoryInitParams,
   FakeEntityBuildParams,
   EntityBuildResponse,
   DbDoc
-> implements IFakeDbDataFactory<FakeDbDataFactoryInitParams, FakeEntityBuildParams, DbDoc>
+> implements IFakeDbDataFactory<PartialFakeDbDataFactoryInitParams, FakeEntityBuildParams, DbDoc>
 {
   protected _entity!: IEntity<any, any, EntityBuildResponse>;
   protected _dbService!: IDbService<any, DbDoc>;
-  protected _defaultDbAccessOptions: DbServiceAccessOptions;
+  protected _dbServiceAccessOptions: DbServiceAccessOptions;
   protected _cloneDeep!: any;
   constructor() {
-    this._defaultDbAccessOptions = {
+    this._dbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted: true,
       currentAPIUserRole: 'user',
@@ -22,43 +22,50 @@ abstract class AbstractFakeDbDataFactory<
     };
   }
 
-  public createFakeDbData = async (fakeEntityData?: FakeEntityBuildParams): Promise<DbDoc> => {
-    const fakeEntity = await this._createFakeEntity(fakeEntityData);
-    let newDbDocCallback = this._dbService.insert({
+  public createFakeDbData = async (
+    fakeEntityBuildParams?: FakeEntityBuildParams
+  ): Promise<DbDoc> => {
+    const fakeEntity = await this._createFakeEntity(fakeEntityBuildParams);
+    let fakeDbData = await this._dbService.insert({
       modelToInsert: fakeEntity,
-      dbServiceAccessOptions: this._defaultDbAccessOptions,
+      dbServiceAccessOptions: this._dbServiceAccessOptions,
     });
-    const fakeDbData = await this._awaitDbInsert(newDbDocCallback);
     return fakeDbData;
   };
 
   protected _createFakeEntity = async (
-    fakeEntityData?: FakeEntityBuildParams
+    fakeEntityBuildParams?: FakeEntityBuildParams
   ): Promise<EntityBuildResponse> => {
-    const fakeEntity = await this._entity.build(fakeEntityData);
+    const fakeEntity = await this._entity.build(fakeEntityBuildParams);
     return fakeEntity;
   };
 
-  protected _awaitDbInsert = async (newDbDocCallback: Promise<any>) => {
-    const newDbDoc = await newDbDocCallback;
-    return newDbDoc;
-  };
-
   public init = async (
-    props: { makeEntity: any; makeDbService: any; cloneDeep: any } & FakeDbDataFactoryInitParams
+    fakeDbDataFactoryInitParams: {
+      makeEntity: Promise<IEntity<any, any, any>> | IEntity<any, any, any>;
+      makeDbService: Promise<IDbService<any, any>>;
+      cloneDeep: any;
+    } & PartialFakeDbDataFactoryInitParams
   ): Promise<this> => {
-    const { makeEntity, makeDbService, cloneDeep } = props;
+    const { makeEntity, makeDbService, cloneDeep, ...partialFakeDbDataFactoryInitParams } =
+      fakeDbDataFactoryInitParams;
     this._entity = await makeEntity;
     this._dbService = await makeDbService;
     this._cloneDeep = cloneDeep;
-    this._initTemplate(props);
+    this._initTemplate(partialFakeDbDataFactoryInitParams);
     return this;
   };
 
-  protected _initTemplate = (props: any): void => {};
+  protected _initTemplate = (
+    partialFakeDbDataFactoryInitParams: Omit<
+      { makeEntity: any; makeDbService: any; cloneDeep: any } & PartialFakeDbDataFactoryInitParams,
+      'makeEntity' | 'makeDbService' | 'cloneDeep'
+    >
+  ): void => {};
 
-  public getDefaultAccessOptions = () => {
-    return this._cloneDeep(this._defaultDbAccessOptions);
+  public getDbServiceAccessOptions = () => {
+    const dbServiceAccessOptionsCopy = this._cloneDeep(this._dbServiceAccessOptions);
+    return dbServiceAccessOptionsCopy;
   };
 }
 

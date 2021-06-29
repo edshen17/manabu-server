@@ -50,7 +50,7 @@ class AppointmentEntity extends AbstractEntity<
 > {
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
-  protected _defaultDbServiceAccessOptions: DbServiceAccessOptions = {
+  protected _dbServiceAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,
@@ -96,12 +96,12 @@ class AppointmentEntity extends AbstractEntity<
     const overrideHostedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: hostedBy,
-      overideAccessOptions: this._defaultDbServiceAccessOptions,
+      overrideDbServiceAccessOptions: this._dbServiceAccessOptions,
     });
     const overrideReservedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: reservedBy,
-      overideAccessOptions: this._defaultDbServiceAccessOptions,
+      overrideDbServiceAccessOptions: this._dbServiceAccessOptions,
     });
     const hostedByData = this._getRestrictedUserData(overrideHostedByData);
     const reservedByData = this._getRestrictedUserData(overrideReservedByData);

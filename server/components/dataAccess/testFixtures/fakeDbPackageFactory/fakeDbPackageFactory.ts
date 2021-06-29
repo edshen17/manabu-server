@@ -3,26 +3,29 @@ import { PackageEntityBuildResponse } from '../../../entities/package/packageEnt
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
 type FakeDbPackageFactoryInitParams = {};
-type FakeEntityParams = { hostedBy: any; lessonAmount?: number; packageType?: string };
-
+type FakeDbPackageEntityBuildParams = {
+  hostedBy: any;
+  lessonAmount?: number;
+  packageType?: string;
+};
 class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   FakeDbPackageFactoryInitParams,
-  FakeEntityParams,
+  FakeDbPackageEntityBuildParams,
   PackageEntityBuildResponse,
   PackageDoc
 > {
-  public createFakePackages = async (entityData: FakeEntityParams) => {
-    const defaultPackages = await this._createDefaultPackages(entityData);
-    const dbServiceAccessOptions = this.getDefaultAccessOptions();
-    const insertedPackages = await this._dbService.insertMany({
-      modelToInsert: defaultPackages,
+  public createFakePackages = async (fakeEntityBuildParams: FakeDbPackageEntityBuildParams) => {
+    const fakePackages = await this._createFakePackages(fakeEntityBuildParams);
+    const dbServiceAccessOptions = this.getDbServiceAccessOptions();
+    const fakeInsertedPackages = await this._dbService.insertMany({
+      modelToInsert: fakePackages,
       dbServiceAccessOptions,
     });
-    return insertedPackages;
+    return fakeInsertedPackages;
   };
 
-  private _createDefaultPackages = async (entityData: FakeEntityParams) => {
-    const { hostedBy } = entityData;
+  private _createFakePackages = async (fakeEntityBuildParams: FakeDbPackageEntityBuildParams) => {
+    const { hostedBy } = fakeEntityBuildParams;
     const lightPackage = await this._createFakeEntity({
       hostedBy,
       lessonAmount: 5,

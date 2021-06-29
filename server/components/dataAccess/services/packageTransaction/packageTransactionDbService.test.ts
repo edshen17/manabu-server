@@ -21,7 +21,7 @@ before(async () => {
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-  dbServiceAccessOptions = fakeDbPackageTransactionFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbPackageTransactionFactory.getDbServiceAccessOptions();
 });
 
 beforeEach(async () => {

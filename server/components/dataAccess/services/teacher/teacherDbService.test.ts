@@ -21,7 +21,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = fakeDbTeacherFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbTeacherFactory.getDbServiceAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
 });
 
