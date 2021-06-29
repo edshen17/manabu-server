@@ -37,7 +37,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
 
     return this._dbService.findById({
       _id: fakeDbUser._id,
-      accessOptions: this._defaultAccessOptions,
+      dbServiceAccessOptions: this._defaultAccessOptions,
     });
   };
 

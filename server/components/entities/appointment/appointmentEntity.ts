@@ -1,5 +1,5 @@
 import { PackageTransactionDoc } from '../../../models/PackageTransaction';
-import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
@@ -50,7 +50,7 @@ class AppointmentEntity extends AbstractEntity<
 > {
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
-  protected _defaultAccessOptions: AccessOptions = {
+  protected _defaultAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,

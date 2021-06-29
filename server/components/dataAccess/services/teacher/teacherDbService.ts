@@ -1,8 +1,13 @@
-import { DbParams, IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
+import { DbServiceParams, IDbService } from '../../abstractions/IDbService';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDoc } from '../../../../models/Teacher';
 
-class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOperations<TeacherDoc> {
+type TeacherDbServiceInitParams = {};
+
+class TeacherDbService
+  extends AbstractDbService<TeacherDbServiceInitParams, TeacherDoc>
+  implements IDbService<TeacherDbServiceInitParams, TeacherDoc>
+{
   constructor() {
     super();
     this._defaultSelectOptions = {
@@ -14,10 +19,10 @@ class TeacherDbService extends CommonDbOperations<TeacherDoc> implements IDbOper
     };
   }
 
-  public findById = async (dbParams: DbParams): Promise<TeacherDoc> => {
-    const { _id, accessOptions } = dbParams;
-    const asyncCallback = this.findOne({ searchQuery: { userId: _id }, accessOptions });
-    return await this._grantAccess(accessOptions, asyncCallback);
+  public findById = async (dbServiceParams: DbServiceParams): Promise<TeacherDoc> => {
+    const { _id, dbServiceAccessOptions } = dbServiceParams;
+    const asyncCallback = this.findOne({ searchQuery: { userId: _id }, dbServiceAccessOptions });
+    return await this._grantAccess(dbServiceAccessOptions, asyncCallback);
   };
 }
 

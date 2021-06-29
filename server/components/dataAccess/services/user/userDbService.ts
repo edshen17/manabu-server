@@ -1,17 +1,18 @@
-import { AccessOptions, DbParams, IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
+import { DbServiceAccessOptions, DbServiceParams, IDbService } from '../../abstractions/IDbService';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDbService } from '../teacher/teacherDbService';
 import { PackageDbService } from '../package/packageDbService';
 import { UserDoc } from '../../../../models/User';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { PackageDoc } from '../../../../models/Package';
 
+type UserDbServiceInitParams = {};
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
 class UserDbService
-  extends CommonDbOperations<JoinedUserDoc>
-  implements IDbOperations<JoinedUserDoc>
+  extends AbstractDbService<UserDbServiceInitParams, JoinedUserDoc>
+  implements IDbService<UserDbServiceInitParams, JoinedUserDoc>
 {
   private _teacherDbService!: TeacherDbService;
   private _packageDbService!: PackageDbService;
@@ -40,8 +41,11 @@ class UserDbService
     };
   }
 
-  public authenticateUser = async (dbParams: DbParams, inputtedPassword: string): Promise<any> => {
-    const user = await this.findOne(dbParams);
+  public authenticateUser = async (
+    dbServiceParams: DbServiceParams,
+    inputtedPassword: string
+  ): Promise<any> => {
+    const user = await this.findOne(dbServiceParams);
     if (!user) {
       return null;
     }
@@ -61,36 +65,36 @@ class UserDbService
   };
 
   protected _dbReturnTemplate = async (
-    accessOptions: AccessOptions,
+    dbServiceAccessOptions: DbServiceAccessOptions,
     asyncCallback: any
   ): Promise<any> => {
-    return await this._returnJoinedUser(accessOptions, asyncCallback);
+    return await this._returnJoinedUser(dbServiceAccessOptions, asyncCallback);
   };
 
   private _returnJoinedUser = async (
-    accessOptions: AccessOptions,
+    dbServiceAccessOptions: DbServiceAccessOptions,
     asyncCallback: Promise<JoinedUserDoc>
   ): Promise<any> => {
-    const user = await this._grantAccess(accessOptions, asyncCallback);
+    const user = await this._grantAccess(dbServiceAccessOptions, asyncCallback);
     if (user) {
-      return await this._joinUserTeacherPackage(user, accessOptions);
+      return await this._joinUserTeacherPackage(user, dbServiceAccessOptions);
     }
   };
 
   private _joinUserTeacherPackage = async (
     user: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
     const userCopy: any = JSON.parse(JSON.stringify(user));
     const _id: string = user._id;
     const teacher: TeacherDoc = await this._teacherDbService.findById({
       _id,
-      accessOptions,
+      dbServiceAccessOptions,
     });
 
     const packages = await this._packageDbService.find({
       searchQuery: { hostedBy: _id },
-      accessOptions,
+      dbServiceAccessOptions,
     });
 
     if (teacher) {

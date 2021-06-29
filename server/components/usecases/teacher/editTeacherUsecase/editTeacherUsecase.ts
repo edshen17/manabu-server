@@ -22,18 +22,18 @@ class EditTeacherUsecase
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<EditTeacherUsecaseResponse> => {
-    const { params, body, accessOptions } = props;
+    const { params, body, dbServiceAccessOptions } = props;
     const updatedDbTeacher = await this._teacherDbService.findOneAndUpdate({
       searchQuery: { userId: params.uId },
       updateParams: body,
-      accessOptions,
+      dbServiceAccessOptions,
     });
 
     if (updatedDbTeacher) {
       const _id = updatedDbTeacher.userId;
       const savedDbUser = await this._userDbService.findById({
         _id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       return { user: savedDbUser };
     } else {

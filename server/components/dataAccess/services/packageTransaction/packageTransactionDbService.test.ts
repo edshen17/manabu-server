@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { makePackageTransactionDbService } from '.';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
@@ -13,7 +13,7 @@ let packageTransactionDbService: PackageTransactionDbService;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeTeacher: JoinedUserDoc;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakePackageTransaction: PackageTransactionDoc;
 
 before(async () => {
@@ -21,7 +21,7 @@ before(async () => {
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-  accessOptions = fakeDbPackageTransactionFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbPackageTransactionFactory.getDefaultAccessOptions();
 });
 
 beforeEach(async () => {
@@ -33,15 +33,15 @@ describe('packageTransactionDbService', () => {
     it('should find a package from the given search query', async () => {
       const findByIdPackageTransaction = await packageTransactionDbService.findById({
         _id: fakePackageTransaction._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findOnePackageTransaction = await packageTransactionDbService.findOne({
         searchQuery: { _id: fakePackageTransaction._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findPackageTransactions = await packageTransactionDbService.find({
         searchQuery: { _id: fakePackageTransaction._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findByIdPackageTransaction).to.deep.equal(fakePackageTransaction);
       expect(findByIdPackageTransaction).to.deep.equal(findOnePackageTransaction);
@@ -59,7 +59,7 @@ describe('packageTransactionDbService', () => {
       const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackageTransaction._id },
         updateParams: { remainingAppointments: 0 },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(updatedPackageTransaction.remainingAppointments).to.equal(0);
     });
@@ -68,11 +68,11 @@ describe('packageTransactionDbService', () => {
     it('should delete the packageTransaction', async () => {
       const deletedPackageTransaction = await packageTransactionDbService.findByIdAndDelete({
         _id: fakePackageTransaction._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const foundPackageTransaction = await packageTransactionDbService.findById({
         _id: fakePackageTransaction._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(foundPackageTransaction).to.not.deep.equal(deletedPackageTransaction);
       expect(foundPackageTransaction).to.be.equal(null);

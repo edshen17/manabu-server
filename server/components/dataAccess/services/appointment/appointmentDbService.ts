@@ -1,10 +1,12 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
-import { IDbOperations } from '../../abstractions/IDbOperations';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
+import { IDbService } from '../../abstractions/IDbService';
+
+type AppointmentDbServiceInitParams = {};
 
 class AppointmentDbService
-  extends CommonDbOperations<AppointmentDoc>
-  implements IDbOperations<AppointmentDoc>
+  extends AbstractDbService<AppointmentDbServiceInitParams, AppointmentDoc>
+  implements IDbService<AppointmentDbServiceInitParams, AppointmentDoc>
 {
   constructor() {
     super();

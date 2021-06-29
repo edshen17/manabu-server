@@ -1,4 +1,4 @@
-import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -19,11 +19,11 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetUserUsecaseResponse> => {
-    const { currentAPIUser, endpointPath, params, accessOptions } = props;
-    const user = await this._getUser(currentAPIUser, endpointPath, params, accessOptions);
+    const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
+    const user = await this._getUser(currentAPIUser, endpointPath, params, dbServiceAccessOptions);
     if (user) {
       if (endpointPath == '/self/me') {
-        this._updateOnlineTimestamp(currentAPIUser.userId, accessOptions);
+        this._updateOnlineTimestamp(currentAPIUser.userId, dbServiceAccessOptions);
       }
       return { user };
     } else {
@@ -35,19 +35,19 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
     currentAPIUser: CurrentAPIUser,
     endpointPath: string,
     params: any,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
     const _id: string = endpointPath == '/self/me' ? currentAPIUser.userId : params.uId;
     const user = await this._userDbService.findById({
       _id,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return user;
   };
 
   private _updateOnlineTimestamp = async (
     _id: string | undefined,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<void> => {
     this._userDbService.findOneAndUpdate({
       searchQuery: {
@@ -56,7 +56,7 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
       updateParams: {
         lastOnline: new Date(),
       },
-      accessOptions,
+      dbServiceAccessOptions,
     });
   };
 

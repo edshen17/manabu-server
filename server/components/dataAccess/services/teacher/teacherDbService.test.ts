@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makeTeacherDbService } from '.';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbTeacherFactory } from '../../testFixtures/fakeDbTeacherFactory';
 import { FakeDbTeacherFactory } from '../../testFixtures/fakeDbTeacherFactory/fakeDbTeacherFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
@@ -11,7 +11,7 @@ import { TeacherDbService } from './teacherDbService';
 let teacherDbService: TeacherDbService;
 let fakeDbTeacherFactory: FakeDbTeacherFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakeUser: JoinedUserDoc;
 
 before(async () => {
@@ -21,7 +21,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  accessOptions = fakeDbTeacherFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbTeacherFactory.getDefaultAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
 });
 
@@ -31,15 +31,15 @@ describe('teacherDbService', () => {
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
       const findByIdTeacher = await teacherDbService.findById({
         _id: fakeUser._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findOneTeacher = await teacherDbService.findOne({
         searchQuery: { userId: fakeUser._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findTeachers = await teacherDbService.find({
         searchQuery: { userId: fakeUser._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findByIdTeacher).to.deep.equal(newTeacher);
       expect(findByIdTeacher).to.deep.equal(findOneTeacher);
@@ -48,20 +48,20 @@ describe('teacherDbService', () => {
       expect(findByIdTeacher).to.not.have.property('licensePath');
     });
     it('should return a teacher with restricted properties (user, self)', async () => {
-      accessOptions.isSelf = true;
+      dbServiceAccessOptions.isSelf = true;
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
       const findByIdTeacher = await teacherDbService.findById({
         _id: newTeacher.userId.toString(),
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findByIdTeacher).to.have.property('licensePath');
     });
     it('should return a teacher with restricted properties (admin, not self)', async () => {
-      accessOptions.currentAPIUserRole = 'admin';
+      dbServiceAccessOptions.currentAPIUserRole = 'admin';
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
       const findByIdTeacher = await teacherDbService.findById({
         _id: newTeacher.userId.toString(),
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findByIdTeacher).to.have.property('licensePath');
     });
@@ -69,7 +69,7 @@ describe('teacherDbService', () => {
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
       const findByIdTeacher = await teacherDbService.findById({
         _id: newTeacher._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findByIdTeacher).to.equal(null);
     });

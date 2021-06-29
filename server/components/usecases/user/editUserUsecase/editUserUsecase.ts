@@ -1,4 +1,4 @@
-import { AccessOptions, IDbOperations } from '../../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions, IDbService } from '../../../dataAccess/abstractions/IDbService';
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
@@ -25,11 +25,11 @@ class EditUserUsecase
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<EditUserUsecaseResponse> => {
-    const { params, body, accessOptions } = props;
+    const { params, body, dbServiceAccessOptions } = props;
     const savedDbUser = await this._userDbService.findOneAndUpdate({
       searchQuery: { _id: params.uId },
       updateParams: body,
-      accessOptions,
+      dbServiceAccessOptions,
     });
 
     //TODO remove/add await for testing..., make alias for below functions (_updateDbUserDependencyData)
@@ -37,7 +37,7 @@ class EditUserUsecase
     this._updateDbUserDependencyData({
       dbService: this._minuteBankDbService,
       savedDbUser,
-      accessOptions,
+      dbServiceAccessOptions,
       hostedBySearchQuery: { hostedBy: savedDbUser._id },
       reservedBySearchQuery: { reservedBy: savedDbUser._id },
     });
@@ -46,7 +46,7 @@ class EditUserUsecase
     this._updateDbUserDependencyData({
       dbService: this._packageTransactionDbService,
       savedDbUser,
-      accessOptions,
+      dbServiceAccessOptions,
       hostedBySearchQuery: { hostedBy: savedDbUser._id, isPast: false },
       reservedBySearchQuery: { reservedBy: savedDbUser._id, isPast: false },
     });
@@ -58,23 +58,28 @@ class EditUserUsecase
   };
 
   private _updateDbUserDependencyData = async (props: {
-    dbService: IDbOperations<any>;
+    dbService: IDbService<any, any>;
     savedDbUser: JoinedUserDoc;
-    accessOptions: AccessOptions;
+    dbServiceAccessOptions: DbServiceAccessOptions;
     hostedBySearchQuery: any;
     reservedBySearchQuery: any;
   }): Promise<void> => {
-    const { dbService, savedDbUser, accessOptions, hostedBySearchQuery, reservedBySearchQuery } =
-      props;
+    const {
+      dbService,
+      savedDbUser,
+      dbServiceAccessOptions,
+      hostedBySearchQuery,
+      reservedBySearchQuery,
+    } = props;
     const updateHostedByData = await dbService.updateMany({
       searchQuery: hostedBySearchQuery,
       updateParams: { hostedByData: savedDbUser },
-      accessOptions,
+      dbServiceAccessOptions,
     });
     const updateReservedByData = await dbService.updateMany({
       searchQuery: reservedBySearchQuery,
       updateParams: { reservedByData: savedDbUser },
-      accessOptions,
+      dbServiceAccessOptions,
     });
   };
 

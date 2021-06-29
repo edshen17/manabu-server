@@ -1,8 +1,13 @@
-import { IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
+import { IDbService } from '../../abstractions/IDbService';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageDoc } from '../../../../models/Package';
 
-class PackageDbService extends CommonDbOperations<PackageDoc> implements IDbOperations<PackageDoc> {
+type PackageDbServiceInitParams = {};
+
+class PackageDbService
+  extends AbstractDbService<PackageDbServiceInitParams, PackageDoc>
+  implements IDbService<PackageDbServiceInitParams, PackageDoc>
+{
   constructor() {
     super();
     this._defaultSelectOptions = {

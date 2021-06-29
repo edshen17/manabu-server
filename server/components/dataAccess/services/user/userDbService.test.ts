@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
@@ -7,12 +7,12 @@ import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUs
 
 let userDbService: UserDbService;
 let fakeDbUserFactory: FakeDbUserFactory;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 
 before(async () => {
   userDbService = await makeUserDbService;
   fakeDbUserFactory = await makeFakeDbUserFactory;
-  accessOptions = fakeDbUserFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbUserFactory.getDefaultAccessOptions();
 });
 
 context('userDbService', () => {
@@ -21,7 +21,7 @@ context('userDbService', () => {
       try {
         await userDbService.findById({
           _id: undefined,
-          accessOptions,
+          dbServiceAccessOptions,
         });
       } catch (err) {
         expect(err).be.an('error');
@@ -32,7 +32,7 @@ context('userDbService', () => {
       try {
         await userDbService.findById({
           _id: '60979db0bb31ed001589a1ea',
-          accessOptions,
+          dbServiceAccessOptions,
         });
       } catch (err) {
         expect(err).be.an('error');
@@ -45,7 +45,7 @@ context('userDbService', () => {
         const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
-          accessOptions,
+          dbServiceAccessOptions,
         });
         expect(searchUser).to.have.property('teacherData');
         expect(searchUser).to.have.property('teacherAppPending');
@@ -61,7 +61,7 @@ context('userDbService', () => {
         const newUser = await fakeDbUserFactory.createFakeDbUser();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
-          accessOptions,
+          dbServiceAccessOptions,
         });
 
         expect(searchUser).to.not.have.property('email');
@@ -77,13 +77,15 @@ context('userDbService', () => {
     });
 
     it('given an existing user id (viewing teacher as admin), should have additional restricted data', async () => {
-      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      const accessOptionsCopy: DbServiceAccessOptions = JSON.parse(
+        JSON.stringify(dbServiceAccessOptions)
+      );
       accessOptionsCopy.currentAPIUserRole = 'admin';
       try {
         const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
-          accessOptions: accessOptionsCopy,
+          dbServiceAccessOptions: accessOptionsCopy,
         });
         expect(searchUser.teacherData).to.have.property('licensePath');
         expect(searchUser).to.have.property('email');
@@ -95,14 +97,16 @@ context('userDbService', () => {
     });
 
     it('given an existing user id (viewing teacher as self), should return only relevant data', async () => {
-      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      const accessOptionsCopy: DbServiceAccessOptions = JSON.parse(
+        JSON.stringify(dbServiceAccessOptions)
+      );
       accessOptionsCopy.isSelf = true;
 
       try {
         const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
-          accessOptions: accessOptionsCopy,
+          dbServiceAccessOptions: accessOptionsCopy,
         });
 
         expect(searchUser.teacherData).to.have.property('licensePath');
@@ -115,7 +119,9 @@ context('userDbService', () => {
     });
 
     it('given an existing user id (viewing admin & teacher as self), should have additional restricted data', async () => {
-      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      const accessOptionsCopy: DbServiceAccessOptions = JSON.parse(
+        JSON.stringify(dbServiceAccessOptions)
+      );
       accessOptionsCopy.currentAPIUserRole = 'admin';
       accessOptionsCopy.isSelf = true;
 
@@ -123,7 +129,7 @@ context('userDbService', () => {
         const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
-          accessOptions: accessOptionsCopy,
+          dbServiceAccessOptions: accessOptionsCopy,
         });
 
         expect(searchUser.teacherData).to.have.property('licensePath');
@@ -136,14 +142,16 @@ context('userDbService', () => {
     });
 
     it('given an existing user id, overriding select options should return an user with the password field', async () => {
-      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      const accessOptionsCopy: DbServiceAccessOptions = JSON.parse(
+        JSON.stringify(dbServiceAccessOptions)
+      );
       accessOptionsCopy.isOverridingSelectOptions = true;
 
       try {
         const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const searchUser = await userDbService.findById({
           _id: newUser._id,
-          accessOptions: accessOptionsCopy,
+          dbServiceAccessOptions: accessOptionsCopy,
         });
 
         expect(searchUser).to.have.property('password');
@@ -157,7 +165,7 @@ context('userDbService', () => {
       const newUser = await fakeDbUserFactory.createFakeDbUser();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(searchUser).to.not.equal(null);
     });
@@ -179,30 +187,32 @@ context('userDbService', () => {
       const newUser = await fakeDbUserFactory.createFakeDbUser();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(searchUser.profileBio).to.equal('');
       const updatedUser = await userDbService.findOneAndUpdate({
         searchQuery: { email: newUser.email },
         updateParams: { profileBio: 'updated bio' },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(updatedUser.profileBio).to.equal('updated bio');
     });
 
     it('should update db document and return additional restricted properties as admin', async () => {
-      const accessOptionsCopy: AccessOptions = JSON.parse(JSON.stringify(accessOptions));
+      const accessOptionsCopy: DbServiceAccessOptions = JSON.parse(
+        JSON.stringify(dbServiceAccessOptions)
+      );
       accessOptionsCopy.currentAPIUserRole = 'admin';
       const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
       const searchUser = await userDbService.findById({
         _id: newUser._id,
-        accessOptions: accessOptionsCopy,
+        dbServiceAccessOptions: accessOptionsCopy,
       });
       expect(searchUser.profileBio).to.equal('');
       const updatedUser = await userDbService.findOneAndUpdate({
         searchQuery: { _id: newUser._id },
         updateParams: { profileBio: 'updated bio' },
-        accessOptions: accessOptionsCopy,
+        dbServiceAccessOptions: accessOptionsCopy,
       });
       expect(updatedUser.profileBio).to.equal('updated bio');
       expect(updatedUser.teacherData).to.have.property('licensePath');

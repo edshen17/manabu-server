@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makePackageDbService } from '.';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbPackageFactory } from '../../testFixtures/fakeDbPackageFactory';
 import { FakeDbPackageFactory } from '../../testFixtures/fakeDbPackageFactory/fakeDbPackageFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
@@ -12,14 +12,14 @@ let packageDbService: PackageDbService;
 let fakeDbPackageFactory: FakeDbPackageFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeTeacher: JoinedUserDoc;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 
 before(async () => {
   packageDbService = await makePackageDbService;
   fakeDbPackageFactory = await makeFakeDbPackageFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-  accessOptions = fakeDbPackageFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbPackageFactory.getDefaultAccessOptions();
 });
 
 describe('packageDbService', () => {
@@ -28,15 +28,15 @@ describe('packageDbService', () => {
       const fakePackages = fakeTeacher.teacherData.packages;
       const findByIdPackage = await packageDbService.findById({
         _id: fakePackages[0]._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findOnePackage = await packageDbService.findOne({
         searchQuery: { _id: fakePackages[0]._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findPackages = await packageDbService.find({
         searchQuery: { hostedBy: fakeTeacher._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findByIdPackage._id.toString()).to.deep.equal(fakePackages[0]._id.toString());
       expect(findByIdPackage._id.toString()).to.deep.equal(findOnePackage._id.toString());
@@ -51,7 +51,7 @@ describe('packageDbService', () => {
       });
       const foundPackages = await packageDbService.find({
         searchQuery: { hostedBy: fakeUser._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(foundPackages.length).to.equal(fakePackages.length);
     });
@@ -62,7 +62,7 @@ describe('packageDbService', () => {
       const updatedPackage = await packageDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackage._id },
         updateParams: { packageType: 'different', packageDurations: [90] },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(updatedPackage).to.not.deep.equal(fakePackage);
       expect(updatedPackage.packageType).to.equal('different');
@@ -74,11 +74,11 @@ describe('packageDbService', () => {
       const fakePackage = fakeTeacher.teacherData.packages[0];
       const deletedPackage = await packageDbService.findByIdAndDelete({
         _id: fakePackage._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const foundPackage = await packageDbService.findById({
         _id: fakePackage._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(foundPackage).to.not.deep.equal(deletedPackage);
       expect(foundPackage).to.be.equal(null);

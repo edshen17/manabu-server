@@ -1,4 +1,4 @@
-import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
@@ -27,13 +27,13 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
     endpointPath: string;
   }) => {
     const { isCurrentAPIUserPermitted, currentAPIUser } = props;
-    const accessOptions: AccessOptions = {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
       isSelf: true,
     };
-    return accessOptions;
+    return dbServiceAccessOptions;
   };
 
   protected _isValidRequest = (controllerData: ControllerData) => {
@@ -44,17 +44,17 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
   };
 
   protected _makeRequestTemplate = async (props: MakeRequestTemplateParams) => {
-    const { accessOptions, params } = props;
+    const { dbServiceAccessOptions, params } = props;
     const { verificationToken } = params;
     const user = await this._userDbService.findOne({
       searchQuery: { verificationToken },
-      accessOptions,
+      dbServiceAccessOptions,
     });
     if (user) {
       const updatedDbUser = await this._userDbService.findOneAndUpdate({
         searchQuery: { _id: user._id },
         updateParams: { emailVerified: true },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const redirectURI = this._redirectPathBuilder
         .host('client')

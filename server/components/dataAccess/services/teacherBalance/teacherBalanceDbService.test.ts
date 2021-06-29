@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { makeTeacherBalanceDbService } from '.';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbTeacherBalanceFactory } from '../../testFixtures/fakeDbTeacherBalanceFactory';
 import { FakeDbTeacherBalanceFactory } from '../../testFixtures/fakeDbTeacherBalanceFactory/fakeDbTeacherBalanceFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
@@ -13,7 +13,7 @@ let teacherBalanceDbService: TeacherBalanceDbService;
 let fakeDbTeacherBalanceFactory: FakeDbTeacherBalanceFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeTeacher: JoinedUserDoc;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakeTeacherBalance: TeacherBalanceDoc;
 
 before(async () => {
@@ -21,7 +21,7 @@ before(async () => {
   fakeDbTeacherBalanceFactory = await makeFakeDbTeacherBalanceFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-  accessOptions = fakeDbTeacherBalanceFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbTeacherBalanceFactory.getDefaultAccessOptions();
 });
 
 beforeEach(async () => {
@@ -36,15 +36,15 @@ describe('teacherBalanceDbService', () => {
     it('should find a package from the given search query', async () => {
       const findOneTeacherBalance = await teacherBalanceDbService.findOne({
         searchQuery: { userId: fakeTeacher._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findTeacherBalances = await teacherBalanceDbService.find({
         searchQuery: { userId: fakeTeacher._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findByIdTeacherBalance = await teacherBalanceDbService.findById({
         _id: findOneTeacherBalance._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(findOneTeacherBalance).to.deep.equal(findTeacherBalances[0]);
       expect(findOneTeacherBalance).to.deep.equal(findByIdTeacherBalance);
@@ -61,7 +61,7 @@ describe('teacherBalanceDbService', () => {
       const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
         searchQuery: { userId: fakeTeacher._id },
         updateParams: { 'balanceDetails.balance': 10 },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(updatedTeacherBalance.balanceDetails.balance).to.equal(10);
     });

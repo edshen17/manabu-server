@@ -1,10 +1,12 @@
-import { IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
+import { IDbService } from '../../abstractions/IDbService';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 
+type MinuteBankDbServiceInitParams = {};
+
 class MinuteBankDbService
-  extends CommonDbOperations<MinuteBankDoc>
-  implements IDbOperations<MinuteBankDoc>
+  extends AbstractDbService<MinuteBankDbServiceInitParams, MinuteBankDoc>
+  implements IDbService<MinuteBankDbServiceInitParams, MinuteBankDoc>
 {
   constructor() {
     super();

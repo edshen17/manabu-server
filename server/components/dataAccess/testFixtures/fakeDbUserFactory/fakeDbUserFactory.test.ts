@@ -34,10 +34,10 @@ describe('fakeDbUserFactory', () => {
   describe('createFakeDbTeacherWithDefaultPackages', () => {
     it('should create a fake db teacher with default packages', async () => {
       const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-      const accessOptions = fakeDbUserFactory.getDefaultAccessOptions();
+      const dbServiceAccessOptions = fakeDbUserFactory.getDefaultAccessOptions();
       const joinedTeacher = await userDbService.findById({
         _id: fakeDbTeacher._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(fakeDbTeacher._id.toString()).to.equal(joinedTeacher._id.toString());
     });

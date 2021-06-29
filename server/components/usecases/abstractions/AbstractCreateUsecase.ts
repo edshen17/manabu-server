@@ -1,4 +1,4 @@
-import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { AbstractUsecase } from './AbstractUsecase';
 import { CurrentAPIUser } from './IUsecase';
 
@@ -23,7 +23,7 @@ abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<Us
     endpointPath: string;
   }) => {
     const { currentAPIUser, isCurrentAPIUserPermitted } = props;
-    const accessOptions: AccessOptions = {
+    const accessOptions: DbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,

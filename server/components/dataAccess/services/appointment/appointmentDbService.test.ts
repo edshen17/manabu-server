@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { makeAppointmentDbService } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
 import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
 import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
@@ -12,7 +12,7 @@ import { AppointmentDbService } from './appointmentDbService';
 let appointmentDbService: AppointmentDbService;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
 
@@ -23,7 +23,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  accessOptions = fakeDbAppointmentFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbAppointmentFactory.getDefaultAccessOptions();
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedBy: fakePackageTransaction.hostedBy.toString(),
@@ -41,11 +41,11 @@ describe('appointmentDbService', () => {
         searchQuery: {
           hostedBy: fakeAppointment.hostedBy,
         },
-        accessOptions,
+        dbServiceAccessOptions,
       };
       const findByIdAppointment = await appointmentDbService.findById({
         _id: fakeAppointment._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findOneAppointment = await appointmentDbService.findOne(findParams);
       const findAppointments = await appointmentDbService.find(findParams);
@@ -62,7 +62,7 @@ describe('appointmentDbService', () => {
         updateParams: {
           status: 'cancelled',
         },
-        accessOptions,
+        dbServiceAccessOptions,
       });
 
       expect(updatedAppointment.status).to.equal('cancelled');

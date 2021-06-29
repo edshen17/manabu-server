@@ -1,10 +1,10 @@
-import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import { IEntity } from './IEntity';
 
 abstract class AbstractEntity<EntityInitParams, EntityBuildParams, EntityBuildResponse>
   implements IEntity<EntityInitParams, EntityBuildParams, EntityBuildResponse>
 {
-  protected _defaultAccessOptions: AccessOptions = {
+  protected _defaultAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,
@@ -12,13 +12,13 @@ abstract class AbstractEntity<EntityInitParams, EntityBuildParams, EntityBuildRe
   };
 
   public getDbDataById = async (props: {
-    dbService: IDbOperations<any>;
+    dbService: IDbService<any, any>;
     _id: string;
-    overideAccessOptions?: AccessOptions;
+    overideAccessOptions?: DbServiceAccessOptions;
   }): Promise<any> => {
     const { dbService, _id, overideAccessOptions } = props;
-    const accessOptions = overideAccessOptions || this._defaultAccessOptions;
-    const dbData = await dbService.findById({ _id, accessOptions });
+    const dbServiceAccessOptions = overideAccessOptions || this._defaultAccessOptions;
+    const dbData = await dbService.findById({ _id, dbServiceAccessOptions });
     return dbData;
   };
 

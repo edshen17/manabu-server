@@ -1,12 +1,12 @@
-import { AccessOptions, IDbOperations } from '../../dataAccess/abstractions/IDbOperations';
+import { DbAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 
 interface IEntity<InitParams, EntityBuildParams, EntityBuildResponse> {
   build: (entityParams: EntityBuildParams) => Promise<EntityBuildResponse> | EntityBuildResponse;
   init?: (initParams: InitParams) => Promise<this> | this;
   getDbDataById?: (props: {
-    dbService: IDbOperations<any>;
+    dbService: IDbService<any>;
     _id: string;
-    overideAccessOptions?: AccessOptions;
+    overideAccessOptions?: DbAccessOptions;
   }) => Promise<any>;
 }
 

@@ -1,10 +1,10 @@
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 
-interface IFakeDbDataFactory<InitParams, FakeEntityData, DbDoc> {
+interface IFakeDbDataFactory<FakeDbDataFactoryInitParams, FakeEntityData, DbDoc> {
   init: (
-    props: { makeEntity: any; makeDbService: any; cloneDeep: any } & InitParams
+    props: { makeEntity: any; makeDbService: any; cloneDeep: any } & FakeDbDataFactoryInitParams
   ) => Promise<this> | this;
-  getDefaultAccessOptions: () => AccessOptions;
+  getDefaultAccessOptions: () => DbServiceAccessOptions;
   createFakeDbData?: (fakeEntityData?: FakeEntityData) => Promise<DbDoc>;
 }
 

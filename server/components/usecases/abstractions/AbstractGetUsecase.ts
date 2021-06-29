@@ -1,4 +1,4 @@
-import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { AbstractUsecase } from './AbstractUsecase';
 import { CurrentAPIUser } from './IUsecase';
 
@@ -14,7 +14,7 @@ abstract class AbstractGetUsecase<UsecaseResponse> extends AbstractUsecase<Useca
     endpointPath: string;
   }) => {
     const { currentAPIUser, isCurrentAPIUserPermitted, params, endpointPath } = props;
-    const accessOptions: AccessOptions = {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
@@ -22,7 +22,7 @@ abstract class AbstractGetUsecase<UsecaseResponse> extends AbstractUsecase<Useca
         (params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId) ||
         (currentAPIUser.userId && endpointPath == '/self/me'),
     };
-    return accessOptions;
+    return dbServiceAccessOptions;
   };
 }
 

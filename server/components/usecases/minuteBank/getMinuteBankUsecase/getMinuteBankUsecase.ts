@@ -1,5 +1,5 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -35,13 +35,13 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
     endpointPath: string;
   }) => {
     const { currentAPIUser, isCurrentAPIUserPermitted } = props;
-    const accessOptions: AccessOptions = {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
       isProtectedResource: true,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
       isSelf: isCurrentAPIUserPermitted,
     };
-    return accessOptions;
+    return dbServiceAccessOptions;
   };
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
@@ -54,7 +54,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetMinuteBankUsecaseResponse> => {
-    const { params, accessOptions, endpointPath, currentAPIUser } = props;
+    const { params, dbServiceAccessOptions, endpointPath, currentAPIUser } = props;
     if (endpointPath == '/self/minuteBanks') {
       const searchQuery = {
         $or: [
@@ -68,7 +68,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
       };
       const minuteBanks = await this._minuteBankDbService.find({
         searchQuery,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       return { minuteBanks };
     } else {
@@ -76,7 +76,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
       const searchQuery = { hostedBy, reservedBy };
       const minuteBank = await this._minuteBankDbService.findOne({
         searchQuery,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       return { minuteBank };
     }

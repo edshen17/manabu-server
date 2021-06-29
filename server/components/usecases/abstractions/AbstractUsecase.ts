@@ -1,8 +1,8 @@
-import { AccessOptions } from '../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { ControllerData, CurrentAPIUser, IUsecase } from './IUsecase';
 
 type MakeRequestTemplateParams = {
-  accessOptions: AccessOptions;
+  dbServiceAccessOptions: DbServiceAccessOptions;
   body: any;
   isValidRequest: boolean;
   isCurrentAPIUserPermitted: boolean;
@@ -42,7 +42,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       endpointPath,
     });
 
-    const accessOptions: AccessOptions = this._setAccessOptions({
+    const dbServiceAccessOptions: DbServiceAccessOptions = this._setAccessOptions({
       isCurrentAPIUserPermitted,
       currentAPIUser,
       params,
@@ -50,7 +50,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     });
     const isValidRequest = this._isValidRequest(controllerData);
     return {
-      accessOptions,
+      dbServiceAccessOptions,
       body,
       isValidRequest,
       isCurrentAPIUserPermitted,
@@ -80,9 +80,9 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     isCurrentAPIUserPermitted: boolean;
     params: any;
     endpointPath: string;
-  }): AccessOptions => {
-    const accessOptions = this._setAccessOptionsTemplate(props);
-    return accessOptions;
+  }): DbServiceAccessOptions => {
+    const dbServiceAccessOptions = this._setAccessOptionsTemplate(props);
+    return dbServiceAccessOptions;
   };
 
   protected _setAccessOptionsTemplate = (props: {
@@ -92,13 +92,13 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     endpointPath: string;
   }) => {
     const { currentAPIUser, isCurrentAPIUserPermitted, params } = props;
-    const accessOptions: AccessOptions = {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
       isProtectedResource: true,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
       isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
     };
-    return accessOptions;
+    return dbServiceAccessOptions;
   };
 
   protected abstract _isValidRequest(controllerData: ControllerData): boolean;

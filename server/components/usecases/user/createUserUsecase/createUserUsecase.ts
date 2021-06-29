@@ -2,7 +2,7 @@ import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { PackageDoc } from '../../../../models/Package';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
-import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { PackageDbService } from '../../../dataAccess/services/package/packageDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
@@ -58,14 +58,14 @@ class CreateUserUsecase
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateUserUsecaseResponse> => {
-    const { body, accessOptions } = props;
+    const { body, dbServiceAccessOptions } = props;
     const { isTeacherApp } = body || {};
 
     try {
       const userInstance = this._userEntity.build(body);
-      let savedDbUser = await this._insertUser(userInstance, accessOptions);
+      let savedDbUser = await this._insertUser(userInstance, dbServiceAccessOptions);
       if (isTeacherApp) {
-        savedDbUser = await this.handleTeacherCreation(savedDbUser, accessOptions);
+        savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
       }
 
       if (process.env.NODE_ENV == 'production') {
@@ -84,26 +84,26 @@ class CreateUserUsecase
 
   private _insertUser = async (
     userInstance: any,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
     const savedDbUser = await this._userDbService.insert({
       modelToInsert: userInstance,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return savedDbUser;
   };
 
   public handleTeacherCreation = async (
     savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
     const joinedUserData = JSON.parse(JSON.stringify(savedDbUser));
-    const teacherData: any = await this._insertTeacher(savedDbUser, accessOptions);
-    const packages = await this._insertTeacherPackages(savedDbUser, accessOptions);
+    const teacherData: any = await this._insertTeacher(savedDbUser, dbServiceAccessOptions);
+    const packages = await this._insertTeacherPackages(savedDbUser, dbServiceAccessOptions);
 
-    await this._insertAdminPackageTransaction(savedDbUser, accessOptions);
-    await this._insertAdminMinuteBank(savedDbUser, accessOptions);
-    await this._insertTeacherBalance(savedDbUser, accessOptions);
+    await this._insertAdminPackageTransaction(savedDbUser, dbServiceAccessOptions);
+    await this._insertAdminMinuteBank(savedDbUser, dbServiceAccessOptions);
+    await this._insertTeacherBalance(savedDbUser, dbServiceAccessOptions);
 
     teacherData.packages = packages;
     joinedUserData.teacherData = teacherData;
@@ -113,27 +113,27 @@ class CreateUserUsecase
 
   private _insertTeacher = async (
     savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherDoc> => {
     const userId = savedDbUser._id;
     const modelToInsert = makeTeacherEntity.build({ userId });
     const savedDbTeacher = await this._teacherDbService.insert({
       modelToInsert,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return savedDbTeacher;
   };
 
   private _insertTeacherPackages = async (
     savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<PackageDoc[]> => {
     const packagesToInsert = await this._createDefaultTeacherPackages(savedDbUser);
     const modelToInsert = await Promise.all(packagesToInsert);
 
     const newPackages = await this._packageDbService.insertMany({
       modelToInsert,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return newPackages;
   };
@@ -169,7 +169,7 @@ class CreateUserUsecase
 
   private _insertAdminPackageTransaction = async (
     savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<PackageTransactionDoc> => {
     const packageTransactionEntity = await makePackageTransactionEntity;
     const modelToInsert = await packageTransactionEntity.build({
@@ -186,14 +186,14 @@ class CreateUserUsecase
     });
     const newPackageTransaction = await this._packageTransactionDbService.insert({
       modelToInsert,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return newPackageTransaction;
   };
 
   private _insertAdminMinuteBank = async (
     savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<MinuteBankDoc> => {
     const minuteBankEntity = await makeMinuteBankEntity;
     const modelToInsert = await minuteBankEntity.build({
@@ -202,14 +202,14 @@ class CreateUserUsecase
     });
     const newMinuteBank = await this._minuteBankDbService.insert({
       modelToInsert,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return newMinuteBank;
   };
 
   private _insertTeacherBalance = async (
     savedDbUser: JoinedUserDoc,
-    accessOptions: AccessOptions
+    dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherBalanceDoc> => {
     const teacherBalanceEntity = makeTeacherBalanceEntity;
     const modelToInsert = await teacherBalanceEntity.build({
@@ -217,7 +217,7 @@ class CreateUserUsecase
     });
     const newTeacherBalance = this._teacherBalanceDbService.insert({
       modelToInsert,
-      accessOptions,
+      dbServiceAccessOptions,
     });
     return newTeacherBalance;
   };

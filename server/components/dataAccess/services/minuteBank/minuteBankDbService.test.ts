@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import { makeMinuteBankDbService } from '.';
-import { AccessOptions } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
 import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { MinuteBankDbService } from './minuteBankDbService';
 
 let minuteBankDbService: MinuteBankDbService;
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
-let accessOptions: AccessOptions;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 
 before(async () => {
   minuteBankDbService = await makeMinuteBankDbService;
@@ -15,7 +15,7 @@ before(async () => {
 });
 
 beforeEach(() => {
-  accessOptions = fakeDbMinuteBankFactory.getDefaultAccessOptions();
+  dbServiceAccessOptions = fakeDbMinuteBankFactory.getDefaultAccessOptions();
 });
 
 describe('minuteBankDbService', () => {
@@ -24,15 +24,15 @@ describe('minuteBankDbService', () => {
       const newMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({ minuteBank: 0 });
       const findMinuteBanks = await minuteBankDbService.find({
         searchQuery: { _id: newMinuteBank._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findByIdMinuteBank = await minuteBankDbService.findById({
         _id: newMinuteBank._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       const findOneMinuteBank = await minuteBankDbService.findOne({
         searchQuery: { _id: newMinuteBank._id },
-        accessOptions,
+        dbServiceAccessOptions,
       });
 
       expect(findMinuteBanks.length == 1).to.equal(true);
@@ -45,12 +45,12 @@ describe('minuteBankDbService', () => {
       expect(findByIdMinuteBank.reservedByData).to.not.have.property('password');
     });
     it('should find the correct minuteBank with a restricted view on user data, even if self (admin, self)', async () => {
-      accessOptions.currentAPIUserRole = 'admin';
-      accessOptions.isSelf = true;
+      dbServiceAccessOptions.currentAPIUserRole = 'admin';
+      dbServiceAccessOptions.isSelf = true;
       const newMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({ minuteBank: 0 });
       const foundMinuteBank = await minuteBankDbService.findById({
         _id: newMinuteBank._id,
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(foundMinuteBank).to.deep.equal(newMinuteBank);
       expect(foundMinuteBank.hostedByData).to.not.have.property('email');
@@ -62,7 +62,7 @@ describe('minuteBankDbService', () => {
       const newMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({ minuteBank: 0 });
       const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
         updateParams: { minuteBank: 10 },
-        accessOptions,
+        dbServiceAccessOptions,
       });
       expect(newMinuteBank).to.not.deep.equal(updatedMinuteBank);
       expect(newMinuteBank.minuteBank).to.equal(10);

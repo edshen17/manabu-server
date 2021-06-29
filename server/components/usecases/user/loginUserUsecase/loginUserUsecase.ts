@@ -1,4 +1,4 @@
-import { AccessOptions } from '../../../dataAccess/abstractions/IDbOperations';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
@@ -40,17 +40,17 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
-    const { body, accessOptions, query, endpointPath, controllerData } = props;
+    const { body, dbServiceAccessOptions, query, endpointPath, controllerData } = props;
     if (endpointPath == SERVER_LOGIN_ENDPOINTS.BASE_LOGIN) {
       return await this._handleBaseLogin({
         body,
         query,
-        accessOptions,
+        dbServiceAccessOptions,
       });
     } else if (endpointPath == SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN) {
       return await this._handleGoogleLogin({
         query,
-        accessOptions,
+        dbServiceAccessOptions,
         body,
         controllerData,
       });
@@ -62,15 +62,15 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   private _handleBaseLogin = async (props: {
     body: any;
     query: any;
-    accessOptions: AccessOptions;
+    dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<LoginUserUsecaseResponse> => {
-    const { body, accessOptions } = props;
+    const { body, dbServiceAccessOptions } = props;
     const { email, password, isTeacherApp } = body || {};
-    accessOptions.isOverridingSelectOptions = true;
+    dbServiceAccessOptions.isOverridingSelectOptions = true;
     let savedDbUser = await this._userDbService.authenticateUser(
       {
         searchQuery: { email },
-        accessOptions,
+        dbServiceAccessOptions,
       },
       password
     );
@@ -79,7 +79,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     };
     const loginUserUsecaseResponse = await this._loginUser({
       savedDbUser,
-      accessOptions,
+      dbServiceAccessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
@@ -88,11 +88,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
 
   private _loginUser = async (props: {
     savedDbUser: JoinedUserDoc;
-    accessOptions: AccessOptions;
+    dbServiceAccessOptions: DbServiceAccessOptions;
     isTeacherApp: boolean;
     handleNoSavedDbUser: () => any;
   }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, isTeacherApp, handleNoSavedDbUser } = props || {};
+    const { dbServiceAccessOptions, isTeacherApp, handleNoSavedDbUser } = props || {};
     let { savedDbUser } = props;
     if (savedDbUser) {
       const shouldCreateNewTeacher =
@@ -100,7 +100,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
       if (shouldCreateNewTeacher) {
         savedDbUser = await this._createUserUsecase.handleTeacherCreation(
           savedDbUser,
-          accessOptions
+          dbServiceAccessOptions
         );
       }
       return this._createLoginUserUsecaseResponse(savedDbUser);
@@ -121,16 +121,19 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
 
   private _handleGoogleLogin = async (props: {
     query: any;
-    accessOptions: AccessOptions;
+    dbServiceAccessOptions: DbServiceAccessOptions;
     body: any;
     controllerData: ControllerData;
   }): Promise<LoginUserUsecaseResponse> => {
-    const { accessOptions, body, controllerData, query } = props;
+    const { dbServiceAccessOptions, body, controllerData, query } = props;
     const { code, isTeacherApp, hostedBy } = this._parseGoogleQuery(query);
     const { tokens } = await this._oauth2Client.getToken(code);
     const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
 
-    let savedDbUser = await this._userDbService.findOne({ searchQuery: { email }, accessOptions });
+    let savedDbUser = await this._userDbService.findOne({
+      searchQuery: { email },
+      dbServiceAccessOptions,
+    });
 
     const handleNoSavedDbUser = async () => {
       body.name = name;
@@ -146,7 +149,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
 
     const loginUserUsecaseResponse = await this._loginUser({
       savedDbUser,
-      accessOptions,
+      dbServiceAccessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });

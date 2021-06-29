@@ -1,10 +1,12 @@
-import { IDbOperations } from '../../abstractions/IDbOperations';
-import { CommonDbOperations } from '../../abstractions/AbstractDbOperations';
+import { IDbService } from '../../abstractions/IDbService';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 
+type TeacherBalanceDbServiceInitParams = {};
+
 class TeacherBalanceDbService
-  extends CommonDbOperations<TeacherBalanceDoc>
-  implements IDbOperations<TeacherBalanceDoc>
+  extends AbstractDbService<TeacherBalanceDbServiceInitParams, TeacherBalanceDoc>
+  implements IDbService<TeacherBalanceDbServiceInitParams, TeacherBalanceDoc>
 {
   constructor() {
     super();

@@ -1,17 +1,17 @@
 import { IEntity } from '../../../entities/abstractions/IEntity';
-import { AccessOptions, IDbOperations } from '../../abstractions/IDbOperations';
+import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
 import { IFakeDbDataFactory } from './IFakeDbDataFactory';
 
 abstract class AbstractFakeDbDataFactory<
-  InitParams,
+  FakeDbDataFactoryInitParams,
   FakeEntityBuildParams,
   EntityBuildResponse,
   DbDoc
-> implements IFakeDbDataFactory<InitParams, FakeEntityBuildParams, DbDoc>
+> implements IFakeDbDataFactory<FakeDbDataFactoryInitParams, FakeEntityBuildParams, DbDoc>
 {
   protected _entity!: IEntity<any, any, EntityBuildResponse>;
-  protected _dbService!: IDbOperations<DbDoc>;
-  protected _defaultAccessOptions: AccessOptions;
+  protected _dbService!: IDbService<any, DbDoc>;
+  protected _defaultAccessOptions: DbServiceAccessOptions;
   protected _cloneDeep!: any;
   constructor() {
     this._defaultAccessOptions = {
@@ -26,7 +26,7 @@ abstract class AbstractFakeDbDataFactory<
     const fakeEntity = await this._createFakeEntity(fakeEntityData);
     let newDbDocCallback = this._dbService.insert({
       modelToInsert: fakeEntity,
-      accessOptions: this._defaultAccessOptions,
+      dbServiceAccessOptions: this._defaultAccessOptions,
     });
     const fakeDbData = await this._awaitDbInsert(newDbDocCallback);
     return fakeDbData;
@@ -45,7 +45,7 @@ abstract class AbstractFakeDbDataFactory<
   };
 
   public init = async (
-    props: { makeEntity: any; makeDbService: any; cloneDeep: any } & InitParams
+    props: { makeEntity: any; makeDbService: any; cloneDeep: any } & FakeDbDataFactoryInitParams
   ): Promise<this> => {
     const { makeEntity, makeDbService, cloneDeep } = props;
     this._entity = await makeEntity;
