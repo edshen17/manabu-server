@@ -2,11 +2,11 @@ import { IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageDoc } from '../../../../models/Package';
 
-type PackageDbServiceInitParams = {};
+type PartialPackageDbServiceInitParams = {};
 
 class PackageDbService
-  extends AbstractDbService<PackageDbServiceInitParams, PackageDoc>
-  implements IDbService<PackageDbServiceInitParams, PackageDoc>
+  extends AbstractDbService<PartialPackageDbServiceInitParams, PackageDoc>
+  implements IDbService<PartialPackageDbServiceInitParams, PackageDoc>
 {
   constructor() {
     super();

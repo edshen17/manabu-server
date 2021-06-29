@@ -2,11 +2,11 @@ import { IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 
-type MinuteBankDbServiceInitParams = {};
+type PartialMinuteBankDbServiceInitParams = {};
 
 class MinuteBankDbService
-  extends AbstractDbService<MinuteBankDbServiceInitParams, MinuteBankDoc>
-  implements IDbService<MinuteBankDbServiceInitParams, MinuteBankDoc>
+  extends AbstractDbService<PartialMinuteBankDbServiceInitParams, MinuteBankDoc>
+  implements IDbService<PartialMinuteBankDbServiceInitParams, MinuteBankDoc>
 {
   constructor() {
     super();

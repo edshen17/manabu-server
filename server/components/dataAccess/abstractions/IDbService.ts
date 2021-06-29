@@ -21,7 +21,7 @@ type DbModelViews = {
   overrideView?: {};
 };
 
-interface IDbService<DbServiceInitParams, DbDoc> {
+interface IDbService<PartialDbServiceInitParams, DbDoc> {
   findById: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   findOne: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   find: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
@@ -31,11 +31,11 @@ interface IDbService<DbServiceInitParams, DbDoc> {
   updateMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   init: (
-    props: {
-      makeDb: Promise<IDbService<DbServiceInitParams, DbDoc>>;
+    dbServiceInitParams: {
+      makeDb: () => Promise<any>;
       cloneDeep: any;
       dbModel: DbDoc;
-    } & DbServiceInitParams
+    } & PartialDbServiceInitParams
   ) => Promise<this>;
   getDbModelViews: () => DbModelViews;
 }

@@ -2,11 +2,11 @@ import { DbServiceParams, IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDoc } from '../../../../models/Teacher';
 
-type TeacherDbServiceInitParams = {};
+type PartialTeacherDbServiceInitParams = {};
 
 class TeacherDbService
-  extends AbstractDbService<TeacherDbServiceInitParams, TeacherDoc>
-  implements IDbService<TeacherDbServiceInitParams, TeacherDoc>
+  extends AbstractDbService<PartialTeacherDbServiceInitParams, TeacherDoc>
+  implements IDbService<PartialTeacherDbServiceInitParams, TeacherDoc>
 {
   constructor() {
     super();

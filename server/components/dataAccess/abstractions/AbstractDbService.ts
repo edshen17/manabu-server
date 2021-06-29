@@ -1,7 +1,7 @@
 import { DbServiceAccessOptions, DbModelViews, IDbService } from './IDbService';
 
-abstract class AbstractDbService<DbServiceInitParams, DbDoc>
-  implements IDbService<DbServiceInitParams, DbDoc>
+abstract class AbstractDbService<PartialDbServiceInitParams, DbDoc>
+  implements IDbService<PartialDbServiceInitParams, DbDoc>
 {
   protected _dbModel!: any;
   protected _dbModelViews!: DbModelViews;
@@ -158,13 +158,27 @@ abstract class AbstractDbService<DbServiceInitParams, DbDoc>
     return dbData;
   };
 
-  public init = async (props: any): Promise<this> => {
-    const { makeDb, cloneDeep, dbModel } = props;
+  public init = async (
+    dbServiceInitParams: {
+      makeDb: () => Promise<any>;
+      cloneDeep: any;
+      dbModel: any;
+    } & PartialDbServiceInitParams
+  ): Promise<this> => {
+    const { makeDb, cloneDeep, dbModel, ...partialDbServiceInitParams } = dbServiceInitParams;
     await makeDb();
     this._cloneDeep = cloneDeep;
     this._dbModel = dbModel;
+    await this._initTemplate(partialDbServiceInitParams);
     return this;
   };
+
+  protected _initTemplate = async (
+    partialDbServiceInitParams: Omit<
+      { makeDb: any; dbModel: any; cloneDeep: any } & PartialDbServiceInitParams,
+      'makeDb' | 'dbModel' | 'cloneDeep'
+    >
+  ): Promise<void> => {};
 
   public getDbModelViews = (): DbModelViews => {
     const dbModelViewsCopy = this._cloneDeep(this._dbModelViews);

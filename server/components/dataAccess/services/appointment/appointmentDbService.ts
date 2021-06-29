@@ -2,11 +2,11 @@ import { AppointmentDoc } from '../../../../models/Appointment';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { IDbService } from '../../abstractions/IDbService';
 
-type AppointmentDbServiceInitParams = {};
+type PartialAppointmentDbServiceInitParams = {};
 
 class AppointmentDbService
-  extends AbstractDbService<AppointmentDbServiceInitParams, AppointmentDoc>
-  implements IDbService<AppointmentDbServiceInitParams, AppointmentDoc>
+  extends AbstractDbService<PartialAppointmentDbServiceInitParams, AppointmentDoc>
+  implements IDbService<PartialAppointmentDbServiceInitParams, AppointmentDoc>
 {
   constructor() {
     super();

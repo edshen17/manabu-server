@@ -6,17 +6,21 @@ import { UserDoc } from '../../../../models/User';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { PackageDoc } from '../../../../models/Package';
 
-type UserDbServiceInitParams = {};
+type PartialUserDbServiceInitParams = {
+  makeTeacherDbService: Promise<TeacherDbService>;
+  makePackageDbService: Promise<PackageDbService>;
+  bcrypt: any;
+};
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
 class UserDbService
-  extends AbstractDbService<UserDbServiceInitParams, JoinedUserDoc>
-  implements IDbService<UserDbServiceInitParams, JoinedUserDoc>
+  extends AbstractDbService<PartialUserDbServiceInitParams, JoinedUserDoc>
+  implements IDbService<PartialUserDbServiceInitParams, JoinedUserDoc>
 {
   private _teacherDbService!: TeacherDbService;
   private _packageDbService!: PackageDbService;
-  private _passwordLib!: any;
+  private _bcrypt!: any;
   constructor() {
     super();
     this._dbModelViews = {
@@ -55,7 +59,7 @@ class UserDbService
       );
     }
 
-    const isPasswordValid = this._passwordLib.compareSync(inputtedPassword, dbUserData.password);
+    const isPasswordValid = this._bcrypt.compareSync(inputtedPassword, dbUserData.password);
     if (isPasswordValid) {
       const { password, ...partialDbUserDataWithoutPassword } = dbUserData;
       return partialDbUserDataWithoutPassword;
@@ -107,16 +111,11 @@ class UserDbService
     return userCopy;
   };
 
-  public init = async (props: any) => {
-    const { makeDb, dbModel, cloneDeep, makeTeacherDbService, makePackageDbService, passwordLib } =
-      props;
-    await makeDb();
-    this._dbModel = dbModel;
+  protected _initTemplate = async (partialDbServiceInitParams: PartialUserDbServiceInitParams) => {
+    const { makeTeacherDbService, makePackageDbService, bcrypt } = partialDbServiceInitParams;
     this._teacherDbService = await makeTeacherDbService;
     this._packageDbService = await makePackageDbService;
-    this._cloneDeep = cloneDeep;
-    this._passwordLib = passwordLib;
-    return this;
+    this._bcrypt = bcrypt;
   };
 }
 
