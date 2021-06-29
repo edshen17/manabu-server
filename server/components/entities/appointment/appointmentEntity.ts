@@ -59,16 +59,16 @@ class AppointmentEntity extends AbstractEntity<
   };
 
   public build = async (
-    entityParams: AppointmentEntityBuildParams
+    entityBuildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const appointmentEntity = this._buildAppointmentEntity(entityParams);
+    const appointmentEntity = this._buildAppointmentEntity(entityBuildParams);
     return appointmentEntity;
   };
 
   private _buildAppointmentEntity = async (
-    entityParams: AppointmentEntityBuildParams
+    entityBuildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const { hostedBy, reservedBy, packageTransactionId, from, to } = entityParams;
+    const { hostedBy, reservedBy, packageTransactionId, from, to } = entityBuildParams;
     const { hostedByData, reservedByData, packageTransactionData, locationData } =
       await this._getDbDataDependencies({ hostedBy, reservedBy, packageTransactionId });
     const appointmentEntity = Object.freeze({
@@ -87,12 +87,12 @@ class AppointmentEntity extends AbstractEntity<
     return appointmentEntity;
   };
 
-  private _getDbDataDependencies = async (initParams: {
+  private _getDbDataDependencies = async (entityInitParams: {
     hostedBy: string;
     reservedBy: string;
     packageTransactionId: string;
   }) => {
-    const { hostedBy, reservedBy, packageTransactionId } = initParams;
+    const { hostedBy, reservedBy, packageTransactionId } = entityInitParams;
     const overrideHostedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: hostedBy,
@@ -155,8 +155,8 @@ class AppointmentEntity extends AbstractEntity<
     }
   };
 
-  public init = async (initParams: AppointmentEntityInitParams): Promise<this> => {
-    const { makeUserDbService, makePackageTransactionDbService } = initParams;
+  public init = async (entityInitParams: AppointmentEntityInitParams): Promise<this> => {
+    const { makeUserDbService, makePackageTransactionDbService } = entityInitParams;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     return this;

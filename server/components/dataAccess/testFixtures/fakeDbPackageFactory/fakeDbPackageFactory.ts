@@ -2,14 +2,14 @@ import { PackageDoc } from '../../../../models/Package';
 import { PackageEntityBuildResponse } from '../../../entities/package/packageEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-type FakeDbPackageFactoryInitParams = {};
+type PartialFakeDbPackageFactoryInitParams = {};
 type FakeDbPackageEntityBuildParams = {
   hostedBy: any;
   lessonAmount?: number;
   packageType?: string;
 };
 class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
-  FakeDbPackageFactoryInitParams,
+  PartialFakeDbPackageFactoryInitParams,
   FakeDbPackageEntityBuildParams,
   PackageEntityBuildResponse,
   PackageDoc

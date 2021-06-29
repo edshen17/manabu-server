@@ -17,8 +17,8 @@ class TeacherBalanceEntity extends AbstractEntity<
   TeacherBalanceEntityBuildParams,
   TeacherBalanceEntityBuildResponse
 > {
-  build(entityParams: TeacherBalanceEntityBuildParams): any {
-    const { userId } = entityParams;
+  build(entityBuildParams: TeacherBalanceEntityBuildParams): any {
+    const { userId } = entityBuildParams;
     const teacherBalanceEntity = Object.freeze({
       userId,
       balanceDetails: {

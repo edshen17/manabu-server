@@ -1,4 +1,4 @@
-import { IHttpRequest } from '../../expressCallback/abstractions/IHttpRequest';
+import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { IUsecase } from '../../usecases/abstractions/IUsecase';
 
 export type ControllerResponse<UsecaseResponse> = {

@@ -54,14 +54,14 @@ class PackageTransactionEntity extends AbstractEntity<
   private _dayjs!: any;
 
   public build = async (
-    entityParams: PackageTransactionEntityBuildParams
+    entityBuildParams: PackageTransactionEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
-    const packageTransactionEntity = await this._buildPackageTransactionEntity(entityParams);
+    const packageTransactionEntity = await this._buildPackageTransactionEntity(entityBuildParams);
     return packageTransactionEntity;
   };
 
   private _buildPackageTransactionEntity = async (
-    entityParams: PackageTransactionEntityBuildParams
+    entityBuildParams: PackageTransactionEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
     const {
       hostedBy,
@@ -74,7 +74,7 @@ class PackageTransactionEntity extends AbstractEntity<
       lessonLanguage,
       isSubscription,
       paymentMethodData,
-    } = entityParams;
+    } = entityBuildParams;
     const packageTransactionEntity = Object.freeze({
       hostedBy,
       reservedBy,
@@ -99,8 +99,8 @@ class PackageTransactionEntity extends AbstractEntity<
     return packageTransactionEntity;
   };
 
-  public init = async (initParams: PackageTransactionEntityInitParams): Promise<this> => {
-    const { makeUserDbService, makePackageDbService, dayjs } = initParams;
+  public init = async (entityInitParams: PackageTransactionEntityInitParams): Promise<this> => {
+    const { makeUserDbService, makePackageDbService, dayjs } = entityInitParams;
     this._userDbService = await makeUserDbService;
     this._packageDbService = await makePackageDbService;
     this._dayjs = dayjs;

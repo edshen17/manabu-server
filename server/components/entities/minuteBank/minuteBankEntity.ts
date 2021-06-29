@@ -28,16 +28,16 @@ class MinuteBankEntity extends AbstractEntity<
   private _userDbService!: UserDbService;
 
   public build = async (
-    entityParams: MinuteBankEntityBuildParams
+    entityBuildParams: MinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
-    const minuteBankEntity = this._buildMinuteBankEntity(entityParams);
+    const minuteBankEntity = this._buildMinuteBankEntity(entityBuildParams);
     return minuteBankEntity;
   };
 
   private _buildMinuteBankEntity = async (
-    entityParams: MinuteBankEntityBuildParams
+    entityBuildParams: MinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
-    const { hostedBy, reservedBy, minuteBank } = entityParams;
+    const { hostedBy, reservedBy, minuteBank } = entityBuildParams;
     const minuteBankEntity = Object.freeze({
       hostedBy,
       reservedBy,
@@ -51,8 +51,8 @@ class MinuteBankEntity extends AbstractEntity<
     return minuteBankEntity;
   };
 
-  public init = async (initParams: MinuteBankEntityInitParams): Promise<this> => {
-    const { makeUserDbService } = initParams;
+  public init = async (entityInitParams: MinuteBankEntityInitParams): Promise<this> => {
+    const { makeUserDbService } = entityInitParams;
     this._userDbService = await makeUserDbService;
     return this;
   };

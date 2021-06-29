@@ -1,10 +1,10 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type UserEntityInitParams = {
-  sanitize: any;
-  inputValidator: any;
-  passwordHasher: any;
-  randTokenGenerator: any;
+  sanitizeHtml: any;
+  bcrypt: any;
+  cryptoRandomString: any;
+  jwt: any;
 };
 
 type UserEntityBuildParams = {
@@ -42,38 +42,60 @@ class UserEntity extends AbstractEntity<
   UserEntityBuildParams,
   UserEntityBuildResponse
 > {
-  private _sanitize!: any;
-  private _inputValidator!: any;
-  private _passwordHasher!: any;
-  private _randTokenGenerator!: any;
+  private _sanitizeHtml!: any;
+  private _bcrypt!: any;
+  private _cryptoRandomString!: any;
+  private _jwt!: any;
 
-  public build = (entityParams: UserEntityBuildParams): UserEntityBuildResponse => {
+  public build = (entityBuildParams: UserEntityBuildParams): UserEntityBuildResponse => {
     try {
-      this._validateUserInput(entityParams);
-      const userEntity = this._buildUserEntity(entityParams);
+      this._validateUserInput(entityBuildParams);
+      const userEntity = this._buildUserEntity(entityBuildParams);
       return userEntity;
     } catch (err) {
       throw err;
     }
   };
 
-  private _validateUserInput = (entityParams: UserEntityBuildParams): void => {
-    const { name, email, password, profileImage } = entityParams;
-    if (!this._inputValidator.isValidName(name)) {
+  private _validateUserInput = (entityBuildParams: UserEntityBuildParams): void => {
+    const { name, email, password, profileImage } = entityBuildParams;
+    const inputValidator = this._makeInputValidator();
+    if (!inputValidator.isValidName(name)) {
       throw new Error('User must have a valid name.');
     }
 
-    if (!this._inputValidator.isValidEmail(email)) {
+    if (!inputValidator.isValidEmail(email)) {
       throw new Error('User must have a valid email.');
     }
 
-    if (!this._inputValidator.isValidPassword(password)) {
+    if (!inputValidator.isValidPassword(password)) {
       throw new Error('User must have a valid password.');
     }
   };
 
-  private _buildUserEntity = (entityParams: UserEntityBuildParams): UserEntityBuildResponse => {
-    const { name, email, password, profileImage, commMethods } = entityParams || {};
+  private _makeInputValidator = () => {
+    const inputValidator = {
+      // TODO: Finish all validations & sanitize
+      isValidName: (name: string) => {
+        return true;
+      },
+      isValidEmail: (email: string) => {
+        return true;
+      },
+      isValidPassword: (password?: string) => {
+        return true;
+      },
+      isValidURL: (url: string) => {
+        return true;
+      },
+    };
+    return inputValidator;
+  };
+
+  private _buildUserEntity = (
+    entityBuildParams: UserEntityBuildParams
+  ): UserEntityBuildResponse => {
+    const { name, email, password, profileImage, commMethods } = entityBuildParams || {};
     const userEntity = Object.freeze({
       name,
       email,
@@ -98,22 +120,28 @@ class UserEntity extends AbstractEntity<
 
   private _encryptPassword = (password?: string): string | undefined => {
     if (password) {
-      return this._passwordHasher(password);
+      return this._bcrypt.hashSync(password, 10);
     } else {
       return undefined;
     }
   };
 
   private _generateVerificationToken = (name: string, email: string): string => {
-    return this._randTokenGenerator(name, email);
+    const randToken = this._cryptoRandomString({ length: 15 });
+    const secret = process.env.JWT_SECRET!;
+    const verificationToken = this._jwt.sign({ randToken, name, email }, secret, {
+      expiresIn: 24 * 60 * 60 * 7,
+    });
+
+    return verificationToken;
   };
 
-  public init = (initParams: UserEntityInitParams) => {
-    const { sanitize, inputValidator, passwordHasher, randTokenGenerator } = initParams;
-    this._sanitize = sanitize;
-    this._inputValidator = inputValidator;
-    this._passwordHasher = passwordHasher;
-    this._randTokenGenerator = randTokenGenerator;
+  public init = (entityInitParams: UserEntityInitParams) => {
+    const { sanitizeHtml, bcrypt, cryptoRandomString, jwt } = entityInitParams;
+    this._sanitizeHtml = sanitizeHtml;
+    this._bcrypt = bcrypt;
+    this._cryptoRandomString = cryptoRandomString;
+    this._jwt = jwt;
     return this;
   };
 }
