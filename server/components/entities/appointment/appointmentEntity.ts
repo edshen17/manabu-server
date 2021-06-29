@@ -37,7 +37,7 @@ type LocationData = {
   hostedByMethodId?: string;
   reservedByMethodId?: string;
   isOnline: boolean;
-  alternativeContact?: {
+  alternativeCo1ntact?: {
     method: string;
     reservedByMethodId: string;
   };
@@ -50,12 +50,12 @@ class AppointmentEntity extends AbstractEntity<
 > {
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
-  protected _defaultAccessOptions: DbServiceAccessOptions = {
+  protected _defaultDbServiceAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
     isSelf: false,
     currentAPIUserRole: 'user',
-    isOverridingSelectOptions: true,
+    isOverrideView: true,
   };
 
   public build = async (
@@ -96,12 +96,12 @@ class AppointmentEntity extends AbstractEntity<
     const overrideHostedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: hostedBy,
-      overideAccessOptions: this._defaultAccessOptions,
+      overideAccessOptions: this._defaultDbServiceAccessOptions,
     });
     const overrideReservedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: reservedBy,
-      overideAccessOptions: this._defaultAccessOptions,
+      overideAccessOptions: this._defaultDbServiceAccessOptions,
     });
     const hostedByData = this._getRestrictedUserData(overrideHostedByData);
     const reservedByData = this._getRestrictedUserData(overrideReservedByData);

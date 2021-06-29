@@ -66,7 +66,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
   }): Promise<LoginUserUsecaseResponse> => {
     const { body, dbServiceAccessOptions } = props;
     const { email, password, isTeacherApp } = body || {};
-    dbServiceAccessOptions.isOverridingSelectOptions = true;
+    dbServiceAccessOptions.isOverrideView = true;
     let savedDbUser = await this._userDbService.authenticateUser(
       {
         searchQuery: { email },

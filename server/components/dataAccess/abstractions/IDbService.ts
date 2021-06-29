@@ -1,9 +1,9 @@
 type DbServiceParams = {
   _id?: string;
-  searchQuery?: { [key: string]: any };
+  searchQuery?: {};
   dbServiceAccessOptions: DbServiceAccessOptions;
-  modelToInsert?: { [key: string]: any };
-  updateParams?: { [key: string]: any };
+  modelToInsert?: {};
+  updateParams?: {};
 };
 
 type DbServiceAccessOptions = {
@@ -11,14 +11,14 @@ type DbServiceAccessOptions = {
   isCurrentAPIUserPermitted: boolean;
   currentAPIUserRole: string | undefined;
   isSelf: boolean;
-  isOverridingSelectOptions?: boolean;
+  isOverrideView?: boolean;
 };
 
-type DbServiceDefaultSelectOptions = {
-  defaultSettings: {};
-  adminSettings?: {};
-  isSelfSettings?: {};
-  overrideSettings?: {};
+type DbModelViews = {
+  defaultView: {};
+  adminView?: {};
+  selfView?: {};
+  overrideView?: {};
 };
 
 interface IDbService<DbServiceInitParams, DbDoc> {
@@ -37,7 +37,7 @@ interface IDbService<DbServiceInitParams, DbDoc> {
       dbModel: DbDoc;
     } & DbServiceInitParams
   ) => Promise<this>;
-  getDefaultSelectOptions: () => DbServiceDefaultSelectOptions;
+  getDbModelViews: () => DbModelViews;
 }
 
-export { DbServiceAccessOptions, DbServiceParams, IDbService, DbServiceDefaultSelectOptions };
+export { DbServiceAccessOptions, DbServiceParams, IDbService, DbModelViews };

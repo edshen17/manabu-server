@@ -10,8 +10,8 @@ class PackageTransactionDbService
 {
   constructor() {
     super();
-    this._defaultSelectOptions = {
-      defaultSettings: {},
+    this._dbModelViews = {
+      defaultView: {},
     };
   }
 }

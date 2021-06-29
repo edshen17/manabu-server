@@ -10,19 +10,20 @@ class TeacherDbService
 {
   constructor() {
     super();
-    this._defaultSelectOptions = {
-      defaultSettings: {
+    this._dbModelViews = {
+      defaultView: {
         licensePath: 0,
       },
-      adminSettings: {},
-      isSelfSettings: {},
+      adminView: {},
+      selfView: {},
     };
   }
 
   public findById = async (dbServiceParams: DbServiceParams): Promise<TeacherDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
-    const asyncCallback = this.findOne({ searchQuery: { userId: _id }, dbServiceAccessOptions });
-    return await this._grantAccess(dbServiceAccessOptions, asyncCallback);
+    const dbDataPromise = this.findOne({ searchQuery: { userId: _id }, dbServiceAccessOptions });
+    const dbData = await this._grantAccess(dbServiceAccessOptions, dbDataPromise);
+    return dbData;
   };
 }
 

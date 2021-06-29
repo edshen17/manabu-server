@@ -11,10 +11,10 @@ abstract class AbstractFakeDbDataFactory<
 {
   protected _entity!: IEntity<any, any, EntityBuildResponse>;
   protected _dbService!: IDbService<any, DbDoc>;
-  protected _defaultAccessOptions: DbServiceAccessOptions;
+  protected _defaultDbAccessOptions: DbServiceAccessOptions;
   protected _cloneDeep!: any;
   constructor() {
-    this._defaultAccessOptions = {
+    this._defaultDbAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted: true,
       currentAPIUserRole: 'user',
@@ -26,7 +26,7 @@ abstract class AbstractFakeDbDataFactory<
     const fakeEntity = await this._createFakeEntity(fakeEntityData);
     let newDbDocCallback = this._dbService.insert({
       modelToInsert: fakeEntity,
-      dbServiceAccessOptions: this._defaultAccessOptions,
+      dbServiceAccessOptions: this._defaultDbAccessOptions,
     });
     const fakeDbData = await this._awaitDbInsert(newDbDocCallback);
     return fakeDbData;
@@ -58,7 +58,7 @@ abstract class AbstractFakeDbDataFactory<
   protected _initTemplate = (props: any): void => {};
 
   public getDefaultAccessOptions = () => {
-    return this._cloneDeep(this._defaultAccessOptions);
+    return this._cloneDeep(this._defaultDbAccessOptions);
   };
 }
 

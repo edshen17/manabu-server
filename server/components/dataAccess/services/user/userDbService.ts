@@ -19,23 +19,23 @@ class UserDbService
   private _passwordLib!: any;
   constructor() {
     super();
-    this._defaultSelectOptions = {
-      defaultSettings: {
+    this._dbModelViews = {
+      defaultView: {
         email: 0,
         password: 0,
         verificationToken: 0,
         settings: 0,
         commMethods: 0,
       },
-      adminSettings: {
+      adminView: {
         password: 0,
         verificationToken: 0,
       },
-      isSelfSettings: {
+      selfView: {
         password: 0,
         verificationToken: 0,
       },
-      overrideSettings: {
+      overrideView: {
         verificationToken: 0,
       },
     };
@@ -45,48 +45,49 @@ class UserDbService
     dbServiceParams: DbServiceParams,
     inputtedPassword: string
   ): Promise<any> => {
-    const user = await this.findOne(dbServiceParams);
-    if (!user) {
+    const dbUserData = await this.findOne(dbServiceParams);
+    if (!dbUserData) {
       return null;
     }
-    if (!user.password) {
+    if (!dbUserData.password) {
       throw new Error(
         'It seems that you signed up previously through a third-party service like Google.'
       );
     }
 
-    const passwordIsValid = this._passwordLib.compareSync(inputtedPassword, user.password);
-    if (passwordIsValid) {
-      const { password, ...partialUserWithoutPassword } = user;
-      return partialUserWithoutPassword;
+    const isPasswordValid = this._passwordLib.compareSync(inputtedPassword, dbUserData.password);
+    if (isPasswordValid) {
+      const { password, ...partialDbUserDataWithoutPassword } = dbUserData;
+      return partialDbUserDataWithoutPassword;
     } else {
       throw new Error('Username or password incorrect.');
     }
   };
 
-  protected _dbReturnTemplate = async (
+  protected _dbDataReturnTemplate = async (
     dbServiceAccessOptions: DbServiceAccessOptions,
     asyncCallback: any
   ): Promise<any> => {
-    return await this._returnJoinedUser(dbServiceAccessOptions, asyncCallback);
+    const dbUserData = await this._returnJoinedUser(dbServiceAccessOptions, asyncCallback);
+    return dbUserData;
   };
 
   private _returnJoinedUser = async (
     dbServiceAccessOptions: DbServiceAccessOptions,
     asyncCallback: Promise<JoinedUserDoc>
   ): Promise<any> => {
-    const user = await this._grantAccess(dbServiceAccessOptions, asyncCallback);
-    if (user) {
-      return await this._joinUserTeacherPackage(user, dbServiceAccessOptions);
+    const dbUserData = await this._grantAccess(dbServiceAccessOptions, asyncCallback);
+    if (dbUserData) {
+      return await this._joinUserTeacherPackage(dbUserData, dbServiceAccessOptions);
     }
   };
 
   private _joinUserTeacherPackage = async (
-    user: JoinedUserDoc,
+    dbUserData: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
-    const userCopy: any = JSON.parse(JSON.stringify(user));
-    const _id: string = user._id;
+    const userCopy: any = this._cloneDeep(dbUserData);
+    const _id: string = dbUserData._id;
     const teacher: TeacherDoc = await this._teacherDbService.findById({
       _id,
       dbServiceAccessOptions,

@@ -145,7 +145,7 @@ context('userDbService', () => {
       const accessOptionsCopy: DbServiceAccessOptions = JSON.parse(
         JSON.stringify(dbServiceAccessOptions)
       );
-      accessOptionsCopy.isOverridingSelectOptions = true;
+      accessOptionsCopy.isOverrideView = true;
 
       try {
         const newUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
