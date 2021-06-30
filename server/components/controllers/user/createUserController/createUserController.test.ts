@@ -14,7 +14,7 @@ before(async () => {
 });
 
 describe('createUserController', () => {
-  describe('makeRequest', async () => {
+  describe('makeRequest', () => {
     it('should create a new user and return a user as well as cookies to set', async () => {
       const createUserHttpRequest = iHttpRequestBuilder
         .body({

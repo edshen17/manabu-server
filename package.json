@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "server": "nodemon server/index.ts",
     "start": "node server/dist/index.js",
-    "test": "mocha --require fixtures.cjs --parallel -r ts-node/register server/**/*.test.ts"
+    "test": "mocha --timeout 5000 --require fixtures.cjs --parallel -r ts-node/register server/**/*.test.ts"
   },
   "main": "index.js",
   "dependencies": {

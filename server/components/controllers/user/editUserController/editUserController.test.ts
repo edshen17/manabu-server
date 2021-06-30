@@ -17,7 +17,7 @@ before(async () => {
 });
 
 describe('editUserController', () => {
-  describe('makeRequest', async () => {
+  describe('makeRequest', () => {
     it('should update the user', async () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbUser();
       const editUserHttpRequest = iHttpRequestBuilder
