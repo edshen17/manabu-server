@@ -26,7 +26,7 @@ const UserSchema = createSchema({
     method: Type.string(),
     id: Type.string(),
   }),
-  emailVerified: Type.boolean({ required: true }),
+  isEmailVerified: Type.boolean({ required: true }),
   verificationToken: Type.string({ required: true }),
 });
 

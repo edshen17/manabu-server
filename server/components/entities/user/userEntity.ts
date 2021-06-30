@@ -32,7 +32,7 @@ type UserEntityBuildResponse =
       settings: { currency: string };
       membership: string[];
       commMethods: { method: string; id: string }[];
-      emailVerified: boolean;
+      isEmailVerified: boolean;
       verificationToken: string;
     }
   | Error;
@@ -114,7 +114,7 @@ class UserEntity extends AbstractEntity<
       settings: { currency: 'SGD' },
       membership: [],
       commMethods: commMethods || [],
-      emailVerified: false,
+      isEmailVerified: false,
       verificationToken,
     });
     return userEntity;

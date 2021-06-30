@@ -26,8 +26,8 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
     const { isValidRequest } = setUpProps;
 
     if (isValidRequest) {
-      const dbServiceResponse = await this._makeRequestTemplate(setUpProps);
-      return dbServiceResponse;
+      const usecaseResponse = await this._makeRequestTemplate(setUpProps);
+      return usecaseResponse;
     } else {
       throw new Error(this._makeRequestErrorMsg);
     }

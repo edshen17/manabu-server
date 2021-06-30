@@ -51,19 +51,23 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
     const { body, dbServiceAccessOptions, query, endpointPath, controllerData } = props;
-    if (endpointPath == SERVER_LOGIN_ENDPOINTS.BASE_LOGIN) {
-      return await this._handleBaseLogin({
+    const isBaseLogin = endpointPath == SERVER_LOGIN_ENDPOINTS.BASE_LOGIN;
+    const isGoogleLogin = endpointPath == SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN;
+    if (isBaseLogin) {
+      const baseLoginResponse = await this._handleBaseLogin({
         body,
         query,
         dbServiceAccessOptions,
       });
-    } else if (endpointPath == SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN) {
-      return await this._handleGoogleLogin({
+      return baseLoginResponse;
+    } else if (isGoogleLogin) {
+      const googleLoginResponse = await this._handleGoogleLogin({
         query,
         dbServiceAccessOptions,
         body,
         controllerData,
       });
+      return googleLoginResponse;
     } else {
       throw new Error('Unsupported authentication endpoint.');
     }
@@ -87,13 +91,13 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const handleNoSavedDbUser = () => {
       throw new Error('Username or password incorrect.');
     };
-    const loginUserUsecaseResponse = await this._loginUser({
+    const baseLoginResponse = await this._loginUser({
       savedDbUser,
       dbServiceAccessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
-    return loginUserUsecaseResponse;
+    return baseLoginResponse;
   };
 
   private _loginUser = async (props: {
@@ -105,23 +109,21 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { dbServiceAccessOptions, isTeacherApp, handleNoSavedDbUser } = props || {};
     let { savedDbUser } = props;
     if (savedDbUser) {
-      const shouldCreateNewTeacher =
-        !(savedDbUser.teacherAppPending || savedDbUser.role == 'teacher') && isTeacherApp;
+      const isTeacher = savedDbUser.teacherAppPending || savedDbUser.role == 'teacher';
+      const shouldCreateNewTeacher = !isTeacher && isTeacherApp;
       if (shouldCreateNewTeacher) {
         savedDbUser = await this._createUserUsecase.handleTeacherCreation(
           savedDbUser,
           dbServiceAccessOptions
         );
       }
-      return this._createLoginUserUsecaseResponse(savedDbUser);
+      return this._createUsecaseResponse(savedDbUser);
     } else {
       return await handleNoSavedDbUser();
     }
   };
 
-  private _createLoginUserUsecaseResponse = (
-    savedDbUser: JoinedUserDoc
-  ): LoginUserUsecaseResponse => {
+  private _createUsecaseResponse = (savedDbUser: JoinedUserDoc): LoginUserUsecaseResponse => {
     return {
       user: savedDbUser,
       cookies: this._createUserUsecase.splitLoginCookies(savedDbUser),
@@ -146,6 +148,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     });
 
     const handleNoSavedDbUser = async () => {
+      // mutate controller data body
       body.name = name;
       body.email = email;
       body.profilePicture = picture;
@@ -157,13 +160,13 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       return userRes;
     };
 
-    const loginUserUsecaseResponse = await this._loginUser({
+    const googleLoginResponse = await this._loginUser({
       savedDbUser,
       dbServiceAccessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
-    return loginUserUsecaseResponse;
+    return googleLoginResponse;
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {

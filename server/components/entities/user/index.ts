@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'; // import { ... as bcryptjs }
 import sanitizeHtml from 'sanitize-html';
 import jwt from 'jsonwebtoken';
 import cryptoRandomString from 'crypto-random-string';

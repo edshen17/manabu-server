@@ -53,11 +53,11 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
     const { dbServiceAccessOptions, endpointPath, currentAPIUser } = props;
     const isSelfEndpoint = endpointPath == '/self/minuteBanks';
     if (isSelfEndpoint) {
-      const jsonResponse = await this._getSelfMinuteBanks({
+      const usecaseResponse = await this._getSelfMinuteBanks({
         currentAPIUser,
         dbServiceAccessOptions,
       });
-      return jsonResponse;
+      return usecaseResponse;
     } else {
       throw new Error('Access denied.');
     }
@@ -82,8 +82,8 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
       searchQuery,
       dbServiceAccessOptions,
     });
-    const jsonResponse = { minuteBanks };
-    return jsonResponse;
+    const usecaseResponse = { minuteBanks };
+    return usecaseResponse;
   };
 
   public init = async (usecaseInitParams: {

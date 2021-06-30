@@ -39,8 +39,8 @@ class EditTeacherUsecase extends AbstractEditUsecase<
         _id,
         dbServiceAccessOptions,
       });
-      const jsonResponse = { user: savedDbUser };
-      return jsonResponse;
+      const usecaseResponse = { user: savedDbUser };
+      return usecaseResponse;
     } else {
       throw new Error('Access denied.');
     }

@@ -15,7 +15,7 @@ import { makePackageTransactionEntity } from '../../../entities/packageTransacti
 import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
 import { makeTeacherEntity } from '../../../entities/teacher';
 import { EmailHandler } from '../../utils/emailHandler/emailHandler';
-import { ControllerData, IUsecase } from '../../abstractions/IUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -80,7 +80,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
         savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
       }
 
-      if (process.env.NODE_ENV == 'production') {
+      if (process.env.NODE_ENV == 'production' && !savedDbUser.isEmailVerified) {
         this._sendVerificationEmail(userInstance);
         this._sendInternalEmail(userInstance, isTeacherApp);
       }
