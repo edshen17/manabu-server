@@ -9,7 +9,7 @@ import { PackageDoc } from '../../../../models/Package';
 type PartialUserDbServiceInitParams = {
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
-  bcrypt: any;
+  comparePassword: any;
 };
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
@@ -20,7 +20,7 @@ class UserDbService
 {
   private _teacherDbService!: TeacherDbService;
   private _packageDbService!: PackageDbService;
-  private _bcrypt!: any;
+  private _comparePassword!: any;
   constructor() {
     super();
     this._dbModelViews = {
@@ -59,7 +59,7 @@ class UserDbService
       );
     }
 
-    const isPasswordValid = this._bcrypt.compareSync(inputtedPassword, userData.password);
+    const isPasswordValid = this._comparePassword(inputtedPassword, userData.password);
     if (isPasswordValid) {
       const { password, ...partialuserDataWithoutPassword } = userData;
       return partialuserDataWithoutPassword;
@@ -112,10 +112,11 @@ class UserDbService
   };
 
   protected _initTemplate = async (partialDbServiceInitParams: PartialUserDbServiceInitParams) => {
-    const { makeTeacherDbService, makePackageDbService, bcrypt } = partialDbServiceInitParams;
+    const { makeTeacherDbService, makePackageDbService, comparePassword } =
+      partialDbServiceInitParams;
     this._teacherDbService = await makeTeacherDbService;
     this._packageDbService = await makePackageDbService;
-    this._bcrypt = bcrypt;
+    this._comparePassword = comparePassword;
   };
 }
 

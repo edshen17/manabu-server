@@ -5,7 +5,9 @@ import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFacto
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
 type PartialFakeDbUserFactoryInitParams = {
-  faker: any;
+  fakerImage: any;
+  fakerInternet: any;
+  fakerName: any;
   makeFakeDbTeacherFactory: Promise<FakeDbTeacherFactory>;
   makeFakeDbPackageFactory: Promise<FakeDbPackageFactory>;
 };
@@ -22,7 +24,9 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   UserEntityBuildResponse,
   JoinedUserDoc
 > {
-  private _faker!: any;
+  private _fakerImage: any;
+  private _fakerInternet: any;
+  private _fakerName: any;
   private _fakeDbTeacherFactory!: FakeDbTeacherFactory;
   private _fakeDbPackageFactory!: FakeDbPackageFactory;
 
@@ -54,11 +58,11 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   ): Promise<UserEntityBuildResponse> => {
     const { name, email, password } = fakeEntityBuildParams || {};
     const fakeUserEntity = await this._entity.build({
-      name: name || this._faker.name.findName(),
-      email: email || this._faker.internet.email(),
-      password: password || this._faker.internet.password(),
-      profileImage: this._faker.image.imageUrl(),
-      commMethods: [{ method: 'LINE', id: this._faker.internet.userName() }],
+      name: name || this._fakerName.findName(),
+      email: email || this._fakerInternet.email(),
+      password: password || this._fakerInternet.password(),
+      profileImage: this._fakerImage.imageUrl(),
+      commMethods: [{ method: 'LINE', id: this._fakerInternet.userName() }],
     });
     return fakeUserEntity;
   };
@@ -66,9 +70,16 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   protected _initTemplate = async (
     partialFakeDbDataFactoryInitParams: PartialFakeDbUserFactoryInitParams
   ) => {
-    const { faker, makeFakeDbTeacherFactory, makeFakeDbPackageFactory } =
-      partialFakeDbDataFactoryInitParams;
-    this._faker = faker;
+    const {
+      fakerImage,
+      fakerInternet,
+      fakerName,
+      makeFakeDbTeacherFactory,
+      makeFakeDbPackageFactory,
+    } = partialFakeDbDataFactoryInitParams;
+    this._fakerImage = fakerImage;
+    this._fakerInternet = fakerInternet;
+    this._fakerName = fakerName;
     this._fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
     this._fakeDbPackageFactory = await makeFakeDbPackageFactory;
   };

@@ -29,7 +29,7 @@ type CreateUserUsecaseInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeMinuteBankDbService: Promise<MinuteBankDbService>;
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
-  jwt: any;
+  signJwt: any;
   emailHandler: EmailHandler;
 };
 
@@ -58,7 +58,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _minuteBankDbService!: MinuteBankDbService;
   private _teacherBalanceDbService!: TeacherBalanceDbService;
-  private _jwt!: any;
+  private _signJwt!: any;
   private _emailHandler!: EmailHandler;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
@@ -267,7 +267,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   public splitLoginCookies = (savedDbUser: JoinedUserDoc): CookieData[] => {
-    const token = this._jwtToClient(savedDbUser);
+    const token = this._signClientJwt(savedDbUser);
     const tokenArr: string[] = token.split('.');
     const options = this._setCookieOptions();
     const hpCookie = {
@@ -284,9 +284,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return loginCookies;
   };
 
-  private _jwtToClient = (savedDbUser: any): string => {
+  private _signClientJwt = (savedDbUser: any): string => {
     const { role, name } = savedDbUser;
-    const token = this._jwt.sign(
+    const token = this._signJwt(
       {
         _id: savedDbUser._id,
         role,
@@ -323,7 +323,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makePackageTransactionDbService,
       makeMinuteBankDbService,
       makeTeacherBalanceDbService,
-      jwt,
+      signJwt,
       emailHandler,
     } = usecaseInitParams;
     this._userDbService = await makeUserDbService;
@@ -333,7 +333,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._minuteBankDbService = await makeMinuteBankDbService;
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
-    this._jwt = jwt;
+    this._signJwt = signJwt;
     this._emailHandler = emailHandler;
     return this;
   };

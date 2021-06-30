@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { isEqual } from 'lodash';
 import { makePackageTransactionDbService } from '.';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
@@ -43,9 +44,9 @@ describe('packageTransactionDbService', () => {
         searchQuery: { _id: fakePackageTransaction._id },
         dbServiceAccessOptions,
       });
-      expect(findByIdPackageTransaction).to.deep.equal(fakePackageTransaction);
-      expect(findByIdPackageTransaction).to.deep.equal(findOnePackageTransaction);
-      expect(findByIdPackageTransaction).to.deep.equal(findPackageTransactions[0]);
+      expect(isEqual(findByIdPackageTransaction, findOnePackageTransaction)).to.equal(true);
+      expect(isEqual(findByIdPackageTransaction, fakePackageTransaction)).to.equal(true);
+      expect(isEqual(findByIdPackageTransaction, findPackageTransactions[0])).to.equal(true);
     });
   });
   describe('insert', async () => {

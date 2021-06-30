@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import { compareSync as comparePassword } from 'bcryptjs';
 import cloneDeep from 'clone-deep';
 import { makeDb } from '../..';
 import { User } from '../../../../models/User';
@@ -11,7 +11,7 @@ const makeUserDbService = new UserDbService().init({
   dbModel: User,
   makeTeacherDbService,
   makePackageDbService,
-  bcrypt,
+  comparePassword,
   cloneDeep,
 });
 

@@ -1,10 +1,10 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type UserEntityInitParams = {
-  sanitizeHtml: any;
-  bcrypt: any;
+  // sanitizeHtml: any;
+  hashPassword: any;
   cryptoRandomString: any;
-  jwt: any;
+  signJwt: any;
 };
 
 type UserEntityBuildParams = {
@@ -42,10 +42,10 @@ class UserEntity extends AbstractEntity<
   UserEntityBuildParams,
   UserEntityBuildResponse
 > {
-  private _sanitizeHtml!: any;
-  private _bcrypt!: any;
+  // private _sanitizeHtml!: any;
+  private _hashPassword!: any;
   private _cryptoRandomString!: any;
-  private _jwt!: any;
+  private _signJwt!: any;
 
   public build = (entityBuildParams: UserEntityBuildParams): UserEntityBuildResponse => {
     try {
@@ -122,7 +122,7 @@ class UserEntity extends AbstractEntity<
 
   private _encryptPassword = (password?: string): string | undefined => {
     if (password) {
-      return this._bcrypt.hashSync(password, 10);
+      return this._hashPassword(password, 10);
     } else {
       return undefined;
     }
@@ -130,9 +130,9 @@ class UserEntity extends AbstractEntity<
 
   private _createVerificationToken = (name: string, email: string): string => {
     const randToken = this._cryptoRandomString({ length: 15 });
-    const secret = process.env.JWT_SECRET!;
+    const secret = process.env.JWT_SECRET;
     const TOKEN_EXPIRY_DATE = 24 * 60 * 60 * 7;
-    const verificationToken = this._jwt.sign({ randToken, name, email }, secret, {
+    const verificationToken = this._signJwt({ randToken, name, email }, secret, {
       expiresIn: TOKEN_EXPIRY_DATE,
     });
 
@@ -140,11 +140,11 @@ class UserEntity extends AbstractEntity<
   };
 
   public init = (entityInitParams: UserEntityInitParams) => {
-    const { sanitizeHtml, bcrypt, cryptoRandomString, jwt } = entityInitParams;
-    this._sanitizeHtml = sanitizeHtml;
-    this._bcrypt = bcrypt;
+    const { hashPassword, cryptoRandomString, signJwt } = entityInitParams;
+    // this._sanitizeHtml = sanitizeHtml;
+    this._hashPassword = hashPassword;
     this._cryptoRandomString = cryptoRandomString;
-    this._jwt = jwt;
+    this._signJwt = signJwt;
     return this;
   };
 }

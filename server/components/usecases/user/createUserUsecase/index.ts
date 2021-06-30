@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { sign as signJwt } from 'jsonwebtoken';
 import { makeUserEntity } from '../../../entities/user';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
 import { makeTeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance';
@@ -17,7 +17,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makePackageTransactionDbService,
   makeMinuteBankDbService,
   makeTeacherBalanceDbService,
-  jwt,
+  signJwt,
   emailHandler,
 });
 
