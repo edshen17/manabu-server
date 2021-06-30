@@ -45,15 +45,15 @@ describe('packageDbService', () => {
   });
   describe('insert', () => {
     it('should insert a package', async () => {
-      const fakeUser = await fakeDbUserFactory.createFakeDbUser();
+      const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
       const fakePackages = await fakeDbPackageFactory.createFakePackages({
-        hostedBy: fakeUser._id,
+        hostedBy: fakeTeacher._id,
       });
       const foundPackages = await packageDbService.find({
-        searchQuery: { hostedBy: fakeUser._id },
+        searchQuery: { hostedBy: fakeTeacher._id },
         dbServiceAccessOptions,
       });
-      expect(foundPackages.length).to.equal(fakePackages.length);
+      expect(foundPackages.length).to.equal(6);
     });
   });
   describe('update', () => {

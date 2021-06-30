@@ -5,30 +5,25 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
+type GetMinuteBankUsecaseInitParams = {};
+
 type GetMinuteBankUsecaseResponse =
   | { minuteBank: MinuteBankDoc }
   | { minuteBanks: MinuteBankDoc[] };
 
-class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseResponse> {
+class GetMinuteBankUsecase extends AbstractGetUsecase<
+  GetMinuteBankUsecaseInitParams,
+  GetMinuteBankUsecaseResponse
+> {
   private _minuteBankDbService!: MinuteBankDbService;
 
-  protected _isCurrentAPIUserPermitted = (props: {
-    params: any;
-    currentAPIUser: any;
-    endpointPath: string;
-  }): boolean => {
-    const { params, currentAPIUser, endpointPath } = props;
-    if (endpointPath == '/self/minuteBanks') {
-      return true;
-    } else {
-      const { hostedBy, reservedBy } = params;
-      const isSelf = hostedBy == currentAPIUser.userId || reservedBy == currentAPIUser.userId;
-      const isCurrentAPIUserPermitted = isSelf || currentAPIUser.role == 'admin';
-      return isCurrentAPIUserPermitted;
-    }
+  protected _isCurrentAPIUserPermitted = (props: { endpointPath: string }): boolean => {
+    const { endpointPath } = props;
+    const isCurrentAPIUserPermitted = endpointPath == '/self/minuteBanks';
+    return isCurrentAPIUserPermitted;
   };
 
-  protected _setAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptionsTemplate = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
@@ -45,47 +40,56 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<GetMinuteBankUsecaseRespon
   };
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { endpointPath, routeData } = controllerData;
-    const { params } = routeData;
-    const { hostedBy, reservedBy } = params || {};
-    return endpointPath == '/self/minuteBanks' || (hostedBy && reservedBy);
+    const { endpointPath } = controllerData;
+    const isValidRequest = this._isCurrentAPIUserPermitted({
+      endpointPath,
+    });
+    return isValidRequest;
   };
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetMinuteBankUsecaseResponse> => {
-    const { params, dbServiceAccessOptions, endpointPath, currentAPIUser } = props;
-    if (endpointPath == '/self/minuteBanks') {
-      const searchQuery = {
-        $or: [
-          {
-            reservedBy: currentAPIUser.userId,
-          },
-          {
-            hostedBy: currentAPIUser.userId,
-          },
-        ],
-      };
-      const minuteBanks = await this._minuteBankDbService.find({
-        searchQuery,
+    const { dbServiceAccessOptions, endpointPath, currentAPIUser } = props;
+    const isSelfEndpoint = endpointPath == '/self/minuteBanks';
+    if (isSelfEndpoint) {
+      const jsonResponse = await this._getSelfMinuteBanks({
+        currentAPIUser,
         dbServiceAccessOptions,
       });
-      return { minuteBanks };
+      return jsonResponse;
     } else {
-      const { hostedBy, reservedBy } = params;
-      const searchQuery = { hostedBy, reservedBy };
-      const minuteBank = await this._minuteBankDbService.findOne({
-        searchQuery,
-        dbServiceAccessOptions,
-      });
-      return { minuteBank };
+      throw new Error('Access denied.');
     }
   };
 
-  public init = async (services: {
+  private _getSelfMinuteBanks = async (props: {
+    currentAPIUser: CurrentAPIUser;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }) => {
+    const { currentAPIUser, dbServiceAccessOptions } = props;
+    const searchQuery = {
+      $or: [
+        {
+          reservedBy: currentAPIUser.userId,
+        },
+        {
+          hostedBy: currentAPIUser.userId,
+        },
+      ],
+    };
+    const minuteBanks = await this._minuteBankDbService.find({
+      searchQuery,
+      dbServiceAccessOptions,
+    });
+    const jsonResponse = { minuteBanks };
+    return jsonResponse;
+  };
+
+  public init = async (usecaseInitParams: {
     makeMinuteBankDbService: Promise<MinuteBankDbService>;
   }): Promise<this> => {
-    const { makeMinuteBankDbService } = services;
+    const { makeMinuteBankDbService } = usecaseInitParams;
     this._minuteBankDbService = await makeMinuteBankDbService;
     return this;
   };

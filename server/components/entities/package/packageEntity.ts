@@ -7,16 +7,18 @@ type PackageEntityInitParams = {
 
 type PackageEntityBuildParams = {
   hostedBy: string;
-  priceDetails?: { hourlyPrice: number; currency: string };
+  priceDetails?: PriceDetails;
   lessonAmount: number;
   isOffering?: boolean;
   packageType: string;
   packageDurations?: number[];
 };
 
+type PriceDetails = { hourlyPrice: number; currency: string };
+
 type PackageEntityBuildResponse = {
   hostedBy: string;
-  priceDetails: { hourlyPrice: number; currency: string };
+  priceDetails: PriceDetails;
   lessonAmount: number;
   isOffering: boolean;
   packageType: string;
@@ -58,16 +60,18 @@ class PackageEntity extends AbstractEntity<
       dbService: this._userDbService,
       _id: hostedBy,
     });
-    if (savedDbTeacher.teacherData) {
+    const teacherData = savedDbTeacher.teacherData;
+    let priceDetails: PriceDetails;
+    if (teacherData) {
       const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
-      const priceDetails = {
+      priceDetails = {
         currency: teacherHourlyRate.currency!,
         hourlyPrice: teacherHourlyRate.amount!,
       };
-      return priceDetails;
     } else {
-      return { hourlyPrice: 35, currency: 'SGD' };
+      throw new Error('Only teachers can have packages.');
     }
+    return priceDetails;
   };
 
   public init = async (entityInitParams: PackageEntityInitParams): Promise<this> => {

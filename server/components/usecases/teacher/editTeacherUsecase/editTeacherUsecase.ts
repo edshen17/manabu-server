@@ -4,12 +4,16 @@ import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, IUsecase } from '../../abstractions/IUsecase';
 
+type EditTeacherUsecaseUsecaseInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makeTeacherDbService: Promise<TeacherDbService>;
+};
 type EditTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
 
-class EditTeacherUsecase
-  extends AbstractEditUsecase<EditTeacherUsecaseResponse>
-  implements IUsecase<EditTeacherUsecaseResponse>
-{
+class EditTeacherUsecase extends AbstractEditUsecase<
+  EditTeacherUsecaseUsecaseInitParams,
+  EditTeacherUsecaseResponse
+> {
   private _userDbService!: UserDbService;
   private _teacherDbService!: TeacherDbService;
 
@@ -35,17 +39,15 @@ class EditTeacherUsecase
         _id,
         dbServiceAccessOptions,
       });
-      return { user: savedDbUser };
+      const jsonResponse = { user: savedDbUser };
+      return jsonResponse;
     } else {
       throw new Error('Access denied.');
     }
   };
 
-  public init = async (services: {
-    makeUserDbService: Promise<UserDbService>;
-    makeTeacherDbService: Promise<TeacherDbService>;
-  }): Promise<this> => {
-    const { makeUserDbService, makeTeacherDbService } = services;
+  public init = async (usecaseInitParams: EditTeacherUsecaseUsecaseInitParams): Promise<this> => {
+    const { makeUserDbService, makeTeacherDbService } = usecaseInitParams;
     this._userDbService = await makeUserDbService;
     this._teacherDbService = await makeTeacherDbService;
     return this;

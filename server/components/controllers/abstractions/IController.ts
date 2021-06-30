@@ -9,5 +9,5 @@ export type ControllerResponse<UsecaseResponse> = {
 
 export interface IController<UsecaseResponse> {
   makeRequest: (httpRequest: IHttpRequest) => Promise<ControllerResponse<UsecaseResponse>>;
-  init: (props: { makeUsecase: Promise<IUsecase<UsecaseResponse>> }) => Promise<this>;
+  init: (props: { makeUsecase: Promise<IUsecase<any, UsecaseResponse>> }) => Promise<this>;
 }

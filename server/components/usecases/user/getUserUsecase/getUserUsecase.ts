@@ -4,9 +4,10 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
+type GetUserUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 
-class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
+class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseInitParams, GetUserUsecaseResponse> {
   private _userDbService!: UserDbService;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
@@ -60,8 +61,9 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseResponse> {
     });
   };
 
-  public init = async (services: { makeUserDbService: Promise<UserDbService> }): Promise<this> => {
-    this._userDbService = await services.makeUserDbService;
+  public init = async (usecaseInitParams: GetUserUsecaseInitParams): Promise<this> => {
+    const { makeUserDbService } = usecaseInitParams;
+    this._userDbService = await makeUserDbService;
     return this;
   };
 }

@@ -49,20 +49,20 @@ class UserDbService
     dbServiceParams: DbServiceParams,
     inputtedPassword: string
   ): Promise<any> => {
-    const dbUserData = await this.findOne(dbServiceParams);
-    if (!dbUserData) {
+    const userData = await this.findOne(dbServiceParams);
+    if (!userData) {
       return null;
     }
-    if (!dbUserData.password) {
+    if (!userData.password) {
       throw new Error(
         'It seems that you signed up previously through a third-party service like Google.'
       );
     }
 
-    const isPasswordValid = this._bcrypt.compareSync(inputtedPassword, dbUserData.password);
+    const isPasswordValid = this._bcrypt.compareSync(inputtedPassword, userData.password);
     if (isPasswordValid) {
-      const { password, ...partialDbUserDataWithoutPassword } = dbUserData;
-      return partialDbUserDataWithoutPassword;
+      const { password, ...partialuserDataWithoutPassword } = userData;
+      return partialuserDataWithoutPassword;
     } else {
       throw new Error('Username or password incorrect.');
     }
@@ -72,27 +72,27 @@ class UserDbService
     dbServiceAccessOptions: DbServiceAccessOptions,
     asyncCallback: any
   ): Promise<any> => {
-    const dbUserData = await this._returnJoinedUser(dbServiceAccessOptions, asyncCallback);
-    return dbUserData;
+    const userData = await this._returnJoinedUser(dbServiceAccessOptions, asyncCallback);
+    return userData;
   };
 
   private _returnJoinedUser = async (
     dbServiceAccessOptions: DbServiceAccessOptions,
     asyncCallback: Promise<JoinedUserDoc>
   ): Promise<any> => {
-    const dbUserData = await this._grantAccess(dbServiceAccessOptions, asyncCallback);
-    if (dbUserData) {
-      return await this._joinUserTeacherPackage(dbUserData, dbServiceAccessOptions);
+    const userData = await this._grantAccess(dbServiceAccessOptions, asyncCallback);
+    if (userData) {
+      return await this._joinUserTeacherPackage(userData, dbServiceAccessOptions);
     }
   };
 
   private _joinUserTeacherPackage = async (
-    dbUserData: JoinedUserDoc,
+    userData: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
-    const userCopy: any = this._cloneDeep(dbUserData);
-    const _id: string = dbUserData._id;
-    const teacher: TeacherDoc = await this._teacherDbService.findById({
+    const userCopy: any = this._cloneDeep(userData);
+    const _id: string = userData._id;
+    const teacherData: TeacherDoc = await this._teacherDbService.findById({
       _id,
       dbServiceAccessOptions,
     });
@@ -102,9 +102,9 @@ class UserDbService
       dbServiceAccessOptions,
     });
 
-    if (teacher) {
-      userCopy.teacherAppPending = !teacher.isApproved;
-      userCopy.teacherData = teacher;
+    if (teacherData) {
+      userCopy.teacherAppPending = !teacherData.isApproved;
+      userCopy.teacherData = teacherData;
       userCopy.teacherData.packages = packages;
     }
 

@@ -9,6 +9,13 @@ import {
   CreateUserUsecaseResponse,
 } from '../createUserUsecase/createUserUsecase';
 
+type LoginUserUsecaseInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makeCreateUserUsecase: Promise<CreateUserUsecase>;
+  oauth2Client: any;
+  google: any;
+  makeRedirectPathBuilder: RedirectPathBuilder;
+};
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
 enum SERVER_LOGIN_ENDPOINTS {
@@ -16,7 +23,10 @@ enum SERVER_LOGIN_ENDPOINTS {
   GOOGLE_LOGIN = '/auth/google',
 }
 
-class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
+class LoginUserUsecase extends AbstractCreateUsecase<
+  LoginUserUsecaseInitParams,
+  LoginUserUsecaseResponse
+> {
   private _userDbService!: UserDbService;
   private _createUserUsecase!: CreateUserUsecase;
   private _oauth2Client!: any;
@@ -185,20 +195,14 @@ class LoginUserUsecase extends AbstractCreateUsecase<LoginUserUsecaseResponse> {
     return googleRes.data;
   };
 
-  public init = async (props: {
-    makeUserDbService: Promise<UserDbService>;
-    makeCreateUserUsecase: Promise<CreateUserUsecase>;
-    oauth2Client: any;
-    google: any;
-    makeRedirectPathBuilder: RedirectPathBuilder;
-  }): Promise<this> => {
+  public init = async (usecaseInitParams: LoginUserUsecaseInitParams): Promise<this> => {
     const {
       makeUserDbService,
       makeCreateUserUsecase,
       oauth2Client,
       google,
       makeRedirectPathBuilder,
-    } = props;
+    } = usecaseInitParams;
     this._userDbService = await makeUserDbService;
     this._createUserUsecase = await makeCreateUserUsecase;
     this._oauth2Client = oauth2Client;

@@ -96,10 +96,12 @@ class UserEntity extends AbstractEntity<
     entityBuildParams: UserEntityBuildParams
   ): UserEntityBuildResponse => {
     const { name, email, password, profileImage, commMethods } = entityBuildParams || {};
+    const encryptedPassword = this._encryptPassword(password);
+    const verificationToken = this._createVerificationToken(name, email);
     const userEntity = Object.freeze({
       name,
       email,
-      password: this._encryptPassword(password),
+      password: encryptedPassword,
       profileImage: profileImage || '',
       profileBio: '',
       dateRegistered: new Date(),
@@ -113,7 +115,7 @@ class UserEntity extends AbstractEntity<
       membership: [],
       commMethods: commMethods || [],
       emailVerified: false,
-      verificationToken: this._generateVerificationToken(name, email),
+      verificationToken,
     });
     return userEntity;
   };
@@ -126,11 +128,12 @@ class UserEntity extends AbstractEntity<
     }
   };
 
-  private _generateVerificationToken = (name: string, email: string): string => {
+  private _createVerificationToken = (name: string, email: string): string => {
     const randToken = this._cryptoRandomString({ length: 15 });
     const secret = process.env.JWT_SECRET!;
+    const TOKEN_EXPIRY_DATE = 24 * 60 * 60 * 7;
     const verificationToken = this._jwt.sign({ randToken, name, email }, secret, {
-      expiresIn: 24 * 60 * 60 * 7,
+      expiresIn: TOKEN_EXPIRY_DATE,
     });
 
     return verificationToken;

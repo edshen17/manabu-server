@@ -21,6 +21,18 @@ import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { UserEntity } from '../../../entities/user/userEntity';
 
+type CreateUserUsecaseInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makeUserEntity: UserEntity;
+  makeTeacherDbService: Promise<TeacherDbService>;
+  makePackageDbService: Promise<PackageDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+  makeMinuteBankDbService: Promise<MinuteBankDbService>;
+  makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
+  jwt: any;
+  emailHandler: EmailHandler;
+};
+
 type CookieData = {
   name: string;
   value: string;
@@ -35,10 +47,10 @@ type CreateUserUsecaseResponse =
   | { user: JoinedUserDoc; cookies: CookieData[]; redirectURI?: string }
   | Error;
 
-class CreateUserUsecase
-  extends AbstractCreateUsecase<CreateUserUsecaseResponse>
-  implements IUsecase<CreateUserUsecaseResponse>
-{
+class CreateUserUsecase extends AbstractCreateUsecase<
+  CreateUserUsecaseInitParams,
+  CreateUserUsecaseResponse
+> {
   private _userDbService!: UserDbService;
   private _userEntity!: UserEntity;
   private _teacherDbService!: TeacherDbService;
@@ -302,17 +314,7 @@ class CreateUserUsecase
     return cookieOptions;
   };
 
-  public init = async (services: {
-    makeUserDbService: Promise<UserDbService>;
-    makeUserEntity: UserEntity;
-    makeTeacherDbService: Promise<TeacherDbService>;
-    makePackageDbService: Promise<PackageDbService>;
-    makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-    makeMinuteBankDbService: Promise<MinuteBankDbService>;
-    makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
-    jwt: any;
-    emailHandler: EmailHandler;
-  }): Promise<this> => {
+  public init = async (usecaseInitParams: CreateUserUsecaseInitParams): Promise<this> => {
     const {
       makeUserDbService,
       makeUserEntity,
@@ -323,7 +325,7 @@ class CreateUserUsecase
       makeTeacherBalanceDbService,
       jwt,
       emailHandler,
-    } = services;
+    } = usecaseInitParams;
     this._userDbService = await makeUserDbService;
     this._userEntity = makeUserEntity;
     this._teacherDbService = await makeTeacherDbService;

@@ -5,7 +5,7 @@ import { ControllerResponse, IController } from './IController';
 type ControllerParams = { successStatusCode: number; errorStatusCode: number };
 
 abstract class AbstractController<UsecaseResponse> implements IController<UsecaseResponse> {
-  protected _usecase!: IUsecase<UsecaseResponse>;
+  protected _usecase!: IUsecase<any, UsecaseResponse>;
   protected _successStatusCode!: number;
   protected _errorStatusCode!: number;
   constructor(props: ControllerParams) {
@@ -48,7 +48,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   };
 
   public init = async (props: {
-    makeUsecase: Promise<IUsecase<UsecaseResponse>>;
+    makeUsecase: Promise<IUsecase<any, UsecaseResponse>>;
   }): Promise<this> => {
     const { makeUsecase } = props;
     this._usecase = await makeUsecase;

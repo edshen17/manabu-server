@@ -2,7 +2,10 @@ import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService
 import { AbstractUsecase } from './AbstractUsecase';
 import { CurrentAPIUser } from './IUsecase';
 
-abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<UsecaseResponse> {
+abstract class AbstractCreateUsecase<UsecaseInitParams, UsecaseResponse> extends AbstractUsecase<
+  UsecaseInitParams,
+  UsecaseResponse
+> {
   constructor() {
     super('Access denied.');
   }
@@ -13,23 +16,24 @@ abstract class AbstractCreateUsecase<UsecaseResponse> extends AbstractUsecase<Us
     currentAPIUser: any;
     endpointPath: string;
   }): boolean => {
-    return true;
+    const isCurrentAPIUserPermitted = true;
+    return isCurrentAPIUserPermitted;
   };
 
-  protected _setAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptionsTemplate = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
     endpointPath: string;
   }) => {
     const { currentAPIUser, isCurrentAPIUserPermitted } = props;
-    const accessOptions: DbServiceAccessOptions = {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
       isSelf: true,
     };
-    return accessOptions;
+    return dbServiceAccessOptions;
   };
 }
 

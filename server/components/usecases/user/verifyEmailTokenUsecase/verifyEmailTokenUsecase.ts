@@ -5,9 +5,16 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
+type VerifyEmailTokenUsecaseInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makeRedirectPathBuilder: RedirectPathBuilder;
+};
 type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: string };
 
-class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecaseResponse> {
+class VerifyEmailTokenUsecase extends AbstractGetUsecase<
+  VerifyEmailTokenUsecaseInitParams,
+  VerifyEmailTokenUsecaseResponse
+> {
   private _userDbService!: UserDbService;
   private _redirectPathBuilder!: RedirectPathBuilder;
 
@@ -20,7 +27,7 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
     return true;
   };
 
-  protected _setAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptionsTemplate = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
@@ -69,11 +76,8 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<VerifyEmailTokenUsecase
     }
   };
 
-  public init = async (props: {
-    makeUserDbService: Promise<UserDbService>;
-    makeRedirectPathBuilder: RedirectPathBuilder;
-  }): Promise<this> => {
-    const { makeUserDbService, makeRedirectPathBuilder } = props;
+  public init = async (usecaseInitParams: VerifyEmailTokenUsecaseInitParams): Promise<this> => {
+    const { makeUserDbService, makeRedirectPathBuilder } = usecaseInitParams;
     this._userDbService = await makeUserDbService;
     this._redirectPathBuilder = makeRedirectPathBuilder;
     return this;

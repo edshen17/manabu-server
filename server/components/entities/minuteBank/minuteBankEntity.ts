@@ -38,14 +38,20 @@ class MinuteBankEntity extends AbstractEntity<
     entityBuildParams: MinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
     const { hostedBy, reservedBy, minuteBank } = entityBuildParams;
+    const hostedByData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: hostedBy,
+    });
+    const reservedByData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: reservedBy,
+    });
     const minuteBankEntity = Object.freeze({
       hostedBy,
       reservedBy,
       minuteBank: minuteBank || 0,
-      hostedByData:
-        (await this.getDbDataById({ dbService: this._userDbService, _id: hostedBy })) || {},
-      reservedByData:
-        (await this.getDbDataById({ dbService: this._userDbService, _id: reservedBy })) || {},
+      hostedByData: hostedByData || {},
+      reservedByData: reservedByData || {},
       lastUpdated: new Date(),
     });
     return minuteBankEntity;

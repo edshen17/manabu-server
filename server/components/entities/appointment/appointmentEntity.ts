@@ -61,7 +61,7 @@ class AppointmentEntity extends AbstractEntity<
   public build = async (
     entityBuildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const appointmentEntity = this._buildAppointmentEntity(entityBuildParams);
+    const appointmentEntity = await this._buildAppointmentEntity(entityBuildParams);
     return appointmentEntity;
   };
 
@@ -93,6 +93,7 @@ class AppointmentEntity extends AbstractEntity<
     packageTransactionId: string;
   }) => {
     const { hostedBy, reservedBy, packageTransactionId } = entityInitParams;
+    // need to override to get user's commMethods
     const overrideHostedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: hostedBy,

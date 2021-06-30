@@ -6,12 +6,17 @@ import { ControllerData, IUsecase } from '../../abstractions/IUsecase';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
+type EditUserUsecaseInitParams = {
+  makeUserDbService: Promise<UserDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+  makeMinuteBankDbService: Promise<MinuteBankDbService>;
+};
 type EditUserUsecaseResponse = { user: JoinedUserDoc } | Error;
 
-class EditUserUsecase
-  extends AbstractEditUsecase<EditUserUsecaseResponse>
-  implements IUsecase<EditUserUsecaseResponse>
-{
+class EditUserUsecase extends AbstractEditUsecase<
+  EditUserUsecaseInitParams,
+  EditUserUsecaseResponse
+> {
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _minuteBankDbService!: MinuteBankDbService;
@@ -83,13 +88,9 @@ class EditUserUsecase
     });
   };
 
-  public init = async (services: {
-    makeUserDbService: Promise<UserDbService>;
-    makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-    makeMinuteBankDbService: Promise<MinuteBankDbService>;
-  }): Promise<this> => {
+  public init = async (usecaseInitParams: EditUserUsecaseInitParams): Promise<this> => {
     const { makeUserDbService, makePackageTransactionDbService, makeMinuteBankDbService } =
-      services;
+      usecaseInitParams;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._minuteBankDbService = await makeMinuteBankDbService;

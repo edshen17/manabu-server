@@ -75,6 +75,18 @@ class PackageTransactionEntity extends AbstractEntity<
       isSubscription,
       paymentMethodData,
     } = entityBuildParams;
+    const packageData = await this.getDbDataById({
+      dbService: this._packageDbService,
+      _id: packageId,
+    });
+    const hostedByData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: hostedBy,
+    });
+    const reservedByData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id: reservedBy,
+    });
     const packageTransactionEntity = Object.freeze({
       hostedBy,
       reservedBy,
@@ -89,12 +101,9 @@ class PackageTransactionEntity extends AbstractEntity<
       lessonLanguage: lessonLanguage || 'ja',
       isSubscription: isSubscription || false,
       paymentMethodData: paymentMethodData || {},
-      packageData:
-        (await this.getDbDataById({ dbService: this._packageDbService, _id: packageId })) || {},
-      hostedByData:
-        (await this.getDbDataById({ dbService: this._userDbService, _id: hostedBy })) || {},
-      reservedByData:
-        (await this.getDbDataById({ dbService: this._userDbService, _id: reservedBy })) || {},
+      packageData: packageData || {},
+      hostedByData: hostedByData || {},
+      reservedByData: reservedByData || {},
     });
     return packageTransactionEntity;
   };

@@ -11,9 +11,9 @@ type ControllerData = {
   routeData: RouteData;
 };
 
-interface IUsecase<UsecaseResponse> {
+interface IUsecase<UsecaseInitParams, UsecaseResponse> {
   makeRequest: (controllerData: ControllerData) => Promise<UsecaseResponse>;
-  init: (services: any) => Promise<this>;
+  init: (usecaseInitParams: UsecaseInitParams) => Promise<this>;
 }
 
 export { CurrentAPIUser, ControllerData, IUsecase, RouteData };

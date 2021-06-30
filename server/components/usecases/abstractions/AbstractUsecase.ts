@@ -13,7 +13,9 @@ type MakeRequestTemplateParams = {
   controllerData: ControllerData;
 };
 
-abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseResponse> {
+abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
+  implements IUsecase<UsecaseInitParams, UsecaseResponse>
+{
   private _makeRequestErrorMsg: string;
   constructor(makeRequestErrorMsg: string) {
     this._makeRequestErrorMsg = makeRequestErrorMsg;
@@ -24,7 +26,8 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     const { isValidRequest } = setUpProps;
 
     if (isValidRequest) {
-      return await this._makeRequestTemplate(setUpProps);
+      const dbServiceResponse = await this._makeRequestTemplate(setUpProps);
+      return dbServiceResponse;
     } else {
       throw new Error(this._makeRequestErrorMsg);
     }
@@ -41,15 +44,14 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       currentAPIUser,
       endpointPath,
     });
-
-    const dbServiceAccessOptions: DbServiceAccessOptions = this._setAccessOptions({
+    const dbServiceAccessOptions: DbServiceAccessOptions = this._getDbServiceAccessOptions({
       isCurrentAPIUserPermitted,
       currentAPIUser,
       params,
       endpointPath,
     });
     const isValidRequest = this._isValidRequest(controllerData);
-    return {
+    const setUpProps = {
       dbServiceAccessOptions,
       body,
       isValidRequest,
@@ -60,6 +62,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
       currentAPIUser,
       controllerData,
     };
+    return setUpProps;
   };
 
   protected _isCurrentAPIUserPermitted = (props: {
@@ -69,23 +72,23 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     endpointPath: string;
   }): boolean => {
     const { params, currentAPIUser } = props;
-    return (
+    const isCurrentAPIUserPermitted =
       (params.uId && currentAPIUser.userId && params.uId) == currentAPIUser.userId ||
-      currentAPIUser.role == 'admin'
-    );
+      currentAPIUser.role == 'admin';
+    return isCurrentAPIUserPermitted;
   };
 
-  protected _setAccessOptions = (props: {
+  protected _getDbServiceAccessOptions = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
     endpointPath: string;
   }): DbServiceAccessOptions => {
-    const dbServiceAccessOptions = this._setAccessOptionsTemplate(props);
+    const dbServiceAccessOptions = this._getDbServiceAccessOptionsTemplate(props);
     return dbServiceAccessOptions;
   };
 
-  protected _setAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptionsTemplate = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
@@ -107,7 +110,7 @@ abstract class AbstractUsecase<UsecaseResponse> implements IUsecase<UsecaseRespo
     props: MakeRequestTemplateParams
   ): Promise<UsecaseResponse>;
 
-  abstract init(services: any): Promise<this>;
+  abstract init(initParams: UsecaseInitParams): Promise<this>;
 }
 
 export { AbstractUsecase, MakeRequestTemplateParams };
