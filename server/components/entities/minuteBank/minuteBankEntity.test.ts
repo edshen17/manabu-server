@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-
 import { makeMinuteBankEntity } from './index';
 import { MinuteBankEntity } from './minuteBankEntity';
 
@@ -15,20 +14,30 @@ before(async () => {
 
 describe('minuteBank entity', () => {
   describe('build', () => {
-    describe('given valid inputs', () => {
+    context('given valid inputs', () => {
       it('should return given inputs', async () => {
         const fakeHostedBy = await fakeDbUserFactory.createFakeDbUser();
         const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
-        const testMinuteBank = await minuteBankEntity.build({
+        const fakeMinuteBank = await minuteBankEntity.build({
           hostedBy: fakeHostedBy._id,
           reservedBy: fakeReservedBy._id,
           minuteBank: 5,
         });
-        expect(testMinuteBank.hostedBy).to.equal(fakeHostedBy._id);
-        expect(testMinuteBank.reservedBy).to.equal(fakeReservedBy._id);
-        expect(testMinuteBank.minuteBank).to.equal(5);
-        expect(testMinuteBank).to.have.property('hostedByData');
-        expect(testMinuteBank).to.have.property('reservedByData');
+        expect(fakeMinuteBank.hostedBy).to.equal(fakeHostedBy._id);
+        expect(fakeMinuteBank.reservedBy).to.equal(fakeReservedBy._id);
+        expect(fakeMinuteBank.minuteBank).to.equal(5);
+        expect(fakeMinuteBank.hostedByData).to.deep.equal(fakeHostedBy);
+        expect(fakeMinuteBank.reservedByData).to.deep.equal(fakeReservedBy);
+      });
+    });
+    context('given invalid inputs', () => {
+      it('should throw an error', async () => {
+        try {
+          const entityData: any = {};
+          const fakeMinuteBank = await minuteBankEntity.build(entityData);
+        } catch (err) {
+          expect(err).to.be.an('error');
+        }
       });
     });
   });

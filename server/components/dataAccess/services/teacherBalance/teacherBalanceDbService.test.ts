@@ -20,11 +20,7 @@ before(async () => {
   teacherBalanceDbService = await makeTeacherBalanceDbService;
   fakeDbTeacherBalanceFactory = await makeFakeDbTeacherBalanceFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   dbServiceAccessOptions = fakeDbTeacherBalanceFactory.getDbServiceAccessOptions();
-});
-
-beforeEach(async () => {
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakeTeacherBalance = await fakeDbTeacherBalanceFactory.createFakeDbData({
     userId: fakeTeacher._id,
@@ -46,6 +42,7 @@ describe('teacherBalanceDbService', () => {
         _id: findOneTeacherBalance._id,
         dbServiceAccessOptions,
       });
+      expect(findOneTeacherBalance).to.deep.equal(fakeTeacherBalance);
       expect(findOneTeacherBalance).to.deep.equal(findTeacherBalances[0]);
       expect(findOneTeacherBalance).to.deep.equal(findByIdTeacherBalance);
     });
@@ -53,6 +50,10 @@ describe('teacherBalanceDbService', () => {
   describe('insert', async () => {
     it('should insert a new packageTransaction', async () => {
       expect(fakeTeacherBalance).to.not.equal(null);
+      const findByIdTeacherBalance = await teacherBalanceDbService.findById({
+        _id: fakeTeacherBalance._id,
+        dbServiceAccessOptions,
+      });
     });
   });
   describe('update', () => {

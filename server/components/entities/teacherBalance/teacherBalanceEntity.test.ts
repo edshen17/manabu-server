@@ -3,7 +3,7 @@ import { makeTeacherBalanceEntity } from './index';
 
 context('teacherBalance entity', () => {
   describe('build', () => {
-    describe('given valid inputs', () => {
+    context('given valid inputs', () => {
       it('should return given inputs', () => {
         const testTeacherBalance = makeTeacherBalanceEntity.build({
           userId: 'some userId',

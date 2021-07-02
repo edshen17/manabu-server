@@ -18,7 +18,7 @@ before(async () => {
 
 describe('appointmentEntity', () => {
   describe('build', () => {
-    describe('given valid inputs', () => {
+    context('valid inputs', () => {
       it('should build an appointment that has the given inputs as well as additional information from the db', async () => {
         const fakeHostedBy = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
@@ -27,19 +27,29 @@ describe('appointmentEntity', () => {
           reservedBy: fakeReservedBy._id,
           packageId: fakeHostedBy.teacherData.packages[0]._id,
         });
-        const testAppointment = await appointmentEntity.build({
+        const fakeAppointment = await appointmentEntity.build({
           hostedBy: fakeHostedBy._id,
           reservedBy: fakeReservedBy._id,
           packageTransactionId: fakePackageTransaction._id,
           from: new Date(),
           to: new Date(),
         });
-        expect(testAppointment.hostedBy).to.equal(fakeHostedBy._id);
-        expect(testAppointment.reservedBy).to.equal(fakeReservedBy._id);
-        expect(testAppointment).to.have.property('hostedByData');
-        expect(testAppointment).to.have.property('reservedByData');
-        expect(testAppointment).to.have.property('packageTransactionData');
-        expect(testAppointment).to.have.property('locationData');
+        expect(fakeAppointment.hostedBy).to.equal(fakeHostedBy._id);
+        expect(fakeAppointment.reservedBy).to.equal(fakeReservedBy._id);
+        expect(fakeAppointment).to.have.property('hostedByData');
+        expect(fakeAppointment).to.have.property('reservedByData');
+        expect(fakeAppointment).to.have.property('packageTransactionData');
+        expect(fakeAppointment).to.have.property('locationData');
+      });
+    });
+    context('invalid inputs', () => {
+      it('should throw an error', async () => {
+        try {
+          const entityData: any = {};
+          const fakeAppointment = await appointmentEntity.build(entityData);
+        } catch (err) {
+          expect(err).to.be.an('error');
+        }
       });
     });
   });

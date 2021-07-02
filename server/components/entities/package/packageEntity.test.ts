@@ -17,9 +17,9 @@ before(async () => {
 
 context('package entity', () => {
   describe('build', async () => {
-    describe('given valid inputs', () => {
+    context('given valid inputs', () => {
       it('should return a package entity object', async () => {
-        const testPackage = await packageEntity.build({
+        const fakePackage = await packageEntity.build({
           hostedBy: fakeUser._id,
           priceDetails: { currency: 'SGD', hourlyPrice: 5 },
           lessonAmount: 5,
@@ -27,21 +27,22 @@ context('package entity', () => {
           packageDurations: [],
           packageType: 'light',
         });
-        expect(testPackage.hostedBy).to.equal(fakeUser._id);
-        expect(testPackage.lessonAmount).to.equal(5);
-        expect(testPackage.isOffering).to.equal(true);
-        expect(testPackage.packageDurations.length).to.equal(0);
-        expect(testPackage.packageType).to.equal('light');
-        expect(testPackage.priceDetails).to.deep.equal({ currency: 'SGD', hourlyPrice: 5 });
+        expect(fakePackage.hostedBy).to.equal(fakeUser._id);
+        expect(fakePackage.lessonAmount).to.equal(5);
+        expect(fakePackage.isOffering).to.equal(true);
+        expect(fakePackage.packageDurations.length).to.equal(0);
+        expect(fakePackage.packageType).to.equal('light');
+        expect(fakePackage.priceDetails).to.deep.equal({ currency: 'SGD', hourlyPrice: 5 });
       });
-      it('should return default values if optional parameters are not given', async () => {
-        const testPackage = await packageEntity.build({
-          hostedBy: fakeUser._id,
-          lessonAmount: 5,
-          packageType: 'moderate',
-        });
-        expect(testPackage.packageDurations).to.deep.equal([30, 60]);
-        expect(testPackage.isOffering).to.equal(true);
+    });
+    context('given invalid inputs', () => {
+      it('should throw an error', async () => {
+        try {
+          const entityData: any = {};
+          const fakePackage = await packageEntity.build(entityData);
+        } catch (err) {
+          expect(err).to.be.an('error');
+        }
       });
     });
   });
