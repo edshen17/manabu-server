@@ -27,7 +27,7 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
     return true;
   };
 
-  protected _getDbServiceAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptions = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;

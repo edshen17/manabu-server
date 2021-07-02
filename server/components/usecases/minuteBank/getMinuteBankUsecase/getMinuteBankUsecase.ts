@@ -23,7 +23,7 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
     return isCurrentAPIUserPermitted;
   };
 
-  protected _getDbServiceAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptions = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
@@ -53,11 +53,11 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
     const { dbServiceAccessOptions, endpointPath, currentAPIUser } = props;
     const isSelfEndpoint = endpointPath == '/self/minuteBanks';
     if (isSelfEndpoint) {
-      const usecaseResponse = await this._getSelfMinuteBanks({
+      const usecaseRes = await this._getSelfMinuteBanks({
         currentAPIUser,
         dbServiceAccessOptions,
       });
-      return usecaseResponse;
+      return usecaseRes;
     } else {
       throw new Error('Access denied.');
     }

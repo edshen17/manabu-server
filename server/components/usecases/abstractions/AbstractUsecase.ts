@@ -22,12 +22,12 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
   }
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
-    const setUpProps = this._makeRequestSetupTemplate(controllerData);
-    const { isValidRequest } = setUpProps;
+    const makeRequestTemplateParams = this._makeRequestSetupTemplate(controllerData);
+    const { isValidRequest } = makeRequestTemplateParams;
 
     if (isValidRequest) {
-      const usecaseResponse = await this._makeRequestTemplate(setUpProps);
-      return usecaseResponse;
+      const usecaseRes = await this._makeRequestTemplate(makeRequestTemplateParams);
+      return usecaseRes;
     } else {
       throw new Error(this._makeRequestErrorMsg);
     }
@@ -51,7 +51,7 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
       endpointPath,
     });
     const isValidRequest = this._isValidRequest(controllerData);
-    const setUpProps = {
+    const makeRequestTemplateParams = {
       dbServiceAccessOptions,
       body,
       isValidRequest,
@@ -62,7 +62,7 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
       currentAPIUser,
       controllerData,
     };
-    return setUpProps;
+    return makeRequestTemplateParams;
   };
 
   protected _isCurrentAPIUserPermitted = (props: {
@@ -79,16 +79,6 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
   };
 
   protected _getDbServiceAccessOptions = (props: {
-    currentAPIUser: CurrentAPIUser;
-    isCurrentAPIUserPermitted: boolean;
-    params: any;
-    endpointPath: string;
-  }): DbServiceAccessOptions => {
-    const dbServiceAccessOptions = this._getDbServiceAccessOptionsTemplate(props);
-    return dbServiceAccessOptions;
-  };
-
-  protected _getDbServiceAccessOptionsTemplate = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;

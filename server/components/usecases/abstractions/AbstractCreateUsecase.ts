@@ -20,7 +20,7 @@ abstract class AbstractCreateUsecase<UsecaseInitParams, UsecaseResponse> extends
     return isCurrentAPIUserPermitted;
   };
 
-  protected _getDbServiceAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptions = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;

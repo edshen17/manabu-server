@@ -20,6 +20,9 @@ before(async () => {
   teacherBalanceDbService = await makeTeacherBalanceDbService;
   fakeDbTeacherBalanceFactory = await makeFakeDbTeacherBalanceFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
+});
+
+beforeEach(async () => {
   dbServiceAccessOptions = fakeDbTeacherBalanceFactory.getDbServiceAccessOptions();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakeTeacherBalance = await fakeDbTeacherBalanceFactory.createFakeDbData({

@@ -10,7 +10,7 @@ abstract class AbstractGetUsecase<UsecaseInitParams, UsecaseResponse> extends Ab
     super('Resource not found.');
   }
 
-  protected _getDbServiceAccessOptionsTemplate = (props: {
+  protected _getDbServiceAccessOptions = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     params: any;
