@@ -95,14 +95,12 @@ describe('appointmentDbService', () => {
           });
           context('viewing other', () => {
             it('should find the appointment and return an restricted view on some data', async () => {
-              dbServiceAccessOptions.isSelf = true;
               await getAppointment(dbServiceAccessOptions);
             });
           });
         });
         context('as an admin', () => {
           it('should find the appointment and return an restricted view on some data', async () => {
-            dbServiceAccessOptions.isSelf = true;
             await getAppointment(dbServiceAccessOptions);
           });
         });
@@ -186,7 +184,18 @@ describe('appointmentDbService', () => {
           });
           expect(updatedAppointment).to.deep.equal(fakeAppointment);
         });
-        it('should return null if the appointment to update does not exist', async () => {});
+        it('should return null if the appointment to update does not exist', async () => {
+          const updatedAppointment = await appointmentDbService.findOneAndUpdate({
+            searchQuery: {
+              _id: fakeAppointment.hostedBy,
+            },
+            updateParams: {
+              nonExistentField: 'some non-existent field',
+            },
+            dbServiceAccessOptions,
+          });
+          expect(updatedAppointment).to.equal(null);
+        });
       });
       context('valid inputs', () => {
         context('as a non-admin user', () => {
@@ -213,6 +222,62 @@ describe('appointmentDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateAppointment();
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+    });
+  });
+  describe('delete', () => {
+    const deleteAppointment = async () => {
+      const deletedPackage = await appointmentDbService.findByIdAndDelete({
+        _id: fakeAppointment._id,
+        dbServiceAccessOptions,
+      });
+      const foundPackage = await appointmentDbService.findById({
+        _id: fakeAppointment._id,
+        dbServiceAccessOptions,
+      });
+      expect(foundPackage).to.not.deep.equal(deletedPackage);
+      expect(foundPackage).to.be.equal(null);
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should return null if the package to delete does not exist', async () => {
+          const deletedPackage = await appointmentDbService.findByIdAndDelete({
+            _id: fakeAppointment.hostedBy,
+            dbServiceAccessOptions,
+          });
+          expect(deletedPackage).to.equal(null);
+        });
+      });
+      context('valid inputs', () => {
+        context('as a non-admin user', () => {
+          context('deleting self', () => {
+            it('should update the package', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              await deleteAppointment();
+            });
+          });
+          context('deleting other', async () => {
+            it('should update the package', async () => {
+              await deleteAppointment();
+            });
+          });
+        });
+        context('as an admin', async () => {
+          it('should update the package', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            await deleteAppointment();
+          });
+        });
+      });
+    });
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          await deleteAppointment();
         } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }

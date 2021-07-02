@@ -158,12 +158,24 @@ describe('minuteBankDbService', () => {
           });
           expect(updatedMinuteBank).to.deep.equal(fakeMinuteBank);
         });
-        it('should return null if the minuteBank to update does not exist', async () => {});
+        it('should return null if the minuteBank to update does not exist', async () => {
+          const updatedAppointment = await minuteBankDbService.findOneAndUpdate({
+            searchQuery: {
+              _id: fakeMinuteBank.hostedBy,
+            },
+            updateParams: {
+              nonExistentField: 'some non-existent field',
+            },
+            dbServiceAccessOptions,
+          });
+          expect(updatedAppointment).to.equal(null);
+        });
       });
       context('valid inputs', () => {
         context('as a non-admin user', () => {
           context('updating self', () => {
             it('should update the minuteBank', async () => {
+              dbServiceAccessOptions.isSelf = true;
               await updateMinuteBank();
             });
           });
@@ -175,6 +187,7 @@ describe('minuteBankDbService', () => {
         });
         context('as an admin', async () => {
           it('should update the minuteBank', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
             await updateMinuteBank();
           });
         });
