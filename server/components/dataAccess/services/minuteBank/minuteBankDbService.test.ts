@@ -62,12 +62,12 @@ describe('minuteBankDbService', () => {
         context('as a non-admin user', () => {
           context('viewing self', () => {
             it('should find the minuteBank and return a restricted view on user data', async () => {
+              dbServiceAccessOptions.isSelf = true;
               await getMinuteBank();
             });
           });
           context('viewing other', () => {
             it('should find the minuteBank and return a restricted view on user data', async () => {
-              dbServiceAccessOptions.isSelf = false;
               await getMinuteBank();
             });
           });
@@ -159,16 +159,14 @@ describe('minuteBankDbService', () => {
           expect(updatedMinuteBank).to.deep.equal(fakeMinuteBank);
         });
         it('should return null if the minuteBank to update does not exist', async () => {
-          const updatedAppointment = await minuteBankDbService.findOneAndUpdate({
+          const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
             searchQuery: {
               _id: fakeMinuteBank.hostedBy,
             },
-            updateParams: {
-              nonExistentField: 'some non-existent field',
-            },
+            updateParams: { minuteBank: 10 },
             dbServiceAccessOptions,
           });
-          expect(updatedAppointment).to.equal(null);
+          expect(updatedMinuteBank).to.equal(null);
         });
       });
       context('valid inputs', () => {
@@ -198,6 +196,62 @@ describe('minuteBankDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateMinuteBank();
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+    });
+  });
+  describe('delete', () => {
+    const deleteMinuteBank = async () => {
+      const deletedMinuteBank = await minuteBankDbService.findByIdAndDelete({
+        _id: fakeMinuteBank._id,
+        dbServiceAccessOptions,
+      });
+      const foundMinuteBank = await minuteBankDbService.findById({
+        _id: fakeMinuteBank._id,
+        dbServiceAccessOptions,
+      });
+      expect(foundMinuteBank).to.not.deep.equal(deletedMinuteBank);
+      expect(foundMinuteBank).to.be.equal(null);
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should return null if the minuteBank to delete does not exist', async () => {
+          const deletedMinuteBank = await minuteBankDbService.findByIdAndDelete({
+            _id: fakeMinuteBank.hostedBy,
+            dbServiceAccessOptions,
+          });
+          expect(deletedMinuteBank).to.equal(null);
+        });
+      });
+      context('valid inputs', () => {
+        context('as a non-admin user', () => {
+          context('deleting self', () => {
+            it('should update the minuteBank', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              await deleteMinuteBank();
+            });
+          });
+          context('deleting other', async () => {
+            it('should update the minuteBank', async () => {
+              await deleteMinuteBank();
+            });
+          });
+        });
+        context('as an admin', async () => {
+          it('should update the minuteBank', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            await deleteMinuteBank();
+          });
+        });
+      });
+    });
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          await deleteMinuteBank();
         } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }

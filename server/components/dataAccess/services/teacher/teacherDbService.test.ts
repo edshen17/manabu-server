@@ -12,7 +12,7 @@ let teacherDbService: TeacherDbService;
 let fakeDbTeacherFactory: FakeDbTeacherFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
 let dbServiceAccessOptions: DbServiceAccessOptions;
-let fakeUser: JoinedUserDoc;
+let fakeTeacher: JoinedUserDoc;
 
 before(async () => {
   teacherDbService = await makeTeacherDbService;
@@ -22,56 +22,255 @@ before(async () => {
 
 beforeEach(async () => {
   dbServiceAccessOptions = fakeDbTeacherFactory.getDbServiceAccessOptions();
-  fakeUser = await fakeDbUserFactory.createFakeDbUser();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
 });
 
 describe('teacherDbService', () => {
-  describe('findById, findOne, and find', () => {
-    it('should return a teacher with the correct restricted properties (user, not self)', async () => {
-      const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
-      const findByIdTeacher = await teacherDbService.findById({
-        _id: fakeUser._id,
-        dbServiceAccessOptions,
+  describe('findById, findOne, find', () => {
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should throw an error if given an invalid id', async () => {
+          try {
+            await teacherDbService.findById({
+              _id: undefined,
+              dbServiceAccessOptions,
+            });
+          } catch (err) {
+            expect(err).be.an('error');
+          }
+        });
+        it('should return null if given an non-existent id', async () => {
+          const findByIdTeacher = await teacherDbService.findById({
+            _id: '60979db0bb31ed001589a1ea',
+            dbServiceAccessOptions,
+          });
+          expect(findByIdTeacher).to.equal(null);
+        });
       });
-      const findOneTeacher = await teacherDbService.findOne({
-        searchQuery: { userId: fakeUser._id },
-        dbServiceAccessOptions,
+      context('valid inputs', () => {
+        const getTeacher = async () => {
+          const findParams = {
+            searchQuery: {
+              userId: fakeTeacher._id,
+            },
+            dbServiceAccessOptions,
+          };
+          const findByIdTeacher = await teacherDbService.findById({
+            _id: fakeTeacher._id,
+            dbServiceAccessOptions,
+          });
+          const findOneTeacher = await teacherDbService.findOne(findParams);
+          const findTeachers = await teacherDbService.find(findParams);
+          expect(findByIdTeacher).to.deep.equal(findOneTeacher);
+          expect(findByIdTeacher).to.deep.equal(findTeachers[0]);
+          return findByIdTeacher;
+        };
+        context('as a non-admin user', () => {
+          context('viewing self', () => {
+            it('should find the teacher and return an unrestricted view', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              const findByIdTeacher = await getTeacher();
+              expect(findByIdTeacher).to.have.property('licensePath');
+            });
+          });
+          context('viewing other', () => {
+            it('should find the teacher and return an restricted view', async () => {
+              const findByIdTeacher = await getTeacher();
+              expect(findByIdTeacher).to.not.have.property('licensePath');
+            });
+          });
+        });
+        context('as an admin', () => {
+          it('should find the teacher and return an unrestricted view', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            const findByIdTeacher = await getTeacher();
+            expect(findByIdTeacher).to.have.property('licensePath');
+          });
+        });
       });
-      const findTeachers = await teacherDbService.find({
-        searchQuery: { userId: fakeUser._id },
-        dbServiceAccessOptions,
-      });
-      expect(findByIdTeacher).to.deep.equal(newTeacher);
-      expect(findByIdTeacher).to.deep.equal(findOneTeacher);
-      expect(findTeachers.length).to.equal(1);
-      expect(findByIdTeacher).to.deep.equal(findTeachers[0]);
-      expect(findByIdTeacher).to.not.have.property('licensePath');
     });
-    it('should return a teacher with restricted properties (user, self)', async () => {
-      dbServiceAccessOptions.isSelf = true;
-      const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
-      const findByIdTeacher = await teacherDbService.findById({
-        _id: newTeacher.userId.toString(),
-        dbServiceAccessOptions,
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          const findByIdTeacher = await teacherDbService.findById({
+            _id: fakeTeacher._id,
+            dbServiceAccessOptions,
+          });
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
       });
-      expect(findByIdTeacher).to.have.property('licensePath');
     });
-    it('should return a teacher with restricted properties (admin, not self)', async () => {
-      dbServiceAccessOptions.currentAPIUserRole = 'admin';
-      const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
-      const findByIdTeacher = await teacherDbService.findById({
-        _id: newTeacher.userId.toString(),
-        dbServiceAccessOptions,
+  });
+  describe('insert', () => {
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should throw an error if required fields are not given', async () => {
+          try {
+            await teacherDbService.insert({
+              modelToInsert: {},
+              dbServiceAccessOptions,
+            });
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
       });
-      expect(findByIdTeacher).to.have.property('licensePath');
+      context('valid inputs', () => {
+        it('should insert a teacher', async () => {
+          const findByIdTeacher = await teacherDbService.findById({
+            _id: fakeTeacher._id,
+            dbServiceAccessOptions,
+          });
+          expect(findByIdTeacher).to.not.equal(null);
+        });
+      });
     });
-    it('should return null when no teacher found', async () => {
-      const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: fakeUser._id });
-      const findByIdTeacher = await teacherDbService.findById({
-        _id: newTeacher._id,
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        const { _id, ...modelToInsert } = fakeTeacher.teacherData;
+        modelToInsert.userId = _id; // ensure we insert an unique teacher id
+        try {
+          await teacherDbService.insert({
+            modelToInsert,
+            dbServiceAccessOptions,
+          });
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+    });
+  });
+  describe('update', () => {
+    const updateTeacher = async () => {
+      const updatedTeacher = await teacherDbService.findOneAndUpdate({
+        searchQuery: { userId: fakeTeacher._id },
+        updateParams: { studentCount: 5 },
         dbServiceAccessOptions,
       });
-      expect(findByIdTeacher).to.equal(null);
+      expect(updatedTeacher).to.not.deep.equal(fakeTeacher);
+      expect(updatedTeacher.studentCount).to.equal(5);
+      return updatedTeacher;
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should return the original teacher if update field does not exist', async () => {
+          const updatedTeacher = await teacherDbService.findOneAndUpdate({
+            searchQuery: {
+              userId: fakeTeacher._id,
+            },
+            updateParams: {
+              nonExistentField: 'some non-existent field',
+            },
+            dbServiceAccessOptions,
+          });
+          const { packages, ...unjoinedTeacherData } = fakeTeacher.teacherData;
+          expect(updatedTeacher).to.deep.equal(unjoinedTeacherData);
+          return updatedTeacher;
+        });
+        it('should return null if the teacher to update does not exist', async () => {
+          const updatedTeacher = await teacherDbService.findOneAndUpdate({
+            searchQuery: {
+              _id: fakeTeacher.teacherData.packages[0]._id,
+            },
+            updateParams: { studentCount: 5 },
+            dbServiceAccessOptions,
+          });
+          expect(updatedTeacher).to.equal(null);
+        });
+      });
+      context('valid inputs', () => {
+        context('as a non-admin user', () => {
+          context('updating self', () => {
+            it('should update the teacher', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              const updatedTeacher = await updateTeacher();
+              expect(updatedTeacher).to.have.property('licensePath');
+            });
+          });
+          context('updating other', async () => {
+            it('should update the teacher', async () => {
+              const updatedTeacher = await updateTeacher();
+              expect(updatedTeacher).to.not.have.property('licensePath');
+            });
+          });
+        });
+        context('as an admin', async () => {
+          it('should update the teacher', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            const updatedTeacher = await updateTeacher();
+            expect(updatedTeacher).to.have.property('licensePath');
+          });
+        });
+      });
+    });
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          await updateTeacher();
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+    });
+  });
+  describe('delete', () => {
+    const deleteTeacher = async () => {
+      const deletedTeacher = await teacherDbService.findByIdAndDelete({
+        _id: fakeTeacher._id,
+        dbServiceAccessOptions,
+      });
+      const foundTeacher = await teacherDbService.findById({
+        _id: fakeTeacher._id,
+        dbServiceAccessOptions,
+      });
+      expect(deletedTeacher).to.not.deep.equal(foundTeacher);
+      expect(foundTeacher).to.be.equal(null);
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should return null if the teacher to delete does not exist', async () => {
+          const deletedTeacher = await teacherDbService.findByIdAndDelete({
+            _id: fakeTeacher.teacherData.packages[0]._id,
+            dbServiceAccessOptions,
+          });
+          expect(deletedTeacher).to.equal(null);
+        });
+      });
+      context('valid inputs', () => {
+        context('as a non-admin user', () => {
+          context('deleting self', () => {
+            it('should update the package', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              await deleteTeacher();
+            });
+          });
+          context('deleting other', async () => {
+            it('should update the package', async () => {
+              await deleteTeacher();
+            });
+          });
+        });
+        context('as an admin', async () => {
+          it('should update the package', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            await deleteTeacher();
+          });
+        });
+      });
+    });
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          await deleteTeacher();
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
     });
   });
 });

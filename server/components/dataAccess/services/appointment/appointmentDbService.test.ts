@@ -11,24 +11,24 @@ import { AppointmentDbService } from './appointmentDbService';
 
 let appointmentDbService: AppointmentDbService;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
-let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
+let fakeDbAppointmentTransactionFactory: FakeDbPackageTransactionFactory;
 let dbServiceAccessOptions: DbServiceAccessOptions;
-let fakePackageTransaction: PackageTransactionDoc;
+let fakeAppointmentTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
 
 before(async () => {
   appointmentDbService = await makeAppointmentDbService;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
-  fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+  fakeDbAppointmentTransactionFactory = await makeFakeDbPackageTransactionFactory;
 });
 
 beforeEach(async () => {
   dbServiceAccessOptions = fakeDbAppointmentFactory.getDbServiceAccessOptions();
-  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  fakeAppointmentTransaction = await fakeDbAppointmentTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-    hostedBy: fakePackageTransaction.hostedBy.toString(),
-    reservedBy: fakePackageTransaction.reservedBy.toString(),
-    packageTransactionId: fakePackageTransaction._id,
+    hostedBy: fakeAppointmentTransaction.hostedBy.toString(),
+    reservedBy: fakeAppointmentTransaction.reservedBy.toString(),
+    packageTransactionId: fakeAppointmentTransaction._id,
     from: new Date(),
     to: new Date(),
   });
@@ -57,7 +57,7 @@ describe('appointmentDbService', () => {
         });
       });
       context('valid inputs', () => {
-        const getAppointment = async (dbServiceAccessOptions: DbServiceAccessOptions) => {
+        const getAppointment = async () => {
           const findParams = {
             searchQuery: {
               hostedBy: fakeAppointment.hostedBy,
@@ -71,8 +71,8 @@ describe('appointmentDbService', () => {
           const findOneAppointment = await appointmentDbService.findOne(findParams);
           const findAppointments = await appointmentDbService.find(findParams);
           const appointmentPackageTransactionData: any = findByIdAppointment.packageTransactionData;
-          expect(findByIdAppointment._id.toString()).to.equal(findOneAppointment._id.toString());
-          expect(findByIdAppointment._id.toString()).to.equal(findAppointments[0]._id.toString());
+          expect(findByIdAppointment).to.deep.equal(findOneAppointment);
+          expect(findByIdAppointment).to.deep.equal(findAppointments[0]);
           expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('password');
           expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('email');
           expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('settings');
@@ -88,20 +88,21 @@ describe('appointmentDbService', () => {
         };
         context('as a non-admin user', () => {
           context('viewing self', () => {
-            it('should find the appointment and return an restricted view on some data', async () => {
+            it('should find the appointment and return an unrestricted view on some data', async () => {
               dbServiceAccessOptions.isSelf = true;
-              await getAppointment(dbServiceAccessOptions);
+              await getAppointment();
             });
           });
           context('viewing other', () => {
-            it('should find the appointment and return an restricted view on some data', async () => {
-              await getAppointment(dbServiceAccessOptions);
+            it('should find the appointment and return an unrestricted view on some data', async () => {
+              await getAppointment();
             });
           });
         });
         context('as an admin', () => {
           it('should find the appointment and return an restricted view on some data', async () => {
-            await getAppointment(dbServiceAccessOptions);
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            await getAppointment();
           });
         });
       });
@@ -124,15 +125,13 @@ describe('appointmentDbService', () => {
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if required fields are not given', async () => {
-          dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-          const { _id, ...modelToInsert } = fakeAppointment;
           try {
             fakeAppointment = await appointmentDbService.insert({
-              modelToInsert,
+              modelToInsert: {},
               dbServiceAccessOptions,
             });
           } catch (err) {
-            expect(err.message).to.equal('Access denied.');
+            expect(err).to.be.an('error');
           }
         });
       });
@@ -149,13 +148,15 @@ describe('appointmentDbService', () => {
     });
     context('db access denied', () => {
       it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        const { _id, ...modelToInsert } = fakeAppointment;
         try {
           fakeAppointment = await appointmentDbService.insert({
-            modelToInsert: {},
+            modelToInsert,
             dbServiceAccessOptions,
           });
         } catch (err) {
-          expect(err).to.be.an('error');
+          expect(err.message).to.equal('Access denied.');
         }
       });
     });
@@ -189,9 +190,7 @@ describe('appointmentDbService', () => {
             searchQuery: {
               _id: fakeAppointment.hostedBy,
             },
-            updateParams: {
-              nonExistentField: 'some non-existent field',
-            },
+            updateParams: { status: 'cancelled' },
             dbServiceAccessOptions,
           });
           expect(updatedAppointment).to.equal(null);
@@ -201,6 +200,7 @@ describe('appointmentDbService', () => {
         context('as a non-admin user', () => {
           context('updating self', () => {
             it('should update the appointment', async () => {
+              dbServiceAccessOptions.isSelf = true;
               await updateAppointment();
             });
           });
@@ -212,6 +212,7 @@ describe('appointmentDbService', () => {
         });
         context('as an admin', async () => {
           it('should update the appointment', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
             await updateAppointment();
           });
         });
@@ -230,43 +231,43 @@ describe('appointmentDbService', () => {
   });
   describe('delete', () => {
     const deleteAppointment = async () => {
-      const deletedPackage = await appointmentDbService.findByIdAndDelete({
+      const deletedAppointment = await appointmentDbService.findByIdAndDelete({
         _id: fakeAppointment._id,
         dbServiceAccessOptions,
       });
-      const foundPackage = await appointmentDbService.findById({
+      const foundAppointment = await appointmentDbService.findById({
         _id: fakeAppointment._id,
         dbServiceAccessOptions,
       });
-      expect(foundPackage).to.not.deep.equal(deletedPackage);
-      expect(foundPackage).to.be.equal(null);
+      expect(foundAppointment).to.not.deep.equal(deletedAppointment);
+      expect(foundAppointment).to.be.equal(null);
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return null if the package to delete does not exist', async () => {
-          const deletedPackage = await appointmentDbService.findByIdAndDelete({
+        it('should return null if the minuteBank to delete does not exist', async () => {
+          const deletedAppointment = await appointmentDbService.findByIdAndDelete({
             _id: fakeAppointment.hostedBy,
             dbServiceAccessOptions,
           });
-          expect(deletedPackage).to.equal(null);
+          expect(deletedAppointment).to.equal(null);
         });
       });
       context('valid inputs', () => {
         context('as a non-admin user', () => {
           context('deleting self', () => {
-            it('should update the package', async () => {
+            it('should update the minuteBank', async () => {
               dbServiceAccessOptions.isSelf = true;
               await deleteAppointment();
             });
           });
           context('deleting other', async () => {
-            it('should update the package', async () => {
+            it('should update the minuteBank', async () => {
               await deleteAppointment();
             });
           });
         });
         context('as an admin', async () => {
-          it('should update the package', async () => {
+          it('should update the minuteBank', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
             await deleteAppointment();
           });

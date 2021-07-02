@@ -1,4 +1,4 @@
-import { DbServiceParams, IDbService } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, DbServiceParams, IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDoc } from '../../../../models/Teacher';
 
@@ -19,10 +19,23 @@ class TeacherDbService
     };
   }
 
-  public findById = async (dbServiceParams: DbServiceParams): Promise<TeacherDoc> => {
+  public findById = async (dbServiceParams: {
+    _id?: any;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<TeacherDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const dbDataPromise = this.findOne({ searchQuery: { userId: _id }, dbServiceAccessOptions });
     const dbData = await this._grantAccess(dbServiceAccessOptions, dbDataPromise);
+    return dbData;
+  };
+
+  public findByIdAndDelete = async (dbServiceParams: {
+    _id?: any;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<TeacherDoc> => {
+    const { _id, dbServiceAccessOptions } = dbServiceParams;
+    const dbDataPromise = this._dbModel.findOneAndDelete({ userId: _id }).lean();
+    const dbData = await this._dbDataReturnTemplate(dbServiceAccessOptions, dbDataPromise);
     return dbData;
   };
 }

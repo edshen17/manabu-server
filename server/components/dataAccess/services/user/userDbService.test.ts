@@ -45,7 +45,7 @@ describe('userDbService', () => {
       });
       context('valid inputs', () => {
         context('as a non-admin user', () => {
-          context('viewing others', () => {
+          context('viewing other', () => {
             it('should return a restricted view of another user', async () => {
               const findByIdUser = await userDbService.findById({
                 _id: fakeUser._id,

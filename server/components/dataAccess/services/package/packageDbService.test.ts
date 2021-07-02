@@ -55,7 +55,7 @@ describe('packageDbService', () => {
         });
       });
       context('valid inputs', () => {
-        const getPackage = async (dbServiceAccessOptions: DbServiceAccessOptions) => {
+        const getPackage = async () => {
           const findParams = {
             searchQuery: {
               _id: fakePackage._id,
@@ -75,19 +75,19 @@ describe('packageDbService', () => {
           context('viewing self', () => {
             it('should find the package and return an unrestricted view', async () => {
               dbServiceAccessOptions.isSelf = true;
-              await getPackage(dbServiceAccessOptions);
+              await getPackage();
             });
           });
           context('viewing other', () => {
             it('should find the package and return an unrestricted view', async () => {
-              await getPackage(dbServiceAccessOptions);
+              await getPackage();
             });
           });
         });
         context('as an admin', () => {
           it('should find the package and return an unrestricted view', async () => {
             dbServiceAccessOptions.isSelf = true;
-            await getPackage(dbServiceAccessOptions);
+            await getPackage();
           });
         });
       });
@@ -173,9 +173,7 @@ describe('packageDbService', () => {
             searchQuery: {
               _id: fakePackage.hostedBy,
             },
-            updateParams: {
-              nonExistentField: 'some non-existent field',
-            },
+            updateParams: { packageType: 'custom' },
             dbServiceAccessOptions,
           });
           expect(updatedPackage).to.equal(null);
