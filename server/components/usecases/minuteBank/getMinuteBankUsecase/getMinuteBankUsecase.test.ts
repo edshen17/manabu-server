@@ -27,23 +27,32 @@ before(async () => {
     hostedBy: fakeUser._id,
     reservedBy: fakeUser._id,
   });
+  const te = await fakeDbUserFactory.createFakeDbUser();
+  await fakeDbMinuteBankFactory.createFakeDbData({
+    minuteBank: 5,
+    hostedBy: te._id,
+    reservedBy: te._id,
+  });
   getMinuteBankUsecase = await makeGetMinuteBankUsecase;
 });
 
-context('getMinuteBankUsecase', () => {
+describe('getMinuteBankUsecase', () => {
   describe('makeRequest', () => {
     it('should return a minuteBank given a valid inputs', async () => {
-      const buildGetMinuteBankControllerData = controllerDataBuilder
+      const buildControllerData = controllerDataBuilder
         .endpointPath('/self/minuteBanks')
+        .currentAPIUser({
+          userId: fakeUser._id,
+          role: 'admin',
+        })
         .build();
-      const minuteBankRes = await getMinuteBankUsecase.makeRequest(
-        buildGetMinuteBankControllerData
-      );
+      const minuteBankRes = await getMinuteBankUsecase.makeRequest(buildControllerData);
       if ('minuteBanks' in minuteBankRes) {
         expect(minuteBankRes).to.have.property('minuteBanks');
         expect(minuteBankRes.minuteBanks).to.be.an('array');
         expect(minuteBankRes.minuteBanks.length > 0).to.equal(true);
       }
     });
+    // invalid input no current api user
   });
 });

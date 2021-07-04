@@ -73,7 +73,7 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
   }): boolean => {
     const { params, currentAPIUser } = props;
     const isCurrentAPIUserPermitted =
-      (params.uId && currentAPIUser.userId && params.uId) == currentAPIUser.userId ||
+      (params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId) ||
       currentAPIUser.role == 'admin';
     return isCurrentAPIUserPermitted;
   };

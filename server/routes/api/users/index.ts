@@ -22,7 +22,7 @@ users.get(
   makeJSONExpressCallback.consume(makeGetMinuteBankController)
 );
 
-users.get('/:uId', VerifyToken, makeRedirectExpressCallback.consume(makeGetUserController));
+users.get('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 users.put('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeEditUserController));
 users.get(
@@ -32,6 +32,6 @@ users.get(
 );
 
 users.post('/auth/login', makeJSONCookieExpressCallback.consume(makeLoginUserController));
-users.get('/auth/google', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
+users.get('/auth/google', makeJSONCookieExpressCallback.consume(makeLoginUserController));
 
 export default users;

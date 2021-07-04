@@ -20,6 +20,7 @@ import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase'
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { UserEntity } from '../../../entities/user/userEntity';
+import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 
 type CreateUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
@@ -31,6 +32,7 @@ type CreateUserUsecaseInitParams = {
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   signJwt: any;
   emailHandler: EmailHandler;
+  makeRedirectPathBuilder: RedirectPathBuilder;
 };
 
 type CookieData = {
@@ -43,9 +45,11 @@ type CookieData = {
   };
 };
 
-type CreateUserUsecaseResponse =
-  | { user: JoinedUserDoc; cookies: CookieData[]; redirectURI?: string }
-  | Error;
+type CreateUserUsecaseResponse = {
+  user: JoinedUserDoc;
+  cookies: CookieData[];
+  redirectPath: string;
+};
 
 class CreateUserUsecase extends AbstractCreateUsecase<
   CreateUserUsecaseInitParams,
@@ -60,41 +64,44 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _teacherBalanceDbService!: TeacherBalanceDbService;
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
+  private _redirectPathBuilder!: RedirectPathBuilder;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
-    const { role, _id, dateRegistered } = body || {};
-    return !role && !_id && !dateRegistered;
+    const { role, _id, dateRegistered, verificationToken } = body || {};
+    return !role && !_id && !dateRegistered && !verificationToken;
   };
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateUserUsecaseResponse> => {
-    const { body, dbServiceAccessOptions } = props;
+    const { body, dbServiceAccessOptions, query } = props;
     const { isTeacherApp } = body || {};
-
-    try {
-      const userInstance = this._userEntity.build(body);
-      let savedDbUser = await this._insertUser(userInstance, dbServiceAccessOptions);
-      if (isTeacherApp) {
-        savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
-      }
-
-      if (process.env.NODE_ENV == 'production' && !savedDbUser.isEmailVerified) {
-        this._sendVerificationEmail(userInstance);
-        this._sendInternalEmail(userInstance, isTeacherApp);
-      }
-      const cookies = this.splitLoginCookies(savedDbUser);
-      return {
-        user: savedDbUser,
-        cookies,
-      };
-    } catch (err) {
-      throw err;
+    const userInstance = this._userEntity.build(body);
+    let savedDbUser = await this._createDbUser(userInstance, dbServiceAccessOptions);
+    if (isTeacherApp) {
+      savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
     }
+
+    if (process.env.NODE_ENV == 'production' && !savedDbUser.isEmailVerified) {
+      this._sendVerificationEmail(userInstance);
+      this._sendInternalEmail(userInstance, isTeacherApp);
+    }
+    const cookies = this.splitLoginCookies(savedDbUser);
+    const redirectPath = this._redirectPathBuilder
+      .host('client')
+      .endpointPath('/dashboard')
+      .stringifyQueryStrings(query)
+      .build();
+    const usecaseRes = {
+      user: savedDbUser,
+      cookies,
+      redirectPath,
+    };
+    return usecaseRes;
   };
 
-  private _insertUser = async (
+  private _createDbUser = async (
     userInstance: any,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
@@ -110,12 +117,12 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
     const joinedUserData = JSON.parse(JSON.stringify(savedDbUser));
-    const teacherData: any = await this._insertTeacher(savedDbUser, dbServiceAccessOptions);
-    const packages = await this._insertTeacherPackages(savedDbUser, dbServiceAccessOptions);
+    const teacherData = await this._createDbTeacher(savedDbUser, dbServiceAccessOptions);
+    const packages = await this._createDbTeacherPackages(savedDbUser, dbServiceAccessOptions);
 
-    await this._insertAdminPackageTransaction(savedDbUser, dbServiceAccessOptions);
-    await this._insertAdminMinuteBank(savedDbUser, dbServiceAccessOptions);
-    await this._insertTeacherBalance(savedDbUser, dbServiceAccessOptions);
+    await this._createDbAdminPackageTransaction(savedDbUser, dbServiceAccessOptions);
+    await this._createDbAdminMinuteBank(savedDbUser, dbServiceAccessOptions);
+    await this._createDbTeacherBalance(savedDbUser, dbServiceAccessOptions);
 
     teacherData.packages = packages;
     joinedUserData.teacherData = teacherData;
@@ -123,10 +130,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return joinedUserData;
   };
 
-  private _insertTeacher = async (
+  private _createDbTeacher = async (
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<TeacherDoc> => {
+  ): Promise<TeacherDoc & { packages?: PackageDoc[] }> => {
     const userId = savedDbUser._id;
     const modelToInsert = makeTeacherEntity.build({ userId });
     const savedDbTeacher = await this._teacherDbService.insert({
@@ -136,7 +143,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return savedDbTeacher;
   };
 
-  private _insertTeacherPackages = async (
+  private _createDbTeacherPackages = async (
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<PackageDoc[]> => {
@@ -179,7 +186,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return packagesToInsert;
   };
 
-  private _insertAdminPackageTransaction = async (
+  private _createDbAdminPackageTransaction = async (
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<PackageTransactionDoc> => {
@@ -203,7 +210,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return newPackageTransaction;
   };
 
-  private _insertAdminMinuteBank = async (
+  private _createDbAdminMinuteBank = async (
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<MinuteBankDoc> => {
@@ -219,7 +226,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return newMinuteBank;
   };
 
-  private _insertTeacherBalance = async (
+  private _createDbTeacherBalance = async (
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherBalanceDoc> => {
@@ -325,6 +332,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makeTeacherBalanceDbService,
       signJwt,
       emailHandler,
+      makeRedirectPathBuilder,
     } = usecaseInitParams;
     this._userDbService = await makeUserDbService;
     this._userEntity = makeUserEntity;
@@ -335,6 +343,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
+    this._redirectPathBuilder = makeRedirectPathBuilder;
     return this;
   };
 }

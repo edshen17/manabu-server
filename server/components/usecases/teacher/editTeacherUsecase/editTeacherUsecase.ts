@@ -2,13 +2,13 @@ import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDb
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData, IUsecase } from '../../abstractions/IUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
 
 type EditTeacherUsecaseUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeTeacherDbService: Promise<TeacherDbService>;
 };
-type EditTeacherUsecaseResponse = { user: JoinedUserDoc } | Error;
+type EditTeacherUsecaseResponse = { user: JoinedUserDoc };
 
 class EditTeacherUsecase extends AbstractEditUsecase<
   EditTeacherUsecaseUsecaseInitParams,
@@ -32,18 +32,13 @@ class EditTeacherUsecase extends AbstractEditUsecase<
       updateParams: body,
       dbServiceAccessOptions,
     });
-
-    if (updatedDbTeacher) {
-      const _id = updatedDbTeacher.userId;
-      const savedDbUser = await this._userDbService.findById({
-        _id,
-        dbServiceAccessOptions,
-      });
-      const usecaseRes = { user: savedDbUser };
-      return usecaseRes;
-    } else {
-      throw new Error('Access denied.');
-    }
+    const _id = updatedDbTeacher.userId;
+    const savedDbUser = await this._userDbService.findById({
+      _id,
+      dbServiceAccessOptions,
+    });
+    const usecaseRes = { user: savedDbUser };
+    return usecaseRes;
   };
 
   public init = async (usecaseInitParams: EditTeacherUsecaseUsecaseInitParams): Promise<this> => {

@@ -22,6 +22,7 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
   AppointmentDoc
 > {
   private _fakeDbPackageTransactionFactory!: FakeDbPackageTransactionFactory;
+
   protected _createFakeEntity = async (
     fakeEntityBuildParams?: FakeAppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
@@ -37,6 +38,7 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
     });
     return fakeAppointmentEntity;
   };
+
   protected _initTemplate = async (
     partialFakeDbDataFactoryInitParams: PartialFakeDbAppointmentFactoryInitParams
   ) => {

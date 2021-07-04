@@ -3,20 +3,20 @@ import { expect } from 'chai';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { CreateUserUsecase } from './createUserUsecase';
+import { CreateUserUsecase, CreateUserUsecaseResponse } from './createUserUsecase';
 import { makeCreateUserUsecase } from '.';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let createUserUsecase: CreateUserUsecase;
-let defaultRouteData: RouteData;
+let routeData: RouteData;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   createUserUsecase = await makeCreateUserUsecase;
 });
 
-beforeEach(async () => {
-  defaultRouteData = {
+beforeEach(() => {
+  routeData = {
     params: {},
     body: {
       name: faker.name.findName(),
@@ -27,45 +27,58 @@ beforeEach(async () => {
   };
 });
 
-context('createUserUsecase', () => {
+describe('createUserUsecase', () => {
   describe('makeRequest', () => {
-    describe('creating a new user should return the correct properties', () => {
-      it('should create a new user in the db', async () => {
-        const buildNewUserControllerData = controllerDataBuilder
-          .routeData(defaultRouteData)
-          .build();
+    const getUser = async () => {
+      const controllerData = controllerDataBuilder.routeData(routeData).build();
+      const createUserRes = await createUserUsecase.makeRequest(controllerData);
+      return createUserRes;
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should throw an error if restricted fields found in body', async () => {
+          const routeDataBody = routeData.body;
+          routeDataBody._id = 'some id';
+          routeDataBody.role = 'admin';
+          routeDataBody.dateRegistered = new Date();
+          routeDataBody.verificationToken = 'new token';
 
-        const newUserRes = await createUserUsecase.makeRequest(buildNewUserControllerData);
-        if ('user' in newUserRes!) {
-          expect(newUserRes.user._id).to.not.equal('');
-        }
+          try {
+            await getUser();
+          } catch (err) {
+            expect(err.message).to.equal('Access denied.');
+          }
+        });
+        it('should throw if no inputs are provided', async () => {
+          try {
+            await getUser();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
       });
-      it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {
-        defaultRouteData.body.isTeacherApp = true;
-        const buildNewUserControllerData = controllerDataBuilder
-          .routeData(defaultRouteData)
-          .build();
-        const newTeacherRes = await createUserUsecase.makeRequest(buildNewUserControllerData);
-        if ('user' in newTeacherRes!) {
-          expect(newTeacherRes.user).to.have.property('settings');
-          expect(newTeacherRes.user).to.not.have.property('password');
-          expect(newTeacherRes.user.teacherData).to.have.property('licensePath');
-        }
-      });
-      it('should create a new teacher and return a joined user/teacher/packages doc (viewing as self)', async () => {
-        defaultRouteData.body.isTeacherApp = true;
-        const buildNewUserControllerData = controllerDataBuilder
-          .routeData(defaultRouteData)
-          .currentAPIUser({ role: 'admin' })
-          .build();
 
-        const newTeacherRes = await createUserUsecase.makeRequest(buildNewUserControllerData);
-        if ('user' in newTeacherRes!) {
-          expect(newTeacherRes.user).to.have.property('settings');
-          expect(newTeacherRes.user).to.not.have.property('password');
-          expect(newTeacherRes.user.teacherData).to.have.property('licensePath');
-          expect(newTeacherRes.user.teacherData.packages.length).to.equal(3);
-        }
+      context('valid inputs', () => {
+        const validResOutput = (createUserRes: CreateUserUsecaseResponse) => {
+          expect(createUserRes).to.have.property('user');
+          expect(createUserRes.user).to.not.equal(null);
+          expect(createUserRes).to.have.property('redirectPath');
+          expect(createUserRes.redirectPath).to.not.equal(null);
+          expect(createUserRes).to.have.property('cookies');
+          expect(createUserRes.cookies).to.not.equal(null);
+        };
+        it('should return a new user, auth cookies, and a redirect path', async () => {
+          const createUserRes = await getUser();
+          validResOutput(createUserRes);
+        });
+        it('should return a joined user, auth cookies, and a redirect path', async () => {
+          routeData.body.isTeacherApp = true;
+          const createUserRes = await getUser();
+          const savedDbUser = createUserRes.user;
+          expect(savedDbUser).to.have.property('settings');
+          expect(savedDbUser).to.not.have.property('password');
+          expect(savedDbUser.teacherData).to.have.property('licensePath');
+        });
       });
     });
   });

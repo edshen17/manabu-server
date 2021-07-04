@@ -1,6 +1,12 @@
-class RedirectPathBuilder {
-  private _redirectExpressCallbackOptions!: { host: string; endpointPath: string };
+import { QueryStringHandler } from '../queryStringHandler/queryStringHandler';
 
+class RedirectPathBuilder {
+  private _redirectExpressCallbackOptions!: {
+    host: string;
+    endpointPath: string;
+    queryStrings: string;
+  };
+  private _queryStringHandler!: QueryStringHandler;
   constructor() {
     this._setDefaultProperties();
   }
@@ -9,6 +15,7 @@ class RedirectPathBuilder {
     this._redirectExpressCallbackOptions = {
       host: '',
       endpointPath: '',
+      queryStrings: '',
     };
   };
 
@@ -36,10 +43,29 @@ class RedirectPathBuilder {
     this._redirectExpressCallbackOptions.endpointPath = endpointPath;
     return this;
   };
+
+  public encodeQueryStrings = (unencodedQueryStrings: {}) => {
+    const encodedQueryStrings = this._queryStringHandler.encodeQueryStrings(unencodedQueryStrings);
+    this._redirectExpressCallbackOptions.queryStrings = encodedQueryStrings;
+    return this;
+  };
+
+  public stringifyQueryStrings = (queryStrings: {}) => {
+    const stringifiedQueryStrings = this._queryStringHandler.stringifyQueryStrings(queryStrings);
+    this._redirectExpressCallbackOptions.queryStrings = stringifiedQueryStrings;
+    return this;
+  };
+
   public build = (): string => {
     const { host, endpointPath } = this._redirectExpressCallbackOptions || {};
     this._setDefaultProperties();
     return `${host}${endpointPath}`;
+  };
+
+  public init = (initParams: { makeQueryStringHandler: QueryStringHandler }) => {
+    const { makeQueryStringHandler } = initParams;
+    this._queryStringHandler = makeQueryStringHandler;
+    return this;
   };
 }
 

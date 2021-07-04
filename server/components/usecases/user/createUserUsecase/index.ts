@@ -8,6 +8,7 @@ import { makeMinuteBankDbService } from '../../../dataAccess/services/minuteBank
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { emailHandler } from '../../utils/emailHandler/emailHandler';
 import { CreateUserUsecase } from './createUserUsecase';
+import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserDbService,
@@ -19,6 +20,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeTeacherBalanceDbService,
   signJwt,
   emailHandler,
+  makeRedirectPathBuilder,
 });
 
 export { makeCreateUserUsecase };

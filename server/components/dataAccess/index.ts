@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
+import 'dotenv/config';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 const mongod = new MongoMemoryServer();
 
 const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   if (mongoose.connection.readyState != 1) {
-    let dbHost: string = 'users';
+    let dbHost: string = 'dev';
     let dbURI: string = `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?retryWrites=true&w=majority`;
-
     if (process.env.NODE_ENV != 'production') {
       dbURI = await mongod.getUri();
     }

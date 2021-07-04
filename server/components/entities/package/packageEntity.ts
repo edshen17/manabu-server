@@ -69,7 +69,10 @@ class PackageEntity extends AbstractEntity<
         hourlyPrice: teacherHourlyRate.amount!,
       };
     } else {
-      throw new Error('Only teachers can have packages.');
+      priceDetails = {
+        currency: 'SGD',
+        hourlyPrice: 35,
+      };
     }
     return priceDetails;
   };

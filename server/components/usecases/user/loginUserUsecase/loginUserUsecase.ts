@@ -54,20 +54,20 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const isBaseLogin = endpointPath == SERVER_LOGIN_ENDPOINTS.BASE_LOGIN;
     const isGoogleLogin = endpointPath == SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN;
     if (isBaseLogin) {
-      const baseLoginResponse = await this._handleBaseLogin({
+      const baseLoginRes = await this._handleBaseLogin({
         body,
         query,
         dbServiceAccessOptions,
       });
-      return baseLoginResponse;
+      return baseLoginRes;
     } else if (isGoogleLogin) {
-      const googleLoginResponse = await this._handleGoogleLogin({
+      const googleLoginRes = await this._handleGoogleLogin({
         query,
         dbServiceAccessOptions,
         body,
         controllerData,
       });
-      return googleLoginResponse;
+      return googleLoginRes;
     } else {
       throw new Error('Unsupported authentication endpoint.');
     }
@@ -117,17 +117,19 @@ class LoginUserUsecase extends AbstractCreateUsecase<
           dbServiceAccessOptions
         );
       }
-      return this._createUsecaseResponse(savedDbUser);
+      const loginUserRes = this._createLoginResponse(savedDbUser);
+      return loginUserRes;
     } else {
-      return await handleNoSavedDbUser();
+      const noSavedDbUserRes = await handleNoSavedDbUser();
+      return noSavedDbUserRes;
     }
   };
 
-  private _createUsecaseResponse = (savedDbUser: JoinedUserDoc): LoginUserUsecaseResponse => {
+  private _createLoginResponse = (savedDbUser: JoinedUserDoc): LoginUserUsecaseResponse => {
     return {
       user: savedDbUser,
       cookies: this._createUserUsecase.splitLoginCookies(savedDbUser),
-      redirectURI: this._CLIENT_DASHBOARD_URI,
+      redirectPath: this._CLIENT_DASHBOARD_URI,
     };
   };
 
@@ -155,18 +157,18 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       body.isTeacherApp = isTeacherApp;
       const userRes = await this._createUserUsecase.makeRequest(controllerData);
       if ('user' in userRes) {
-        userRes.redirectURI = this._CLIENT_DASHBOARD_URI;
+        userRes.redirectPath = this._CLIENT_DASHBOARD_URI;
       }
       return userRes;
     };
 
-    const googleLoginResponse = await this._loginUser({
+    const googleLoginRes = await this._loginUser({
       savedDbUser,
       dbServiceAccessOptions,
       isTeacherApp,
       handleNoSavedDbUser,
     });
-    return googleLoginResponse;
+    return googleLoginRes;
   };
 
   private _parseGoogleQuery = (query: { code: string; state: string }) => {

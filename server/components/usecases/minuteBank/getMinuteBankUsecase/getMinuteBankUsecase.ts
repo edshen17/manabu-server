@@ -7,9 +7,7 @@ import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
 type GetMinuteBankUsecaseInitParams = {};
 
-type GetMinuteBankUsecaseResponse =
-  | { minuteBank: MinuteBankDoc }
-  | { minuteBanks: MinuteBankDoc[] };
+type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] } | Error;
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<
   GetMinuteBankUsecaseInitParams,
@@ -68,6 +66,9 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { currentAPIUser, dbServiceAccessOptions } = props;
+    if (!currentAPIUser.userId) {
+      throw new Error('You need to be logged in to access this resource.');
+    }
     const searchQuery = {
       $or: [
         {

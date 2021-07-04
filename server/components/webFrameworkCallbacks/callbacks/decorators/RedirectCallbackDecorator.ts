@@ -8,12 +8,12 @@ class RedirectCallbackDecorator extends AbstractExpressCallback {
   }
   public consumeTemplate = (res: any, body: any) => {
     this.abstractExpressCallback.consumeTemplate(res, body);
-    if (!(body && 'redirectURI' in body)) {
-      throw new Error('Redirect URI is not set. Make sure body has a redirectURI property.');
+    if (!(body && 'redirectPath' in body)) {
+      throw new Error('Redirect URI is not set. Make sure body has a redirectPath property.');
     }
-    const { redirectURI } = body;
+    const { redirectPath } = body;
 
-    return res.redirect(redirectURI);
+    return res.redirect(redirectPath);
   };
 }
 

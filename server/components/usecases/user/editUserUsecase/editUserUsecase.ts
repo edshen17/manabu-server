@@ -11,7 +11,7 @@ type EditUserUsecaseInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeMinuteBankDbService: Promise<MinuteBankDbService>;
 };
-type EditUserUsecaseResponse = { user: JoinedUserDoc } | Error;
+type EditUserUsecaseResponse = { user: JoinedUserDoc };
 
 class EditUserUsecase extends AbstractEditUsecase<
   EditUserUsecaseInitParams,
@@ -23,8 +23,8 @@ class EditUserUsecase extends AbstractEditUsecase<
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
-    const { role, _id, dateRegistered } = body || {};
-    return !role && !_id && !dateRegistered;
+    const { role, _id, dateRegistered, verificationToken } = body || {};
+    return !role && !_id && !dateRegistered && !verificationToken;
   };
 
   protected _makeRequestTemplate = async (

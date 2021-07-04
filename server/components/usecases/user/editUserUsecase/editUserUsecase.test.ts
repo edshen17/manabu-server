@@ -5,70 +5,121 @@ import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/
 import { EditUserUsecase } from './editUserUsecase';
 import { makeEditUserUsecase } from '.';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+import { CurrentAPIUser, RouteData } from '../../abstractions/IUsecase';
+import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;
 let editUserUsecase: EditUserUsecase;
-
+let routeData: RouteData;
+let currentAPIUser: CurrentAPIUser;
+let fakeTeacher: JoinedUserDoc;
 before(async () => {
   editUserUsecase = await makeEditUserUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   controllerDataBuilder = makeControllerDataBuilder;
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+});
+
+beforeEach(() => {
+  routeData = {
+    params: {
+      uId: fakeTeacher._id,
+    },
+    body: {},
+    query: {},
+  };
+  currentAPIUser = {
+    userId: fakeTeacher._id,
+    role: fakeTeacher.role,
+  };
 });
 
 describe('editUserUsecase', () => {
-  describe('makeRequest', async () => {
-    describe('editing user data', () => {
-      it('should update the user in the db and return the correct properties (self)', async () => {
-        const newUser = await fakeDbUserFactory.createFakeDbUser();
-        expect(newUser.profileBio).to.equal('');
-        const buildEditUserControllerData = controllerDataBuilder
-          .currentAPIUser({
-            userId: newUser._id,
-            role: newUser.role,
-          })
-          .routeData({
-            query: {},
-            body: { profileBio: 'new profile bio' },
-            params: { uId: newUser._id },
-          })
-          .build();
-        const updateUserRes = await editUserUsecase.makeRequest(buildEditUserControllerData);
-        if ('user' in updateUserRes) {
-          expect(updateUserRes.user.profileBio).to.equal('new profile bio');
-          expect(updateUserRes.user).to.not.have.property('password');
-          expect(updateUserRes.user).to.have.property('settings');
-        }
+  describe('makeRequest', () => {
+    const editUser = async () => {
+      const controllerData = controllerDataBuilder
+        .currentAPIUser(currentAPIUser)
+        .routeData(routeData)
+        .build();
+      const updateUserRes = await editUserUsecase.makeRequest(controllerData);
+      const updatedUser = updateUserRes.user;
+      return updatedUser;
+    };
+    const testUserViews = (savedDbUser: JoinedUserDoc) => {
+      expect(savedDbUser).to.have.property('email');
+      expect(savedDbUser).to.have.property('settings');
+      expect(savedDbUser).to.have.property('commMethods');
+      expect(savedDbUser.teacherData).to.have.property('licensePath');
+      expect(savedDbUser).to.not.have.property('password');
+      expect(savedDbUser).to.not.have.property('verificationToken');
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should throw an error if restricted fields found in body', async () => {
+          routeData.body = {
+            _id: 'some id',
+            role: 'admin',
+            dateRegistered: new Date(),
+            verificationToken: 'new token',
+          };
+          try {
+            await editUser();
+          } catch (err) {
+            expect(err.message).to.equal('Access denied.');
+          }
+        });
+        it('should throw if no inputs are provided', async () => {
+          try {
+            await editUser();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
       });
-      it('should deny access when updating restricted properties (self)', async () => {
-        try {
-          const newUser = await fakeDbUserFactory.createFakeDbUser();
-          const buildEditUserControllerData = controllerDataBuilder
-            .currentAPIUser({
-              userId: newUser._id,
-              role: newUser.role,
-            })
-            .routeData({
-              query: {},
-              body: {
-                verificationToken: 'new token',
-                role: 'admin',
-              },
-              params: { uId: newUser._id },
-            })
-            .build();
-          const updateUserRes = await editUserUsecase.makeRequest(buildEditUserControllerData);
-        } catch (err) {
-          expect(err.message).to.equal('Access denied.');
-        }
-      });
+      context('valid inputs', () => {
+        context('as a non-admin user', () => {
+          context('updating self', () => {
+            it('should update the user and return a restricted view', async () => {
+              expect(fakeTeacher.profileBio).to.equal('');
+              routeData.body = {
+                profileBio: 'new profile bio',
+              };
 
-      it('should deny access when trying to update restricted properties (not self)', async () => {
+              const updatedUser = await editUser();
+              expect(updatedUser.profileBio).to.equal('new profile bio');
+              testUserViews(updatedUser);
+            });
+          });
+        });
+        context('as an admin', () => {
+          context('updating other', () => {
+            it('should update the user and return a less restricted view', async () => {
+              const updaterUser = fakeTeacher;
+              const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+              expect(updateeUser.profileBio).to.equal('');
+              routeData.body = {
+                profileBio: 'new profile bio',
+              };
+              currentAPIUser = {
+                userId: updaterUser._id,
+                role: updaterUser.role,
+              };
+              const updatedUser = await editUser();
+              expect(updatedUser.profileBio).to.equal('new profile bio');
+              testUserViews(updatedUser);
+            });
+          });
+        });
+      });
+    });
+    context('db access denied', () => {
+      it('should throw an error when updating another user', async () => {
         try {
-          const updaterUser = await fakeDbUserFactory.createFakeDbUser();
+          const updaterUser = fakeTeacher;
           const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
           expect(updateeUser.profileBio).to.equal('');
-          const buildEditUserControllerData = controllerDataBuilder
+          const controllerData = controllerDataBuilder
             .currentAPIUser({
               userId: updaterUser._id,
               role: updaterUser.role,
@@ -81,7 +132,7 @@ describe('editUserUsecase', () => {
               params: { uId: updateeUser._id },
             })
             .build();
-          const updateUserRes = await editUserUsecase.makeRequest(buildEditUserControllerData);
+          const updateUserRes = await editUserUsecase.makeRequest(controllerData);
         } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }
