@@ -57,9 +57,13 @@ class RedirectPathBuilder {
   };
 
   public build = (): string => {
-    const { host, endpointPath } = this._redirectExpressCallbackOptions || {};
+    const { host, endpointPath, queryStrings } = this._redirectExpressCallbackOptions || {};
     this._setDefaultProperties();
-    return `${host}${endpointPath}`;
+    let redirectPath = `${host}${endpointPath}`;
+    if (queryStrings) {
+      redirectPath = `${redirectPath}?${queryStrings}`;
+    }
+    return redirectPath;
   };
 
   public init = (initParams: { makeQueryStringHandler: QueryStringHandler }) => {
