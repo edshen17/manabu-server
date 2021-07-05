@@ -59,16 +59,16 @@ class AppointmentEntity extends AbstractEntity<
   };
 
   public build = async (
-    entityBuildParams: AppointmentEntityBuildParams
+    buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const appointmentEntity = await this._buildAppointmentEntity(entityBuildParams);
+    const appointmentEntity = await this._buildAppointmentEntity(buildParams);
     return appointmentEntity;
   };
 
   private _buildAppointmentEntity = async (
-    entityBuildParams: AppointmentEntityBuildParams
+    buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const { hostedBy, reservedBy, packageTransactionId, from, to } = entityBuildParams;
+    const { hostedBy, reservedBy, packageTransactionId, from, to } = buildParams;
     const { hostedByData, reservedByData, packageTransactionData, locationData } =
       await this._getDbDataDependencies({ hostedBy, reservedBy, packageTransactionId });
     const appointmentEntity = Object.freeze({
@@ -156,8 +156,8 @@ class AppointmentEntity extends AbstractEntity<
     }
   };
 
-  public init = async (entityInitParams: AppointmentEntityInitParams): Promise<this> => {
-    const { makeUserDbService, makePackageTransactionDbService } = entityInitParams;
+  public init = async (initParams: AppointmentEntityInitParams): Promise<this> => {
+    const { makeUserDbService, makePackageTransactionDbService } = initParams;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     return this;

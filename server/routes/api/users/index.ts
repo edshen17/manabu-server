@@ -8,7 +8,6 @@ import { makeVerifyEmailTokenController } from '../../../components/controllers/
 
 import {
   makeCookieRedirectExpressCallback,
-  makeJSONCookieExpressCallback,
   makeJSONExpressCallback,
   makeRedirectExpressCallback,
 } from '../../../components/webFrameworkCallbacks/callbacks/expressCallback';
@@ -23,7 +22,8 @@ users.get(
 );
 
 users.get('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
-users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
+// change back to cookie redirect
+users.post('/create', makeJSONExpressCallback.consume(makeCreateUserController));
 users.put('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeEditUserController));
 users.get(
   '/auth/emailToken/:verificationToken/verify',
@@ -31,7 +31,7 @@ users.get(
   makeRedirectExpressCallback.consume(makeVerifyEmailTokenController)
 );
 
-users.post('/auth/login', makeJSONCookieExpressCallback.consume(makeLoginUserController));
-users.get('/auth/google', makeJSONCookieExpressCallback.consume(makeLoginUserController));
+users.post('/auth/login', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
+users.get('/auth/google', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
 
 export default users;

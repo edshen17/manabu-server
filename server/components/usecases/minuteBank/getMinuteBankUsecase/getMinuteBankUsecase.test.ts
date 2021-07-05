@@ -27,12 +27,6 @@ before(async () => {
     hostedBy: fakeUser._id,
     reservedBy: fakeUser._id,
   });
-  const te = await fakeDbUserFactory.createFakeDbUser();
-  await fakeDbMinuteBankFactory.createFakeDbData({
-    minuteBank: 5,
-    hostedBy: te._id,
-    reservedBy: te._id,
-  });
   getMinuteBankUsecase = await makeGetMinuteBankUsecase;
 });
 

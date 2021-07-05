@@ -1,20 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
-import bodyParser from 'body-parser';
-//@ts-ignore
 import cors from 'cors';
-//@ts-ignore
 import cookieParser from 'cookie-parser';
-//@ts-ignore
 import compression from 'compression';
 import http from 'http';
-//@ts-ignore
-import Ddos from 'ddos';
 import helmet from 'helmet';
-//@ts-ignore
-import api from './routes/api/api';
+import { api } from './routes/api/api';
+import hpp from 'hpp';
+import mongoSanitize from 'express-mongo-sanitize';
 
 const app = express();
-const ddos = new Ddos({ burst: 50, limit: 50 });
 const corsConfig = {
   origin: true,
   credentials: true,
@@ -24,18 +18,19 @@ const corsConfig = {
 };
 
 // Middleware
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(hpp());
 app.use(cookieParser());
 app.use(cors(corsConfig));
-app.options('*', cors(corsConfig));
 app.enable('trust proxy');
 app.use(
   helmet({
     contentSecurityPolicy: false,
   })
 );
-app.use(ddos.express);
 app.use(compression());
+app.use(mongoSanitize());
 app.use('/api/', api);
 
 if (process.env.NODE_ENV == 'production') {

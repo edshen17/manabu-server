@@ -23,10 +23,10 @@ abstract class AbstractEntity<EntityInitParams, EntityBuildParams, EntityBuildRe
   };
 
   abstract build(
-    entityBuildParams: EntityBuildParams
+    buildParams: EntityBuildParams
   ): Promise<EntityBuildResponse> | EntityBuildResponse;
 
-  public init = (entityInitParams: EntityInitParams): Promise<this> | this => {
+  public init = (initParams: EntityInitParams): Promise<this> | this => {
     return this;
   };
 }

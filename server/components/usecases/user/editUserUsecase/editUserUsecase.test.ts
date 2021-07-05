@@ -14,6 +14,7 @@ let editUserUsecase: EditUserUsecase;
 let routeData: RouteData;
 let currentAPIUser: CurrentAPIUser;
 let fakeTeacher: JoinedUserDoc;
+
 before(async () => {
   editUserUsecase = await makeEditUserUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
@@ -97,14 +98,12 @@ describe('editUserUsecase', () => {
             it('should update the user and return a less restricted view', async () => {
               const updaterUser = fakeTeacher;
               const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+              const { body, params } = routeData;
               expect(updateeUser.profileBio).to.equal('');
-              routeData.body = {
-                profileBio: 'new profile bio',
-              };
-              currentAPIUser = {
-                userId: updaterUser._id,
-                role: updaterUser.role,
-              };
+              body.profileBio = 'new profile bio';
+              params.uId = updateeUser._id;
+              currentAPIUser.userId = updaterUser._id;
+              currentAPIUser.role = 'admin';
               const updatedUser = await editUser();
               expect(updatedUser.profileBio).to.equal('new profile bio');
               testUserViews(updatedUser);
@@ -115,24 +114,14 @@ describe('editUserUsecase', () => {
     });
     context('db access denied', () => {
       it('should throw an error when updating another user', async () => {
+        const updaterUser = fakeTeacher;
+        const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+        const { body, params } = routeData;
+        body.profileBio = 'new profile bio';
+        params.uId = updateeUser._id;
+        currentAPIUser.userId = updaterUser._id;
         try {
-          const updaterUser = fakeTeacher;
-          const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-          expect(updateeUser.profileBio).to.equal('');
-          const controllerData = controllerDataBuilder
-            .currentAPIUser({
-              userId: updaterUser._id,
-              role: updaterUser.role,
-            })
-            .routeData({
-              query: {},
-              body: {
-                profileBio: 'new profile bio',
-              },
-              params: { uId: updateeUser._id },
-            })
-            .build();
-          const updateUserRes = await editUserUsecase.makeRequest(controllerData);
+          const updatedUser = await editUser();
         } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }

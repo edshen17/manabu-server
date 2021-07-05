@@ -33,17 +33,17 @@ class PackageEntity extends AbstractEntity<
   private _userDbService!: UserDbService;
 
   public build = async (
-    entityBuildParams: PackageEntityBuildParams
+    buildParams: PackageEntityBuildParams
   ): Promise<PackageEntityBuildResponse> => {
-    const packageEntity = await this._buildPackageEntity(entityBuildParams);
+    const packageEntity = await this._buildPackageEntity(buildParams);
     return packageEntity;
   };
 
   private _buildPackageEntity = async (
-    entityBuildParams: PackageEntityBuildParams
+    buildParams: PackageEntityBuildParams
   ): Promise<PackageEntityBuildResponse> => {
     const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
-      entityBuildParams;
+      buildParams;
     const packageEntity = Object.freeze({
       hostedBy,
       priceDetails: priceDetails || (await this._getPriceDetails(hostedBy)),
@@ -77,8 +77,8 @@ class PackageEntity extends AbstractEntity<
     return priceDetails;
   };
 
-  public init = async (entityInitParams: PackageEntityInitParams): Promise<this> => {
-    const { makeUserDbService } = entityInitParams;
+  public init = async (initParams: PackageEntityInitParams): Promise<this> => {
+    const { makeUserDbService } = initParams;
     this._userDbService = await makeUserDbService;
     return this;
   };

@@ -6,4 +6,4 @@ const router = express.Router();
 router.use('/users/', users);
 router.use('/teachers/', teachers);
 
-module.exports = router;
+export { router as api };

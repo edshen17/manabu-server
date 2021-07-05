@@ -66,7 +66,6 @@ describe('editTeacherUsecase', () => {
             buildEditTeacherControllerData
           );
         } catch (err) {
-          expect(err).to.be.an('error');
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -74,10 +73,6 @@ describe('editTeacherUsecase', () => {
         try {
           const otherFakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
           const buildEditTeacherControllerData = controllerDataBuilder
-            .currentAPIUser({
-              userId: fakeTeacher._id,
-              role: fakeTeacher.role,
-            })
             .routeData({
               body: {
                 userId: 'new user id',
@@ -92,7 +87,30 @@ describe('editTeacherUsecase', () => {
             buildEditTeacherControllerData
           );
         } catch (err) {
-          expect(err).to.be.an('error');
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+      it('should deny access with not logged in', async () => {
+        try {
+          const buildEditTeacherControllerData = controllerDataBuilder
+            .currentAPIUser({
+              userId: undefined,
+              role: 'user',
+            })
+            .routeData({
+              body: {
+                licensePath: 'new license path',
+              },
+              params: {
+                uId: fakeTeacher._id,
+              },
+              query: {},
+            })
+            .build();
+          const editTeacherRes = await editTeacherUsecase.makeRequest(
+            buildEditTeacherControllerData
+          );
+        } catch (err) {
           expect(err.message).to.equal('Access denied.');
         }
       });

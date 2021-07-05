@@ -54,14 +54,14 @@ class PackageTransactionEntity extends AbstractEntity<
   private _dayjs!: any;
 
   public build = async (
-    entityBuildParams: PackageTransactionEntityBuildParams
+    buildParams: PackageTransactionEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
-    const packageTransactionEntity = await this._buildPackageTransactionEntity(entityBuildParams);
+    const packageTransactionEntity = await this._buildPackageTransactionEntity(buildParams);
     return packageTransactionEntity;
   };
 
   private _buildPackageTransactionEntity = async (
-    entityBuildParams: PackageTransactionEntityBuildParams
+    buildParams: PackageTransactionEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
     const {
       hostedBy,
@@ -74,7 +74,7 @@ class PackageTransactionEntity extends AbstractEntity<
       lessonLanguage,
       isSubscription,
       paymentMethodData,
-    } = entityBuildParams;
+    } = buildParams;
     const packageData = await this.getDbDataById({
       dbService: this._packageDbService,
       _id: packageId,
@@ -108,8 +108,8 @@ class PackageTransactionEntity extends AbstractEntity<
     return packageTransactionEntity;
   };
 
-  public init = async (entityInitParams: PackageTransactionEntityInitParams): Promise<this> => {
-    const { makeUserDbService, makePackageDbService, dayjs } = entityInitParams;
+  public init = async (initParams: PackageTransactionEntityInitParams): Promise<this> => {
+    const { makeUserDbService, makePackageDbService, dayjs } = initParams;
     this._userDbService = await makeUserDbService;
     this._packageDbService = await makePackageDbService;
     this._dayjs = dayjs;
