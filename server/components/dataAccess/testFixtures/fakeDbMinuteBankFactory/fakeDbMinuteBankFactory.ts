@@ -1,45 +1,39 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { MinuteBankEntityBuildResponse } from '../../../entities/minuteBank/minuteBankEntity';
+import {
+  MinuteBankEntityBuildParams,
+  MinuteBankEntityBuildResponse,
+} from '../../../entities/minuteBank/minuteBankEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-type PartialFakeDbMinuteBankFactoryInitParams = {
+type OptionalFakeDbMinuteBankFactoryInitParams = {
   makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
 };
 
-type FakeMinuteBankEntityBuildParams = {
-  hostedBy?: string;
-  reservedBy?: string;
-  minuteBank?: number;
-};
-
 class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
-  PartialFakeDbMinuteBankFactoryInitParams,
-  FakeMinuteBankEntityBuildParams,
+  OptionalFakeDbMinuteBankFactoryInitParams,
+  MinuteBankEntityBuildParams,
   MinuteBankEntityBuildResponse,
   MinuteBankDoc
 > {
-  private _fakeUserDbFactory!: FakeDbUserFactory;
+  private _fakeDbUserFactory!: FakeDbUserFactory;
 
-  protected _createFakeEntity = async (
-    fakeEntityBuildParams?: FakeMinuteBankEntityBuildParams
-  ): Promise<MinuteBankEntityBuildResponse> => {
-    let { hostedBy, reservedBy, minuteBank } = fakeEntityBuildParams || {};
-    const fakeHostedByData = await this._fakeUserDbFactory.createFakeDbTeacherWithDefaultPackages();
-    const fakeReservedByData = await this._fakeUserDbFactory.createFakeDbUser();
-    const fakeMinuteBankEntity = await this._entity.build({
-      hostedBy: hostedBy || fakeHostedByData._id,
-      reservedBy: reservedBy || fakeReservedByData._id,
-      minuteBank: minuteBank || 0,
-    });
-    return fakeMinuteBankEntity;
+  protected _createFakeBuildParams = async (): Promise<MinuteBankEntityBuildParams> => {
+    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
+    const fakeBuildParams = {
+      hostedBy: fakeTeacher._id,
+      reservedBy: fakeUser._id,
+      minuteBank: 0,
+    };
+    return fakeBuildParams;
   };
 
   protected _initTemplate = async (
-    partialFakeDbDataFactoryInitParams: PartialFakeDbMinuteBankFactoryInitParams
+    partialFakeDbDataFactoryInitParams: OptionalFakeDbMinuteBankFactoryInitParams
   ) => {
     const { makeFakeDbUserFactory } = partialFakeDbDataFactoryInitParams || {};
-    this._fakeUserDbFactory = await makeFakeDbUserFactory;
+    this._fakeDbUserFactory = await makeFakeDbUserFactory;
   };
 }
 

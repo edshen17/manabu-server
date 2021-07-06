@@ -4,10 +4,9 @@ const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
   email: Type.string({ required: true, index: true, unique: true }),
   password: Type.string({ required: false }),
-  profileImage: Type.string({ required: false }),
+  profileImageUrl: Type.string({ required: false }),
   profileBio: Type.string({ required: false }),
   dateRegistered: Type.date({ default: Date.now }),
-  lastUpdated: Type.date({ default: Date.now }),
   languages: Type.array({ required: true }).of({
     language: Type.string(),
     level: Type.string(),
@@ -21,10 +20,15 @@ const UserSchema = createSchema({
   }).of({
     currency: Type.string(),
   }),
-  membership: Type.array({ required: true }).of(Type.string()),
-  commMethods: Type.array({ required: true }).of({
-    method: Type.string(),
-    id: Type.string(),
+  memberships: Type.array({ required: true }).of({
+    name: Type.string(),
+    dateJoined: Type.date(),
+  }),
+  contactMethods: Type.array({ required: true }).of({
+    methodName: Type.string({ required: true }),
+    methodId: Type.string({ required: true }),
+    isPrimaryMethod: Type.boolean({ required: true }),
+    methodType: Type.string({ required: true }),
   }),
   isEmailVerified: Type.boolean({ required: true }),
   verificationToken: Type.string({ required: true }),

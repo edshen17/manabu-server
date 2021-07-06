@@ -29,7 +29,7 @@ class UserDbService
         password: 0,
         verificationToken: 0,
         settings: 0,
-        commMethods: 0,
+        contactMethods: 0,
         isEmailVerified: 0,
       },
       adminView: {

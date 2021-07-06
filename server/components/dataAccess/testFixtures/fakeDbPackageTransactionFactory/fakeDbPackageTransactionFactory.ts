@@ -1,54 +1,39 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { PackageTransactionEntityBuildResponse } from '../../../entities/packageTransaction/packageTransactionEntity';
+import {
+  PackageTransactionEntityBuildParams,
+  PackageTransactionEntityBuildResponse,
+} from '../../../entities/packageTransaction/packageTransactionEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-type PartialFakeDbPackageTransactionFactoryInitParams = {
+type OptionalFakeDbPackageTransactionFactoryInitParams = {
   makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
 };
 
-type FakePackageEntityBuildParams = {
-  hostedBy?: string;
-  reservedBy?: string;
-  packageId?: string;
-  reservationLength?: number;
-  remainingAppointments?: number;
-  transactionDetails?: { currency: string; subTotal: number; total: number };
-};
-
 class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
-  PartialFakeDbPackageTransactionFactoryInitParams,
-  FakePackageEntityBuildParams,
+  OptionalFakeDbPackageTransactionFactoryInitParams,
+  PackageTransactionEntityBuildParams,
   PackageTransactionEntityBuildResponse,
   PackageTransactionDoc
 > {
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
-  protected _createFakeEntity = async (
-    fakeEntityBuildParams?: FakePackageEntityBuildParams
-  ): Promise<PackageTransactionEntityBuildResponse> => {
-    const {
-      hostedBy,
-      reservedBy,
-      packageId,
-      reservationLength,
-      remainingAppointments,
-      transactionDetails,
-    } = fakeEntityBuildParams || {};
+  protected _createFakeBuildParams = async (): Promise<PackageTransactionEntityBuildParams> => {
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-    const fakePackageTransaction = await this._entity.build({
-      hostedBy: hostedBy || fakeTeacher._id,
-      reservedBy: reservedBy || fakeTeacher._id,
-      packageId: packageId || fakeTeacher.teacherData.packages[0]._id,
-      reservationLength: reservationLength || 60,
-      remainingAppointments: remainingAppointments || 5,
-      transactionDetails: transactionDetails || { currency: 'SGD', subTotal: 0, total: 0 },
-    });
-    return fakePackageTransaction;
+    const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
+    const fakeBuildParams = {
+      hostedBy: fakeTeacher._id,
+      reservedBy: fakeUser._id,
+      packageId: fakeTeacher.teacherData.packages[0]._id,
+      reservationLength: 60,
+      transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+      remainingAppointments: 0,
+    };
+    return fakeBuildParams;
   };
 
   protected _initTemplate = async (
-    partialFakeDbDataFactoryInitParams: PartialFakeDbPackageTransactionFactoryInitParams
+    partialFakeDbDataFactoryInitParams: OptionalFakeDbPackageTransactionFactoryInitParams
   ) => {
     const { makeFakeDbUserFactory } = partialFakeDbDataFactoryInitParams;
     this._fakeDbUserFactory = await makeFakeDbUserFactory;

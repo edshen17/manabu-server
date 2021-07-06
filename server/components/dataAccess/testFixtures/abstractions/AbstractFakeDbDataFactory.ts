@@ -1,15 +1,21 @@
 import { IEntity } from '../../../entities/abstractions/IEntity';
 import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
-import { IFakeDbDataFactory } from './IFakeDbDataFactory';
+import { FakeDbDataFactoryInitParams, IFakeDbDataFactory } from './IFakeDbDataFactory';
 
 abstract class AbstractFakeDbDataFactory<
-  PartialFakeDbDataFactoryInitParams,
-  FakeEntityBuildParams,
+  OptionalFakeDbDataFactoryInitParams,
+  EntityBuildParams,
   EntityBuildResponse,
   DbDoc
-> implements IFakeDbDataFactory<PartialFakeDbDataFactoryInitParams, FakeEntityBuildParams, DbDoc>
+> implements
+    IFakeDbDataFactory<
+      OptionalFakeDbDataFactoryInitParams,
+      EntityBuildParams,
+      EntityBuildResponse,
+      DbDoc
+    >
 {
-  protected _entity!: IEntity<any, any, EntityBuildResponse>;
+  protected _entity!: IEntity<any, EntityBuildParams, EntityBuildResponse>;
   protected _dbService!: IDbService<any, DbDoc>;
   protected _dbServiceAccessOptions: DbServiceAccessOptions;
   protected _cloneDeep!: any;
@@ -22,10 +28,9 @@ abstract class AbstractFakeDbDataFactory<
     };
   }
 
-  public createFakeDbData = async (
-    fakeEntityBuildParams?: FakeEntityBuildParams
-  ): Promise<DbDoc> => {
-    const fakeEntity = await this._createFakeEntity(fakeEntityBuildParams);
+  public createFakeDbData = async (buildParams?: EntityBuildParams): Promise<DbDoc> => {
+    const fakeBuildParams = buildParams || (await this._createFakeBuildParams());
+    const fakeEntity = await this._entity.build(fakeBuildParams);
     let fakeDbData = await this._dbService.insert({
       modelToInsert: fakeEntity,
       dbServiceAccessOptions: this._dbServiceAccessOptions,
@@ -33,32 +38,33 @@ abstract class AbstractFakeDbDataFactory<
     return fakeDbData;
   };
 
-  protected _createFakeEntity = async (
-    fakeEntityBuildParams?: FakeEntityBuildParams
-  ): Promise<EntityBuildResponse> => {
-    const fakeEntity = await this._entity.build(fakeEntityBuildParams);
-    return fakeEntity;
-  };
+  protected abstract _createFakeBuildParams(): Promise<EntityBuildParams>;
 
   public init = async (
-    fakeDbDataFactoryInitParams: {
-      makeEntity: Promise<IEntity<any, any, any>> | IEntity<any, any, any>;
-      makeDbService: Promise<IDbService<any, any>>;
-      cloneDeep: any;
-    } & PartialFakeDbDataFactoryInitParams
+    initParams: FakeDbDataFactoryInitParams<
+      OptionalFakeDbDataFactoryInitParams,
+      EntityBuildParams,
+      EntityBuildResponse,
+      DbDoc
+    >
   ): Promise<this> => {
-    const { makeEntity, makeDbService, cloneDeep, ...partialFakeDbDataFactoryInitParams } =
-      fakeDbDataFactoryInitParams;
+    const { makeEntity, makeDbService, cloneDeep, ...partialInitParams } = initParams;
     this._entity = await makeEntity;
     this._dbService = await makeDbService;
     this._cloneDeep = cloneDeep;
-    this._initTemplate(partialFakeDbDataFactoryInitParams);
+    this._initTemplate(partialInitParams);
     return this;
   };
 
   protected _initTemplate = (
-    partialFakeDbDataFactoryInitParams: Omit<
-      { makeEntity: any; makeDbService: any; cloneDeep: any } & PartialFakeDbDataFactoryInitParams,
+    partialInitParams: Omit<
+      {
+        makeEntity:
+          | Promise<IEntity<any, EntityBuildParams, EntityBuildResponse>>
+          | IEntity<any, EntityBuildParams, EntityBuildResponse>;
+        makeDbService: Promise<IDbService<any, DbDoc>>;
+        cloneDeep: any;
+      } & OptionalFakeDbDataFactoryInitParams,
       'makeEntity' | 'makeDbService' | 'cloneDeep'
     >
   ): void => {};

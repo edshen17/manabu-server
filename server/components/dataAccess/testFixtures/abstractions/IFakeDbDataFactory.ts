@@ -1,15 +1,38 @@
-import { DbServiceAccessOptions } from '../../abstractions/IDbService';
+import { IEntity } from '../../../entities/abstractions/IEntity';
+import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
 
-interface IFakeDbDataFactory<PartialFakeDbDataFactoryInitParams, FakeEntityBuildParams, DbDoc> {
+type FakeDbDataFactoryInitParams<
+  OptionalFakeDbDataFactoryInitParams,
+  EntityBuildParams,
+  EntityBuildResponse,
+  DbDoc
+> = RequiredFakeDbDataFactoryInitParams<EntityBuildParams, EntityBuildResponse, DbDoc> &
+  OptionalFakeDbDataFactoryInitParams;
+
+type RequiredFakeDbDataFactoryInitParams<EntityBuildParams, EntityBuildResponse, DbDoc> = {
+  makeEntity:
+    | Promise<IEntity<any, EntityBuildParams, EntityBuildResponse>>
+    | IEntity<any, EntityBuildParams, EntityBuildResponse>;
+  makeDbService: Promise<IDbService<any, DbDoc>>;
+  cloneDeep: any;
+};
+
+interface IFakeDbDataFactory<
+  OptionalFakeDbDataFactoryInitParams,
+  EntityBuildParams,
+  EntityBuildResponse,
+  DbDoc
+> {
   init: (
-    fakeDbDataFactoryInitParams: {
-      makeEntity: any;
-      makeDbService: any;
-      cloneDeep: any;
-    } & PartialFakeDbDataFactoryInitParams
+    initParams: FakeDbDataFactoryInitParams<
+      OptionalFakeDbDataFactoryInitParams,
+      EntityBuildParams,
+      EntityBuildResponse,
+      DbDoc
+    >
   ) => Promise<this> | this;
   getDbServiceAccessOptions: () => DbServiceAccessOptions;
-  createFakeDbData?: (fakeEntityBuildParams?: FakeEntityBuildParams) => Promise<DbDoc>;
+  createFakeDbData?: (buildParams: EntityBuildParams) => Promise<DbDoc>;
 }
 
-export { IFakeDbDataFactory };
+export { IFakeDbDataFactory, FakeDbDataFactoryInitParams };

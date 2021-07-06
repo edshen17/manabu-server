@@ -69,72 +69,72 @@ describe('userDbService', () => {
               expect(findByIdUser).to.not.have.property('password');
               expect(findByIdUser).to.not.have.property('verificationToken');
               expect(findByIdUser).to.not.have.property('settings');
-              expect(findByIdUser).to.not.have.property('commMethods');
+              expect(findByIdUser).to.not.have.property('contactMethods');
             });
             it('should return a joined restricted view of another teacher', async () => {
-              const searchTeacher = await userDbService.findById({
+              const findByIdTeacher = await userDbService.findById({
                 _id: fakeTeacher._id,
                 dbServiceAccessOptions,
               });
-              expect(searchTeacher).to.have.property('teacherData');
-              expect(searchTeacher.teacherData).to.have.property('packages');
-              expect(searchTeacher.teacherData).to.not.have.property('licensePath');
-              expect(searchTeacher).to.have.property('teacherAppPending');
-              expect(searchTeacher).to.not.have.property('email');
-              expect(searchTeacher).to.not.have.property('password');
-              expect(searchTeacher).to.not.have.property('verificationToken');
-              expect(searchTeacher).to.not.have.property('settings');
-              expect(searchTeacher).to.not.have.property('commMethods');
-              expect(fakeTeacher).to.deep.equal(searchTeacher);
+              expect(findByIdTeacher).to.have.property('teacherData');
+              expect(findByIdTeacher.teacherData).to.have.property('packages');
+              expect(findByIdTeacher.teacherData).to.not.have.property('licensePath');
+              expect(findByIdTeacher).to.have.property('teacherAppPending');
+              expect(findByIdTeacher).to.not.have.property('email');
+              expect(findByIdTeacher).to.not.have.property('password');
+              expect(findByIdTeacher).to.not.have.property('verificationToken');
+              expect(findByIdTeacher).to.not.have.property('settings');
+              expect(findByIdTeacher).to.not.have.property('contactMethods');
+              expect(fakeTeacher).to.deep.equal(findByIdTeacher);
             });
           });
           context('viewing self', () => {
             it('should return a less restricted view of a user', async () => {
               dbServiceAccessOptions.isSelf = true;
-              const searchUser = await userDbService.findById({
+              const findByIdUser = await userDbService.findById({
                 _id: fakeUser._id,
                 dbServiceAccessOptions,
               });
-              expect(searchUser).to.not.have.property('password');
-              expect(searchUser).to.not.have.property('verificationToken');
-              expect(searchUser).to.have.property('email');
-              expect(searchUser).to.have.property('settings');
-              expect(searchUser).to.have.property('commMethods');
+              expect(findByIdUser).to.not.have.property('password');
+              expect(findByIdUser).to.not.have.property('verificationToken');
+              expect(findByIdUser).to.have.property('email');
+              expect(findByIdUser).to.have.property('settings');
+              expect(findByIdUser).to.have.property('contactMethods');
             });
             it('should return a less restricted view of a teacher', async () => {
               dbServiceAccessOptions.isSelf = true;
-              const searchTeacher = await userDbService.findById({
+              const findByIdTeacher = await userDbService.findById({
                 _id: fakeTeacher._id,
                 dbServiceAccessOptions,
               });
-              expect(searchTeacher.teacherData).to.have.property('licensePath');
+              expect(findByIdTeacher.teacherData).to.have.property('licensePath');
             });
           });
           context('overriding default select view', () => {
             it('should return an user with the password field', async () => {
               dbServiceAccessOptions.isOverrideView = true;
-              const searchUser = await userDbService.findById({
+              const findByIdUser = await userDbService.findById({
                 _id: fakeUser._id,
                 dbServiceAccessOptions,
               });
 
-              expect(searchUser).to.have.property('password');
+              expect(findByIdUser).to.have.property('password');
             });
           });
         });
         context('as an admin', () => {
           it('should return additional restricted data', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
-            const searchTeacher = await userDbService.findById({
+            const findByIdTeacher = await userDbService.findById({
               _id: fakeTeacher._id,
               dbServiceAccessOptions,
             });
-            expect(searchTeacher.teacherData).to.have.property('licensePath');
-            expect(searchTeacher).to.have.property('email');
-            expect(searchTeacher).to.have.property('settings');
-            expect(searchTeacher).to.have.property('commMethods');
-            expect(searchTeacher).to.not.have.property('password');
-            expect(searchTeacher).to.not.have.property('verificationToken');
+            expect(findByIdTeacher.teacherData).to.have.property('licensePath');
+            expect(findByIdTeacher).to.have.property('email');
+            expect(findByIdTeacher).to.have.property('settings');
+            expect(findByIdTeacher).to.have.property('contactMethods');
+            expect(findByIdTeacher).to.not.have.property('password');
+            expect(findByIdTeacher).to.not.have.property('verificationToken');
           });
         });
       });
@@ -143,7 +143,7 @@ describe('userDbService', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
-          const searchTeacher = await userDbService.findById({
+          const findByIdUser = await userDbService.findById({
             _id: fakeUser._id,
             dbServiceAccessOptions,
           });
@@ -169,10 +169,11 @@ describe('userDbService', () => {
         it('should throw an error when creating a duplicate user', async () => {
           try {
             const dupeEntityData = {
+              name: 'some name',
               email: 'duplicateEmail@email.com',
             };
-            const fakeUser = await fakeDbUserFactory.createFakeDbUser(dupeEntityData);
-            const dupeUser = await fakeDbUserFactory.createFakeDbUser(dupeEntityData);
+            const fakeUser = await fakeDbUserFactory.createFakeDbData(dupeEntityData);
+            const dupeUser = await fakeDbUserFactory.createFakeDbData(dupeEntityData);
           } catch (err) {
             expect(err).be.an('error');
           }
@@ -197,7 +198,7 @@ describe('userDbService', () => {
             name: 'test',
             email: 'someEmail@email.test',
           };
-          const fakeUser = await fakeDbUserFactory.createFakeDbUser(entityData);
+          const fakeUser = await fakeDbUserFactory.createFakeDbData(entityData);
         } catch (err) {
           expect(err).to.be.an('error');
           expect(err.message).to.equal('Access denied.');
@@ -220,7 +221,7 @@ describe('userDbService', () => {
               expect(updatedTeacher.name).to.equal('updated name');
               expect(updatedTeacher).to.have.property('email');
               expect(updatedTeacher).to.have.property('settings');
-              expect(updatedTeacher).to.have.property('commMethods');
+              expect(updatedTeacher).to.have.property('contactMethods');
               expect(updatedTeacher).to.not.have.property('password');
               expect(updatedTeacher).to.not.have.property('verficiationToken');
             });
@@ -246,14 +247,14 @@ describe('userDbService', () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
             const updatedTeacher = await userDbService.findOneAndUpdate({
               searchQuery: { _id: fakeTeacher._id },
-              updateParams: { profileImage: 'updated image' },
+              updateParams: { profileImageUrl: 'updated image' },
               dbServiceAccessOptions,
             });
             expect(updatedTeacher.teacherData).to.have.property('licensePath');
-            expect(updatedTeacher.profileImage).to.equal('updated image');
+            expect(updatedTeacher.profileImageUrl).to.equal('updated image');
             expect(updatedTeacher).to.have.property('email');
             expect(updatedTeacher).to.have.property('settings');
-            expect(updatedTeacher).to.have.property('commMethods');
+            expect(updatedTeacher).to.have.property('contactMethods');
             expect(updatedTeacher).to.not.have.property('password');
             expect(updatedTeacher).to.not.have.property('verficiationToken');
           });
@@ -271,7 +272,7 @@ describe('userDbService', () => {
         it('should return undefined if the user to update does not exist', async () => {
           const updatedTeacher = await userDbService.findOneAndUpdate({
             searchQuery: { email: fakeTeacher._id },
-            updateParams: { profileImage: 'updated image' },
+            updateParams: { profileImageUrl: 'updated image' },
             dbServiceAccessOptions,
           });
           expect(updatedTeacher).to.equal(undefined);
@@ -284,7 +285,7 @@ describe('userDbService', () => {
           dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
           const updatedTeacher = await userDbService.findOneAndUpdate({
             searchQuery: { _id: fakeTeacher._id },
-            updateParams: { profileImage: 'updated image' },
+            updateParams: { profileImageUrl: 'updated image' },
             dbServiceAccessOptions,
           });
         } catch (err) {

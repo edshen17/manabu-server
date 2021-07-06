@@ -35,9 +35,7 @@ describe('userEntityValidator', () => {
             role: 'admin',
           };
           const validatedObj = userEntityValidator.validate(requestBody);
-          console.log(validatedObj, 'here');
         } catch (err) {
-          console.log(err);
           expect(err).be.an('error');
         }
       });

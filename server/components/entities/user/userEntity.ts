@@ -1,7 +1,6 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type UserEntityInitParams = {
-  // sanitizeHtml: any;
   hashPassword: any;
   cryptoRandomString: any;
   signJwt: any;
@@ -11,8 +10,15 @@ type UserEntityBuildParams = {
   name: string;
   email: string;
   password?: string;
-  profileImage?: string;
-  commMethods?: { method: string; id: string }[];
+  profileImageUrl?: string;
+  contactMethods?: UserContactMethod[] | [];
+};
+
+type UserContactMethod = {
+  methodName: string;
+  methodId: string;
+  isPrimaryMethod: boolean;
+  methodType: string;
 };
 
 type UserEntityBuildResponse =
@@ -20,18 +26,17 @@ type UserEntityBuildResponse =
       name: string;
       email: string;
       password?: string;
-      profileImage: string;
+      profileImageUrl: string;
       profileBio: string;
       dateRegistered: Date;
-      lastUpdated: Date;
       languages?: { level: string; language: string }[];
       region: string;
       timezone: string;
       lastOnline: Date;
       role: string;
       settings: { currency: string };
-      membership: string[];
-      commMethods: { method: string; id: string }[];
+      memberships: string[];
+      contactMethods: UserContactMethod[] | [];
       isEmailVerified: boolean;
       verificationToken: string;
     }
@@ -42,7 +47,6 @@ class UserEntity extends AbstractEntity<
   UserEntityBuildParams,
   UserEntityBuildResponse
 > {
-  // private _sanitizeHtml!: any;
   private _hashPassword!: any;
   private _cryptoRandomString!: any;
   private _signJwt!: any;
@@ -58,7 +62,7 @@ class UserEntity extends AbstractEntity<
   };
 
   private _validateUserInput = (entityBuildParams: UserEntityBuildParams): void => {
-    const { name, email, password, profileImage } = entityBuildParams;
+    const { name, email, password, profileImageUrl } = entityBuildParams;
     const inputValidator = this._makeInputValidator();
     if (!inputValidator.isValidName(name)) {
       throw new Error('User must have a valid name.');
@@ -95,25 +99,24 @@ class UserEntity extends AbstractEntity<
   private _buildUserEntity = (
     entityBuildParams: UserEntityBuildParams
   ): UserEntityBuildResponse => {
-    const { name, email, password, profileImage, commMethods } = entityBuildParams || {};
+    const { name, email, password, profileImageUrl, contactMethods } = entityBuildParams || {};
     const encryptedPassword = this._encryptPassword(password);
     const verificationToken = this._createVerificationToken(name, email);
     const userEntity = Object.freeze({
       name,
       email,
       password: encryptedPassword,
-      profileImage: profileImage || '',
+      profileImageUrl: profileImageUrl || '',
       profileBio: '',
       dateRegistered: new Date(),
-      lastUpdated: new Date(),
       languages: [],
       region: '',
       timezone: '',
       lastOnline: new Date(),
       role: 'user',
       settings: { currency: 'SGD' },
-      membership: [],
-      commMethods: commMethods || [],
+      memberships: [],
+      contactMethods: contactMethods || [],
       isEmailVerified: false,
       verificationToken,
     });
@@ -141,7 +144,6 @@ class UserEntity extends AbstractEntity<
 
   public init = (entityInitParams: UserEntityInitParams) => {
     const { hashPassword, cryptoRandomString, signJwt } = entityInitParams;
-    // this._sanitizeHtml = sanitizeHtml;
     this._hashPassword = hashPassword;
     this._cryptoRandomString = cryptoRandomString;
     this._signJwt = signJwt;
@@ -149,4 +151,4 @@ class UserEntity extends AbstractEntity<
   };
 }
 
-export { UserEntity, UserEntityBuildParams, UserEntityBuildResponse };
+export { UserEntity, UserEntityBuildParams, UserEntityBuildResponse, UserContactMethod };

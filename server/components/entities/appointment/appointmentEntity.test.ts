@@ -26,6 +26,9 @@ describe('appointmentEntity', () => {
           hostedBy: fakeHostedBy._id,
           reservedBy: fakeReservedBy._id,
           packageId: fakeHostedBy.teacherData.packages[0]._id,
+          reservationLength: 60,
+          transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+          remainingAppointments: 0,
         });
         const fakeAppointment = await appointmentEntity.build({
           hostedBy: fakeHostedBy._id,

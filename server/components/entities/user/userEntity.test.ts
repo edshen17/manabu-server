@@ -19,7 +19,7 @@ describe('user entity', () => {
           expect(testEntity.name).to.equal('test');
           expect(testEntity.password).to.not.equal('pass');
           expect(testEntity.email).to.equal('test@gmail.com');
-          expect(testEntity.profileImage).to.equal('');
+          expect(testEntity.profileImageUrl).to.equal('');
           expect(testEntity.verificationToken).to.not.equal('');
         }
       });

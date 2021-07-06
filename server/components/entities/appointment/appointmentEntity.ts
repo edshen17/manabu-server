@@ -3,6 +3,7 @@ import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { UserContactMethod } from '../user/userEntity';
 
 type AppointmentEntityInitParams = {
   makeUserDbService: Promise<UserDbService>;
@@ -32,15 +33,15 @@ type AppointmentEntityBuildResponse = {
   locationData: LocationData;
 };
 
+type MatchedContactMethod = {
+  hostedByContactMethod: UserContactMethod;
+  reservedByContactMethod: UserContactMethod;
+};
+
 type LocationData = {
-  method: string;
-  hostedByMethodId?: string;
-  reservedByMethodId?: string;
-  isOnline: boolean;
-  alternativeCo1ntact?: {
-    method: string;
-    reservedByMethodId: string;
-  };
+  locationName: string;
+  locationType: string;
+  matchedContactMethod: MatchedContactMethod;
 };
 
 class AppointmentEntity extends AbstractEntity<
@@ -87,30 +88,22 @@ class AppointmentEntity extends AbstractEntity<
     return appointmentEntity;
   };
 
-  private _getDbDataDependencies = async (entityInitParams: {
+  private _getDbDataDependencies = async (props: {
     hostedBy: string;
     reservedBy: string;
     packageTransactionId: string;
   }) => {
-    const { hostedBy, reservedBy, packageTransactionId } = entityInitParams;
-    // need to override to get user's commMethods
-    const overrideHostedByData = await this.getDbDataById({
-      dbService: this._userDbService,
-      _id: hostedBy,
-      overrideDbServiceAccessOptions: this._dbServiceAccessOptions,
-    });
-    const overrideReservedByData = await this.getDbDataById({
-      dbService: this._userDbService,
-      _id: reservedBy,
-      overrideDbServiceAccessOptions: this._dbServiceAccessOptions,
-    });
+    // need to override to get user's contactMethods
+    const { hostedBy, reservedBy, packageTransactionId } = props;
+    const overrideHostedByData = await this._getOverrideUserData(hostedBy);
+    const overrideReservedByData = await this._getOverrideUserData(reservedBy);
     const hostedByData = this._getRestrictedUserData(overrideHostedByData);
     const reservedByData = this._getRestrictedUserData(overrideReservedByData);
-    const packageTransactionData = await this.getDbDataById({
-      dbService: this._packageTransactionDbService,
-      _id: packageTransactionId,
+    const packageTransactionData = await this._getPackageTransactionData(packageTransactionId);
+    const locationData = this._getLocationData({
+      hostedByData: overrideHostedByData,
+      reservedByData: overrideReservedByData,
     });
-    const locationData = this._getLocationData(overrideHostedByData, overrideReservedByData);
     const dataDependencies = {
       hostedByData,
       reservedByData,
@@ -121,39 +114,87 @@ class AppointmentEntity extends AbstractEntity<
     return dataDependencies;
   };
 
+  private _getOverrideUserData = async (_id: string) => {
+    const overrideUserData = await this.getDbDataById({
+      dbService: this._userDbService,
+      _id,
+      overrideDbServiceAccessOptions: this._dbServiceAccessOptions,
+    });
+    return overrideUserData;
+  };
+
   private _getRestrictedUserData = async (overrideUserData: JoinedUserDoc) => {
-    const { email, password, verificationToken, settings, commMethods, ...restrictedUserData } =
+    const { email, password, verificationToken, settings, contactMethods, ...restrictedUserData } =
       overrideUserData;
     return restrictedUserData;
   };
 
-  private _getLocationData = (hostedByData: any, reservedByData: any) => {
-    const commonCommMethod = hostedByData.commMethods.filter(
-      (hostedByCommMethod: { method: string; id: string }) => {
-        return hostedByCommMethod.method == reservedByData.commMethods[0].method;
-      }
-    );
-    const hasCommonCommMethod = commonCommMethod.length > 0;
-    if (hasCommonCommMethod) {
-      return {
-        method: commonCommMethod[0].method,
-        hostedByMethodId: commonCommMethod[0].id,
-        reservedByMethodId: reservedByData.commMethods[0].id,
-        isOnline: true,
-      };
+  private _getPackageTransactionData = async (_id: string) => {
+    const packageTransactionData = await this.getDbDataById({
+      dbService: this._packageTransactionDbService,
+      _id,
+    });
+    return packageTransactionData;
+  };
+
+  private _getLocationData = (props: {
+    hostedByData: JoinedUserDoc;
+    reservedByData: JoinedUserDoc;
+  }): LocationData => {
+    const matchedContactMethod = this._getMatchedContactMethod(props);
+    const { hostedByContactMethod, reservedByContactMethod } = matchedContactMethod;
+    const isOnline =
+      hostedByContactMethod.methodType == 'online' &&
+      reservedByContactMethod.methodType == 'online';
+    const locationData = <LocationData>{
+      matchedContactMethod,
+      locationType: isOnline ? 'online' : 'offline',
+    };
+    if (hostedByContactMethod.methodName == reservedByContactMethod.methodName) {
+      locationData.locationName = hostedByContactMethod.methodName;
     } else {
-      const hostedByCommMethod = hostedByData.commMethods[0];
-      const reservedByCommMethod = reservedByData.commMethods[0];
-      return {
-        method: hostedByCommMethod.method,
-        hostedByMethodId: hostedByCommMethod.id,
-        alternativeContact: {
-          method: reservedByCommMethod.method,
-          reservedByMethodId: reservedByCommMethod.id,
-        },
-        isOnline: true,
-      };
+      locationData.locationName = 'alternative';
     }
+    return locationData;
+  };
+
+  private _getMatchedContactMethod = (props: {
+    hostedByData: JoinedUserDoc;
+    reservedByData: JoinedUserDoc;
+  }): MatchedContactMethod => {
+    const { hostedByData, reservedByData } = props;
+    const matchedContactMethod = <MatchedContactMethod>{
+      hostedByContactMethod: {},
+      reservedByContactMethod: {},
+    };
+    const hostedByContactMethods = this._sortByPrimaryContactMethod(hostedByData.contactMethods);
+    const reservedByContactMethods = this._sortByPrimaryContactMethod(
+      reservedByData.contactMethods
+    );
+    hostedByContactMethods.forEach((hostedByContactMethod) => {
+      reservedByContactMethods.forEach((reservedByContactMethod) => {
+        const isSharedContactMethod =
+          hostedByContactMethod.methodName == reservedByContactMethod.methodName;
+        if (isSharedContactMethod) {
+          matchedContactMethod.hostedByContactMethod = hostedByContactMethod;
+          matchedContactMethod.reservedByContactMethod = reservedByContactMethod;
+          return;
+        } else {
+          matchedContactMethod.hostedByContactMethod = hostedByContactMethods[0];
+          matchedContactMethod.reservedByContactMethod = reservedByContactMethods[0];
+        }
+      });
+    });
+    return matchedContactMethod;
+  };
+
+  private _sortByPrimaryContactMethod = (contactMethods: UserContactMethod[]) => {
+    const sortedByPrimaryContactMethod = contactMethods.sort((a, b) => {
+      let aPrefOrder = a.isPrimaryMethod ? 1 : 0;
+      let bPrefOrder = b.isPrimaryMethod ? 1 : 0;
+      return aPrefOrder - bPrefOrder;
+    });
+    return sortedByPrimaryContactMethod;
   };
 
   public init = async (initParams: AppointmentEntityInitParams): Promise<this> => {
