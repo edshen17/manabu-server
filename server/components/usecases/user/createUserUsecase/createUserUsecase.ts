@@ -9,11 +9,6 @@ import { PackageTransactionDbService } from '../../../dataAccess/services/packag
 import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
-import { makeMinuteBankEntity } from '../../../entities/minuteBank';
-import { makePackageEntity } from '../../../entities/package';
-import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
-import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
-import { makeTeacherEntity } from '../../../entities/teacher';
 import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
@@ -21,10 +16,20 @@ import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { UserEntity } from '../../../entities/user/userEntity';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
+import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
+import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
+import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
+import { PackageEntity } from '../../../entities/package/packageEntity';
+import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
 
 type CreateUserUsecaseInitParams = {
+  makeUserEntity: Promise<UserEntity>;
+  makePackageEntity: Promise<PackageEntity>;
+  makePackageTransactionEntity: Promise<PackageTransactionEntity>;
+  makeTeacherBalanceEntity: Promise<TeacherBalanceEntity>;
+  makeMinuteBankEntity: Promise<MinuteBankEntity>;
+  makeTeacherEntity: Promise<TeacherEntity>;
   makeUserDbService: Promise<UserDbService>;
-  makeUserEntity: UserEntity;
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
@@ -55,8 +60,13 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   CreateUserUsecaseInitParams,
   CreateUserUsecaseResponse
 > {
-  private _userDbService!: UserDbService;
   private _userEntity!: UserEntity;
+  private _packageEntity!: PackageEntity;
+  private _packageTransactionEntity!: PackageTransactionEntity;
+  private _teacherBalanceEntity!: TeacherBalanceEntity;
+  private _teacherEntity!: TeacherEntity;
+  private _minuteBankEntity!: MinuteBankEntity;
+  private _userDbService!: UserDbService;
   private _teacherDbService!: TeacherDbService;
   private _packageDbService!: PackageDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
@@ -135,7 +145,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherDoc & { packages?: PackageDoc[] }> => {
     const userId = savedDbUser._id;
-    const modelToInsert = makeTeacherEntity.build({ userId });
+    const modelToInsert = this._teacherEntity.build({ userId });
     const savedDbTeacher = await this._teacherDbService.insert({
       modelToInsert,
       dbServiceAccessOptions,
@@ -170,11 +180,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,
       };
-      const packageEntity = await makePackageEntity;
 
       packagesToInsert.push(
         new Promise(async (resolve, reject) => {
-          const modelToInsert = await packageEntity.build(packageProperties);
+          const modelToInsert = await this._packageEntity.build(packageProperties);
           if (modelToInsert) {
             resolve(modelToInsert);
           } else {
@@ -190,8 +199,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<PackageTransactionDoc> => {
-    const packageTransactionEntity = await makePackageTransactionEntity;
-    const modelToInsert = await packageTransactionEntity.build({
+    const modelToInsert = await this._packageTransactionEntity.build({
       hostedBy: process.env.MANABU_ADMIN_ID!,
       reservedBy: savedDbUser._id,
       packageId: process.env.MANABU_ADMIN_PKG_ID!,
@@ -214,8 +222,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<MinuteBankDoc> => {
-    const minuteBankEntity = await makeMinuteBankEntity;
-    const modelToInsert = await minuteBankEntity.build({
+    const modelToInsert = await this._minuteBankEntity.build({
       hostedBy: process.env.MANABU_ADMIN_ID!,
       reservedBy: savedDbUser._id,
     });
@@ -230,8 +237,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherBalanceDoc> => {
-    const teacherBalanceEntity = makeTeacherBalanceEntity;
-    const modelToInsert = await teacherBalanceEntity.build({
+    const modelToInsert = await this._teacherBalanceEntity.build({
       userId: savedDbUser._id,
     });
     const newTeacherBalance = this._teacherBalanceDbService.insert({
@@ -323,9 +329,14 @@ class CreateUserUsecase extends AbstractCreateUsecase<
 
   public init = async (usecaseInitParams: CreateUserUsecaseInitParams): Promise<this> => {
     const {
-      makeUserDbService,
       makeUserEntity,
+      makePackageEntity,
+      makePackageTransactionEntity,
+      makeTeacherBalanceEntity,
+      makeTeacherEntity,
+      makeUserDbService,
       makeTeacherDbService,
+      makeMinuteBankEntity,
       makePackageDbService,
       makePackageTransactionDbService,
       makeMinuteBankDbService,
@@ -334,8 +345,13 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       emailHandler,
       makeRedirectPathBuilder,
     } = usecaseInitParams;
+    this._userEntity = await makeUserEntity;
+    this._packageEntity = await makePackageEntity;
+    this._packageTransactionEntity = await makePackageTransactionEntity;
+    this._teacherBalanceEntity = await makeTeacherBalanceEntity;
+    this._teacherEntity = await makeTeacherEntity;
+    this._minuteBankEntity = await makeMinuteBankEntity;
     this._userDbService = await makeUserDbService;
-    this._userEntity = makeUserEntity;
     this._teacherDbService = await makeTeacherDbService;
     this._packageDbService = await makePackageDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;

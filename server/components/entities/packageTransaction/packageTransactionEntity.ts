@@ -2,8 +2,9 @@ import { PackageDoc } from '../../../models/Package';
 import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { IEntityValidator } from '../abstractions/IEntityValidator';
 
-type PackageTransactionEntityInitParams = {
+type OptionalPackageTransactionEntityInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makePackageDbService: Promise<PackageDbService>;
   dayjs: any;
@@ -45,7 +46,7 @@ type PackageTransactionEntityBuildResponse = {
 };
 
 class PackageTransactionEntity extends AbstractEntity<
-  PackageTransactionEntityInitParams,
+  OptionalPackageTransactionEntityInitParams,
   PackageTransactionEntityBuildParams,
   PackageTransactionEntityBuildResponse
 > {
@@ -108,12 +109,18 @@ class PackageTransactionEntity extends AbstractEntity<
     return packageTransactionEntity;
   };
 
-  public init = async (initParams: PackageTransactionEntityInitParams): Promise<this> => {
-    const { makeUserDbService, makePackageDbService, dayjs } = initParams;
+  protected _initTemplate = async (
+    partialInitParams: Omit<
+      {
+        makeEntityValidator: IEntityValidator;
+      } & OptionalPackageTransactionEntityInitParams,
+      'makeEntityValidator'
+    >
+  ): Promise<void> => {
+    const { makeUserDbService, makePackageDbService, dayjs } = partialInitParams;
     this._userDbService = await makeUserDbService;
     this._packageDbService = await makePackageDbService;
     this._dayjs = dayjs;
-    return this;
   };
 }
 

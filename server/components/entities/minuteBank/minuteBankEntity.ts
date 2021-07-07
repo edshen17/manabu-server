@@ -1,7 +1,8 @@
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { IEntityValidator } from '../abstractions/IEntityValidator';
 
-type MinuteBankEntityInitParams = {
+type OptionalMinuteBankEntityInitParams = {
   makeUserDbService: Promise<UserDbService>;
 };
 
@@ -17,11 +18,10 @@ type MinuteBankEntityBuildResponse = {
   minuteBank: number;
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;
-  lastUpdated: Date;
 };
 
 class MinuteBankEntity extends AbstractEntity<
-  MinuteBankEntityInitParams,
+  OptionalMinuteBankEntityInitParams,
   MinuteBankEntityBuildParams,
   MinuteBankEntityBuildResponse
 > {
@@ -52,15 +52,20 @@ class MinuteBankEntity extends AbstractEntity<
       minuteBank: minuteBank || 0,
       hostedByData: hostedByData || {},
       reservedByData: reservedByData || {},
-      lastUpdated: new Date(),
     });
     return minuteBankEntity;
   };
 
-  public init = async (initParams: MinuteBankEntityInitParams): Promise<this> => {
-    const { makeUserDbService } = initParams;
+  protected _initTemplate = async (
+    partialInitParams: Omit<
+      {
+        makeEntityValidator: IEntityValidator;
+      } & OptionalMinuteBankEntityInitParams,
+      'makeEntityValidator'
+    >
+  ): Promise<void> => {
+    const { makeUserDbService } = partialInitParams;
     this._userDbService = await makeUserDbService;
-    return this;
   };
 }
 

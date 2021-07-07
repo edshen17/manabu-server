@@ -1,6 +1,7 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { IEntityValidator } from '../abstractions/IEntityValidator';
 
-type UserEntityInitParams = {
+type OptionalUserEntityInitParams = {
   hashPassword: any;
   cryptoRandomString: any;
   signJwt: any;
@@ -43,7 +44,7 @@ type UserEntityBuildResponse =
   | Error;
 
 class UserEntity extends AbstractEntity<
-  UserEntityInitParams,
+  OptionalUserEntityInitParams,
   UserEntityBuildParams,
   UserEntityBuildResponse
 > {
@@ -142,12 +143,18 @@ class UserEntity extends AbstractEntity<
     return verificationToken;
   };
 
-  public init = (entityInitParams: UserEntityInitParams) => {
-    const { hashPassword, cryptoRandomString, signJwt } = entityInitParams;
+  protected _initTemplate = async (
+    partialInitParams: Omit<
+      {
+        makeEntityValidator: IEntityValidator;
+      } & OptionalUserEntityInitParams,
+      'makeEntityValidator'
+    >
+  ): Promise<void> => {
+    const { hashPassword, signJwt, cryptoRandomString } = partialInitParams;
     this._hashPassword = hashPassword;
-    this._cryptoRandomString = cryptoRandomString;
     this._signJwt = signJwt;
-    return this;
+    this._cryptoRandomString = cryptoRandomString;
   };
 }
 

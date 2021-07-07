@@ -2,7 +2,7 @@ import { DbServiceAccessOptions, IDbService } from '../../../dataAccess/abstract
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
-import { ControllerData, IUsecase } from '../../abstractions/IUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 

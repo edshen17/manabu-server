@@ -1,7 +1,8 @@
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { IEntityValidator } from '../abstractions/IEntityValidator';
 
-type PackageEntityInitParams = {
+type OptionalPackageEntityInitParams = {
   makeUserDbService: Promise<UserDbService>;
 };
 
@@ -26,7 +27,7 @@ type PackageEntityBuildResponse = {
 };
 
 class PackageEntity extends AbstractEntity<
-  PackageEntityInitParams,
+  OptionalPackageEntityInitParams,
   PackageEntityBuildParams,
   PackageEntityBuildResponse
 > {
@@ -77,10 +78,16 @@ class PackageEntity extends AbstractEntity<
     return priceDetails;
   };
 
-  public init = async (initParams: PackageEntityInitParams): Promise<this> => {
-    const { makeUserDbService } = initParams;
+  protected _initTemplate = async (
+    partialInitParams: Omit<
+      {
+        makeEntityValidator: IEntityValidator;
+      } & OptionalPackageEntityInitParams,
+      'makeEntityValidator'
+    >
+  ): Promise<void> => {
+    const { makeUserDbService } = partialInitParams;
     this._userDbService = await makeUserDbService;
-    return this;
   };
 }
 

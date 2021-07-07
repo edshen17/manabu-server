@@ -9,10 +9,20 @@ import { makeUserDbService } from '../../../dataAccess/services/user';
 import { emailHandler } from '../../utils/emailHandler/emailHandler';
 import { CreateUserUsecase } from './createUserUsecase';
 import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
+import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
+import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
+import { makeMinuteBankEntity } from '../../../entities/minuteBank';
+import { makeTeacherEntity } from '../../../entities/teacher';
+import { makePackageEntity } from '../../../entities/package';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
-  makeUserDbService,
   makeUserEntity,
+  makePackageEntity,
+  makePackageTransactionEntity,
+  makeMinuteBankEntity,
+  makeTeacherEntity,
+  makeTeacherBalanceEntity,
+  makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,

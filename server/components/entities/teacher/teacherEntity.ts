@@ -1,6 +1,6 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
-type TeacherEntityInitParams = {};
+type OptionalTeacherEntityInitParams = {};
 
 type TeacherEntityBuildParams = { userId: string };
 
@@ -19,7 +19,7 @@ type TeacherEntityBuildResponse = {
 };
 
 class TeacherEntity extends AbstractEntity<
-  TeacherEntityInitParams,
+  OptionalTeacherEntityInitParams,
   TeacherEntityBuildParams,
   TeacherEntityBuildResponse
 > {

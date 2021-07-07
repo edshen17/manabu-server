@@ -1,12 +1,16 @@
 import { expect } from 'chai';
 import { makeUserEntity } from './index';
+import { UserEntity } from './userEntity';
 
 let defaultTestUserEntityParams: any;
-before(() => {
+let userEntity: UserEntity;
+
+before(async () => {
   defaultTestUserEntityParams = {
     name: 'test',
     password: 'pass',
   };
+  userEntity = await makeUserEntity;
 });
 
 describe('user entity', () => {
@@ -14,7 +18,7 @@ describe('user entity', () => {
     context('valid inputs', () => {
       it('should get the correct data provided good input', () => {
         defaultTestUserEntityParams.email = 'test@gmail.com';
-        const testEntity = makeUserEntity.build(defaultTestUserEntityParams);
+        const testEntity = userEntity.build(defaultTestUserEntityParams);
         if ('password' in testEntity) {
           expect(testEntity.name).to.equal('test');
           expect(testEntity.password).to.not.equal('pass');
@@ -24,7 +28,7 @@ describe('user entity', () => {
         }
       });
       it('should have an undefined password property if no password was given', () => {
-        const testEntity = makeUserEntity.build({
+        const testEntity = userEntity.build({
           name: 'test',
           email: 'test@gmail.com',
         });
