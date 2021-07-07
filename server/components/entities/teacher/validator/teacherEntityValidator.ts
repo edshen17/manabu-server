@@ -2,8 +2,12 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 
 class TeacherEntityValidator extends AbstractEntityValidator {
   protected _initTemplate = () => {
-    this._entityValidationSchema = this._joi.object().keys({
+    this._createValidationSchema = this._joi.object().keys({
       userId: this._joi.string().alphanum().min(24).max(24),
+    });
+    this._editValidationSchema = this._createValidationSchema.keys({
+      userId: this._joi.string().forbidden(),
+      teacherType: this._joi.string().valid('professional', 'community'),
       teachingLanguages: this._joi.array().items({
         language: this._joi.string().max(5),
         level: this._joi.string().max(5),
@@ -13,16 +17,17 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         level: this._joi.string().max(5),
       }),
       introductionVideo: this._joi.string().dataUri().allow('').max(2048),
-      isApproved: this._joi.boolean(),
-      isHidden: this._joi.boolean(),
-      teacherType: this._joi.string().valid('professional', 'community'),
       licensePath: this._joi.string().dataUri().allow('').max(2048),
       hourlyRate: this._joi.object({
         amount: this._joi.number(),
         currency: this._joi.string().max(5),
       }),
-      lessonCount: this._joi.number(),
-      studentCount: this._joi.number(),
+      lessonCount: this._joi.number().forbidden(),
+      studentCount: this._joi.number().forbidden(),
+    });
+    this._adminValidationSchema = this._editValidationSchema.keys({
+      isApproved: this._joi.boolean(),
+      isHidden: this._joi.boolean(),
     });
   };
 }

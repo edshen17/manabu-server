@@ -24,6 +24,9 @@ context('packageTransaction entity', () => {
           reservationLength: 60,
           remainingAppointments: 5,
           transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+          lessonLanguage: 'ja',
+          isSubscription: false,
+          paymentMethodData: {},
         });
         expect(fakePackageTransaction.lessonLanguage).to.equal('ja');
         expect(fakePackageTransaction.isSubscription).to.equal(false);

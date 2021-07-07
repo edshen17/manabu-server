@@ -29,6 +29,9 @@ describe('appointmentEntity', () => {
           reservationLength: 60,
           transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
           remainingAppointments: 0,
+          lessonLanguage: 'ja',
+          isSubscription: false,
+          paymentMethodData: {},
         });
         const fakeAppointment = await appointmentEntity.build({
           hostedBy: fakeHostedBy._id,

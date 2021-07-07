@@ -210,6 +210,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
         subTotal: 0,
         total: 0,
       },
+      lessonLanguage: 'ja',
+      isSubscription: false,
+      paymentMethodData: {},
     });
     const newPackageTransaction = await this._packageTransactionDbService.insert({
       modelToInsert,

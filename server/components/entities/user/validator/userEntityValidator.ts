@@ -2,12 +2,12 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 
 class UserEntityValidator extends AbstractEntityValidator {
   protected _initTemplate = () => {
-    this._entityValidationSchema = this._joi.object().keys({
-      name: this._joi.string().pattern(new RegExp(/^([a-zA-Z ]){2,30}$/)),
-      email: this._joi.string().email().max(254),
+    this._createValidationSchema = this._joi.object().keys({
+      name: this._joi.string().max(256),
+      email: this._joi.string().email().max(256),
       password: this._joi
         .string()
-        .pattern(new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/)),
+        .pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)),
       profileImageUrl: this._joi.string().dataUri().allow('').max(2048),
       contactMethods: this._joi.array().items({
         methodName: this._joi.string().max(256),
@@ -15,6 +15,8 @@ class UserEntityValidator extends AbstractEntityValidator {
         isPrimaryMethod: this._joi.boolean(),
         methodType: this._joi.string().max(256),
       }),
+    });
+    this._editValidationSchema = this._createValidationSchema.keys({
       profileBio: this._joi.string().htmlStrip().max(3000),
       dateRegistered: this._joi.date().forbidden(),
       languages: this._joi.array().items({
@@ -23,18 +25,21 @@ class UserEntityValidator extends AbstractEntityValidator {
       }),
       region: this._joi.string().max(256),
       timezone: this._joi.string().max(256),
-      lastOnline: this._joi.date(),
+      lastOnline: this._joi.date().forbidden(),
       role: this._joi.string().forbidden(),
       settings: this._joi.object({
         currency: this._joi.string().max(5),
         locale: this._joi.string().max(5),
       }),
+      verificationToken: this._joi.string().forbidden(),
+      isEmailVerified: this._joi.boolean().forbidden(),
+    });
+    this._adminValidationSchema = this._editValidationSchema.keys({
       memberships: this._joi.array().items({
         name: this._joi.string().max(256),
         dateJoined: this._joi.date(),
       }),
-      isEmailVerified: this._joi.boolean(),
-      verificationToken: this._joi.string().forbidden(),
+      role: this._joi.string().valid('user', 'teacher'),
     });
   };
 }

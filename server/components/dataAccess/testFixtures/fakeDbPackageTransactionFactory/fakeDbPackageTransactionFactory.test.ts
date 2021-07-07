@@ -28,6 +28,9 @@ describe('fakeDbPackageTransaction', () => {
         reservationLength: 60,
         transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
         remainingAppointments: 0,
+        lessonLanguage: 'ja',
+        isSubscription: false,
+        paymentMethodData: {},
       });
       expect(fakePackageTransaction._id.toString().length).to.equal(24);
     });

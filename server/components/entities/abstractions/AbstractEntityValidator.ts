@@ -1,4 +1,9 @@
-import { IEntityValidator } from './IEntityValidator';
+import {
+  IEntityValidator,
+  EntityValidatorValidateParams,
+  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+} from './IEntityValidator';
 
 type JoiValidationObject = {
   value: {};
@@ -7,10 +12,12 @@ type JoiValidationObject = {
 
 abstract class AbstractEntityValidator implements IEntityValidator {
   protected _joi: any;
-  protected _entityValidationSchema: any;
+  protected _createValidationSchema: any;
+  protected _editValidationSchema: any;
+  protected _adminValidationSchema: any;
 
-  public validate = (buildParams: {}): {} | Error => {
-    const validationObj = this._validateBuildParams(buildParams);
+  public validate = (props: EntityValidatorValidateParams): {} | Error => {
+    const validationObj = this._validateBuildParams(props);
     if ('error' in validationObj) {
       const errMessage = validationObj.error;
       throw new Error(errMessage);
@@ -20,8 +27,16 @@ abstract class AbstractEntityValidator implements IEntityValidator {
     }
   };
 
-  protected _validateBuildParams = (buildParams: {}): JoiValidationObject => {
-    let validatedBuildParams = this._entityValidationSchema.validate(buildParams);
+  protected _validateBuildParams = (props: EntityValidatorValidateParams): JoiValidationObject => {
+    const { validationMode: validationType, userRole, buildParams } = props;
+    let validatedBuildParams;
+    if (userRole == ENTITY_VALIDATOR_VALIDATE_USER_ROLES.ADMIN) {
+      validatedBuildParams = this._adminValidationSchema.validate(buildParams);
+    } else if (validationType == ENTITY_VALIDATOR_VALIDATE_MODES.CREATE) {
+      validatedBuildParams = this._createValidationSchema.validate(buildParams);
+    } else if (validationType == ENTITY_VALIDATOR_VALIDATE_MODES.EDIT) {
+      validatedBuildParams = this._editValidationSchema.validate(buildParams);
+    }
     return validatedBuildParams;
   };
 

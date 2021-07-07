@@ -28,6 +28,9 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
       reservationLength: 60,
       transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
       remainingAppointments: 0,
+      lessonLanguage: 'ja',
+      isSubscription: false,
+      paymentMethodData: {},
     };
     return fakeBuildParams;
   };

@@ -2,7 +2,7 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 
 class AppointmentEntityValidator extends AbstractEntityValidator {
   protected _initTemplate = () => {
-    this._entityValidationSchema = this._joi.object().keys({
+    this._createValidationSchema = this._joi.object().keys({
       hostedBy: this._joi.string().alphanum().min(24).max(24),
       reservedBy: this._joi.string().alphanum().min(24).max(24),
       packageTransactionId: this._joi.string().alphanum().min(24).max(24),

@@ -15,34 +15,33 @@ type PackageTransactionEntityBuildParams = {
   reservedBy: string;
   packageId: string;
   reservationLength: number;
-  terminationDate?: Date;
-  transactionDetails: { currency: string; subTotal: number; total: number };
+  transactionDetails: TransactionDetails;
   remainingAppointments: number;
-  lessonLanguage?: string;
-  isSubscription?: boolean;
-  hostedByData?: JoinedUserDoc;
-  reservedByData?: JoinedUserDoc;
-  packageData?: PackageDoc;
-  paymentMethodData?: { method: string; paymentId?: string };
+  lessonLanguage: string;
+  isSubscription: boolean;
+  paymentMethodData: PaymentMethodData;
 };
+
+type TransactionDetails = { currency: string; subTotal: number; total: number };
+type PaymentMethodData = { method: string; paymentId: string } | {};
 
 type PackageTransactionEntityBuildResponse = {
   hostedBy: string;
   reservedBy: string;
   packageId: string;
-  transactionDate: Date;
   reservationLength: number;
-  transactionDetails: { currency: string; subTotal: number; total: number };
   terminationDate: Date;
-  isTerminated: boolean;
+  transactionDetails: TransactionDetails;
   remainingAppointments: number;
-  remainingReschedules: number;
   lessonLanguage: string;
   isSubscription: boolean;
-  methodData?: { method: string; paymentId?: string };
+  transactionDate: Date;
+  remainingReschedules: number;
+  isTerminated: boolean;
   packageData: PackageDoc;
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;
+  paymentMethodData: PaymentMethodData;
 };
 
 class PackageTransactionEntity extends AbstractEntity<
@@ -69,25 +68,27 @@ class PackageTransactionEntity extends AbstractEntity<
       reservedBy,
       packageId,
       reservationLength,
-      terminationDate,
       transactionDetails,
       remainingAppointments,
       lessonLanguage,
       isSubscription,
       paymentMethodData,
     } = buildParams;
-    const packageData = await this.getDbDataById({
-      dbService: this._packageDbService,
-      _id: packageId,
-    });
-    const hostedByData = await this.getDbDataById({
-      dbService: this._userDbService,
-      _id: hostedBy,
-    });
-    const reservedByData = await this.getDbDataById({
-      dbService: this._userDbService,
-      _id: reservedBy,
-    });
+    const packageData =
+      (await this.getDbDataById({
+        dbService: this._packageDbService,
+        _id: packageId,
+      })) || {};
+    const hostedByData =
+      (await this.getDbDataById({
+        dbService: this._userDbService,
+        _id: hostedBy,
+      })) || {};
+    const reservedByData =
+      (await this.getDbDataById({
+        dbService: this._userDbService,
+        _id: reservedBy,
+      })) || {};
     const packageTransactionEntity = Object.freeze({
       hostedBy,
       reservedBy,
@@ -95,16 +96,16 @@ class PackageTransactionEntity extends AbstractEntity<
       transactionDate: new Date(),
       reservationLength,
       transactionDetails,
-      terminationDate: terminationDate || this._dayjs().add(1, 'month').toDate(),
+      terminationDate: this._dayjs().add(1, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       remainingReschedules: 5,
-      lessonLanguage: lessonLanguage || 'ja',
-      isSubscription: isSubscription || false,
-      paymentMethodData: paymentMethodData || {},
-      packageData: packageData || {},
-      hostedByData: hostedByData || {},
-      reservedByData: reservedByData || {},
+      lessonLanguage,
+      isSubscription,
+      paymentMethodData,
+      packageData,
+      hostedByData,
+      reservedByData,
     });
     return packageTransactionEntity;
   };

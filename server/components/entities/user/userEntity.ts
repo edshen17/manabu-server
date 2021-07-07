@@ -22,26 +22,24 @@ type UserContactMethod = {
   methodType: string;
 };
 
-type UserEntityBuildResponse =
-  | {
-      name: string;
-      email: string;
-      password?: string;
-      profileImageUrl: string;
-      profileBio: string;
-      dateRegistered: Date;
-      languages?: { level: string; language: string }[];
-      region: string;
-      timezone: string;
-      lastOnline: Date;
-      role: string;
-      settings: { currency: string };
-      memberships: string[];
-      contactMethods: UserContactMethod[] | [];
-      isEmailVerified: boolean;
-      verificationToken: string;
-    }
-  | Error;
+type UserEntityBuildResponse = {
+  name: string;
+  email: string;
+  password?: string;
+  profileImageUrl: string;
+  profileBio: string;
+  dateRegistered: Date;
+  languages?: { level: string; language: string }[];
+  region: string;
+  timezone: string;
+  lastOnline: Date;
+  role: string;
+  settings: { currency: string };
+  memberships: string[];
+  contactMethods: UserContactMethod[] | [];
+  isEmailVerified: boolean;
+  verificationToken: string;
+};
 
 class UserEntity extends AbstractEntity<
   OptionalUserEntityInitParams,
@@ -53,48 +51,9 @@ class UserEntity extends AbstractEntity<
   private _signJwt!: any;
 
   public build = (entityBuildParams: UserEntityBuildParams): UserEntityBuildResponse => {
-    try {
-      this._validateUserInput(entityBuildParams);
-      const userEntity = this._buildUserEntity(entityBuildParams);
-      return userEntity;
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  private _validateUserInput = (entityBuildParams: UserEntityBuildParams): void => {
-    const { name, email, password, profileImageUrl } = entityBuildParams;
-    const inputValidator = this._makeInputValidator();
-    if (!inputValidator.isValidName(name)) {
-      throw new Error('User must have a valid name.');
-    }
-
-    if (!inputValidator.isValidEmail(email)) {
-      throw new Error('User must have a valid email.');
-    }
-
-    if (!inputValidator.isValidPassword(password)) {
-      throw new Error('User must have a valid password.');
-    }
-  };
-
-  private _makeInputValidator = () => {
-    const inputValidator = {
-      // TODO: Finish all validations & sanitize
-      isValidName: (name: string) => {
-        return true;
-      },
-      isValidEmail: (email: string) => {
-        return true;
-      },
-      isValidPassword: (password?: string) => {
-        return true;
-      },
-      isValidURL: (url: string) => {
-        return true;
-      },
-    };
-    return inputValidator;
+    // this._entityValidator.validate(entityBuildParams);
+    const userEntity = this._buildUserEntity(entityBuildParams);
+    return userEntity;
   };
 
   private _buildUserEntity = (
