@@ -8,11 +8,10 @@ type OptionalPackageEntityInitParams = {
 
 type PackageEntityBuildParams = {
   hostedBy: string;
-  priceDetails?: PriceDetails;
   lessonAmount: number;
-  isOffering?: boolean;
+  isOffering: boolean;
   packageType: string;
-  packageDurations?: number[];
+  packageDurations: number[];
 };
 
 type PriceDetails = { hourlyPrice: number; currency: string };
@@ -43,15 +42,15 @@ class PackageEntity extends AbstractEntity<
   private _buildPackageEntity = async (
     buildParams: PackageEntityBuildParams
   ): Promise<PackageEntityBuildResponse> => {
-    const { hostedBy, priceDetails, lessonAmount, isOffering, packageType, packageDurations } =
-      buildParams;
+    const { hostedBy, lessonAmount, isOffering, packageType, packageDurations } = buildParams;
+    const priceDetails = await this._getPriceDetails(hostedBy);
     const packageEntity = Object.freeze({
       hostedBy,
-      priceDetails: priceDetails || (await this._getPriceDetails(hostedBy)),
-      lessonAmount: lessonAmount || 5,
-      isOffering: isOffering || true,
-      packageType: packageType || 'light',
-      packageDurations: packageDurations || [30, 60],
+      priceDetails,
+      lessonAmount,
+      isOffering,
+      packageType,
+      packageDurations,
     });
     return packageEntity;
   };

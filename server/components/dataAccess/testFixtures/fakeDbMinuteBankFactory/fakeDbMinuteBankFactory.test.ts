@@ -25,7 +25,6 @@ describe('fakeDbMinuteBankFactory', () => {
     it('should create a fake db minuteBank with data about the given users', async () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbUser();
       const fakeDbMinutebank = await fakeDbMinuteBankFactory.createFakeDbData({
-        minuteBank: 5,
         hostedBy: fakeUser._id,
         reservedBy: fakeUser._id,
       });

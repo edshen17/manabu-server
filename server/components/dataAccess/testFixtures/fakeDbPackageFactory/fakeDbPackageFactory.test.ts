@@ -35,6 +35,8 @@ describe('fakeDbPackageFactory', () => {
         hostedBy: fakeTeacher._id,
         lessonAmount: 5,
         packageType: 'light',
+        isOffering: true,
+        packageDurations: [30, 60],
       });
       expect(fakePackage.packageType).to.equal('light');
     });

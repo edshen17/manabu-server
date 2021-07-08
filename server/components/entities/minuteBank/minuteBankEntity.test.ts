@@ -21,11 +21,10 @@ describe('minuteBank entity', () => {
         const fakeMinuteBank = await minuteBankEntity.build({
           hostedBy: fakeHostedBy._id,
           reservedBy: fakeReservedBy._id,
-          minuteBank: 5,
         });
         expect(fakeMinuteBank.hostedBy).to.equal(fakeHostedBy._id);
         expect(fakeMinuteBank.reservedBy).to.equal(fakeReservedBy._id);
-        expect(fakeMinuteBank.minuteBank).to.equal(5);
+        expect(fakeMinuteBank.minuteBank).to.equal(0);
         expect(fakeMinuteBank.hostedByData).to.deep.equal(fakeHostedBy);
         expect(fakeMinuteBank.reservedByData).to.deep.equal(fakeReservedBy);
       });

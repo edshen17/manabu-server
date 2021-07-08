@@ -9,7 +9,6 @@ type OptionalMinuteBankEntityInitParams = {
 type MinuteBankEntityBuildParams = {
   hostedBy: string;
   reservedBy: string;
-  minuteBank?: number;
 };
 
 type MinuteBankEntityBuildResponse = {
@@ -37,7 +36,7 @@ class MinuteBankEntity extends AbstractEntity<
   private _buildMinuteBankEntity = async (
     buildParams: MinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
-    const { hostedBy, reservedBy, minuteBank } = buildParams;
+    const { hostedBy, reservedBy } = buildParams;
     const hostedByData = await this.getDbDataById({
       dbService: this._userDbService,
       _id: hostedBy,
@@ -49,7 +48,7 @@ class MinuteBankEntity extends AbstractEntity<
     const minuteBankEntity = Object.freeze({
       hostedBy,
       reservedBy,
-      minuteBank: minuteBank || 0,
+      minuteBank: 0,
       hostedByData: hostedByData || {},
       reservedByData: reservedByData || {},
     });

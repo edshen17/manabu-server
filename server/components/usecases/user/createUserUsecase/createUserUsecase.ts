@@ -19,7 +19,7 @@ import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPat
 import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
-import { PackageEntity } from '../../../entities/package/packageEntity';
+import { PackageEntity, PackageEntityBuildParams } from '../../../entities/package/packageEntity';
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
 
 type CreateUserUsecaseInitParams = {
@@ -175,10 +175,12 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     ];
     const packagesToInsert: any[] = [];
     defaultPackages.forEach(async (pkg) => {
-      const packageProperties: { hostedBy: string; lessonAmount: number; packageType: string } = {
+      const packageProperties: PackageEntityBuildParams = {
         hostedBy: savedDbUser._id,
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,
+        isOffering: true,
+        packageDurations: [30, 60],
       };
 
       packagesToInsert.push(

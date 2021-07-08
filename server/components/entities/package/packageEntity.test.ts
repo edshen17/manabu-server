@@ -21,7 +21,6 @@ context('package entity', () => {
       it('should return a package entity object', async () => {
         const fakePackage = await packageEntity.build({
           hostedBy: fakeUser._id,
-          priceDetails: { currency: 'SGD', hourlyPrice: 5 },
           lessonAmount: 5,
           isOffering: true,
           packageDurations: [],
@@ -32,7 +31,7 @@ context('package entity', () => {
         expect(fakePackage.isOffering).to.equal(true);
         expect(fakePackage.packageDurations.length).to.equal(0);
         expect(fakePackage.packageType).to.equal('light');
-        expect(fakePackage.priceDetails).to.deep.equal({ currency: 'SGD', hourlyPrice: 5 });
+        expect(fakePackage.priceDetails).to.deep.equal({ currency: 'SGD', hourlyPrice: 35 });
       });
     });
     context('given invalid inputs', () => {

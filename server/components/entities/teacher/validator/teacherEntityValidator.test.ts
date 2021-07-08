@@ -92,10 +92,14 @@ describe('teacherEntityValidator', () => {
           teacherType: 'professional',
         };
         context('as a non-admin user', () => {
-          testValidate({ validationMode: 'edit', userRole: 'user' });
+          it('should throw an error', () => {
+            testValidate({ validationMode: 'edit', userRole: 'user' });
+          });
         });
         context('as an admin', () => {
-          testValidate({ validationMode: 'edit', userRole: 'admin' });
+          it('should throw an error', () => {
+            testValidate({ validationMode: 'edit', userRole: 'admin' });
+          });
         });
       });
     });
