@@ -14,6 +14,7 @@ import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
 import { makeMinuteBankEntity } from '../../../entities/minuteBank';
 import { makeTeacherEntity } from '../../../entities/teacher';
 import { makePackageEntity } from '../../../entities/package';
+import { makeQueryStringHandler } from '../../utils/queryStringHandler';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserEntity,
@@ -31,6 +32,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   signJwt,
   emailHandler,
   makeRedirectPathBuilder,
+  makeQueryStringHandler,
 });
 
 export { makeCreateUserUsecase };

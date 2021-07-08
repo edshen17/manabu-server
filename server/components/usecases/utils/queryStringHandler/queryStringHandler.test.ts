@@ -3,99 +3,119 @@ import { makeQueryStringHandler } from '.';
 import { QueryStringHandler } from './queryStringHandler';
 
 let queryStringHandler: QueryStringHandler;
-let defaultQueryStrings: {};
+let toQueryStringObj: {};
 before(() => {
   queryStringHandler = makeQueryStringHandler;
 });
 
 beforeEach(() => {
-  defaultQueryStrings = {
-    state: 'some state',
+  toQueryStringObj = {
+    state: '',
     id: 'some id',
+    test: {
+      field: 'some field',
+    },
   };
 });
 
 describe('queryStringHandler', () => {
-  const encodeQueryStrings = (unencodedQueryStrings: {}) => {
-    const encodedQueryStrings = queryStringHandler.encodeQueryStrings(unencodedQueryStrings);
-    const decodedQueryStrings = queryStringHandler.decodeQueryStrings(encodedQueryStrings);
-    expect(decodedQueryStrings).to.deep.equal(defaultQueryStrings);
-    return encodedQueryStrings;
+  const encodeQueryStringObj = (unencodedQueryStrings: {}) => {
+    const encodedQueryString = queryStringHandler.encodeQueryStringObj(unencodedQueryStrings);
+    const decodedQueryString = queryStringHandler.decodeQueryString(encodedQueryString);
+    expect(decodedQueryString).to.deep.equal(toQueryStringObj);
+    return encodedQueryString;
   };
 
-  const decodeQueryStrings = (encodedQueryStrings: string, expectedObj: {}) => {
-    const decodedQueryStrings = queryStringHandler.decodeQueryStrings(encodedQueryStrings);
-    expect(decodedQueryStrings).to.deep.equal(expectedObj);
-    return decodedQueryStrings;
+  const decodeQueryString = (encodedQueryStrings: string, expectedObj: {}) => {
+    const decodedQueryString = queryStringHandler.decodeQueryString(encodedQueryStrings);
+    expect(decodedQueryString).to.deep.equal(expectedObj);
+    return decodedQueryString;
   };
 
-  const stringifyQueryStrings = (queryStrings: {}, expectedStr: string) => {
-    const stringifiedQueryStrings = queryStringHandler.stringifyQueryStrings(queryStrings);
-    expect(stringifiedQueryStrings).to.equal(expectedStr);
+  const stringifyQueryStringObj = (queryStrings: {}, expectedStr: string) => {
+    const stringifiedQueryStringObj = queryStringHandler.stringifyQueryStringObj(queryStrings);
+    expect(stringifiedQueryStringObj).to.equal(expectedStr);
   };
 
-  const parseQueryStrings = (queryStrings: string, expectedObj: {}) => {
-    const parsedQueryStrings = queryStringHandler.parseQueryStrings(queryStrings);
+  const parseQueryString = (queryStrings: string, expectedObj: {}) => {
+    const parsedQueryStrings = queryStringHandler.parseQueryString(queryStrings);
     expect(parsedQueryStrings).to.deep.equal(expectedObj);
   };
 
-  describe('encodeQueryStrings', () => {
+  const decodeQueryStringObj = (encodedQueryStringObj: {}, expectedObj: {}) => {
+    const decodedQueryStringObj = queryStringHandler.decodeQueryStringObj(encodedQueryStringObj);
+    expect(decodedQueryStringObj).to.deep.equal(expectedObj);
+  };
+
+  describe('encodeQueryStringObj', () => {
     context('empty query strings', () => {
       it('should encode the query strings', () => {
-        defaultQueryStrings = {};
-        const encodedQueryStrings = encodeQueryStrings(defaultQueryStrings);
+        toQueryStringObj = {};
+        const encodedQueryStrings = encodeQueryStringObj(toQueryStringObj);
         expect(encodedQueryStrings).to.equal('');
       });
     });
     context('non-empty query strings', () => {
       it('should encode the query strings', () => {
-        const encodedQueryStrings = encodeQueryStrings(defaultQueryStrings);
+        const encodedQueryStrings = encodeQueryStringObj(toQueryStringObj);
         expect(encodedQueryStrings).to.not.equal('');
       });
     });
   });
-  describe('decodeQueryStrings', () => {
+  describe('decodeQueryString', () => {
     context('empty encoded query strings', () => {
       it('should decode the query strings', () => {
-        defaultQueryStrings = {};
-        const encodedQueryString = queryStringHandler.encodeQueryStrings(defaultQueryStrings);
-        decodeQueryStrings(encodedQueryString, defaultQueryStrings);
+        toQueryStringObj = {};
+        const encodedQueryString = queryStringHandler.encodeQueryStringObj(toQueryStringObj);
+        decodeQueryString(encodedQueryString, toQueryStringObj);
       });
     });
     context('non-empty encoded query strings', () => {
       it('should decode the query strings', () => {
-        const encodedQueryString = queryStringHandler.encodeQueryStrings(defaultQueryStrings);
-        decodeQueryStrings(encodedQueryString, defaultQueryStrings);
+        const encodedQueryString = queryStringHandler.encodeQueryStringObj(toQueryStringObj);
+        decodeQueryString(encodedQueryString, toQueryStringObj);
       });
     });
   });
-  describe('stringifyQueryStrings', () => {
+  describe('decodeQueryStringObj', () => {
+    context('empty query strings', () => {
+      it('should parse the query strings', () => {});
+    });
+    context('non-empty query strings', () => {
+      it('should parse the query strings', () => {
+        const encodedQueryString = queryStringHandler.encodeQueryStringObj(toQueryStringObj);
+        const parsedQueryString = queryStringHandler.parseQueryString(encodedQueryString);
+        decodeQueryStringObj(parsedQueryString, toQueryStringObj);
+      });
+    });
+  });
+  describe('stringifyQueryStringObj', () => {
     context('empty query strings', () => {
       it('should stringify the query object', () => {
-        defaultQueryStrings = {};
-        stringifyQueryStrings(defaultQueryStrings, '');
+        toQueryStringObj = {};
+        stringifyQueryStringObj(toQueryStringObj, '');
       });
     });
     context('non-empty query strings', () => {
       it('should stringify the query object', () => {
-        stringifyQueryStrings(defaultQueryStrings, 'id=some%20id&state=some%20state');
+        stringifyQueryStringObj(toQueryStringObj, 'id=some%20id&state=&test=%5Bobject%20Object%5D');
       });
     });
   });
 
-  describe('parseQueryStrings', () => {
+  describe('parseQueryString', () => {
     context('empty query strings', () => {
       it('should parse the query strings', () => {
         const queryString = '';
         const expectedObj = {};
-        parseQueryStrings(queryString, expectedObj);
+        parseQueryString(queryString, expectedObj);
       });
     });
     context('non-empty query strings', () => {
       it('should parse the query strings', () => {
         const queryString = '?foo=bar';
         const expectedObj = { foo: 'bar' };
-        parseQueryStrings(queryString, expectedObj);
+        parseQueryString(queryString, expectedObj);
       });
     });
   });

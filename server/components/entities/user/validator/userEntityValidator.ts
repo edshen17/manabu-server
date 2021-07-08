@@ -8,7 +8,7 @@ class UserEntityValidator extends AbstractEntityValidator {
       password: this._joi
         .string()
         .pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)),
-      profileImageUrl: this._joi.string().dataUri().allow('').max(2048),
+      profileImageUrl: this._joi.string().uri().allow('').max(2048),
       contactMethods: this._joi.array().items({
         methodName: this._joi.string().max(256),
         methodId: this._joi.string().max(256),

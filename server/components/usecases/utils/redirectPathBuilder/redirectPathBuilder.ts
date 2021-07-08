@@ -45,13 +45,14 @@ class RedirectPathBuilder {
   };
 
   public encodeQueryStrings = (unencodedQueryStrings: {}) => {
-    const encodedQueryStrings = this._queryStringHandler.encodeQueryStrings(unencodedQueryStrings);
+    const encodedQueryStrings =
+      this._queryStringHandler.encodeQueryStringObj(unencodedQueryStrings);
     this._redirectExpressCallbackOptions.queryStrings = encodedQueryStrings;
     return this;
   };
 
   public stringifyQueryStrings = (queryStrings: {}) => {
-    const stringifiedQueryStrings = this._queryStringHandler.stringifyQueryStrings(queryStrings);
+    const stringifiedQueryStrings = this._queryStringHandler.stringifyQueryStringObj(queryStrings);
     this._redirectExpressCallbackOptions.queryStrings = stringifiedQueryStrings;
     return this;
   };

@@ -1,60 +1,72 @@
-type StringKeyObject = { [index: string]: any };
 class QueryStringHandler {
-  private _parseQueryStrings: any;
-  private _stringifyQueryStrings: any;
+  private _queryStringLib: any;
 
-  public stringifyQueryStrings = (queryStrings: StringKeyObject) => {
-    const stringifiedQueryStrings = this._stringifyQueryStrings(queryStrings);
+  public encodeQueryStringObj = (toEncodeObj: StringKeyObject): string => {
+    const encodedQueryStringObj = this._encodeQueryStringObj(toEncodeObj);
+    const encodedQueryString = this.stringifyQueryStringObj(encodedQueryStringObj);
+    return encodedQueryString;
+  };
+
+  private _encodeQueryStringObj = (toEncodeObj: StringKeyObject): StringKeyObject => {
+    const encodedQueryStringObj: StringKeyObject = {};
+    for (const queryString in toEncodeObj) {
+      const itemToEncode = toEncodeObj[queryString];
+      let stringifiedQueryString: string;
+      if (typeof itemToEncode != 'string') {
+        stringifiedQueryString = JSON.stringify(itemToEncode);
+      } else {
+        stringifiedQueryString = itemToEncode;
+      }
+      const encodedQueryString = Buffer.from(stringifiedQueryString).toString('base64');
+      encodedQueryStringObj[queryString] = encodedQueryString;
+    }
+    return encodedQueryStringObj;
+  };
+
+  public stringifyQueryStringObj = (toStringifyObj: StringKeyObject) => {
+    const stringifiedQueryStrings = this._queryStringLib.stringify(toStringifyObj);
     return stringifiedQueryStrings;
   };
 
-  public parseQueryStrings = (queryStrings: string) => {
-    const parsedQueryStrings = this._parseQueryStrings(queryStrings);
-    return parsedQueryStrings;
-  };
-
-  public encodeQueryStrings = (unencodedQueryStrings: StringKeyObject): string => {
-    const base64EncodedQueryStrings = this._base64Encode(unencodedQueryStrings);
-    const encodedQueryStrings = this.stringifyQueryStrings(base64EncodedQueryStrings);
-    return encodedQueryStrings;
-  };
-
-  private _base64Encode = (unencodedQueryStrings: StringKeyObject) => {
-    const base64EncodedObj: StringKeyObject = {};
-    for (const queryString in unencodedQueryStrings) {
-      const unencodedQueryString = unencodedQueryStrings[queryString];
-      let stringifiedQueryString: string;
-      if (typeof unencodedQueryString != 'string') {
-        stringifiedQueryString = JSON.stringify(unencodedQueryString);
-      } else {
-        stringifiedQueryString = unencodedQueryString;
-      }
-      const encodedQueryString = Buffer.from(stringifiedQueryString).toString('base64');
-      base64EncodedObj[queryString] = encodedQueryString;
-    }
-    return base64EncodedObj;
-  };
-
-  public decodeQueryStrings = (encodedQueryStrings: string) => {
-    const decodedQueryStrings = this._base64Decode(encodedQueryStrings);
-    return decodedQueryStrings;
-  };
-
-  private _base64Decode = (encodedQueryStrings: string) => {
-    const encodedQueryStringObj: StringKeyObject = this.parseQueryStrings(encodedQueryStrings);
-    const base64DecodedObj: StringKeyObject = {};
+  public decodeQueryStringObj = (encodedQueryStringObj: StringKeyObject): {} => {
+    const decodedQueryStringObj: StringKeyObject = {};
     for (const queryString in encodedQueryStringObj) {
       const encodedQueryString = encodedQueryStringObj[queryString];
       const decodedQueryString = Buffer.from(encodedQueryString, 'base64').toString();
-      base64DecodedObj[queryString] = decodedQueryString;
+      decodedQueryStringObj[queryString] = this._parseStringifiedItem(decodedQueryString);
     }
-    return base64DecodedObj;
+    return decodedQueryStringObj;
   };
 
-  public init = (initParams: { parseQueryString: any; stringifyQueryString: any }) => {
-    const { parseQueryString, stringifyQueryString } = initParams;
-    this._parseQueryStrings = parseQueryString;
-    this._stringifyQueryStrings = stringifyQueryString;
+  private _parseStringifiedItem = (stringifiedItem: string): {} | string => {
+    let parsedObj: {} | string;
+    try {
+      parsedObj = JSON.parse(stringifiedItem);
+    } catch (err) {
+      parsedObj = stringifiedItem;
+    }
+    return parsedObj;
+  };
+
+  public decodeQueryString = (encodedQueryString: string): {} => {
+    const encodedQueryStringObj: StringKeyObject = this.parseQueryString(encodedQueryString);
+    const decodedQueryStringObj: StringKeyObject = {};
+    for (const queryString in encodedQueryStringObj) {
+      const encodedQueryString = encodedQueryStringObj[queryString];
+      const decodedQueryString = Buffer.from(encodedQueryString, 'base64').toString();
+      decodedQueryStringObj[queryString] = this._parseStringifiedItem(decodedQueryString);
+    }
+    return decodedQueryStringObj;
+  };
+
+  public parseQueryString = (queryString: string) => {
+    const parsedQueryStrings = this._queryStringLib.parse(queryString);
+    return parsedQueryStrings;
+  };
+
+  public init = (initParams: { queryStringLib: any }) => {
+    const { queryStringLib } = initParams;
+    this._queryStringLib = queryStringLib;
     return this;
   };
 }

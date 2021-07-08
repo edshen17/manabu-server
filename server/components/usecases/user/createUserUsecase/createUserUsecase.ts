@@ -21,6 +21,7 @@ import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBa
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity, PackageEntityBuildParams } from '../../../entities/package/packageEntity';
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
+import { QueryStringHandler } from '../../utils/queryStringHandler/queryStringHandler';
 
 type CreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
@@ -38,6 +39,7 @@ type CreateUserUsecaseInitParams = {
   signJwt: any;
   emailHandler: EmailHandler;
   makeRedirectPathBuilder: RedirectPathBuilder;
+  makeQueryStringHandler: QueryStringHandler;
 };
 
 type CookieData = {
@@ -75,6 +77,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
   private _redirectPathBuilder!: RedirectPathBuilder;
+  private _queryStringHandler!: QueryStringHandler;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -349,6 +352,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       signJwt,
       emailHandler,
       makeRedirectPathBuilder,
+      makeQueryStringHandler,
     } = usecaseInitParams;
     this._userEntity = await makeUserEntity;
     this._packageEntity = await makePackageEntity;
@@ -365,6 +369,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
     this._redirectPathBuilder = makeRedirectPathBuilder;
+    this._queryStringHandler = makeQueryStringHandler;
     return this;
   };
 }
