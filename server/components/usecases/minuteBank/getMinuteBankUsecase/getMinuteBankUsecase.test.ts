@@ -23,8 +23,8 @@ before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
-    hostedBy: fakeUser._id.toString(),
-    reservedBy: fakeUser._id.toString(),
+    hostedById: fakeUser._id.toString(),
+    reservedById: fakeUser._id.toString(),
   });
   getMinuteBankUsecase = await makeGetMinuteBankUsecase;
 });

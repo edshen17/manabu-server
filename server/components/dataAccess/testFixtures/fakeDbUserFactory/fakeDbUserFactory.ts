@@ -26,7 +26,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
       userId: fakeDbUser._id.toString(),
     });
     const fakeDbPackages = await this._fakeDbPackageFactory.createFakePackages({
-      hostedBy: fakeDbUser._id.toString(),
+      hostedById: fakeDbUser._id.toString(),
     });
 
     const fakeDbUserData = await this._dbService.findById({
@@ -51,7 +51,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
         {
           methodName: 'LINE',
           methodType: 'online',
-          methodId: this._faker.internet.userName(),
+          methodAddress: this._faker.internet.userName(),
           isPrimaryMethod: true,
         },
       ],

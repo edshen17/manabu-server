@@ -26,8 +26,8 @@ beforeEach(async () => {
   dbServiceAccessOptions = fakeDbAppointmentFactory.getDbServiceAccessOptions();
   fakeAppointmentTransaction = await fakeDbAppointmentTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-    hostedBy: fakeAppointmentTransaction.hostedBy.toString(),
-    reservedBy: fakeAppointmentTransaction.reservedBy.toString(),
+    hostedById: fakeAppointmentTransaction.hostedById.toString(),
+    reservedById: fakeAppointmentTransaction.reservedById.toString(),
     packageTransactionId: fakeAppointmentTransaction._id.toString(),
     from: new Date(),
     to: new Date(),
@@ -60,7 +60,7 @@ describe('appointmentDbService', () => {
         const getAppointment = async () => {
           const findParams = {
             searchQuery: {
-              hostedBy: fakeAppointment.hostedBy,
+              hostedById: fakeAppointment.hostedById,
             },
             dbServiceAccessOptions,
           };
@@ -176,7 +176,7 @@ describe('appointmentDbService', () => {
         it('should return the original appointment if update field does not exist', async () => {
           const updatedAppointment = await appointmentDbService.findOneAndUpdate({
             searchQuery: {
-              hostedBy: fakeAppointment.hostedBy,
+              hostedById: fakeAppointment.hostedById,
             },
             updateParams: {
               nonExistentField: 'some non-existent field',
@@ -188,7 +188,7 @@ describe('appointmentDbService', () => {
         it('should return null if the appointment to update does not exist', async () => {
           const updatedAppointment = await appointmentDbService.findOneAndUpdate({
             searchQuery: {
-              _id: fakeAppointment.hostedBy,
+              _id: fakeAppointment.hostedById,
             },
             updateParams: { status: 'cancelled' },
             dbServiceAccessOptions,
@@ -246,7 +246,7 @@ describe('appointmentDbService', () => {
       context('invalid inputs', () => {
         it('should return null if the minuteBank to delete does not exist', async () => {
           const deletedAppointment = await appointmentDbService.findByIdAndDelete({
-            _id: fakeAppointment.hostedBy,
+            _id: fakeAppointment.hostedById,
             dbServiceAccessOptions,
           });
           expect(deletedAppointment).to.equal(null);

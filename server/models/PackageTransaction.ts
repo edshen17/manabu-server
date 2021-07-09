@@ -3,8 +3,8 @@ import { UserSchema } from './User';
 import { PackageSchema } from './Package';
 
 const PackageTransactionSchema = createSchema({
-  hostedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  reservedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
+  hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
+  reservedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   packageId: Type.ref(Type.objectId({ required: true, index: true })).to('Package', PackageSchema),
   transactionDate: Type.date({ default: Date.now }),
   reservationLength: Type.number({ required: true }),
@@ -19,8 +19,8 @@ const PackageTransactionSchema = createSchema({
   remainingReschedules: Type.number({ required: true }),
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
-  paymentMethodData: Type.object({ required: false }).of({
-    method: Type.string(),
+  paymentData: Type.object({ required: false }).of({
+    methodName: Type.string(),
     paymentId: Type.string(),
   }),
   packageData: Type.object({ required: true }).of({}),

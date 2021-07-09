@@ -21,7 +21,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   protected _createFakeBuildParams = async (): Promise<PackageEntityBuildParams> => {
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
-      hostedBy: fakeUser._id.toString(),
+      hostedById: fakeUser._id.toString(),
       lessonAmount: 5,
       packageType: 'light',
       isOffering: true,
@@ -30,7 +30,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
     return fakeBuildParams;
   };
 
-  public createFakePackages = async (buildParams: { hostedBy: string }) => {
+  public createFakePackages = async (buildParams: { hostedById: string }) => {
     const fakePackages = await this._createFakePackages(buildParams);
     const dbServiceAccessOptions = this.getDbServiceAccessOptions();
     const fakeInsertedPackages = await this._dbService.insertMany({
@@ -40,24 +40,24 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
     return fakeInsertedPackages;
   };
 
-  private _createFakePackages = async (buildParams: { hostedBy: string }) => {
-    const { hostedBy } = buildParams;
+  private _createFakePackages = async (buildParams: { hostedById: string }) => {
+    const { hostedById } = buildParams;
     const lightPackage = await this._entity.build({
-      hostedBy: hostedBy,
+      hostedById: hostedById,
       lessonAmount: 5,
       packageType: 'light',
       isOffering: true,
       packageDurations: [30, 60],
     });
     const moderatePackage = await this._entity.build({
-      hostedBy,
+      hostedById,
       lessonAmount: 12,
       packageType: 'moderate',
       isOffering: true,
       packageDurations: [30, 60],
     });
     const mainichiPackage = await this._entity.build({
-      hostedBy,
+      hostedById,
       lessonAmount: 22,
       packageType: 'mainichi',
       isOffering: true,

@@ -54,7 +54,7 @@ describe('packageTransactionDbService', () => {
         const getPackageTransaction = async () => {
           const findParams = {
             searchQuery: {
-              hostedBy: fakePackageTransaction.hostedBy,
+              hostedById: fakePackageTransaction.hostedById,
             },
             dbServiceAccessOptions,
           };
@@ -164,7 +164,7 @@ describe('packageTransactionDbService', () => {
         it('should return the original packageTransaction if update field does not exist', async () => {
           const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
             searchQuery: {
-              hostedBy: fakePackageTransaction.hostedBy,
+              hostedById: fakePackageTransaction.hostedById,
             },
             updateParams: {
               nonExistentField: 'some non-existent field',
@@ -176,7 +176,7 @@ describe('packageTransactionDbService', () => {
         it('should return null if the packageTransaction to update does not exist', async () => {
           const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
             searchQuery: {
-              _id: fakePackageTransaction.hostedBy,
+              _id: fakePackageTransaction.hostedById,
             },
             updateParams: { lessonLanguage: 'en' },
             dbServiceAccessOptions,
@@ -235,7 +235,7 @@ describe('packageTransactionDbService', () => {
       context('invalid inputs', () => {
         it('should return null if the packageTransaction to delete does not exist', async () => {
           const deletedPackage = await packageTransactionDbService.findByIdAndDelete({
-            _id: fakePackageTransaction.hostedBy,
+            _id: fakePackageTransaction.hostedById,
             dbServiceAccessOptions,
           });
           expect(deletedPackage).to.equal(null);

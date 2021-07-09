@@ -25,18 +25,18 @@ describe('fakeDbMinuteBankFactory', () => {
     it('should create a fake db minuteBank with data about the given users', async () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbUser();
       const fakeDbMinutebank = await fakeDbMinuteBankFactory.createFakeDbData({
-        hostedBy: fakeUser._id.toString(),
-        reservedBy: fakeUser._id.toString(),
+        hostedById: fakeUser._id.toString(),
+        reservedById: fakeUser._id.toString(),
       });
-      expect(fakeDbMinutebank).to.have.property('hostedBy');
+      expect(fakeDbMinutebank).to.have.property('hostedById');
       expect(fakeDbMinutebank.hostedByData).to.deep.equal(fakeUser);
       expect(fakeDbMinutebank.reservedByData).to.deep.equal(fakeUser);
     });
-    it('should create a fake db minuteBank with random users if not given a hostedBy or reservedBy', async () => {
+    it('should create a fake db minuteBank with random users if not given a hostedById or reservedById', async () => {
       const fakeDbMinutebank = await fakeDbMinuteBankFactory.createFakeDbData();
-      expect(fakeDbMinutebank).to.have.property('hostedBy');
+      expect(fakeDbMinutebank).to.have.property('hostedById');
       expect(fakeDbMinutebank.hostedByData).to.not.equal(undefined);
-      expect(fakeDbMinutebank).to.have.property('reservedBy');
+      expect(fakeDbMinutebank).to.have.property('reservedById');
       expect(fakeDbMinutebank.reservedByData).to.not.equal(undefined);
     });
   });

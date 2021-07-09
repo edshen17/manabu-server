@@ -79,7 +79,7 @@ describe('userDbService', () => {
               expect(findByIdTeacher).to.have.property('teacherData');
               expect(findByIdTeacher.teacherData).to.have.property('packages');
               expect(findByIdTeacher.teacherData).to.not.have.property('licensePathUrl');
-              expect(findByIdTeacher).to.have.property('teacherAppPending');
+              expect(findByIdTeacher.teacherData.applicationStatus).to.equal('pending');
               expect(findByIdTeacher).to.not.have.property('email');
               expect(findByIdTeacher).to.not.have.property('password');
               expect(findByIdTeacher).to.not.have.property('verificationToken');

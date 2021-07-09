@@ -20,13 +20,13 @@ context('package entity', () => {
     context('given valid inputs', () => {
       it('should return a package entity object', async () => {
         const fakePackage = await packageEntity.build({
-          hostedBy: fakeUser._id.toString(),
+          hostedById: fakeUser._id.toString(),
           lessonAmount: 5,
           isOffering: true,
           packageDurations: [],
           packageType: 'light',
         });
-        expect(fakePackage.hostedBy.toString()).to.equal(fakeUser._id.toString());
+        expect(fakePackage.hostedById.toString()).to.equal(fakeUser._id.toString());
         expect(fakePackage.lessonAmount).to.equal(5);
         expect(fakePackage.isOffering).to.equal(true);
         expect(fakePackage.packageDurations.length).to.equal(0);

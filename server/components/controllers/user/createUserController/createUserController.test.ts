@@ -42,7 +42,6 @@ describe('createUserController', () => {
             isTeacherApp: true,
           },
         });
-        console.log(state, 'here');
         const query = queryStringHandler.parseQueryString(state);
         const createUserHttpRequest = iHttpRequestBuilder
           .body({

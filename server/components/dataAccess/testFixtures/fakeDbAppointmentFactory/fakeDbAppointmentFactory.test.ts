@@ -17,8 +17,8 @@ describe('fakeDbAppointmentFactory', () => {
     it('should create a fake appointment from the given users and package transaction', async () => {
       const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
       const fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-        hostedBy: fakePackageTransaction.hostedBy.toString(),
-        reservedBy: fakePackageTransaction.reservedBy.toString(),
+        hostedById: fakePackageTransaction.hostedById.toString(),
+        reservedById: fakePackageTransaction.reservedById.toString(),
         packageTransactionId: fakePackageTransaction._id.toString(),
         from: new Date(),
         to: new Date(),

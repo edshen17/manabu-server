@@ -18,8 +18,8 @@ context('packageTransaction entity', () => {
       it("should return a package transaction with the teacher's data", async () => {
         const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const fakePackageTransaction = await packageTransactionEntity.build({
-          hostedBy: fakeTeacher._id.toString(),
-          reservedBy: fakeTeacher._id.toString(),
+          hostedById: fakeTeacher._id.toString(),
+          reservedById: fakeTeacher._id.toString(),
           packageId: fakeTeacher.teacherData.packages[0]._id.toString(),
           reservationLength: 60,
           remainingAppointments: 5,

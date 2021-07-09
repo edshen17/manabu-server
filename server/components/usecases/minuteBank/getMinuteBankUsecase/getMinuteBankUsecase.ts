@@ -72,10 +72,10 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
     const searchQuery = {
       $or: [
         {
-          reservedBy: currentAPIUser.userId,
+          reservedById: currentAPIUser.userId,
         },
         {
-          hostedBy: currentAPIUser.userId,
+          hostedById: currentAPIUser.userId,
         },
       ],
     };

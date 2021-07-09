@@ -99,12 +99,11 @@ class UserDbService
     });
 
     const packages = await this._packageDbService.find({
-      searchQuery: { hostedBy: _id },
+      searchQuery: { hostedById: _id },
       dbServiceAccessOptions,
     });
 
     if (teacherData) {
-      userCopy.teacherAppPending = teacherData.applicationStatus == 'pending';
       userCopy.teacherData = teacherData;
       userCopy.teacherData.packages = packages;
     }

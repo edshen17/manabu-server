@@ -26,7 +26,7 @@ const UserSchema = createSchema({
   }),
   contactMethods: Type.array({ required: true }).of({
     methodName: Type.string({ required: true }),
-    methodId: Type.string({ required: true }),
+    methodAddress: Type.string({ required: true }),
     isPrimaryMethod: Type.boolean({ required: true }),
     methodType: Type.string({ required: true }),
   }),

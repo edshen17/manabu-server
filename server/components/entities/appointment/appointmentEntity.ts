@@ -12,16 +12,16 @@ type OptionalAppointmentEntityInitParams = {
 };
 
 type AppointmentEntityBuildParams = {
-  hostedBy: string;
-  reservedBy: string;
+  hostedById: string;
+  reservedById: string;
   packageTransactionId: string;
   from: Date;
   to: Date;
 };
 
 type AppointmentEntityBuildResponse = {
-  hostedBy: string;
-  reservedBy: string;
+  hostedById: string;
+  reservedById: string;
   packageTransactionId: string;
   from: Date;
   to: Date;
@@ -63,12 +63,12 @@ class AppointmentEntity extends AbstractEntity<
   protected _buildTemplate = async (
     buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const { hostedBy, reservedBy, packageTransactionId, from, to } = buildParams;
+    const { hostedById, reservedById, packageTransactionId, from, to } = buildParams;
     const { hostedByData, reservedByData, packageTransactionData, locationData } =
-      await this._getDbDataDependencies({ hostedBy, reservedBy, packageTransactionId });
+      await this._getDbDataDependencies({ hostedById, reservedById, packageTransactionId });
     const appointmentEntity = Object.freeze({
-      hostedBy,
-      reservedBy,
+      hostedById,
+      reservedById,
       packageTransactionId,
       from,
       to,
@@ -83,14 +83,14 @@ class AppointmentEntity extends AbstractEntity<
   };
 
   private _getDbDataDependencies = async (props: {
-    hostedBy: string;
-    reservedBy: string;
+    hostedById: string;
+    reservedById: string;
     packageTransactionId: string;
   }) => {
     // need to override to get user's contactMethods
-    const { hostedBy, reservedBy, packageTransactionId } = props;
-    const overrideHostedByData = await this._getOverrideUserData(hostedBy);
-    const overrideReservedByData = await this._getOverrideUserData(reservedBy);
+    const { hostedById, reservedById, packageTransactionId } = props;
+    const overrideHostedByData = await this._getOverrideUserData(hostedById);
+    const overrideReservedByData = await this._getOverrideUserData(reservedById);
     const hostedByData = this._getRestrictedUserData(overrideHostedByData);
     const reservedByData = this._getRestrictedUserData(overrideReservedByData);
     const packageTransactionData = await this._getPackageTransactionData(packageTransactionId);

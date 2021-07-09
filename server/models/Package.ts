@@ -2,7 +2,7 @@ import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
 
 const PackageSchema = createSchema({
-  hostedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
+  hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   priceDetails: Type.object({
     required: true,
   }).of({

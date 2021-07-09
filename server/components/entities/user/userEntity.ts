@@ -17,7 +17,7 @@ type UserEntityBuildParams = {
 
 type UserContactMethod = {
   methodName: string;
-  methodId: string;
+  methodAddress: string;
   isPrimaryMethod: boolean;
   methodType: string;
 };

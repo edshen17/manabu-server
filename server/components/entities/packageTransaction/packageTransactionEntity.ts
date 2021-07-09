@@ -11,8 +11,8 @@ type OptionalPackageTransactionEntityInitParams = {
 };
 
 type PackageTransactionEntityBuildParams = {
-  hostedBy: string;
-  reservedBy: string;
+  hostedById: string;
+  reservedById: string;
   packageId: string;
   reservationLength: number;
   transactionDetails: TransactionDetails;
@@ -26,8 +26,8 @@ type TransactionDetails = { currency: string; subTotal: number; total: number };
 type PaymentMethodData = { method: string; paymentId: string } | {};
 
 type PackageTransactionEntityBuildResponse = {
-  hostedBy: string;
-  reservedBy: string;
+  hostedById: string;
+  reservedById: string;
   packageId: string;
   reservationLength: number;
   terminationDate: Date;
@@ -57,8 +57,8 @@ class PackageTransactionEntity extends AbstractEntity<
     buildParams: PackageTransactionEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
     const {
-      hostedBy,
-      reservedBy,
+      hostedById,
+      reservedById,
       packageId,
       reservationLength,
       transactionDetails,
@@ -75,16 +75,16 @@ class PackageTransactionEntity extends AbstractEntity<
     const hostedByData =
       (await this.getDbDataById({
         dbService: this._userDbService,
-        _id: hostedBy,
+        _id: hostedById,
       })) || {};
     const reservedByData =
       (await this.getDbDataById({
         dbService: this._userDbService,
-        _id: reservedBy,
+        _id: reservedById,
       })) || {};
     const packageTransactionEntity = Object.freeze({
-      hostedBy,
-      reservedBy,
+      hostedById,
+      reservedById,
       packageId,
       transactionDate: new Date(),
       reservationLength,

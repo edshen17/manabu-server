@@ -21,8 +21,8 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
   protected _createFakeBuildParams = async (): Promise<AppointmentEntityBuildParams> => {
     const fakePackageTransaction = await this._fakeDbPackageTransactionFactory.createFakeDbData();
     const fakeBuildParams = {
-      hostedBy: fakePackageTransaction.hostedBy.toString(),
-      reservedBy: fakePackageTransaction.reservedBy.toString(),
+      hostedById: fakePackageTransaction.hostedById.toString(),
+      reservedById: fakePackageTransaction.reservedById.toString(),
       packageTransactionId: fakePackageTransaction._id.toString(),
       from: new Date(),
       to: new Date(),

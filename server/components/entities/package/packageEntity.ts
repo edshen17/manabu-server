@@ -7,7 +7,7 @@ type OptionalPackageEntityInitParams = {
 };
 
 type PackageEntityBuildParams = {
-  hostedBy: string;
+  hostedById: string;
   lessonAmount: number;
   isOffering: boolean;
   packageType: string;
@@ -17,7 +17,7 @@ type PackageEntityBuildParams = {
 type PriceDetails = { hourlyPrice: number; currency: string };
 
 type PackageEntityBuildResponse = {
-  hostedBy: string;
+  hostedById: string;
   priceDetails: PriceDetails;
   lessonAmount: number;
   isOffering: boolean;
@@ -35,10 +35,10 @@ class PackageEntity extends AbstractEntity<
   protected _buildTemplate = async (
     buildParams: PackageEntityBuildParams
   ): Promise<PackageEntityBuildResponse> => {
-    const { hostedBy, lessonAmount, isOffering, packageType, packageDurations } = buildParams;
-    const priceDetails = await this._getPriceDetails(hostedBy);
+    const { hostedById, lessonAmount, isOffering, packageType, packageDurations } = buildParams;
+    const priceDetails = await this._getPriceDetails(hostedById);
     const packageEntity = Object.freeze({
-      hostedBy,
+      hostedById,
       priceDetails,
       lessonAmount,
       isOffering,
@@ -48,10 +48,10 @@ class PackageEntity extends AbstractEntity<
     return packageEntity;
   };
 
-  private _getPriceDetails = async (hostedBy: string) => {
+  private _getPriceDetails = async (hostedById: string) => {
     const savedDbTeacher: JoinedUserDoc = await this.getDbDataById({
       dbService: this._userDbService,
-      _id: hostedBy,
+      _id: hostedById,
     });
     const teacherData = savedDbTeacher.teacherData;
     let priceDetails: PriceDetails;

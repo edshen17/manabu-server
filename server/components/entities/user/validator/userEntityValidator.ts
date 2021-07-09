@@ -11,7 +11,7 @@ class UserEntityValidator extends AbstractEntityValidator {
       profileImageUrl: this._joi.string().uri().allow('').max(2048),
       contactMethods: this._joi.array().items({
         methodName: this._joi.string().max(256),
-        methodId: this._joi.string().max(256),
+        methodAddress: this._joi.string().max(256),
         isPrimaryMethod: this._joi.boolean(),
         methodType: this._joi.string().max(256),
       }),

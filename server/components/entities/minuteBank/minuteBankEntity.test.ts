@@ -19,11 +19,11 @@ describe('minuteBank entity', () => {
         const fakeHostedBy = await fakeDbUserFactory.createFakeDbUser();
         const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
         const fakeMinuteBank = await minuteBankEntity.build({
-          hostedBy: fakeHostedBy._id.toString(),
-          reservedBy: fakeReservedBy._id.toString(),
+          hostedById: fakeHostedBy._id.toString(),
+          reservedById: fakeReservedBy._id.toString(),
         });
-        expect(fakeMinuteBank.hostedBy.toString()).to.equal(fakeHostedBy._id.toString());
-        expect(fakeMinuteBank.reservedBy.toString()).to.equal(fakeReservedBy._id.toString());
+        expect(fakeMinuteBank.hostedById.toString()).to.equal(fakeHostedBy._id.toString());
+        expect(fakeMinuteBank.reservedById.toString()).to.equal(fakeReservedBy._id.toString());
         expect(fakeMinuteBank.minuteBank).to.equal(0);
         expect(fakeMinuteBank.hostedByData).to.deep.equal(fakeHostedBy);
         expect(fakeMinuteBank.reservedByData).to.deep.equal(fakeReservedBy);

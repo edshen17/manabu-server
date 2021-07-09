@@ -149,7 +149,7 @@ describe('minuteBankDbService', () => {
         it('should return the original minuteBank if update field does not exist', async () => {
           const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
             searchQuery: {
-              hostedBy: fakeMinuteBank.hostedBy,
+              hostedById: fakeMinuteBank.hostedById,
             },
             updateParams: {
               nonExistentField: 'some non-existent field',
@@ -161,7 +161,7 @@ describe('minuteBankDbService', () => {
         it('should return null if the minuteBank to update does not exist', async () => {
           const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
             searchQuery: {
-              _id: fakeMinuteBank.hostedBy,
+              _id: fakeMinuteBank.hostedById,
             },
             updateParams: { minuteBank: 10 },
             dbServiceAccessOptions,
@@ -219,7 +219,7 @@ describe('minuteBankDbService', () => {
       context('invalid inputs', () => {
         it('should return null if the minuteBank to delete does not exist', async () => {
           const deletedMinuteBank = await minuteBankDbService.findByIdAndDelete({
-            _id: fakeMinuteBank.hostedBy,
+            _id: fakeMinuteBank.hostedById,
             dbServiceAccessOptions,
           });
           expect(deletedMinuteBank).to.equal(null);

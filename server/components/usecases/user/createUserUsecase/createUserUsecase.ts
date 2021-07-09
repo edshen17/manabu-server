@@ -178,7 +178,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const packagesToInsert: any[] = [];
     defaultPackages.forEach(async (pkg) => {
       const packageProperties: PackageEntityBuildParams = {
-        hostedBy: savedDbUser._id.toString(),
+        hostedById: savedDbUser._id.toString(),
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,
         isOffering: true,
@@ -204,8 +204,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<PackageTransactionDoc> => {
     const modelToInsert = await this._packageTransactionEntity.build({
-      hostedBy: process.env.MANABU_ADMIN_ID!,
-      reservedBy: savedDbUser._id.toString(),
+      hostedById: process.env.MANABU_ADMIN_ID!,
+      reservedById: savedDbUser._id.toString(),
       packageId: process.env.MANABU_ADMIN_PKG_ID!,
       reservationLength: 60,
       remainingAppointments: 1,
@@ -230,8 +230,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<MinuteBankDoc> => {
     const modelToInsert = await this._minuteBankEntity.build({
-      hostedBy: process.env.MANABU_ADMIN_ID!,
-      reservedBy: savedDbUser._id.toString(),
+      hostedById: process.env.MANABU_ADMIN_ID!,
+      reservedById: savedDbUser._id.toString(),
     });
     const newMinuteBank = await this._minuteBankDbService.insert({
       modelToInsert,

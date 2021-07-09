@@ -3,8 +3,8 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 class PackageTransactionEntityValidator extends AbstractEntityValidator {
   protected _initTemplate = () => {
     this._createValidationSchema = this._joi.object().keys({
-      hostedBy: this._joi.string().alphanum().min(24).max(24),
-      reservedBy: this._joi.string().alphanum().min(24).max(24),
+      hostedById: this._joi.string().alphanum().min(24).max(24),
+      reservedById: this._joi.string().alphanum().min(24).max(24),
       packageId: this._joi.string().alphanum().min(24).max(24),
       reservationLength: this._joi.number().min(30).max(120),
       transactionDetails: this._joi.object({
@@ -22,8 +22,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       }),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      hostedBy: this._joi.string().forbidden(),
-      reservedBy: this._joi.string().forbidden(),
+      hostedById: this._joi.string().forbidden(),
+      reservedById: this._joi.string().forbidden(),
       packageId: this._joi.string().forbidden(),
       reservationLength: this._joi.number().forbidden(),
       transactionDetails: this._joi.object().forbidden(),

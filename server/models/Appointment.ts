@@ -3,8 +3,8 @@ import { UserSchema } from './User';
 import { PackageTransactionSchema } from './PackageTransaction';
 
 const AppointmentSchema = createSchema({
-  hostedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  reservedBy: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
+  hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
+  reservedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   packageTransactionId: Type.ref(Type.objectId({ required: true, index: true })).to(
     'PackageTransaction',
     PackageTransactionSchema

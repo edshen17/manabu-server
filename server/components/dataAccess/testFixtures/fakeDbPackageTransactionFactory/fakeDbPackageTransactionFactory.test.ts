@@ -22,8 +22,8 @@ describe('fakeDbPackageTransaction', () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbUser();
       const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
       const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
-        hostedBy: fakeTeacher._id.toString(),
-        reservedBy: fakeUser._id.toString(),
+        hostedById: fakeTeacher._id.toString(),
+        reservedById: fakeUser._id.toString(),
         packageId: fakeTeacher.teacherData.packages[0]._id.toString(),
         reservationLength: 60,
         transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },

@@ -26,7 +26,7 @@ beforeEach(async () => {
   dbServiceAccessOptions = fakeDbPackageFactory.getDbServiceAccessOptions();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakePackage = await fakeDbPackageFactory.createFakeDbData({
-    hostedBy: fakeTeacher._id.toString(),
+    hostedById: fakeTeacher._id.toString(),
     lessonAmount: 5,
     packageType: 'light',
     isOffering: true,
@@ -173,7 +173,7 @@ describe('packageDbService', () => {
         it('should return null if the package to update does not exist', async () => {
           const updatedPackage = await packageDbService.findOneAndUpdate({
             searchQuery: {
-              _id: fakePackage.hostedBy,
+              _id: fakePackage.hostedById,
             },
             updateParams: { packageType: 'custom' },
             dbServiceAccessOptions,
@@ -231,7 +231,7 @@ describe('packageDbService', () => {
       context('invalid inputs', () => {
         it('should return null if the package to delete does not exist', async () => {
           const deletedPackage = await packageDbService.findByIdAndDelete({
-            _id: fakePackage.hostedBy,
+            _id: fakePackage.hostedById,
             dbServiceAccessOptions,
           });
           expect(deletedPackage).to.equal(null);
