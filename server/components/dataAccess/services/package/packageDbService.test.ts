@@ -26,7 +26,7 @@ beforeEach(async () => {
   dbServiceAccessOptions = fakeDbPackageFactory.getDbServiceAccessOptions();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakePackage = await fakeDbPackageFactory.createFakeDbData({
-    hostedBy: fakeTeacher._id,
+    hostedBy: fakeTeacher._id.toString(),
     lessonAmount: 5,
     packageType: 'light',
     isOffering: true,

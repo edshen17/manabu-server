@@ -26,13 +26,13 @@ describe('fakeDbPackageFactory', () => {
   describe('createFakeDbData', () => {
     it('should create 3 fake db packages that belong to a given user', async () => {
       const fakePackages = await fakeDbPackageFactory.createFakePackages({
-        hostedBy: fakeTeacher._id,
+        hostedBy: fakeTeacher._id.toString(),
       });
       expect(fakePackages.length).to.equal(3);
     });
     it('should create a fake db package that belong to a given user', async () => {
       const fakePackage = await fakeDbPackageFactory.createFakeDbData({
-        hostedBy: fakeTeacher._id,
+        hostedBy: fakeTeacher._id.toString(),
         lessonAmount: 5,
         packageType: 'light',
         isOffering: true,

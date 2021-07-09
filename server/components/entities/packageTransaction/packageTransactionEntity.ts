@@ -53,14 +53,7 @@ class PackageTransactionEntity extends AbstractEntity<
   private _packageDbService!: PackageDbService;
   private _dayjs!: any;
 
-  public build = async (
-    buildParams: PackageTransactionEntityBuildParams
-  ): Promise<PackageTransactionEntityBuildResponse> => {
-    const packageTransactionEntity = await this._buildPackageTransactionEntity(buildParams);
-    return packageTransactionEntity;
-  };
-
-  private _buildPackageTransactionEntity = async (
+  protected _buildTemplate = async (
     buildParams: PackageTransactionEntityBuildParams
   ): Promise<PackageTransactionEntityBuildResponse> => {
     const {

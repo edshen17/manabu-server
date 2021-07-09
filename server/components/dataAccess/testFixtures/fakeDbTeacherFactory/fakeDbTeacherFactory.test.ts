@@ -20,7 +20,9 @@ describe('fakeDbTeacherFactory', () => {
   describe('createFakeDbData', () => {
     it('should create a fake teacher in the db', async () => {
       const newUser = await fakeDbUserFactory.createFakeDbUser();
-      const newTeacher = await fakeDbTeacherFactory.createFakeDbData({ userId: newUser._id });
+      const newTeacher = await fakeDbTeacherFactory.createFakeDbData({
+        userId: newUser._id.toString(),
+      });
       expect(newTeacher.userId.toString()).to.equal(newUser._id.toString());
     });
   });

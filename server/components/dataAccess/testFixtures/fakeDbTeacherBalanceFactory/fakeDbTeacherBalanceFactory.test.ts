@@ -22,7 +22,7 @@ describe('fakeDbTeacherBalanceFactory', () => {
   describe('createFakeDbData', () => {
     it('should create an empty teacher balance for the given teacher', async () => {
       const fakeTeacherBalance = await fakeDbTeacherBalanceFactory.createFakeDbData({
-        userId: fakeTeacher._id,
+        userId: fakeTeacher._id.toString(),
       });
       expect(fakeTeacherBalance.balanceDetails).to.deep.equal({
         balance: 0,

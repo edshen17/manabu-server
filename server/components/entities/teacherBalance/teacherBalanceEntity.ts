@@ -17,7 +17,7 @@ class TeacherBalanceEntity extends AbstractEntity<
   TeacherBalanceEntityBuildParams,
   TeacherBalanceEntityBuildResponse
 > {
-  build(buildParams: TeacherBalanceEntityBuildParams): any {
+  protected _buildTemplate = (buildParams: TeacherBalanceEntityBuildParams) => {
     const { userId } = buildParams;
     const teacherBalanceEntity = Object.freeze({
       userId,
@@ -27,7 +27,7 @@ class TeacherBalanceEntity extends AbstractEntity<
       },
     });
     return teacherBalanceEntity;
-  }
+  };
 }
 
 export { TeacherBalanceEntity, TeacherBalanceEntityBuildParams, TeacherBalanceEntityBuildResponse };

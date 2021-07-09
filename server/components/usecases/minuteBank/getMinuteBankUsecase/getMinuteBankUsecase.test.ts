@@ -23,8 +23,8 @@ before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
-    hostedBy: fakeUser._id,
-    reservedBy: fakeUser._id,
+    hostedBy: fakeUser._id.toString(),
+    reservedBy: fakeUser._id.toString(),
   });
   getMinuteBankUsecase = await makeGetMinuteBankUsecase;
 });
@@ -35,7 +35,7 @@ describe('getMinuteBankUsecase', () => {
       const buildControllerData = controllerDataBuilder
         .endpointPath('/self/minuteBanks')
         .currentAPIUser({
-          userId: fakeUser._id,
+          userId: fakeUser._id.toString(),
           role: 'admin',
         })
         .build();

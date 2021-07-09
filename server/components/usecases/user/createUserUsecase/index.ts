@@ -1,3 +1,4 @@
+import cloneDeep from 'clone-deep';
 import { sign as signJwt } from 'jsonwebtoken';
 import { makeUserEntity } from '../../../entities/user';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
@@ -31,6 +32,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   signJwt,
   emailHandler,
   makeRedirectPathBuilder,
+  cloneDeep,
 });
 
 export { makeCreateUserUsecase };

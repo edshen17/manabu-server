@@ -54,7 +54,7 @@ describe('createUserUsecase', () => {
           try {
             await getUser();
           } catch (err) {
-            expect(err.message).to.equal('Access denied.');
+            expect(err).to.be.an('error');
           }
         });
         it('should throw if no inputs are provided', async () => {

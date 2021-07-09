@@ -26,14 +26,7 @@ class MinuteBankEntity extends AbstractEntity<
 > {
   private _userDbService!: UserDbService;
 
-  public build = async (
-    buildParams: MinuteBankEntityBuildParams
-  ): Promise<MinuteBankEntityBuildResponse> => {
-    const minuteBankEntity = this._buildMinuteBankEntity(buildParams);
-    return minuteBankEntity;
-  };
-
-  private _buildMinuteBankEntity = async (
+  protected _buildTemplate = async (
     buildParams: MinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
     const { hostedBy, reservedBy } = buildParams;

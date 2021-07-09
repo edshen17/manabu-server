@@ -25,8 +25,8 @@ describe('fakeDbMinuteBankFactory', () => {
     it('should create a fake db minuteBank with data about the given users', async () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbUser();
       const fakeDbMinutebank = await fakeDbMinuteBankFactory.createFakeDbData({
-        hostedBy: fakeUser._id,
-        reservedBy: fakeUser._id,
+        hostedBy: fakeUser._id.toString(),
+        reservedBy: fakeUser._id.toString(),
       });
       expect(fakeDbMinutebank).to.have.property('hostedBy');
       expect(fakeDbMinutebank.hostedByData).to.deep.equal(fakeUser);

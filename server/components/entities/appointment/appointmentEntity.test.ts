@@ -23,9 +23,9 @@ describe('appointmentEntity', () => {
         const fakeHostedBy = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
         const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
-          hostedBy: fakeHostedBy._id,
-          reservedBy: fakeReservedBy._id,
-          packageId: fakeHostedBy.teacherData.packages[0]._id,
+          hostedBy: fakeHostedBy._id.toString(),
+          reservedBy: fakeReservedBy._id.toString(),
+          packageId: fakeHostedBy.teacherData.packages[0]._id.toString(),
           reservationLength: 60,
           transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
           remainingAppointments: 0,
@@ -34,14 +34,14 @@ describe('appointmentEntity', () => {
           paymentMethodData: {},
         });
         const fakeAppointment = await appointmentEntity.build({
-          hostedBy: fakeHostedBy._id,
-          reservedBy: fakeReservedBy._id,
-          packageTransactionId: fakePackageTransaction._id,
+          hostedBy: fakeHostedBy._id.toString(),
+          reservedBy: fakeReservedBy._id.toString(),
+          packageTransactionId: fakePackageTransaction._id.toString(),
           from: new Date(),
           to: new Date(),
         });
-        expect(fakeAppointment.hostedBy).to.equal(fakeHostedBy._id);
-        expect(fakeAppointment.reservedBy).to.equal(fakeReservedBy._id);
+        expect(fakeAppointment.hostedBy.toString()).to.equal(fakeHostedBy._id.toString());
+        expect(fakeAppointment.reservedBy.toString()).to.equal(fakeReservedBy._id.toString());
         expect(fakeAppointment).to.have.property('hostedByData');
         expect(fakeAppointment).to.have.property('reservedByData');
         expect(fakeAppointment).to.have.property('packageTransactionData');

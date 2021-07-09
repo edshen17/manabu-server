@@ -22,7 +22,7 @@ describe('loginUserController', () => {
     it('should login the user given a valid username and password', async () => {
       const fakeUserEntityData = {
         name: faker.name.findName(),
-        password: faker.internet.password(),
+        password: `${faker.internet.password()}A1!`,
         email: faker.internet.email(),
       };
       const fakeUser = await fakeDbUserFactory.createFakeDbData(fakeUserEntityData);

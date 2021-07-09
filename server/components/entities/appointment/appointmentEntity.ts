@@ -60,14 +60,7 @@ class AppointmentEntity extends AbstractEntity<
     isOverrideView: true,
   };
 
-  public build = async (
-    buildParams: AppointmentEntityBuildParams
-  ): Promise<AppointmentEntityBuildResponse> => {
-    const appointmentEntity = await this._buildAppointmentEntity(buildParams);
-    return appointmentEntity;
-  };
-
-  private _buildAppointmentEntity = async (
+  protected _buildTemplate = async (
     buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
     const { hostedBy, reservedBy, packageTransactionId, from, to } = buildParams;

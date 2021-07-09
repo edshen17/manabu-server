@@ -32,14 +32,7 @@ class PackageEntity extends AbstractEntity<
 > {
   private _userDbService!: UserDbService;
 
-  public build = async (
-    buildParams: PackageEntityBuildParams
-  ): Promise<PackageEntityBuildResponse> => {
-    const packageEntity = await this._buildPackageEntity(buildParams);
-    return packageEntity;
-  };
-
-  private _buildPackageEntity = async (
+  protected _buildTemplate = async (
     buildParams: PackageEntityBuildParams
   ): Promise<PackageEntityBuildResponse> => {
     const { hostedBy, lessonAmount, isOffering, packageType, packageDurations } = buildParams;

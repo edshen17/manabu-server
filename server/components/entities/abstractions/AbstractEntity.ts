@@ -25,7 +25,15 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
     return dbData;
   };
 
-  abstract build(
+  public build = (
+    buildParams: EntityBuildParams
+  ): Promise<EntityBuildResponse> | EntityBuildResponse => {
+    this._entityValidator.validate({ buildParams, userRole: 'user', validationMode: 'create' });
+    const builtEntity = this._buildTemplate(buildParams);
+    return builtEntity;
+  };
+
+  protected abstract _buildTemplate(
     buildParams: EntityBuildParams
   ): Promise<EntityBuildResponse> | EntityBuildResponse;
 

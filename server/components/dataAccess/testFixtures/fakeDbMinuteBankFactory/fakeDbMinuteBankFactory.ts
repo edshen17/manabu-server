@@ -22,9 +22,8 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
-      hostedBy: fakeTeacher._id,
-      reservedBy: fakeUser._id,
-      minuteBank: 0,
+      hostedBy: fakeTeacher._id.toString(),
+      reservedBy: fakeUser._id.toString(),
     };
     return fakeBuildParams;
   };

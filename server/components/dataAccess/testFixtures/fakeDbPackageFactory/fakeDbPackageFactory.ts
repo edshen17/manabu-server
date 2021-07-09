@@ -21,7 +21,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   protected _createFakeBuildParams = async (): Promise<PackageEntityBuildParams> => {
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
-      hostedBy: fakeUser._id,
+      hostedBy: fakeUser._id.toString(),
       lessonAmount: 5,
       packageType: 'light',
       isOffering: true,
@@ -43,7 +43,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   private _createFakePackages = async (buildParams: { hostedBy: string }) => {
     const { hostedBy } = buildParams;
     const lightPackage = await this._entity.build({
-      hostedBy,
+      hostedBy: hostedBy,
       lessonAmount: 5,
       packageType: 'light',
       isOffering: true,

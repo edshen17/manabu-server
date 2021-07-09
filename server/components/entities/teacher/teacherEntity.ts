@@ -23,12 +23,7 @@ class TeacherEntity extends AbstractEntity<
   TeacherEntityBuildParams,
   TeacherEntityBuildResponse
 > {
-  public build = (buildParams: TeacherEntityBuildParams): TeacherEntityBuildResponse => {
-    const teacherEntity = this._buildTeacherEntity(buildParams);
-    return teacherEntity;
-  };
-
-  private _buildTeacherEntity = (buildParams: { userId: string }): TeacherEntityBuildResponse => {
+  protected _buildTemplate = (buildParams: { userId: string }): TeacherEntityBuildResponse => {
     const { userId } = buildParams;
     const teacherEntity = Object.freeze({
       userId,

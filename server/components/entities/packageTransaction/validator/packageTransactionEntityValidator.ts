@@ -16,7 +16,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       remainingReschedules: this._joi.number().min(0).max(5),
       lessonLanguage: this._joi.string().max(5),
       isSubscription: this._joi.boolean(),
-      methodData: this._joi.object({
+      paymentMethodData: this._joi.object({
         method: this._joi.string().max(256),
         paymentId: this._joi.string().alphanum().max(256),
       }),

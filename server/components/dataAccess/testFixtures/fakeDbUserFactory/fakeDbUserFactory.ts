@@ -23,14 +23,14 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbUser();
     const fakeDbTeacher = await this._fakeDbTeacherFactory.createFakeDbData({
-      userId: fakeDbUser._id,
+      userId: fakeDbUser._id.toString(),
     });
     const fakeDbPackages = await this._fakeDbPackageFactory.createFakePackages({
-      hostedBy: fakeDbUser._id,
+      hostedBy: fakeDbUser._id.toString(),
     });
 
     const fakeDbUserData = await this._dbService.findById({
-      _id: fakeDbUser._id,
+      _id: fakeDbUser._id.toString(),
       dbServiceAccessOptions: this._dbServiceAccessOptions,
     });
     return fakeDbUserData;
@@ -45,7 +45,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
     const fakeBuildParams = {
       name: this._faker.name.findName(),
       email: this._faker.internet.email(),
-      password: `${this._faker.internet.password()}A1!`,
+      password: `${this._faker.internet.password()}StrongP@ssW0rd!`,
       profileImageUrl: this._faker.image.imageUrl(),
       contactMethods: [
         {

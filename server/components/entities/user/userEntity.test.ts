@@ -19,18 +19,22 @@ describe('user entity', () => {
       it('should get the correct data provided good input', () => {
         defaultTestUserEntityParams.email = 'test@gmail.com';
         const testEntity = userEntity.build(defaultTestUserEntityParams);
-        expect(testEntity.name).to.equal('test');
-        expect(testEntity.password).to.not.equal('pass');
-        expect(testEntity.email).to.equal('test@gmail.com');
-        expect(testEntity.profileImageUrl).to.equal('');
-        expect(testEntity.verificationToken).to.not.equal('');
+        if ('name' in testEntity) {
+          expect(testEntity.name).to.equal('test');
+          expect(testEntity.password).to.not.equal('pass');
+          expect(testEntity.email).to.equal('test@gmail.com');
+          expect(testEntity.profileImageUrl).to.equal('');
+          expect(testEntity.verificationToken).to.not.equal('');
+        }
       });
       it('should have an undefined password property if no password was given', () => {
         const testEntity = userEntity.build({
           name: 'test',
           email: 'test@gmail.com',
         });
-        expect(testEntity.password).to.equal(undefined);
+        if ('name' in testEntity) {
+          expect(testEntity.password).to.equal(undefined);
+        }
       });
     });
     context('invalid inputs', () => {});

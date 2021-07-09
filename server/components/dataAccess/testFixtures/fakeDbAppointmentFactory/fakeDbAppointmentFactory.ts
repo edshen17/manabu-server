@@ -23,7 +23,7 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
     const fakeBuildParams = {
       hostedBy: fakePackageTransaction.hostedBy.toString(),
       reservedBy: fakePackageTransaction.reservedBy.toString(),
-      packageTransactionId: fakePackageTransaction._id,
+      packageTransactionId: fakePackageTransaction._id.toString(),
       from: new Date(),
       to: new Date(),
     };

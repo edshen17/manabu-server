@@ -21,7 +21,6 @@ import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBa
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity, PackageEntityBuildParams } from '../../../entities/package/packageEntity';
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
-import { QueryStringHandler } from '../../utils/queryStringHandler/queryStringHandler';
 
 type CreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
@@ -39,6 +38,7 @@ type CreateUserUsecaseInitParams = {
   signJwt: any;
   emailHandler: EmailHandler;
   makeRedirectPathBuilder: RedirectPathBuilder;
+  cloneDeep: any;
 };
 
 type CookieData = {
@@ -76,6 +76,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
   private _redirectPathBuilder!: RedirectPathBuilder;
+  private _cloneDeep!: any;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -127,7 +128,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
-    const joinedUserData = JSON.parse(JSON.stringify(savedDbUser));
+    const joinedUserData = this._cloneDeep(savedDbUser);
     const teacherData = await this._createDbTeacher(savedDbUser, dbServiceAccessOptions);
     const packages = await this._createDbTeacherPackages(savedDbUser, dbServiceAccessOptions);
 
@@ -145,7 +146,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherDoc & { packages?: PackageDoc[] }> => {
-    const userId = savedDbUser._id;
+    const userId = savedDbUser._id.toString();
     const modelToInsert = this._teacherEntity.build({ userId });
     const savedDbTeacher = await this._teacherDbService.insert({
       modelToInsert,
@@ -177,7 +178,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const packagesToInsert: any[] = [];
     defaultPackages.forEach(async (pkg) => {
       const packageProperties: PackageEntityBuildParams = {
-        hostedBy: savedDbUser._id,
+        hostedBy: savedDbUser._id.toString(),
         lessonAmount: pkg.lessonAmount,
         packageType: pkg.type,
         isOffering: true,
@@ -204,7 +205,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   ): Promise<PackageTransactionDoc> => {
     const modelToInsert = await this._packageTransactionEntity.build({
       hostedBy: process.env.MANABU_ADMIN_ID!,
-      reservedBy: savedDbUser._id,
+      reservedBy: savedDbUser._id.toString(),
       packageId: process.env.MANABU_ADMIN_PKG_ID!,
       reservationLength: 60,
       remainingAppointments: 1,
@@ -230,7 +231,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   ): Promise<MinuteBankDoc> => {
     const modelToInsert = await this._minuteBankEntity.build({
       hostedBy: process.env.MANABU_ADMIN_ID!,
-      reservedBy: savedDbUser._id,
+      reservedBy: savedDbUser._id.toString(),
     });
     const newMinuteBank = await this._minuteBankDbService.insert({
       modelToInsert,
@@ -244,7 +245,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<TeacherBalanceDoc> => {
     const modelToInsert = await this._teacherBalanceEntity.build({
-      userId: savedDbUser._id,
+      userId: savedDbUser._id.toString(),
     });
     const newTeacherBalance = this._teacherBalanceDbService.insert({
       modelToInsert,
@@ -307,7 +308,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { role, name } = savedDbUser;
     const token = this._signJwt(
       {
-        _id: savedDbUser._id,
+        _id: savedDbUser._id.toString(),
         role,
         name,
       },
@@ -350,6 +351,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       signJwt,
       emailHandler,
       makeRedirectPathBuilder,
+      cloneDeep,
     } = usecaseInitParams;
     this._userEntity = await makeUserEntity;
     this._packageEntity = await makePackageEntity;
@@ -366,6 +368,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
     this._redirectPathBuilder = makeRedirectPathBuilder;
+    this._cloneDeep = cloneDeep;
     return this;
   };
 }

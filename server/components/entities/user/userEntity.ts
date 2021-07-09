@@ -50,13 +50,7 @@ class UserEntity extends AbstractEntity<
   private _cryptoRandomString!: any;
   private _signJwt!: any;
 
-  public build = (buildParams: UserEntityBuildParams): UserEntityBuildResponse => {
-    this._entityValidator.validate({ buildParams, userRole: 'user', validationMode: 'create' });
-    const userEntity = this._buildUserEntity(buildParams);
-    return userEntity;
-  };
-
-  private _buildUserEntity = (buildParams: UserEntityBuildParams): UserEntityBuildResponse => {
+  protected _buildTemplate = (buildParams: UserEntityBuildParams): UserEntityBuildResponse => {
     const { name, email, password, profileImageUrl, contactMethods } = buildParams || {};
     const encryptedPassword = this._encryptPassword(password);
     const verificationToken = this._createVerificationToken(name, email);

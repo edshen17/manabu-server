@@ -25,8 +25,8 @@ before(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
-    hostedBy: fakeTeacher._id,
-    reservedBy: fakeUser._id,
+    hostedBy: fakeTeacher._id.toString(),
+    reservedBy: fakeUser._id.toString(),
   });
   iHttpRequestBuilder = makeIHttpRequestBuilder;
 });
@@ -36,7 +36,7 @@ describe('getMinuteBankController', () => {
     it('should get the minute bank (related party -- hostedBy)', async () => {
       const getMinuteBankHttpRequest = iHttpRequestBuilder
         .currentAPIUser({
-          userId: fakeUser._id,
+          userId: fakeUser._id.toString(),
           role: fakeUser.role,
         })
         .path('/self/minuteBanks')
@@ -52,7 +52,7 @@ describe('getMinuteBankController', () => {
     it('should get the minute bank (related party -- reservedBy)', async () => {
       const getMinuteBankHttpRequest = iHttpRequestBuilder
         .currentAPIUser({
-          userId: fakeTeacher._id,
+          userId: fakeTeacher._id.toString(),
           role: fakeTeacher.role,
         })
         .path('/self/minuteBanks')

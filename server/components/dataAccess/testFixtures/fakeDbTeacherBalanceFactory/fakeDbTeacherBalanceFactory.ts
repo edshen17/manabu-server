@@ -21,7 +21,7 @@ class FakeDbTeacherBalanceFactory extends AbstractFakeDbDataFactory<
   protected _createFakeBuildParams = async (): Promise<TeacherBalanceEntityBuildParams> => {
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
-      userId: fakeUser._id,
+      userId: fakeUser._id.toString(),
     };
     return fakeBuildParams;
   };

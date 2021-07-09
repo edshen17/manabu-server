@@ -13,9 +13,11 @@ describe('teacherBalance entity', () => {
     context('given valid inputs', () => {
       it('should return given inputs', () => {
         const testTeacherBalance = teacherBalanceEntity.build({
-          userId: 'some userId',
+          userId: '605c5befd5eae20015bea84a',
         });
-        expect(testTeacherBalance.userId).to.equal('some userId');
+        if ('userId' in testTeacherBalance) {
+          expect(testTeacherBalance.userId.toString()).to.equal('605c5befd5eae20015bea84a');
+        }
       });
     });
   });
