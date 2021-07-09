@@ -8,12 +8,13 @@ type TeacherEntityBuildResponse = {
   userId: string;
   teachingLanguages: { language: string; level: string }[];
   alsoSpeaks: { language: string; level: string }[];
-  introductionVideo: string;
-  isApproved: boolean;
+  introductionVideoUrl: string;
+  applicationStatus: string;
   isHidden: boolean;
   teacherType: string;
-  licensePath: string;
+  licensePathUrl: string;
   hourlyRate: { amount: number; currency: string };
+  tags: string[];
   lessonCount: number;
   studentCount: number;
 };
@@ -29,12 +30,13 @@ class TeacherEntity extends AbstractEntity<
       userId,
       teachingLanguages: [],
       alsoSpeaks: [],
-      introductionVideo: '',
-      isApproved: false,
+      introductionVideoUrl: '',
+      applicationStatus: 'pending',
       isHidden: false,
       teacherType: 'unlicensed',
-      licensePath: '',
+      licensePathUrl: '',
       hourlyRate: { amount: 35, currency: 'SGD' },
+      tags: [],
       lessonCount: 0,
       studentCount: 0,
     });

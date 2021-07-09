@@ -30,7 +30,7 @@ describe('editTeacherUsecase', () => {
           })
           .routeData({
             body: {
-              licensePath: 'new license path',
+              licensePathUrl: 'new license path',
             },
             params: {
               uId: fakeTeacher._id,
@@ -40,7 +40,7 @@ describe('editTeacherUsecase', () => {
           .build();
         const editTeacherRes = await editTeacherUsecase.makeRequest(buildEditTeacherControllerData);
         if ('user' in editTeacherRes) {
-          expect(editTeacherRes.user.teacherData.licensePath).to.equal('new license path');
+          expect(editTeacherRes.user.teacherData.licensePathUrl).to.equal('new license path');
         }
       });
 
@@ -99,7 +99,7 @@ describe('editTeacherUsecase', () => {
             })
             .routeData({
               body: {
-                licensePath: 'new license path',
+                licensePathUrl: 'new license path',
               },
               params: {
                 uId: fakeTeacher._id,

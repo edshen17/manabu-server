@@ -78,7 +78,7 @@ describe('userDbService', () => {
               });
               expect(findByIdTeacher).to.have.property('teacherData');
               expect(findByIdTeacher.teacherData).to.have.property('packages');
-              expect(findByIdTeacher.teacherData).to.not.have.property('licensePath');
+              expect(findByIdTeacher.teacherData).to.not.have.property('licensePathUrl');
               expect(findByIdTeacher).to.have.property('teacherAppPending');
               expect(findByIdTeacher).to.not.have.property('email');
               expect(findByIdTeacher).to.not.have.property('password');
@@ -107,7 +107,7 @@ describe('userDbService', () => {
                 _id: fakeTeacher._id,
                 dbServiceAccessOptions,
               });
-              expect(findByIdTeacher.teacherData).to.have.property('licensePath');
+              expect(findByIdTeacher.teacherData).to.have.property('licensePathUrl');
             });
           });
           context('overriding default select view', () => {
@@ -129,7 +129,7 @@ describe('userDbService', () => {
               _id: fakeTeacher._id,
               dbServiceAccessOptions,
             });
-            expect(findByIdTeacher.teacherData).to.have.property('licensePath');
+            expect(findByIdTeacher.teacherData).to.have.property('licensePathUrl');
             expect(findByIdTeacher).to.have.property('email');
             expect(findByIdTeacher).to.have.property('settings');
             expect(findByIdTeacher).to.have.property('contactMethods');
@@ -250,7 +250,7 @@ describe('userDbService', () => {
               updateParams: { profileImageUrl: 'updated image' },
               dbServiceAccessOptions,
             });
-            expect(updatedTeacher.teacherData).to.have.property('licensePath');
+            expect(updatedTeacher.teacherData).to.have.property('licensePathUrl');
             expect(updatedTeacher.profileImageUrl).to.equal('updated image');
             expect(updatedTeacher).to.have.property('email');
             expect(updatedTeacher).to.have.property('settings');

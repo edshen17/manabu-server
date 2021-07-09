@@ -70,13 +70,13 @@ describe('teacherDbService', () => {
             it('should find the teacher and return an unrestricted view', async () => {
               dbServiceAccessOptions.isSelf = true;
               const findByIdTeacher = await getTeacher();
-              expect(findByIdTeacher).to.have.property('licensePath');
+              expect(findByIdTeacher).to.have.property('licensePathUrl');
             });
           });
           context('viewing other', () => {
             it('should find the teacher and return an restricted view', async () => {
               const findByIdTeacher = await getTeacher();
-              expect(findByIdTeacher).to.not.have.property('licensePath');
+              expect(findByIdTeacher).to.not.have.property('licensePathUrl');
             });
           });
         });
@@ -84,7 +84,7 @@ describe('teacherDbService', () => {
           it('should find the teacher and return an unrestricted view', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
             const findByIdTeacher = await getTeacher();
-            expect(findByIdTeacher).to.have.property('licensePath');
+            expect(findByIdTeacher).to.have.property('licensePathUrl');
           });
         });
       });
@@ -187,13 +187,13 @@ describe('teacherDbService', () => {
             it('should update the teacher', async () => {
               dbServiceAccessOptions.isSelf = true;
               const updatedTeacher = await updateTeacher();
-              expect(updatedTeacher).to.have.property('licensePath');
+              expect(updatedTeacher).to.have.property('licensePathUrl');
             });
           });
           context('updating other', async () => {
             it('should update the teacher', async () => {
               const updatedTeacher = await updateTeacher();
-              expect(updatedTeacher).to.not.have.property('licensePath');
+              expect(updatedTeacher).to.not.have.property('licensePathUrl');
             });
           });
         });
@@ -201,7 +201,7 @@ describe('teacherDbService', () => {
           it('should update the teacher', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
             const updatedTeacher = await updateTeacher();
-            expect(updatedTeacher).to.have.property('licensePath');
+            expect(updatedTeacher).to.have.property('licensePathUrl');
           });
         });
       });

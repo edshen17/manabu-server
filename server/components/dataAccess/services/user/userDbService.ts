@@ -104,7 +104,7 @@ class UserDbService
     });
 
     if (teacherData) {
-      userCopy.teacherAppPending = !teacherData.isApproved;
+      userCopy.teacherAppPending = teacherData.applicationStatus == 'pending';
       userCopy.teacherData = teacherData;
       userCopy.teacherData.packages = packages;
     }

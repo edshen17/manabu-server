@@ -42,6 +42,7 @@ describe('createUserController', () => {
             isTeacherApp: true,
           },
         });
+        console.log(state, 'here');
         const query = queryStringHandler.parseQueryString(state);
         const createUserHttpRequest = iHttpRequestBuilder
           .body({
@@ -55,7 +56,6 @@ describe('createUserController', () => {
         const createUserRes = await createUserController.makeRequest(createUserHttpRequest);
         expect(createUserRes.statusCode).to.equal(201);
         if ('user' in createUserRes.body) {
-          console.log(createUserRes);
           expect(createUserRes.body.user).to.have.property('teacherData');
           expect(createUserRes.body).to.have.property('cookies');
         }

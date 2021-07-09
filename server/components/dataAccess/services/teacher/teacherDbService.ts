@@ -12,7 +12,7 @@ class TeacherDbService
     super();
     this._dbModelViews = {
       defaultView: {
-        licensePath: 0,
+        licensePathUrl: 0,
       },
       adminView: {},
       selfView: {},

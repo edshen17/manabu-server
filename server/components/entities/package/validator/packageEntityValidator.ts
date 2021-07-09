@@ -12,6 +12,7 @@ class PackageEntityValidator extends AbstractEntityValidator {
       isOffering: this._joi.boolean(),
       packageType: this._joi.string().valid('light', 'moderate', 'mainichi', 'custom'),
       packageDurations: this._joi.array().items(this._joi.number().valid(30, 60, 90, 120)).unique(),
+      tags: this._joi.array().items(this._joi.string().max(100)).unique(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedBy: this._joi.string().forbidden(),

@@ -84,7 +84,7 @@ describe('createUserUsecase', () => {
           const savedDbUser = createUserRes.user;
           expect(savedDbUser).to.have.property('settings');
           expect(savedDbUser).to.not.have.property('password');
-          expect(savedDbUser.teacherData).to.have.property('licensePath');
+          expect(savedDbUser.teacherData).to.have.property('licensePathUrl');
         });
       });
     });

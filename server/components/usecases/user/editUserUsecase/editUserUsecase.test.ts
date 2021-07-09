@@ -51,7 +51,7 @@ describe('editUserUsecase', () => {
       expect(savedDbUser).to.have.property('email');
       expect(savedDbUser).to.have.property('settings');
       expect(savedDbUser).to.have.property('contactMethods');
-      expect(savedDbUser.teacherData).to.have.property('licensePath');
+      expect(savedDbUser.teacherData).to.have.property('licensePathUrl');
       expect(savedDbUser).to.not.have.property('password');
       expect(savedDbUser).to.not.have.property('verificationToken');
     };

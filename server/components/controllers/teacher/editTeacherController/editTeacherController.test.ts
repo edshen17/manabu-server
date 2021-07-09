@@ -34,12 +34,12 @@ describe('editTeacherController', () => {
         })
         .params({ uId: fakeTeacher._id })
         .body({
-          licensePath: 'new license path',
+          licensePathUrl: 'new license path',
         })
         .build();
       const editTeacherRes = await editTeacherController.makeRequest(editTeacherHttpRequest);
       if ('user' in editTeacherRes.body) {
-        expect(editTeacherRes.body.user.teacherData.licensePath).to.equal('new license path');
+        expect(editTeacherRes.body.user.teacherData.licensePathUrl).to.equal('new license path');
         expect(editTeacherRes.statusCode).to.equal(200);
       }
     });
