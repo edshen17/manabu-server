@@ -1,13 +1,16 @@
 import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { IUsecase } from '../../usecases/abstractions/IUsecase';
 import { ControllerResponse, IController } from './IController';
+import { QueryStringHandler } from '../../usecases/utils/queryStringHandler/queryStringHandler';
 
 type ControllerParams = { successStatusCode: number; errorStatusCode: number };
 
 abstract class AbstractController<UsecaseResponse> implements IController<UsecaseResponse> {
   protected _usecase!: IUsecase<any, UsecaseResponse>;
+  protected _queryStringHandler!: QueryStringHandler;
   protected _successStatusCode!: number;
   protected _errorStatusCode!: number;
+
   constructor(props: ControllerParams) {
     const { successStatusCode, errorStatusCode } = props;
     this._successStatusCode = successStatusCode;
@@ -37,7 +40,8 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   };
 
   private _awaitUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
-    const { currentAPIUser, path, params, body, query } = httpRequest;
+    const { currentAPIUser, path, params, body } = httpRequest;
+    const query = this._queryStringHandler.decodeQueryStringObj(httpRequest.query);
     const controllerData = {
       currentAPIUser,
       endpointPath: path,
@@ -49,9 +53,11 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
 
   public init = async (props: {
     makeUsecase: Promise<IUsecase<any, UsecaseResponse>>;
+    makeQueryStringHandler: QueryStringHandler;
   }): Promise<this> => {
-    const { makeUsecase } = props;
+    const { makeUsecase, makeQueryStringHandler } = props;
     this._usecase = await makeUsecase;
+    this._queryStringHandler = makeQueryStringHandler;
     return this;
   };
 }

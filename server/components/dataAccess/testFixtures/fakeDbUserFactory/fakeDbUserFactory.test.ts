@@ -16,7 +16,7 @@ describe('fakeDbUserFactory', () => {
     it('should create a fake db user with the given properties', async () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbData({
         name: 'test',
-        password: 'password',
+        password: 'St0nGP@ssword!',
         email: 'test@email.com',
       });
       expect(fakeUser.name).to.equal('test');

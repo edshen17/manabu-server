@@ -39,7 +39,6 @@ type CreateUserUsecaseInitParams = {
   signJwt: any;
   emailHandler: EmailHandler;
   makeRedirectPathBuilder: RedirectPathBuilder;
-  makeQueryStringHandler: QueryStringHandler;
 };
 
 type CookieData = {
@@ -77,7 +76,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
   private _redirectPathBuilder!: RedirectPathBuilder;
-  private _queryStringHandler!: QueryStringHandler;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -89,13 +87,13 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreateUserUsecaseResponse> => {
     const { body, dbServiceAccessOptions, query } = props;
-    const { isTeacherApp } = body || {};
+    const { state } = query || {};
+    const { isTeacherApp } = state || {};
     const userInstance = this._userEntity.build(body);
     let savedDbUser = await this._createDbUser(userInstance, dbServiceAccessOptions);
     if (isTeacherApp) {
       savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
     }
-
     if (process.env.NODE_ENV == 'production' && !savedDbUser.isEmailVerified) {
       this._sendVerificationEmail(userInstance);
       this._sendInternalEmail(userInstance, isTeacherApp);
@@ -104,7 +102,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const redirectPath = this._redirectPathBuilder
       .host('client')
       .endpointPath('/dashboard')
-      .stringifyQueryStrings(query)
+      .stringifyQueryStringObj(query)
       .build();
     const usecaseRes = {
       user: savedDbUser,
@@ -352,7 +350,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       signJwt,
       emailHandler,
       makeRedirectPathBuilder,
-      makeQueryStringHandler,
     } = usecaseInitParams;
     this._userEntity = await makeUserEntity;
     this._packageEntity = await makePackageEntity;
@@ -369,7 +366,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
     this._redirectPathBuilder = makeRedirectPathBuilder;
-    this._queryStringHandler = makeQueryStringHandler;
     return this;
   };
 }

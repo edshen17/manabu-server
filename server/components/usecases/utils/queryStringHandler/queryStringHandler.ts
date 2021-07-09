@@ -23,12 +23,12 @@ class QueryStringHandler {
     return encodedQueryStringObj;
   };
 
-  public stringifyQueryStringObj = (toStringifyObj: StringKeyObject) => {
+  public stringifyQueryStringObj = (toStringifyObj: StringKeyObject): string => {
     const stringifiedQueryStrings = this._queryStringLib.stringify(toStringifyObj);
     return stringifiedQueryStrings;
   };
 
-  public decodeQueryStringObj = (encodedQueryStringObj: StringKeyObject): {} => {
+  public decodeQueryStringObj = (encodedQueryStringObj: StringKeyObject): any => {
     const decodedQueryStringObj: StringKeyObject = {};
     for (const queryString in encodedQueryStringObj) {
       const encodedQueryString = encodedQueryStringObj[queryString];
@@ -48,7 +48,7 @@ class QueryStringHandler {
     return parsedObj;
   };
 
-  public decodeQueryString = (encodedQueryString: string): {} => {
+  public decodeQueryString = (encodedQueryString: string): any => {
     const encodedQueryStringObj: StringKeyObject = this.parseQueryString(encodedQueryString);
     const decodedQueryStringObj: StringKeyObject = {};
     for (const queryString in encodedQueryStringObj) {
@@ -59,12 +59,12 @@ class QueryStringHandler {
     return decodedQueryStringObj;
   };
 
-  public parseQueryString = (queryString: string) => {
+  public parseQueryString = (queryString: string): any => {
     const parsedQueryStrings = this._queryStringLib.parse(queryString);
     return parsedQueryStrings;
   };
 
-  public init = (initParams: { queryStringLib: any }) => {
+  public init = (initParams: { queryStringLib: any }): this => {
     const { queryStringLib } = initParams;
     this._queryStringLib = queryStringLib;
     return this;

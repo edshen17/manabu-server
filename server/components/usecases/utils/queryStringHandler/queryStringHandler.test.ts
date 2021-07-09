@@ -79,7 +79,12 @@ describe('queryStringHandler', () => {
   });
   describe('decodeQueryStringObj', () => {
     context('empty query strings', () => {
-      it('should parse the query strings', () => {});
+      it('should parse the query strings', () => {
+        toQueryStringObj = {};
+        const encodedQueryString = queryStringHandler.encodeQueryStringObj(toQueryStringObj);
+        const parsedQueryString = queryStringHandler.parseQueryString(encodedQueryString);
+        decodeQueryStringObj(parsedQueryString, toQueryStringObj);
+      });
     });
     context('non-empty query strings', () => {
       it('should parse the query strings', () => {

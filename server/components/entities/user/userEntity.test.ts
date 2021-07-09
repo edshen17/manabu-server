@@ -8,7 +8,7 @@ let userEntity: UserEntity;
 before(async () => {
   defaultTestUserEntityParams = {
     name: 'test',
-    password: 'pass',
+    password: 'St0nGP@ssword!',
   };
   userEntity = await makeUserEntity;
 });

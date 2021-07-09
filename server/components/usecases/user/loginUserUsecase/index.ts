@@ -1,3 +1,4 @@
+import cloneDeep from 'clone-deep';
 import { google } from 'googleapis';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
@@ -21,6 +22,7 @@ const makeLoginUserUsecase = new LoginUserUsecase().init({
   oauth2Client,
   google,
   makeRedirectPathBuilder,
+  cloneDeep,
 });
 
 export { makeLoginUserUsecase };

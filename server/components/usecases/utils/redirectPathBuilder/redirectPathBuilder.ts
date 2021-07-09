@@ -19,6 +19,11 @@ class RedirectPathBuilder {
     };
   };
 
+  public host = (host: string): this => {
+    this._redirectExpressCallbackOptions.host = this._getHost(host);
+    return this;
+  };
+
   private _getHost = (host: string): string => {
     const hostOptions: { [key: string]: any } = {
       client: {
@@ -33,26 +38,21 @@ class RedirectPathBuilder {
     return hostOptions[host][process.env.NODE_ENV!];
   };
 
-  public host = (host: string): this => {
-    this._redirectExpressCallbackOptions.host = this._getHost(host);
-    return this;
-  };
-
   // NOTE: endpointPath string should start with / (eg. /users/someUserId)
   public endpointPath = (endpointPath: string): this => {
     this._redirectExpressCallbackOptions.endpointPath = endpointPath;
     return this;
   };
 
-  public encodeQueryStrings = (unencodedQueryStrings: {}) => {
-    const encodedQueryStrings =
-      this._queryStringHandler.encodeQueryStringObj(unencodedQueryStrings);
+  public encodeQueryStringObj = (toEncodeObj: {}) => {
+    const encodedQueryStrings = this._queryStringHandler.encodeQueryStringObj(toEncodeObj);
     this._redirectExpressCallbackOptions.queryStrings = encodedQueryStrings;
     return this;
   };
 
-  public stringifyQueryStrings = (queryStrings: {}) => {
-    const stringifiedQueryStrings = this._queryStringHandler.stringifyQueryStringObj(queryStrings);
+  public stringifyQueryStringObj = (toStringifyObj: {}) => {
+    const stringifiedQueryStrings =
+      this._queryStringHandler.stringifyQueryStringObj(toStringifyObj);
     this._redirectExpressCallbackOptions.queryStrings = stringifiedQueryStrings;
     return this;
   };

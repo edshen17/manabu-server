@@ -19,7 +19,7 @@ describe('createUserController', () => {
       const createUserHttpRequest = iHttpRequestBuilder
         .body({
           name: faker.name.findName(),
-          password: 'password',
+          password: 'St0ngP@ssword!',
           email: faker.internet.email(),
         })
         .path('/register')

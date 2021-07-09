@@ -196,7 +196,7 @@ describe('userDbService', () => {
           dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
           const entityData = {
             name: 'test',
-            email: 'someEmail@email.test',
+            email: 'someEmail@email.com',
           };
           const fakeUser = await fakeDbUserFactory.createFakeDbData(entityData);
         } catch (err) {

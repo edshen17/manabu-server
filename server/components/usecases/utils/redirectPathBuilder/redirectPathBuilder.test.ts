@@ -37,7 +37,7 @@ describe('redirectPathBuilder', () => {
             const redirectPath = redirectPathBuilder
               .host('server')
               .endpointPath('/users/register')
-              .encodeQueryStrings(defaultQueryStrings)
+              .encodeQueryStringObj(defaultQueryStrings)
               .build();
             expect(redirectPath).to.equal(
               'http://localhost:5000/api/users/register?id=c29tZSBpZA%3D%3D&state=c29tZSBzdGF0ZQ%3D%3D'
@@ -60,7 +60,7 @@ describe('redirectPathBuilder', () => {
             const redirectPath = redirectPathBuilder
               .host('client')
               .endpointPath('/dashboard')
-              .encodeQueryStrings(defaultQueryStrings)
+              .encodeQueryStringObj(defaultQueryStrings)
               .build();
             expect(redirectPath).to.equal(
               'http://localhost:8080/dashboard?id=c29tZSBpZA%3D%3D&state=c29tZSBzdGF0ZQ%3D%3D'

@@ -45,7 +45,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
     const fakeBuildParams = {
       name: this._faker.name.findName(),
       email: this._faker.internet.email(),
-      password: this._faker.internet.password(),
+      password: `${this._faker.internet.password()}A1!`,
       profileImageUrl: this._faker.image.imageUrl(),
       contactMethods: [
         {
