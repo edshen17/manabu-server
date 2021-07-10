@@ -1,5 +1,5 @@
+import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntityValidator } from '../abstractions/IEntityValidator';
 
 type OptionalUserEntityInitParams = {
   hashPassword: any;
@@ -95,14 +95,14 @@ class UserEntity extends AbstractEntity<
   };
 
   protected _initTemplate = async (
-    partialInitParams: Omit<
+    optionalInitParams: Omit<
       {
-        makeEntityValidator: IEntityValidator;
+        makeEntityValidator: AbstractEntityValidator;
       } & OptionalUserEntityInitParams,
       'makeEntityValidator'
     >
   ): Promise<void> => {
-    const { hashPassword, signJwt, cryptoRandomString } = partialInitParams;
+    const { hashPassword, signJwt, cryptoRandomString } = optionalInitParams;
     this._hashPassword = hashPassword;
     this._signJwt = signJwt;
     this._cryptoRandomString = cryptoRandomString;

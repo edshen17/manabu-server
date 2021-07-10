@@ -1,7 +1,6 @@
-import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
-
+import { AbstractEntityValidator } from '../../../validators/abstractions/AbstractEntityValidator';
 class PackageEntityValidator extends AbstractEntityValidator {
-  protected _initTemplate = () => {
+  protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
       hostedById: this._joi.string().alphanum().min(24).max(24),
       priceData: this._joi.object({

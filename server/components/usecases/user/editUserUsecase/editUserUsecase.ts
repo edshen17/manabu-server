@@ -26,6 +26,8 @@ class EditUserUsecase extends AbstractEditUsecase<
     const { role, _id, dateRegistered, verificationToken } = body || {};
     return !role && !_id && !dateRegistered && !verificationToken;
     // entity.validate({ validationType: CREATE/EDIT, userRole: , }, buildParams)
+    //this._queryValidator.validate(query)
+    //this._paramsValidator.validate(params)
   };
 
   protected _makeRequestTemplate = async (

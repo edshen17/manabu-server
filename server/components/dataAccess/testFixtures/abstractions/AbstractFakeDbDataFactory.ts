@@ -48,16 +48,16 @@ abstract class AbstractFakeDbDataFactory<
       DbDoc
     >
   ): Promise<this> => {
-    const { makeEntity, makeDbService, cloneDeep, ...partialInitParams } = initParams;
+    const { makeEntity, makeDbService, cloneDeep, ...optionalInitParams } = initParams;
     this._entity = await makeEntity;
     this._dbService = await makeDbService;
     this._cloneDeep = cloneDeep;
-    this._initTemplate(partialInitParams);
+    this._initTemplate(optionalInitParams);
     return this;
   };
 
   protected _initTemplate = (
-    partialInitParams: Omit<
+    optionalInitParams: Omit<
       {
         makeEntity:
           | Promise<IEntity<any, EntityBuildParams, EntityBuildResponse>>

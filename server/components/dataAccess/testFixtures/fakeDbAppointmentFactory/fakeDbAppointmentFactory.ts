@@ -31,9 +31,9 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
   };
 
   protected _initTemplate = async (
-    partialFakeDbDataFactoryInitParams: OptionalFakeDbAppointmentFactoryInitParams
+    optionalInitParams: OptionalFakeDbAppointmentFactoryInitParams
   ) => {
-    const { makeFakeDbPackageTransactionFactory } = partialFakeDbDataFactoryInitParams;
+    const { makeFakeDbPackageTransactionFactory } = optionalInitParams;
     this._fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   };
 }

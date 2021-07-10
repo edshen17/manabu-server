@@ -14,7 +14,7 @@ const AppointmentSchema = createSchema({
   isPast: Type.boolean({ required: true }),
   status: Type.string({
     required: true,
-    enum: ['confirmed', 'pending', 'cancelled'],
+    enum: ['pending', 'confirmed', 'cancelled'],
   }),
   cancellationReason: Type.string({ required: false }),
   packageTransactionData: Type.object({ required: true }).of({}),

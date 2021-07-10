@@ -59,11 +59,8 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
     return fakeBuildParams;
   };
 
-  protected _initTemplate = async (
-    partialFakeDbDataFactoryInitParams: OptionalFakeDbUserFactoryInitParams
-  ) => {
-    const { faker, makeFakeDbTeacherFactory, makeFakeDbPackageFactory } =
-      partialFakeDbDataFactoryInitParams;
+  protected _initTemplate = async (optionalInitParams: OptionalFakeDbUserFactoryInitParams) => {
+    const { faker, makeFakeDbTeacherFactory, makeFakeDbPackageFactory } = optionalInitParams;
     this._faker = faker;
     this._fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
     this._fakeDbPackageFactory = await makeFakeDbPackageFactory;

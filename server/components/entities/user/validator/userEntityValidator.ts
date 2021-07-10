@@ -1,7 +1,7 @@
-import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
+import { AbstractEntityValidator } from '../../../validators/abstractions/AbstractEntityValidator';
 
 class UserEntityValidator extends AbstractEntityValidator {
-  protected _initTemplate = () => {
+  protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
       name: this._joi.string().max(256),
       email: this._joi.string().email().max(256),

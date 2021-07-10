@@ -29,9 +29,9 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   };
 
   protected _initTemplate = async (
-    partialFakeDbDataFactoryInitParams: OptionalFakeDbMinuteBankFactoryInitParams
+    optionalInitParams: OptionalFakeDbMinuteBankFactoryInitParams
   ) => {
-    const { makeFakeDbUserFactory } = partialFakeDbDataFactoryInitParams || {};
+    const { makeFakeDbUserFactory } = optionalInitParams || {};
     this._fakeDbUserFactory = await makeFakeDbUserFactory;
   };
 }

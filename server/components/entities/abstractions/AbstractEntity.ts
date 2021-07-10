@@ -1,11 +1,11 @@
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
+import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { EntityInitParams, IEntity } from './IEntity';
-import { IEntityValidator } from './IEntityValidator';
 
 abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse>
   implements IEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse>
 {
-  protected _entityValidator!: IEntityValidator;
+  protected _entityValidator!: AbstractEntityValidator;
 
   protected _dbServiceAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
@@ -30,6 +30,7 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   ): Promise<EntityBuildResponse> | EntityBuildResponse => {
     this._entityValidator.validate({ buildParams, userRole: 'user', validationMode: 'create' });
     const builtEntity = this._buildTemplate(buildParams);
+    console.log('here');
     return builtEntity;
   };
 
@@ -38,16 +39,16 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   ): Promise<EntityBuildResponse> | EntityBuildResponse;
 
   public init = async (initParams: EntityInitParams<OptionalEntityInitParams>): Promise<this> => {
-    const { makeEntityValidator, ...partialInitParams } = initParams;
+    const { makeEntityValidator, ...optionalInitParams } = initParams;
     this._entityValidator = makeEntityValidator;
-    await this._initTemplate(partialInitParams);
+    await this._initTemplate(optionalInitParams);
     return this;
   };
 
   protected _initTemplate = (
-    partialInitParams: Omit<
+    optionalInitParams: Omit<
       {
-        makeEntityValidator: IEntityValidator;
+        makeEntityValidator: AbstractEntityValidator;
       } & OptionalEntityInitParams,
       'makeEntityValidator'
     >

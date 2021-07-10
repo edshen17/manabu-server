@@ -2,8 +2,8 @@ import { PackageTransactionDoc } from '../../../models/PackageTransaction';
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
+import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { IEntityValidator } from '../abstractions/IEntityValidator';
 import { UserContactMethod } from '../user/userEntity';
 
 type OptionalAppointmentEntityInitParams = {
@@ -191,14 +191,14 @@ class AppointmentEntity extends AbstractEntity<
   };
 
   protected _initTemplate = async (
-    partialInitParams: Omit<
+    optionalInitParams: Omit<
       {
-        makeEntityValidator: IEntityValidator;
+        makeEntityValidator: AbstractEntityValidator;
       } & OptionalAppointmentEntityInitParams,
       'makeEntityValidator'
     >
   ): Promise<void> => {
-    const { makeUserDbService, makePackageTransactionDbService } = partialInitParams;
+    const { makeUserDbService, makePackageTransactionDbService } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
   };
