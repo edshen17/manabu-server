@@ -11,18 +11,19 @@ type PackageEntityBuildParams = {
   lessonAmount: number;
   isOffering: boolean;
   packageType: string;
-  packageDurations: number[];
+  lessonDurations: number[];
+  packageName: string;
 };
 
-type PriceDetails = { hourlyPrice: number; currency: string };
+type PriceData = { hourlyRate: number; currency: string };
 
 type PackageEntityBuildResponse = {
   hostedById: string;
-  priceDetails: PriceDetails;
+  priceData: PriceData;
   lessonAmount: number;
   isOffering: boolean;
   packageType: string;
-  packageDurations: number[];
+  lessonDurations: number[];
 };
 
 class PackageEntity extends AbstractEntity<
@@ -35,15 +36,17 @@ class PackageEntity extends AbstractEntity<
   protected _buildTemplate = async (
     buildParams: PackageEntityBuildParams
   ): Promise<PackageEntityBuildResponse> => {
-    const { hostedById, lessonAmount, isOffering, packageType, packageDurations } = buildParams;
-    const priceDetails = await this._getPriceDetails(hostedById);
+    const { hostedById, lessonAmount, isOffering, packageType, lessonDurations, packageName } =
+      buildParams;
+    const priceData = await this._getPriceDetails(hostedById);
     const packageEntity = Object.freeze({
       hostedById,
-      priceDetails,
+      priceData,
       lessonAmount,
       isOffering,
       packageType,
-      packageDurations,
+      packageName,
+      lessonDurations,
     });
     return packageEntity;
   };
@@ -54,20 +57,20 @@ class PackageEntity extends AbstractEntity<
       _id: hostedById,
     });
     const teacherData = savedDbTeacher.teacherData;
-    let priceDetails: PriceDetails;
+    let priceData: PriceData;
     if (teacherData) {
-      const teacherHourlyRate = savedDbTeacher.teacherData.hourlyRate;
-      priceDetails = {
-        currency: teacherHourlyRate.currency!,
-        hourlyPrice: teacherHourlyRate.amount!,
+      const teacherPriceData = savedDbTeacher.teacherData.priceData;
+      priceData = {
+        currency: teacherPriceData.currency!,
+        hourlyRate: teacherPriceData.hourlyRate!,
       };
     } else {
-      priceDetails = {
+      priceData = {
         currency: 'SGD',
-        hourlyPrice: 35,
+        hourlyRate: 35,
       };
     }
-    return priceDetails;
+    return priceData;
   };
 
   protected _initTemplate = async (

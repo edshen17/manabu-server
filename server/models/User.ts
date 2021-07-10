@@ -1,5 +1,12 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 
+const UserContactMethod = {
+  methodName: Type.string({ required: true }),
+  methodAddress: Type.string({ required: true }),
+  isPrimaryMethod: Type.boolean({ required: true }),
+  methodType: Type.string({ required: true, enum: ['online', 'offline'] }),
+};
+
 const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
   email: Type.string({ required: true, index: true, unique: true }),
@@ -24,12 +31,7 @@ const UserSchema = createSchema({
     name: Type.string(),
     dateJoined: Type.date(),
   }),
-  contactMethods: Type.array({ required: true }).of({
-    methodName: Type.string({ required: true }),
-    methodAddress: Type.string({ required: true }),
-    isPrimaryMethod: Type.boolean({ required: true }),
-    methodType: Type.string({ required: true }),
-  }),
+  contactMethods: Type.array({ required: true }).of(UserContactMethod),
   isEmailVerified: Type.boolean({ required: true }),
   verificationToken: Type.string({ required: true }),
 });
@@ -37,4 +39,4 @@ const UserSchema = createSchema({
 const User = typedModel('User', UserSchema);
 type UserDoc = ExtractDoc<typeof UserSchema>;
 
-export { User, UserSchema, UserDoc };
+export { User, UserSchema, UserDoc, UserContactMethod };

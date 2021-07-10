@@ -25,12 +25,12 @@ describe('fakeDbPackageTransaction', () => {
         hostedById: fakeTeacher._id.toString(),
         reservedById: fakeUser._id.toString(),
         packageId: fakeTeacher.teacherData.packages[0]._id.toString(),
-        reservationLength: 60,
-        transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+        lessonDuration: 60,
+        priceData: { currency: 'SGD', subTotal: 0, total: 0 },
         remainingAppointments: 0,
         lessonLanguage: 'ja',
         isSubscription: false,
-        paymentMethodData: {},
+        paymentData: {},
       });
       expect(fakePackageTransaction._id.toString().length).to.equal(24);
     });

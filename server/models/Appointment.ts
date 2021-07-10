@@ -1,5 +1,5 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { UserSchema } from './User';
+import { UserContactMethod, UserSchema } from './User';
 import { PackageTransactionSchema } from './PackageTransaction';
 
 const AppointmentSchema = createSchema({
@@ -9,8 +9,8 @@ const AppointmentSchema = createSchema({
     'PackageTransaction',
     PackageTransactionSchema
   ),
-  from: Type.date({ required: true }),
-  to: Type.date({ required: true }),
+  startTime: Type.date({ required: true }),
+  endTime: Type.date({ required: true }),
   isPast: Type.boolean({ required: true }),
   status: Type.string({
     required: true,
@@ -18,7 +18,14 @@ const AppointmentSchema = createSchema({
   }),
   cancellationReason: Type.string({ required: false }),
   packageTransactionData: Type.object({ required: true }).of({}),
-  locationData: Type.object({ required: true }).of({}),
+  locationData: Type.object({ required: true }).of({
+    locationName: Type.string({ required: true }),
+    locationType: Type.string({ required: true }),
+    matchedContactMethod: Type.object().of({
+      hostedByContactMethod: UserContactMethod,
+      reservedByContactMethod: UserContactMethod,
+    }),
+  }),
 });
 
 const Appointment = typedModel('Appointment', AppointmentSchema);

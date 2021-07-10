@@ -23,9 +23,10 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
     const fakeBuildParams = {
       hostedById: fakeUser._id.toString(),
       lessonAmount: 5,
-      packageType: 'light',
+      packageType: 'default',
+      packageName: 'light',
       isOffering: true,
-      packageDurations: [30, 60],
+      lessonDurations: [30, 60],
     };
     return fakeBuildParams;
   };
@@ -45,23 +46,26 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
     const lightPackage = await this._entity.build({
       hostedById: hostedById,
       lessonAmount: 5,
-      packageType: 'light',
+      packageType: 'default',
+      packageName: 'light',
       isOffering: true,
-      packageDurations: [30, 60],
+      lessonDurations: [30, 60],
     });
     const moderatePackage = await this._entity.build({
       hostedById,
       lessonAmount: 12,
-      packageType: 'moderate',
+      packageType: 'default',
+      packageName: 'moderate',
       isOffering: true,
-      packageDurations: [30, 60],
+      lessonDurations: [30, 60],
     });
     const mainichiPackage = await this._entity.build({
       hostedById,
       lessonAmount: 22,
-      packageType: 'mainichi',
+      packageType: 'default',
+      packageName: 'mainichi',
       isOffering: true,
-      packageDurations: [30, 60],
+      lessonDurations: [30, 60],
     });
     return [lightPackage, moderatePackage, mainichiPackage];
   };

@@ -3,7 +3,7 @@ import { UserSchema } from './User';
 
 const PackageSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  priceDetails: Type.object({
+  priceData: Type.object({
     required: true,
   }).of({
     hourlyPrice: Type.string(),
@@ -11,13 +11,13 @@ const PackageSchema = createSchema({
   }),
   lessonAmount: Type.number({ required: true }),
   packageDesc: Type.string({ required: false }),
-  packageName: Type.string({ required: false }),
+  packageName: Type.string({ required: true }),
   isOffering: Type.boolean({ required: true }),
   packageType: Type.string({
-    enum: ['mainichi', 'moderate', 'light', 'internal'],
+    enum: ['default', 'custom'],
     required: true,
   }),
-  packageDurations: Type.array({ required: true }).of(Type.number({ required: false })),
+  lessonDurations: Type.array({ required: true }).of(Type.number({ required: false })),
   tags: Type.array({ required: false }).of(Type.string({ required: false })),
 });
 

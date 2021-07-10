@@ -14,24 +14,24 @@ type PackageTransactionEntityBuildParams = {
   hostedById: string;
   reservedById: string;
   packageId: string;
-  reservationLength: number;
-  transactionDetails: TransactionDetails;
+  lessonDuration: number;
+  priceData: PriceData;
   remainingAppointments: number;
   lessonLanguage: string;
   isSubscription: boolean;
-  paymentMethodData: PaymentMethodData;
+  paymentData: PaymentData;
 };
 
-type TransactionDetails = { currency: string; subTotal: number; total: number };
-type PaymentMethodData = { method: string; paymentId: string } | {};
+type PriceData = { currency: string; subTotal: number; total: number };
+type PaymentData = { gatewayName: string; gatewayTransactionId: string } | {};
 
 type PackageTransactionEntityBuildResponse = {
   hostedById: string;
   reservedById: string;
   packageId: string;
-  reservationLength: number;
+  lessonDuration: number;
   terminationDate: Date;
-  transactionDetails: TransactionDetails;
+  priceData: PriceData;
   remainingAppointments: number;
   lessonLanguage: string;
   isSubscription: boolean;
@@ -41,7 +41,7 @@ type PackageTransactionEntityBuildResponse = {
   packageData: PackageDoc;
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;
-  paymentMethodData: PaymentMethodData;
+  paymentData: PaymentData;
 };
 
 class PackageTransactionEntity extends AbstractEntity<
@@ -60,12 +60,12 @@ class PackageTransactionEntity extends AbstractEntity<
       hostedById,
       reservedById,
       packageId,
-      reservationLength,
-      transactionDetails,
+      lessonDuration,
+      priceData,
       remainingAppointments,
       lessonLanguage,
       isSubscription,
-      paymentMethodData,
+      paymentData,
     } = buildParams;
     const packageData =
       (await this.getDbDataById({
@@ -87,15 +87,15 @@ class PackageTransactionEntity extends AbstractEntity<
       reservedById,
       packageId,
       transactionDate: new Date(),
-      reservationLength,
-      transactionDetails,
+      lessonDuration,
+      priceData,
       terminationDate: this._dayjs().add(1, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       remainingReschedules: 5,
       lessonLanguage,
       isSubscription,
-      paymentMethodData,
+      paymentData,
       packageData,
       hostedByData,
       reservedByData,

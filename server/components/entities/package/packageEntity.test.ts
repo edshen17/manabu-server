@@ -23,15 +23,16 @@ context('package entity', () => {
           hostedById: fakeUser._id.toString(),
           lessonAmount: 5,
           isOffering: true,
-          packageDurations: [],
-          packageType: 'light',
+          lessonDurations: [],
+          packageName: 'light',
+          packageType: 'default',
         });
         expect(fakePackage.hostedById.toString()).to.equal(fakeUser._id.toString());
         expect(fakePackage.lessonAmount).to.equal(5);
         expect(fakePackage.isOffering).to.equal(true);
-        expect(fakePackage.packageDurations.length).to.equal(0);
-        expect(fakePackage.packageType).to.equal('light');
-        expect(fakePackage.priceDetails).to.deep.equal({ currency: 'SGD', hourlyPrice: 35 });
+        expect(fakePackage.lessonDurations.length).to.equal(0);
+        expect(fakePackage.packageType).to.equal('default');
+        expect(fakePackage.priceData).to.deep.equal({ currency: 'SGD', hourlyRate: 35 });
       });
     });
     context('given invalid inputs', () => {

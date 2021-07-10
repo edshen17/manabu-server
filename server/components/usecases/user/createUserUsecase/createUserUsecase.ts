@@ -171,18 +171,19 @@ class CreateUserUsecase extends AbstractCreateUsecase<
 
   private _createDefaultTeacherPackages = async (savedDbUser: JoinedUserDoc) => {
     const defaultPackages = [
-      { type: 'mainichi', lessonAmount: 22 },
-      { type: 'moderate', lessonAmount: 12 },
-      { type: 'light', lessonAmount: 5 },
+      { name: 'mainichi', type: 'default', lessonAmount: 22 },
+      { name: 'moderate', type: 'default', lessonAmount: 12 },
+      { name: 'light', type: 'default', lessonAmount: 5 },
     ];
     const packagesToInsert: any[] = [];
     defaultPackages.forEach(async (pkg) => {
       const packageProperties: PackageEntityBuildParams = {
         hostedById: savedDbUser._id.toString(),
         lessonAmount: pkg.lessonAmount,
+        packageName: pkg.name,
         packageType: pkg.type,
         isOffering: true,
-        packageDurations: [30, 60],
+        lessonDurations: [30, 60],
       };
 
       packagesToInsert.push(
@@ -207,16 +208,16 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       hostedById: process.env.MANABU_ADMIN_ID!,
       reservedById: savedDbUser._id.toString(),
       packageId: process.env.MANABU_ADMIN_PKG_ID!,
-      reservationLength: 60,
+      lessonDuration: 60,
       remainingAppointments: 1,
-      transactionDetails: {
+      priceData: {
         currency: 'SGD',
         subTotal: 0,
         total: 0,
       },
       lessonLanguage: 'ja',
       isSubscription: false,
-      paymentMethodData: {},
+      paymentData: {},
     });
     const newPackageTransaction = await this._packageTransactionDbService.insert({
       modelToInsert,

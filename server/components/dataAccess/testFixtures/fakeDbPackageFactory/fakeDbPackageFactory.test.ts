@@ -34,11 +34,12 @@ describe('fakeDbPackageFactory', () => {
       const fakePackage = await fakeDbPackageFactory.createFakeDbData({
         hostedById: fakeTeacher._id.toString(),
         lessonAmount: 5,
-        packageType: 'light',
+        packageName: 'light',
+        packageType: 'default',
         isOffering: true,
-        packageDurations: [30, 60],
+        lessonDurations: [30, 60],
       });
-      expect(fakePackage.packageType).to.equal('light');
+      expect(fakePackage.packageType).to.equal('default');
     });
   });
 });

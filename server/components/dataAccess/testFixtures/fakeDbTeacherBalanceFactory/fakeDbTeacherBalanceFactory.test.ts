@@ -24,10 +24,8 @@ describe('fakeDbTeacherBalanceFactory', () => {
       const fakeTeacherBalance = await fakeDbTeacherBalanceFactory.createFakeDbData({
         userId: fakeTeacher._id.toString(),
       });
-      expect(fakeTeacherBalance.balanceDetails).to.deep.equal({
-        balance: 0,
-        currency: 'SGD',
-      });
+      expect(fakeTeacherBalance.balance).to.equal(0);
+      expect(fakeTeacherBalance.currency).to.equal('SGD');
     });
   });
 });

@@ -6,10 +6,8 @@ type TeacherBalanceEntityBuildParams = { userId: string };
 
 type TeacherBalanceEntityBuildResponse = {
   userId: string;
-  balanceDetails: {
-    balance: number;
-    currency: string;
-  };
+  balance: number;
+  currency: string;
 };
 
 class TeacherBalanceEntity extends AbstractEntity<
@@ -21,10 +19,8 @@ class TeacherBalanceEntity extends AbstractEntity<
     const { userId } = buildParams;
     const teacherBalanceEntity = Object.freeze({
       userId,
-      balanceDetails: {
-        balance: 0,
-        currency: 'SGD',
-      },
+      balance: 0,
+      currency: 'SGD',
     });
     return teacherBalanceEntity;
   };

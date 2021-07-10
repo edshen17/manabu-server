@@ -6,8 +6,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       hostedById: this._joi.string().alphanum().min(24).max(24),
       reservedById: this._joi.string().alphanum().min(24).max(24),
       packageId: this._joi.string().alphanum().min(24).max(24),
-      reservationLength: this._joi.number().min(30).max(120),
-      transactionDetails: this._joi.object({
+      lessonDuration: this._joi.number().min(30).max(120),
+      priceData: this._joi.object({
         currency: this._joi.string().max(5),
         subTotal: this._joi.number().min(0),
         total: this._joi.number().min(0),
@@ -16,17 +16,17 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       remainingReschedules: this._joi.number().min(0).max(5),
       lessonLanguage: this._joi.string().max(5),
       isSubscription: this._joi.boolean(),
-      paymentMethodData: this._joi.object({
-        method: this._joi.string().max(256),
-        paymentId: this._joi.string().alphanum().max(256),
+      paymentData: this._joi.object({
+        gatewayName: this._joi.string().max(256),
+        gatewayTransactionId: this._joi.string().alphanum().max(256),
       }),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi.string().forbidden(),
       reservedById: this._joi.string().forbidden(),
       packageId: this._joi.string().forbidden(),
-      reservationLength: this._joi.number().forbidden(),
-      transactionDetails: this._joi.object().forbidden(),
+      lessonDuration: this._joi.number().forbidden(),
+      priceData: this._joi.object().forbidden(),
       remainingAppointments: this._joi.number().forbidden(),
       remainingReschedules: this._joi.number().forbidden(),
       lessonLanguage: this._joi.string().forbidden(),

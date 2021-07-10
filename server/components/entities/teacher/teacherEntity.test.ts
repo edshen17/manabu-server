@@ -16,7 +16,7 @@ describe('teacher entity', () => {
         if ('userId' in fakeTeacher) {
           expect(fakeTeacher.userId.toString()).to.equal('60e85b368b7a302a040981ce');
           expect(fakeTeacher.applicationStatus).to.equal('pending');
-          expect(fakeTeacher.hourlyRate).to.deep.equal({ amount: 35, currency: 'SGD' });
+          expect(fakeTeacher.priceData).to.deep.equal({ hourlyRate: 35, currency: 'SGD' });
         }
       });
     });

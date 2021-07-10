@@ -148,11 +148,11 @@ describe('teacherBalanceService', () => {
     const updateTeacherBalance = async () => {
       const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacherBalance._id },
-        updateParams: { 'balanceDetails.balance': 5 },
+        updateParams: { balance: 5 },
         dbServiceAccessOptions,
       });
       expect(updatedTeacherBalance).to.not.deep.equal(fakeTeacherBalance);
-      expect(updatedTeacherBalance.balanceDetails.balance).to.equal(5);
+      expect(updatedTeacherBalance.balance).to.equal(5);
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
@@ -299,13 +299,13 @@ describe('teacherBalanceDbService', () => {
   });
   describe('update', () => {
     it('should update the teacherBalanceTransaction', async () => {
-      expect(fakeTeacherBalance.balanceDetails.balance).to.equal(0);
+      expect(fakeTeacherBalance.balance).to.equal(0);
       const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
         searchQuery: { userId: fakeTeacher._id },
-        updateParams: { 'balanceDetails.balance': 10 },
+        updateParams: { balance: 10 },
         dbServiceAccessOptions,
       });
-      expect(updatedTeacherBalance.balanceDetails.balance).to.equal(10);
+      expect(updatedTeacherBalance.balance).to.equal(10);
     });
   });
 });

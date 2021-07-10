@@ -25,8 +25,8 @@ const TeacherSchema = createSchema({
     index: true,
   }),
   licensePathUrl: Type.string({ required: false }),
-  hourlyRate: Type.object({ required: true }).of({
-    amount: Type.number(),
+  priceData: Type.object({ required: true }).of({
+    hourlyRate: Type.number(),
     currency: Type.string(),
   }),
   tags: Type.array({ required: true }).of(Type.string({ required: false })),

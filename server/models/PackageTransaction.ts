@@ -7,8 +7,8 @@ const PackageTransactionSchema = createSchema({
   reservedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   packageId: Type.ref(Type.objectId({ required: true, index: true })).to('Package', PackageSchema),
   transactionDate: Type.date({ default: Date.now }),
-  reservationLength: Type.number({ required: true }),
-  transactionDetails: Type.object({ required: true }).of({
+  lessonDuration: Type.number({ required: true }),
+  priceData: Type.object({ required: true }).of({
     currency: Type.string(),
     subTotal: Type.number(),
     total: Type.number(),
@@ -20,8 +20,8 @@ const PackageTransactionSchema = createSchema({
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
   paymentData: Type.object({ required: false }).of({
-    methodName: Type.string(),
-    paymentId: Type.string(),
+    gatewayName: Type.string(),
+    gatewayTransactionId: Type.string(),
   }),
   packageData: Type.object({ required: true }).of({}),
   hostedByData: Type.object({ required: true }).of({}),

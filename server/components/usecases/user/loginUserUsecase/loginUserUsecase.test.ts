@@ -23,7 +23,7 @@ describe('loginUserUsecase', () => {
       it('should log the user in', async () => {
         const fakeUserEntityData = {
           name: faker.name.findName(),
-          password: faker.internet.password(),
+          password: `${faker.internet.password()}A1!`,
           email: faker.internet.email(),
         };
         const fakeUser = await fakeDbUserFactory.createFakeDbData(fakeUserEntityData);

@@ -28,9 +28,10 @@ beforeEach(async () => {
   fakePackage = await fakeDbPackageFactory.createFakeDbData({
     hostedById: fakeTeacher._id.toString(),
     lessonAmount: 5,
-    packageType: 'light',
+    packageType: 'default',
+    packageName: 'light',
     isOffering: true,
-    packageDurations: [30, 60],
+    lessonDurations: [30, 60],
   });
 });
 

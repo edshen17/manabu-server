@@ -26,24 +26,24 @@ describe('appointmentEntity', () => {
           hostedById: fakeHostedBy._id.toString(),
           reservedById: fakeReservedBy._id.toString(),
           packageId: fakeHostedBy.teacherData.packages[0]._id.toString(),
-          reservationLength: 60,
-          transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
+          lessonDuration: 60,
+          priceData: { currency: 'SGD', subTotal: 0, total: 0 },
           remainingAppointments: 0,
           lessonLanguage: 'ja',
           isSubscription: false,
-          paymentMethodData: {},
+          paymentData: {},
         });
         const fakeAppointment = await appointmentEntity.build({
           hostedById: fakeHostedBy._id.toString(),
           reservedById: fakeReservedBy._id.toString(),
           packageTransactionId: fakePackageTransaction._id.toString(),
-          from: new Date(),
-          to: new Date(),
+          startTime: new Date(),
+          endTime: new Date(),
         });
         expect(fakeAppointment.hostedById.toString()).to.equal(fakeHostedBy._id.toString());
         expect(fakeAppointment.reservedById.toString()).to.equal(fakeReservedBy._id.toString());
-        expect(fakeAppointment).to.have.property('hostedByData');
-        expect(fakeAppointment).to.have.property('reservedByData');
+        expect(fakeAppointment.packageTransactionData).to.have.property('hostedByData');
+        expect(fakeAppointment.packageTransactionData).to.have.property('reservedByData');
         expect(fakeAppointment).to.have.property('packageTransactionData');
         expect(fakeAppointment).to.have.property('locationData');
       });

@@ -15,34 +15,32 @@ type AppointmentEntityBuildParams = {
   hostedById: string;
   reservedById: string;
   packageTransactionId: string;
-  from: Date;
-  to: Date;
+  startTime: Date;
+  endTime: Date;
 };
 
 type AppointmentEntityBuildResponse = {
   hostedById: string;
   reservedById: string;
   packageTransactionId: string;
-  from: Date;
-  to: Date;
+  startTime: Date;
+  endTime: Date;
   isPast: boolean;
   status: string;
   cancellationReason?: string;
-  hostedByData: any;
-  reservedByData: any;
   packageTransactionData: PackageTransactionDoc;
   locationData: LocationData;
-};
-
-type MatchedContactMethod = {
-  hostedByContactMethod: UserContactMethod;
-  reservedByContactMethod: UserContactMethod;
 };
 
 type LocationData = {
   locationName: string;
   locationType: string;
   matchedContactMethod: MatchedContactMethod;
+};
+
+type MatchedContactMethod = {
+  hostedByContactMethod: UserContactMethod;
+  reservedByContactMethod: UserContactMethod;
 };
 
 class AppointmentEntity extends AbstractEntity<
@@ -63,19 +61,20 @@ class AppointmentEntity extends AbstractEntity<
   protected _buildTemplate = async (
     buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const { hostedById, reservedById, packageTransactionId, from, to } = buildParams;
-    const { hostedByData, reservedByData, packageTransactionData, locationData } =
-      await this._getDbDataDependencies({ hostedById, reservedById, packageTransactionId });
+    const { hostedById, reservedById, packageTransactionId, startTime, endTime } = buildParams;
+    const { packageTransactionData, locationData } = await this._getDbDataDependencies({
+      hostedById,
+      reservedById,
+      packageTransactionId,
+    });
     const appointmentEntity = Object.freeze({
       hostedById,
       reservedById,
       packageTransactionId,
-      from,
-      to,
+      startTime,
+      endTime,
       isPast: false,
       status: 'pending',
-      hostedByData: hostedByData || {},
-      reservedByData: reservedByData || {},
       packageTransactionData: packageTransactionData || {},
       locationData: locationData || {},
     });

@@ -5,6 +5,7 @@ class MinuteBankEntityValidator extends AbstractEntityValidator {
     this._createValidationSchema = this._joi.object().keys({
       hostedById: this._joi.string().alphanum().min(24).max(24),
       reservedById: this._joi.string().alphanum().min(24).max(24),
+      minuteBank: this._joi.number().min(0),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi.string().forbidden(),

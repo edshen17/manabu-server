@@ -13,7 +13,7 @@ type TeacherEntityBuildResponse = {
   isHidden: boolean;
   teacherType: string;
   licensePathUrl: string;
-  hourlyRate: { amount: number; currency: string };
+  priceData: { hourlyRate: number; currency: string };
   tags: string[];
   lessonCount: number;
   studentCount: number;
@@ -35,7 +35,7 @@ class TeacherEntity extends AbstractEntity<
       isHidden: false,
       teacherType: 'unlicensed',
       licensePathUrl: '',
-      hourlyRate: { amount: 35, currency: 'SGD' },
+      priceData: { hourlyRate: 35, currency: 'SGD' },
       tags: [],
       lessonCount: 0,
       studentCount: 0,

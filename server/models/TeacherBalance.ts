@@ -3,12 +3,8 @@ import { UserSchema } from './User';
 
 const TeacherBalanceSchema = createSchema({
   userId: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  balanceDetails: Type.object({
-    required: true,
-  }).of({
-    balance: Type.number(),
-    currency: Type.string(),
-  }),
+  balance: Type.number({ required: true }),
+  currency: Type.string({ required: true }),
 });
 
 const TeacherBalance = typedModel('TeacherBalance', TeacherBalanceSchema);
