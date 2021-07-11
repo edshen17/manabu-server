@@ -4,12 +4,13 @@ type DbServiceParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: {};
   updateParams?: {};
+  updateDbDependencies?: boolean;
 };
 
 type DbServiceAccessOptions = {
   isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
-  currentAPIUserRole: string | undefined;
+  currentAPIUserRole: string;
   isSelf: boolean;
   isOverrideView?: boolean;
 };
@@ -21,7 +22,7 @@ type DbModelViews = {
   overrideView?: {};
 };
 
-interface IDbService<PartialDbServiceInitParams, DbDoc> {
+interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findById: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   findOne: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   find: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
@@ -31,13 +32,14 @@ interface IDbService<PartialDbServiceInitParams, DbDoc> {
   updateMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   init: (
-    dbServiceInitParams: {
+    initParams: {
       makeDb: () => Promise<any>;
       cloneDeep: any;
       dbModel: DbDoc;
-    } & PartialDbServiceInitParams
+    } & OptionalDbServiceInitParams
   ) => Promise<this>;
   getDbModelViews: () => DbModelViews;
+  updateManyDbDependencies: (dbData?: any) => Promise<void>;
 }
 
 export { DbServiceAccessOptions, DbServiceParams, IDbService, DbModelViews };

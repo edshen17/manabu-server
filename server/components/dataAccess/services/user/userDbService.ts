@@ -5,22 +5,23 @@ import { PackageDbService } from '../package/packageDbService';
 import { UserDoc } from '../../../../models/User';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { PackageDoc } from '../../../../models/Package';
+import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 
-type PartialUserDbServiceInitParams = {
+type OptionalUserDbServiceInitParams = {
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   comparePassword: any;
 };
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
-class UserDbService
-  extends AbstractDbService<PartialUserDbServiceInitParams, JoinedUserDoc>
-  implements IDbService<PartialUserDbServiceInitParams, JoinedUserDoc>
-{
+class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
   private _teacherDbService!: TeacherDbService;
   private _packageDbService!: PackageDbService;
   private _comparePassword!: any;
+  private _packageTransactionDbService!: PackageTransactionDbService;
+
   constructor() {
     super();
     this._dbModelViews = {
@@ -111,11 +112,51 @@ class UserDbService
     return userCopy;
   };
 
-  protected _initTemplate = async (partialDbServiceInitParams: PartialUserDbServiceInitParams) => {
-    const { makeTeacherDbService, makePackageDbService, comparePassword } =
-      partialDbServiceInitParams;
+  public updateManyDbDependencies = async (savedDbUser?: JoinedUserDoc) => {
+    if (savedDbUser) {
+      const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
+      const userDependencyData = await this.findById({
+        _id: savedDbUser._id,
+        dbServiceAccessOptions,
+      });
+      const updateDbDependencies = false;
+      const hostedByDependencies = await this._packageTransactionDbService.find({
+        searchQuery: { hostedById: savedDbUser._id },
+        dbServiceAccessOptions,
+      });
+      const reservedByDependencies = await this._packageTransactionDbService.find({
+        searchQuery: { reservedById: savedDbUser._id },
+        dbServiceAccessOptions,
+      });
+      const preUpdatePackageTransactions = [hostedByDependencies, reservedByDependencies].flat();
+      await this._packageTransactionDbService.updateMany({
+        searchQuery: { hostedById: savedDbUser._id },
+        updateParams: { hostedByData: userDependencyData },
+        dbServiceAccessOptions,
+        updateDbDependencies,
+      });
+      await this._packageTransactionDbService.updateMany({
+        searchQuery: { reservedById: savedDbUser._id },
+        updateParams: { reservedByData: userDependencyData },
+        dbServiceAccessOptions,
+        updateDbDependencies,
+      });
+      await this._packageTransactionDbService.updateManyDbDependencies(
+        preUpdatePackageTransactions
+      );
+    }
+  };
+
+  protected _initTemplate = async (partialDbServiceInitParams: OptionalUserDbServiceInitParams) => {
+    const {
+      makeTeacherDbService,
+      makePackageDbService,
+      makePackageTransactionDbService,
+      comparePassword,
+    } = partialDbServiceInitParams;
     this._teacherDbService = await makeTeacherDbService;
     this._packageDbService = await makePackageDbService;
+    this._packageTransactionDbService = await makePackageTransactionDbService;
     this._comparePassword = comparePassword;
   };
 }

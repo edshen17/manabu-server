@@ -4,21 +4,60 @@ import { JoinedUserDoc, UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
+import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
+import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
+import { makePackageTransactionDbService } from '../packageTransaction';
+import { AppointmentDbService } from '../appointment/appointmentDbService';
+import { makeAppointmentDbService } from '../appointment';
+import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
+import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
+import { AppointmentDoc } from '../../../../models/Appointment';
 
 let userDbService: UserDbService;
-let fakeDbUserFactory: FakeDbUserFactory;
+let packageTransactionDbService: PackageTransactionDbService;
+let appointmentDbService: AppointmentDbService;
 let dbServiceAccessOptions: DbServiceAccessOptions;
+let fakeDbUserFactory: FakeDbUserFactory;
+let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
+let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
+let fakePackageTransaction: PackageTransactionDoc;
+let fakeAppointment: AppointmentDoc;
+
 before(async () => {
   userDbService = await makeUserDbService;
+  packageTransactionDbService = await makePackageTransactionDbService;
+  appointmentDbService = await makeAppointmentDbService;
   fakeDbUserFactory = await makeFakeDbUserFactory;
+  fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+  fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
 });
 
 beforeEach(async () => {
   dbServiceAccessOptions = fakeDbUserFactory.getDbServiceAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
+    hostedById: fakeTeacher._id.toString(),
+    reservedById: fakeUser._id.toString(),
+    packageId: fakeTeacher.teacherData.packages[0]._id.toString(),
+    lessonDuration: 60,
+    priceData: { currency: 'SGD', subTotal: 0, total: 0 },
+    remainingAppointments: 0,
+    lessonLanguage: 'ja',
+    isSubscription: false,
+    paymentData: {},
+  });
+  fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
+    hostedById: fakePackageTransaction.hostedById.toString(),
+    reservedById: fakePackageTransaction.reservedById.toString(),
+    packageTransactionId: fakePackageTransaction._id.toString(),
+    startTime: new Date(),
+    endTime: new Date(),
+  });
 });
 
 describe('userDbService', () => {
@@ -158,6 +197,7 @@ describe('userDbService', () => {
     context('db access permitted', () => {
       context('valid inputs', () => {
         it('should insert a new user into the db', async () => {
+          //TODO: create a new user for clarity
           const searchUser = await userDbService.findById({
             _id: fakeUser._id,
             dbServiceAccessOptions,
@@ -224,6 +264,36 @@ describe('userDbService', () => {
               expect(updatedTeacher).to.have.property('contactMethods');
               expect(updatedTeacher).to.not.have.property('password');
               expect(updatedTeacher).to.not.have.property('verficiationToken');
+            });
+            it('should update db dependencies with restricted views', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              expect(fakePackageTransaction.hostedByData).to.deep.equal(fakeTeacher);
+              const updatedTeacher = await userDbService.findOneAndUpdate({
+                searchQuery: { _id: fakeTeacher._id },
+                updateParams: { name: 'updated name' },
+                dbServiceAccessOptions,
+                updateDbDependencies: true,
+              });
+              const findPackageTransaction = await packageTransactionDbService.findOne({
+                searchQuery: { hostedById: fakeTeacher._id },
+                dbServiceAccessOptions,
+              });
+              const packageTransactionHostedByData: any = findPackageTransaction.hostedByData;
+              expect(packageTransactionHostedByData.name).to.equal(updatedTeacher.name);
+              expect(packageTransactionHostedByData).to.not.have.property('email');
+              expect(packageTransactionHostedByData).to.not.have.property('contactMethods');
+              expect(packageTransactionHostedByData.teacherData).to.not.have.property(
+                'licensePathUrl'
+              );
+              const findAppointmentWithDependency = await appointmentDbService.findOne({
+                searchQuery: { packageTransactionId: findPackageTransaction._id },
+                dbServiceAccessOptions,
+              });
+              const appointmentPackageTransactionData: any =
+                findAppointmentWithDependency.packageTransactionData;
+              expect(appointmentPackageTransactionData.hostedByData.name).to.equal(
+                updatedTeacher.name
+              );
             });
           });
           context('updating others', () => {

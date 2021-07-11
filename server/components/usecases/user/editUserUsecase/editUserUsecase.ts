@@ -40,55 +40,7 @@ class EditUserUsecase extends AbstractEditUsecase<
       dbServiceAccessOptions,
     });
 
-    //TODO remove/add await for testing..., make alias for below functions (_updateDbUserDependencyData)
-    // update minute banks
-    this._updateDbUserDependencyData({
-      dbService: this._minuteBankDbService,
-      savedDbUser,
-      dbServiceAccessOptions,
-      hostedBySearchQuery: { hostedBy: savedDbUser._id },
-      reservedBySearchQuery: { reservedBy: savedDbUser._id },
-    });
-
-    // update package transactions
-    this._updateDbUserDependencyData({
-      dbService: this._packageTransactionDbService,
-      savedDbUser,
-      dbServiceAccessOptions,
-      hostedBySearchQuery: { hostedBy: savedDbUser._id, isPast: false },
-      reservedBySearchQuery: { reservedBy: savedDbUser._id, isPast: false },
-    });
-
-    // this._updateAppointments(params.uid);
-    // this._updateAvailableTimes(params.uid);
-
     return { user: savedDbUser };
-  };
-
-  private _updateDbUserDependencyData = async (props: {
-    dbService: IDbService<any, any>;
-    savedDbUser: JoinedUserDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-    hostedBySearchQuery: any;
-    reservedBySearchQuery: any;
-  }): Promise<void> => {
-    const {
-      dbService,
-      savedDbUser,
-      dbServiceAccessOptions,
-      hostedBySearchQuery,
-      reservedBySearchQuery,
-    } = props;
-    const updateHostedByData = await dbService.updateMany({
-      searchQuery: hostedBySearchQuery,
-      updateParams: { hostedByData: savedDbUser },
-      dbServiceAccessOptions,
-    });
-    const updateReservedByData = await dbService.updateMany({
-      searchQuery: reservedBySearchQuery,
-      updateParams: { reservedByData: savedDbUser },
-      dbServiceAccessOptions,
-    });
   };
 
   public init = async (usecaseInitParams: EditUserUsecaseInitParams): Promise<this> => {

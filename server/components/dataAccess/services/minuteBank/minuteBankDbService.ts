@@ -1,13 +1,12 @@
-import { IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 
-type PartialMinuteBankDbServiceInitParams = {};
+type OptionalMinuteBankDbServiceInitParams = {};
 
-class MinuteBankDbService
-  extends AbstractDbService<PartialMinuteBankDbServiceInitParams, MinuteBankDoc>
-  implements IDbService<PartialMinuteBankDbServiceInitParams, MinuteBankDoc>
-{
+class MinuteBankDbService extends AbstractDbService<
+  OptionalMinuteBankDbServiceInitParams,
+  MinuteBankDoc
+> {
   constructor() {
     super();
     this._dbModelViews = {

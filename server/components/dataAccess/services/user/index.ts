@@ -3,6 +3,7 @@ import cloneDeep from 'clone-deep';
 import { makeDb } from '../..';
 import { User } from '../../../../models/User';
 import { makePackageDbService } from '../package';
+import { makePackageTransactionDbService } from '../packageTransaction';
 import { makeTeacherDbService } from '../teacher';
 import { UserDbService } from './userDbService';
 
@@ -11,6 +12,7 @@ const makeUserDbService = new UserDbService().init({
   dbModel: User,
   makeTeacherDbService,
   makePackageDbService,
+  makePackageTransactionDbService,
   comparePassword,
   cloneDeep,
 });

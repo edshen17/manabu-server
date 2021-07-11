@@ -1,7 +1,7 @@
 import { DbServiceAccessOptions, DbModelViews, IDbService } from './IDbService';
 
-abstract class AbstractDbService<PartialDbServiceInitParams, DbDoc>
-  implements IDbService<PartialDbServiceInitParams, DbDoc>
+abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
+  implements IDbService<OptionalDbServiceInitParams, DbDoc>
 {
   protected _dbModel!: any;
   protected _dbModelViews!: DbModelViews;
@@ -118,8 +118,10 @@ abstract class AbstractDbService<PartialDbServiceInitParams, DbDoc>
     searchQuery?: {};
     updateParams?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
+    updateDbDependencies?: boolean;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, updateParams, dbServiceAccessOptions, updateDbDependencies } =
+      dbServiceParams;
     const selectView = this._getSelectView(dbServiceAccessOptions);
     const dbDataPromise = this._dbModel
       .findOneAndUpdate(searchQuery, updateParams, {
@@ -128,15 +130,32 @@ abstract class AbstractDbService<PartialDbServiceInitParams, DbDoc>
       })
       .lean();
     const dbData = await this._dbDataReturnTemplate(dbServiceAccessOptions, dbDataPromise);
+    if (updateDbDependencies) {
+      await this.updateManyDbDependencies(dbData);
+    }
     return dbData;
+  };
+
+  public updateManyDbDependencies = async (dbData?: any) => {};
+
+  protected _getBaseDbServiceAccessOptions = () => {
+    const dbServiceAccessOptions = {
+      isProtectedResource: false,
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: 'user',
+      isSelf: false,
+    };
+    return dbServiceAccessOptions;
   };
 
   public updateMany = async (dbServiceParams: {
     searchQuery?: {};
     updateParams?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
+    updateDbDependencies?: boolean;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, updateParams, dbServiceAccessOptions, updateDbDependencies } =
+      dbServiceParams;
     const selectView = this._getSelectView(dbServiceAccessOptions);
     const dbDataPromise = this._dbModel
       .updateMany(searchQuery, updateParams, {
@@ -145,6 +164,9 @@ abstract class AbstractDbService<PartialDbServiceInitParams, DbDoc>
       })
       .lean();
     const dbData = await this._dbDataReturnTemplate(dbServiceAccessOptions, dbDataPromise);
+    if (updateDbDependencies) {
+      await this.updateManyDbDependencies(dbData);
+    }
     return dbData;
   };
 
@@ -159,23 +181,23 @@ abstract class AbstractDbService<PartialDbServiceInitParams, DbDoc>
   };
 
   public init = async (
-    dbServiceInitParams: {
+    initParams: {
       makeDb: () => Promise<any>;
       cloneDeep: any;
       dbModel: any;
-    } & PartialDbServiceInitParams
+    } & OptionalDbServiceInitParams
   ): Promise<this> => {
-    const { makeDb, cloneDeep, dbModel, ...partialDbServiceInitParams } = dbServiceInitParams;
+    const { makeDb, cloneDeep, dbModel, ...OptionalDbServiceInitParams } = initParams;
     await makeDb();
     this._cloneDeep = cloneDeep;
     this._dbModel = dbModel;
-    await this._initTemplate(partialDbServiceInitParams);
+    await this._initTemplate(OptionalDbServiceInitParams);
     return this;
   };
 
   protected _initTemplate = async (
-    partialDbServiceInitParams: Omit<
-      { makeDb: any; dbModel: any; cloneDeep: any } & PartialDbServiceInitParams,
+    optionalDbServiceInitParams: Omit<
+      { makeDb: any; dbModel: any; cloneDeep: any } & OptionalDbServiceInitParams,
       'makeDb' | 'dbModel' | 'cloneDeep'
     >
   ): Promise<void> => {};
