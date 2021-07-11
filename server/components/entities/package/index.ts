@@ -1,6 +1,6 @@
 import { makeUserDbService } from '../../dataAccess/services/user';
 import { PackageEntity } from './packageEntity';
-import { makePackageEntityValidator } from './validator';
+import { makePackageEntityValidator } from './validators';
 
 const makePackageEntity = new PackageEntity().init({
   makeUserDbService,

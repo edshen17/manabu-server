@@ -30,7 +30,6 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   ): Promise<EntityBuildResponse> | EntityBuildResponse => {
     this._entityValidator.validate({ buildParams, userRole: 'user', validationMode: 'create' });
     const builtEntity = this._buildTemplate(buildParams);
-    console.log('here');
     return builtEntity;
   };
 

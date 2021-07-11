@@ -1,5 +1,5 @@
 import { TeacherBalanceEntity } from './teacherBalanceEntity';
-import { makeTeacherBalanceEntityValidator } from './validator';
+import { makeTeacherBalanceEntityValidator } from './validators';
 
 const makeTeacherBalanceEntity = new TeacherBalanceEntity().init({
   makeEntityValidator: makeTeacherBalanceEntityValidator,
