@@ -1,10 +1,15 @@
+enum UPDATE_DB_DEPENDENCY_MODE {
+  SHALLOW = 'shallow',
+  DEEP = 'deep',
+}
+
 type DbServiceParams = {
   _id?: string;
   searchQuery?: {};
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: {};
   updateParams?: {};
-  updateDbDependencies?: boolean;
+  isUpdatingDbDependencies?: boolean;
 };
 
 type DbServiceAccessOptions = {
@@ -39,7 +44,13 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
     } & OptionalDbServiceInitParams
   ) => Promise<this>;
   getDbModelViews: () => DbModelViews;
-  updateManyDbDependencies: (dbData?: any) => Promise<void>;
+  updateDbDependencies: (dbQueryResult: DbDoc | DbDoc[]) => Promise<void>;
 }
 
-export { DbServiceAccessOptions, DbServiceParams, IDbService, DbModelViews };
+export {
+  DbServiceAccessOptions,
+  DbServiceParams,
+  IDbService,
+  DbModelViews,
+  UPDATE_DB_DEPENDENCY_MODE,
+};

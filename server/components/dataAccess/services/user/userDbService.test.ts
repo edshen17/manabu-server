@@ -272,7 +272,7 @@ describe('userDbService', () => {
                 searchQuery: { _id: fakeTeacher._id },
                 updateParams: { name: 'updated name' },
                 dbServiceAccessOptions,
-                updateDbDependencies: true,
+                isUpdatingDbDependencies: true,
               });
               const findPackageTransaction = await packageTransactionDbService.findOne({
                 searchQuery: { hostedById: fakeTeacher._id },

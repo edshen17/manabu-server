@@ -22,7 +22,7 @@ class TeacherDbService extends AbstractDbService<OptionalTeacherDbServiceInitPar
   }): Promise<TeacherDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const dbDataPromise = this.findOne({ searchQuery: { userId: _id }, dbServiceAccessOptions });
-    const dbData = await this._grantAccess(dbServiceAccessOptions, dbDataPromise);
+    const dbData = await this._executeQuery(dbServiceAccessOptions, dbDataPromise);
     return dbData;
   };
 
@@ -32,7 +32,7 @@ class TeacherDbService extends AbstractDbService<OptionalTeacherDbServiceInitPar
   }): Promise<TeacherDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const dbDataPromise = this._dbModel.findOneAndDelete({ userId: _id }).lean();
-    const dbData = await this._dbDataReturnTemplate(dbServiceAccessOptions, dbDataPromise);
+    const dbData = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbDataPromise);
     return dbData;
   };
 }
