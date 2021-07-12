@@ -1,3 +1,4 @@
+import { ExtractDoc } from 'ts-mongoose';
 import {
   DbServiceAccessOptions,
   DbModelViews,
@@ -143,7 +144,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     return dbQueryResult;
   };
 
-  public updateDbDependencies = async (dbQueryResult: DbDoc | DbDoc[]): Promise<void> => {
+  public updateDbDependencies = async (
+    dbQueryResult: ExtractDoc<any> | ExtractDoc<any>[]
+  ): Promise<void> => {
     const isUpdatingSync = process.env.NODE_ENV != 'production';
     const isUpdatingAsync = process.env.NODE_ENV == 'production';
     if (isUpdatingSync) {

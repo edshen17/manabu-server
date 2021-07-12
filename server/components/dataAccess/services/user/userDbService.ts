@@ -1,7 +1,6 @@
 import {
   DbServiceAccessOptions,
   DbServiceParams,
-  IDbService,
   UPDATE_DB_DEPENDENCY_MODE,
 } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
@@ -13,6 +12,7 @@ import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { MinuteBankDoc } from '../../../../models/MinuteBank';
 
 type OptionalUserDbServiceInitParams = {
   makeTeacherDbService: Promise<TeacherDbService>;
@@ -23,6 +23,10 @@ type OptionalUserDbServiceInitParams = {
 };
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
+type MixedUserDbServiceDependency = JoinedUserDoc | PackageTransactionDoc | MinuteBankDoc;
+type UpdateUserDbServiceDependencyTypes =
+  | MixedUserDbServiceDependency
+  | MixedUserDbServiceDependency[];
 
 class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
   private _teacherDbService!: TeacherDbService;
@@ -125,31 +129,31 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
   protected _updateShallowDbDependenciesTemplate = async (props: {
     updatedDependencyData: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-  }) => {
+  }): Promise<void> => {
     const dependentPackageTransactions = await this._getUserDependencies({
       ...props,
       dependencyDbService: this._packageTransactionDbService,
     });
-    // const dependentMinuteBanks = await this._getUserDependencies({
-    //   ...props,
-    //   dependencyDbService: this._minuteBankDbService,
-    // });
+    const dependentMinuteBanks = await this._getUserDependencies({
+      ...props,
+      dependencyDbService: this._minuteBankDbService,
+    });
     await this._updateUserDependencies({
       ...props,
       dependencyDocs: dependentPackageTransactions,
       dependencyDbService: this._packageTransactionDbService,
     });
-    // await this._updateUserDependencies({
-    //   ...props,
-    //   dependencyDocs: dependentMinuteBanks,
-    //   dependencyDbService: this._minuteBankDbService,
-    // });
+    await this._updateUserDependencies({
+      ...props,
+      dependencyDocs: dependentMinuteBanks,
+      dependencyDbService: this._minuteBankDbService,
+    });
   };
 
   private _getUserDependencies = async (props: {
     updatedDependencyData: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dependencyDbService: IDbService<any, any>;
+    dependencyDbService: PackageTransactionDbService | MinuteBankDbService;
   }) => {
     const { updatedDependencyData, dbServiceAccessOptions, dependencyDbService } = props;
     const hostedByDependencies = await dependencyDbService.find({
@@ -167,8 +171,8 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
   private _updateUserDependencies = async (props: {
     updatedDependencyData: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dependencyDocs: PackageTransactionDoc[];
-    dependencyDbService: IDbService<any, any>;
+    dependencyDocs: (PackageTransactionDoc | MinuteBankDoc)[];
+    dependencyDbService: PackageTransactionDbService | MinuteBankDbService;
   }) => {
     const { updatedDependencyData, dbServiceAccessOptions, dependencyDocs, dependencyDbService } =
       props;
