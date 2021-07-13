@@ -1,9 +1,10 @@
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
+import { JoinedUserDoc } from '../../../../models/User';
 
 type VerifyEmailTokenUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;

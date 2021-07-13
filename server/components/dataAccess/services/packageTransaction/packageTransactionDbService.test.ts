@@ -8,7 +8,6 @@ import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackag
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { PackageTransactionDbService } from './packageTransactionDbService';
-
 let packageTransactionDbService: PackageTransactionDbService;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbUserFactory: FakeDbUserFactory;

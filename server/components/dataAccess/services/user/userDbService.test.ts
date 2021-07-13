@@ -270,8 +270,13 @@ describe('userDbService', () => {
               dbServiceAccessOptions.isSelf = true;
               expect(fakePackageTransaction.hostedByData).to.deep.equal(fakeTeacher);
               const updatedTeacher = await userDbService.findOneAndUpdate({
-                searchQuery: { _id: fakeTeacher._id },
-                updateParams: { name: 'updated name' },
+                searchQuery: { _id: fakeTeacher._id, 'contactMethods.methodName': 'LINE' },
+                updateParams: {
+                  name: 'updated name',
+                  $set: {
+                    'contactMethods.$.methodName': 'Skype',
+                  },
+                },
                 dbServiceAccessOptions,
                 isUpdatingDbDependencies: true,
               });
@@ -290,10 +295,11 @@ describe('userDbService', () => {
                 searchQuery: { packageTransactionId: findPackageTransaction._id },
                 dbServiceAccessOptions,
               });
-              const appointmentPackageTransactionData =
-                findAppointmentWithDependency.packageTransactionData;
-              expect(appointmentPackageTransactionData.hostedByData.name).to.equal(
-                updatedTeacher.name
+              expect(
+                findAppointmentWithDependency.packageTransactionData.hostedByData.name
+              ).to.equal(updatedTeacher.name);
+              expect(findAppointmentWithDependency.locationData.locationName).to.equal(
+                'alternative'
               );
             });
           });
