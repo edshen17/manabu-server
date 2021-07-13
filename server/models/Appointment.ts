@@ -1,5 +1,5 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { UserContactMethod, UserSchema } from './User';
+import { UserContactMethodEmbed, UserSchema } from './User';
 import { PackageTransactionDoc, PackageTransactionSchema } from './PackageTransaction';
 
 const AppointmentSchema = createSchema({
@@ -22,8 +22,8 @@ const AppointmentSchema = createSchema({
     locationName: Type.string({ required: true }),
     locationType: Type.string({ required: true }),
     matchedContactMethod: Type.object().of({
-      hostedByContactMethod: UserContactMethod,
-      reservedByContactMethod: UserContactMethod,
+      hostedByContactMethod: UserContactMethodEmbed,
+      reservedByContactMethod: UserContactMethodEmbed,
     }),
   }),
 });

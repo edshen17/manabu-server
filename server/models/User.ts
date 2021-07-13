@@ -2,7 +2,7 @@ import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { PackageDoc } from './Package';
 import { TeacherDoc } from './Teacher';
 
-const UserContactMethod = {
+const UserContactMethodEmbed = {
   methodName: Type.string({ required: true }),
   methodAddress: Type.string({ required: true }),
   isPrimaryMethod: Type.boolean({ required: true }),
@@ -33,7 +33,7 @@ const UserSchema = createSchema({
     name: Type.string(),
     dateJoined: Type.date(),
   }),
-  contactMethods: Type.array({ required: true }).of(UserContactMethod),
+  contactMethods: Type.array({ required: true }).of(UserContactMethodEmbed),
   isEmailVerified: Type.boolean({ required: true }),
   verificationToken: Type.string({ required: true }),
 });
@@ -43,4 +43,4 @@ type UserDoc = ExtractDoc<typeof UserSchema>;
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
-export { User, UserSchema, JoinedUserDoc, UserContactMethod };
+export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed };

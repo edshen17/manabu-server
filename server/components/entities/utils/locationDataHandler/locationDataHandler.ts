@@ -1,5 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
-import { UserContactMethodType } from '../../user/userEntity';
+import { UserContactMethod } from '../../user/userEntity';
 
 type LocationData = {
   locationName: string;
@@ -8,8 +8,8 @@ type LocationData = {
 };
 
 type MatchedContactMethod = {
-  hostedByContactMethod: UserContactMethodType;
-  reservedByContactMethod: UserContactMethodType;
+  hostedByContactMethod: UserContactMethod;
+  reservedByContactMethod: UserContactMethod;
 };
 
 class LocationDataHandler {
@@ -64,7 +64,7 @@ class LocationDataHandler {
     return matchedContactMethod;
   };
 
-  private _sortByPrimaryContactMethod = (contactMethods: UserContactMethodType[]) => {
+  private _sortByPrimaryContactMethod = (contactMethods: UserContactMethod[]) => {
     const sortedByPrimaryContactMethod = contactMethods.sort((a, b) => {
       let aPrefOrder = a.isPrimaryMethod ? 1 : 0;
       let bPrefOrder = b.isPrimaryMethod ? 1 : 0;

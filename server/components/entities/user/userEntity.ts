@@ -1,4 +1,4 @@
-import { UserContactMethod } from '../../../models/User';
+import { UserContactMethodEmbed } from '../../../models/User';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
@@ -13,10 +13,10 @@ type UserEntityBuildParams = {
   email: string;
   password?: string;
   profileImageUrl?: string;
-  contactMethods?: UserContactMethodType[] | [];
+  contactMethods?: UserContactMethod[] | [];
 };
 
-type UserContactMethodType = typeof UserContactMethod;
+type UserContactMethod = typeof UserContactMethodEmbed;
 
 type UserEntityBuildResponse = {
   name: string;
@@ -32,7 +32,7 @@ type UserEntityBuildResponse = {
   role: string;
   settings: { currency: string };
   memberships: string[];
-  contactMethods: UserContactMethodType[] | [];
+  contactMethods: UserContactMethod[] | [];
   isEmailVerified: boolean;
   verificationToken: string;
 };
@@ -105,4 +105,4 @@ class UserEntity extends AbstractEntity<
   };
 }
 
-export { UserEntity, UserEntityBuildParams, UserEntityBuildResponse, UserContactMethodType };
+export { UserEntity, UserEntityBuildParams, UserEntityBuildResponse, UserContactMethod };

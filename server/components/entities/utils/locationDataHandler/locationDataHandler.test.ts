@@ -48,7 +48,9 @@ describe('locationDataHandler', () => {
     context('valid inputs', () => {
       context('same contact method', async () => {
         it('should return locationData with a matched contact method', () => {
-          console.log(locationData, 'here');
+          expect(locationData.matchedContactMethod).to.have.property('hostedByContactMethod');
+          expect(locationData.matchedContactMethod).to.have.property('reservedByContactMethod');
+          expect(locationData.locationName).to.not.equal('alternative');
         });
       });
       context('different contact method', () => {
@@ -58,7 +60,7 @@ describe('locationDataHandler', () => {
             hostedByData: overrideFakeTeacher,
             reservedByData: overrideFakeUser,
           });
-          console.log(locationData, 'here');
+          expect(locationData.locationName).to.equal('alternative');
         });
       });
     });
@@ -70,7 +72,6 @@ describe('locationDataHandler', () => {
             reservedByData: fakeUser,
           });
         } catch (err) {
-          console.log(err, 'here');
           expect(err).to.be.an('error');
         }
       });
