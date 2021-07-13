@@ -1,6 +1,7 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserSchema } from './User';
-import { PackageSchema } from './Package';
+import { PackageDoc, PackageSchema } from './Package';
+import { JoinedUserDoc } from '../components/dataAccess/services/user/userDbService';
 
 const PackageTransactionSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
@@ -29,6 +30,10 @@ const PackageTransactionSchema = createSchema({
 });
 
 const PackageTransaction = typedModel('PackageTransaction', PackageTransactionSchema);
-type PackageTransactionDoc = ExtractDoc<typeof PackageTransactionSchema>;
+type PackageTransactionDoc = ExtractDoc<typeof PackageTransactionSchema> & {
+  packageData: PackageDoc;
+  hostedByData: JoinedUserDoc;
+  reservedByData: JoinedUserDoc;
+};
 
 export { PackageTransaction, PackageTransactionSchema, PackageTransactionDoc };

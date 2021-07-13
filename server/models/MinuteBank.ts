@@ -1,4 +1,5 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
+import { JoinedUserDoc } from '../components/dataAccess/services/user/userDbService';
 import { UserSchema } from './User';
 
 const MinuteBankSchema = createSchema({
@@ -10,6 +11,9 @@ const MinuteBankSchema = createSchema({
 });
 
 const MinuteBank = typedModel('MinuteBank', MinuteBankSchema);
-type MinuteBankDoc = ExtractDoc<typeof MinuteBankSchema>;
+type MinuteBankDoc = ExtractDoc<typeof MinuteBankSchema> & {
+  hostedByData: JoinedUserDoc;
+  reservedByData: JoinedUserDoc;
+};
 
 export { MinuteBank, MinuteBankSchema, MinuteBankDoc };

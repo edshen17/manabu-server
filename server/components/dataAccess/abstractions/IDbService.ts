@@ -1,3 +1,5 @@
+import { ExtractDoc } from 'ts-mongoose';
+
 enum UPDATE_DB_DEPENDENCY_MODE {
   SHALLOW = 'shallow',
   DEEP = 'deep',
@@ -44,7 +46,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
     } & OptionalDbServiceInitParams
   ) => Promise<this>;
   getDbModelViews: () => DbModelViews;
-  updateDbDependencies: (dbQueryResult: DbDoc | DbDoc[]) => Promise<void>;
+  updateDbDependencies: (dbQueryResult: ExtractDoc<any> | ExtractDoc<any>[]) => Promise<void>;
 }
 
 export {

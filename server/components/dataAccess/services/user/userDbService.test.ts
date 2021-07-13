@@ -278,7 +278,7 @@ describe('userDbService', () => {
                 searchQuery: { hostedById: fakeTeacher._id },
                 dbServiceAccessOptions,
               });
-              const packageTransactionHostedByData: any = findPackageTransaction.hostedByData;
+              const packageTransactionHostedByData = findPackageTransaction.hostedByData;
               expect(packageTransactionHostedByData.name).to.equal(updatedTeacher.name);
               expect(packageTransactionHostedByData).to.not.have.property('email');
               expect(packageTransactionHostedByData).to.not.have.property('contactMethods');
@@ -289,7 +289,7 @@ describe('userDbService', () => {
                 searchQuery: { packageTransactionId: findPackageTransaction._id },
                 dbServiceAccessOptions,
               });
-              const appointmentPackageTransactionData: any =
+              const appointmentPackageTransactionData =
                 findAppointmentWithDependency.packageTransactionData;
               expect(appointmentPackageTransactionData.hostedByData.name).to.equal(
                 updatedTeacher.name

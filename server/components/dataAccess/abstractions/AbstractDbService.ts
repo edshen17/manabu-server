@@ -138,10 +138,18 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       })
       .lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    await this._startDbDependencyUpdate({ isUpdatingDbDependencies, dbQueryResult });
+    return dbQueryResult;
+  };
+
+  private _startDbDependencyUpdate = async (props: {
+    dbQueryResult: Promise<any>;
+    isUpdatingDbDependencies?: boolean;
+  }) => {
+    const { dbQueryResult, isUpdatingDbDependencies } = props;
     if (dbQueryResult && isUpdatingDbDependencies) {
       await this.updateDbDependencies(dbQueryResult);
     }
-    return dbQueryResult;
   };
 
   public updateDbDependencies = async (
@@ -234,9 +242,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       })
       .lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
-    if (dbQueryResult && isUpdatingDbDependencies) {
-      await this.updateDbDependencies(dbQueryResult);
-    }
+    await this._startDbDependencyUpdate({ isUpdatingDbDependencies, dbQueryResult });
     return dbQueryResult;
   };
 

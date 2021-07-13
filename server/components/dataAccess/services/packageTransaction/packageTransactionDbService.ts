@@ -33,6 +33,7 @@ class PackageTransactionDbService extends AbstractDbService<
         _id: query._id,
         dbServiceAccessOptions,
       });
+      // do something with appointment entity to get location data here
       const toUpdateAppointment = this._appointmentDbService.findOneAndUpdate({
         searchQuery: { packageTransactionId: query._id },
         dbServiceAccessOptions,

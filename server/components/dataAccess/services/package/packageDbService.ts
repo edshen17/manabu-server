@@ -1,7 +1,8 @@
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
-import { UPDATE_DB_DEPENDENCY_MODE } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, UPDATE_DB_DEPENDENCY_MODE } from '../../abstractions/IDbService';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 
 type OptionalPackageDbServiceInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
@@ -18,27 +19,50 @@ class PackageDbService extends AbstractDbService<OptionalPackageDbServiceInitPar
   protected _updateDbDependencyMode: string = UPDATE_DB_DEPENDENCY_MODE.SHALLOW;
   private _packageTransactionDbService!: PackageTransactionDbService;
 
-  // public updateManyDbDependencies = async (savedDbPackage?: PackageDoc) => {
-  //   if (savedDbPackage) {
-  //     const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
-  //     const packageDependencyData = await this.findById({
-  //       _id: savedDbPackage._id,
-  //       dbServiceAccessOptions,
-  //     });
-  //     const isUpdatingDbDependencies = false;
-  //     const preUpdatePackages = await this._packageTransactionDbService.find({
-  //       searchQuery: { hostedById: savedDbPackage._id },
-  //       dbServiceAccessOptions,
-  //     });
-  //     await this._packageTransactionDbService.updateMany({
-  //       searchQuery: { packageId: savedDbPackage._id },
-  //       updateParams: { packageData: packageDependencyData },
-  //       dbServiceAccessOptions,
-  //       isUpdatingDbDependencies,
-  //     });
-  //     await this._packageTransactionDbService.updateManyDbDependencies(preUpdatePackages);
-  //   }
-  // };
+  protected _updateShallowDbDependenciesTemplate = async (props: {
+    updatedDependencyData: PackageDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<void> => {
+    const dependentPackageTransactions = await this._getPackageDependencies({
+      ...props,
+      dependencyDbService: this._packageTransactionDbService,
+    });
+    await this._updatePackageDependencies({
+      ...props,
+      dependencyDocs: dependentPackageTransactions,
+      dependencyDbService: this._packageTransactionDbService,
+    });
+  };
+
+  private _getPackageDependencies = async (props: {
+    updatedDependencyData: PackageDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    dependencyDbService: PackageTransactionDbService;
+  }) => {
+    const { updatedDependencyData, dbServiceAccessOptions, dependencyDbService } = props;
+    const packageDependencies = await dependencyDbService.find({
+      searchQuery: { packageId: updatedDependencyData._id },
+      dbServiceAccessOptions,
+    });
+    return packageDependencies;
+  };
+
+  private _updatePackageDependencies = async (props: {
+    updatedDependencyData: PackageDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    dependencyDocs: PackageTransactionDoc[];
+    dependencyDbService: PackageTransactionDbService;
+  }) => {
+    const { updatedDependencyData, dbServiceAccessOptions, dependencyDocs, dependencyDbService } =
+      props;
+    await dependencyDbService.updateMany({
+      searchQuery: { packageId: updatedDependencyData._id },
+      updateParams: { packageData: updatedDependencyData },
+      dbServiceAccessOptions,
+      isUpdatingDbDependencies: false,
+    });
+    await dependencyDbService.updateDbDependencies(dependencyDocs);
+  };
 
   protected _initTemplate = async (
     partialDbServiceInitParams: OptionalPackageDbServiceInitParams

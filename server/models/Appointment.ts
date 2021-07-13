@@ -1,6 +1,6 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { UserContactMethod, UserSchema } from './User';
-import { PackageTransactionSchema } from './PackageTransaction';
+import { PackageTransactionDoc, PackageTransactionSchema } from './PackageTransaction';
 
 const AppointmentSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
@@ -29,6 +29,8 @@ const AppointmentSchema = createSchema({
 });
 
 const Appointment = typedModel('Appointment', AppointmentSchema);
-type AppointmentDoc = ExtractDoc<typeof AppointmentSchema>;
+type AppointmentDoc = ExtractDoc<typeof AppointmentSchema> & {
+  packageTransactionData: PackageTransactionDoc;
+};
 
 export { Appointment, AppointmentSchema, AppointmentDoc };

@@ -10,5 +10,4 @@ const makeFakeDbPackageFactory = new FakeDbPackageFactory().init({
   makeDbService: makePackageDbService,
   makeFakeDbUserFactory,
 });
-
 export { makeFakeDbPackageFactory };

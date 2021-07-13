@@ -23,10 +23,6 @@ type OptionalUserDbServiceInitParams = {
 };
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
-type MixedUserDbServiceDependency = JoinedUserDoc | PackageTransactionDoc | MinuteBankDoc;
-type UpdateUserDbServiceDependencyTypes =
-  | MixedUserDbServiceDependency
-  | MixedUserDbServiceDependency[];
 
 class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
   private _teacherDbService!: TeacherDbService;
