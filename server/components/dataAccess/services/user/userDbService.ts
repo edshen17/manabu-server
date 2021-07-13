@@ -6,13 +6,12 @@ import {
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDbService } from '../teacher/teacherDbService';
 import { PackageDbService } from '../package/packageDbService';
-import { UserDoc } from '../../../../models/User';
 import { TeacherDoc } from '../../../../models/Teacher';
-import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
+import { JoinedUserDoc } from '../../../../models/User';
 
 type OptionalUserDbServiceInitParams = {
   makeTeacherDbService: Promise<TeacherDbService>;
@@ -21,8 +20,6 @@ type OptionalUserDbServiceInitParams = {
   makeMinuteBankDbService: Promise<MinuteBankDbService>;
   comparePassword: any;
 };
-type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
-type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
 class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
   private _teacherDbService!: TeacherDbService;
@@ -203,4 +200,4 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
   };
 }
 
-export { UserDbService, JoinedUserDoc };
+export { UserDbService };

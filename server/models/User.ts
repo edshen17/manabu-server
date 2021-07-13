@@ -1,4 +1,6 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
+import { PackageDoc } from './Package';
+import { TeacherDoc } from './Teacher';
 
 const UserContactMethod = {
   methodName: Type.string({ required: true }),
@@ -38,5 +40,7 @@ const UserSchema = createSchema({
 
 const User = typedModel('User', UserSchema);
 type UserDoc = ExtractDoc<typeof UserSchema>;
+type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
+type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
-export { User, UserSchema, UserDoc, UserContactMethod };
+export { User, UserSchema, JoinedUserDoc, UserContactMethod };

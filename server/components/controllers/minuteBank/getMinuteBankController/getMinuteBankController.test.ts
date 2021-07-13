@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
 import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
 import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
@@ -9,6 +8,7 @@ import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHtt
 import { makeGetMinuteBankController } from '.';
 import { GetMinuteBankController } from './getMinuteBankController';
 import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
+import { JoinedUserDoc } from '../../../../models/User';
 
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
 let fakeDbUserFactory: FakeDbUserFactory;

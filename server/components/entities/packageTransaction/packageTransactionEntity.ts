@@ -1,6 +1,7 @@
 import { PackageDoc } from '../../../models/Package';
+import { JoinedUserDoc } from '../../../models/User';
 import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
-import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makeFakeDbTeacherBalanceFactory } from '.';
-import { JoinedUserDoc } from '../../services/user/userDbService';
+import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbUserFactory } from '../fakeDbUserFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 import { FakeDbTeacherBalanceFactory } from './fakeDbTeacherBalanceFactory';

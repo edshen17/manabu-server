@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makeEditTeacherController } from '.';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
+import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';

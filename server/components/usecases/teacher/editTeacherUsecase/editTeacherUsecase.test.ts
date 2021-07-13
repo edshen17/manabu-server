@@ -1,11 +1,11 @@
 import { expect } from 'chai';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { EditTeacherUsecase } from './editTeacherUsecase';
 import { makeEditTeacherUsecase } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;

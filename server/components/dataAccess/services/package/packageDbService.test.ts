@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { makePackageDbService } from '.';
 import { PackageDoc } from '../../../../models/Package';
+import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbPackageFactory } from '../../testFixtures/fakeDbPackageFactory';
 import { FakeDbPackageFactory } from '../../testFixtures/fakeDbPackageFactory/fakeDbPackageFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { JoinedUserDoc } from '../user/userDbService';
 import { PackageDbService } from './packageDbService';
 
 let packageDbService: PackageDbService;

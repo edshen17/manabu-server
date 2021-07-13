@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { makeTeacherBalanceDbService } from '.';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
+import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbTeacherBalanceFactory } from '../../testFixtures/fakeDbTeacherBalanceFactory';
 import { FakeDbTeacherBalanceFactory } from '../../testFixtures/fakeDbTeacherBalanceFactory/fakeDbTeacherBalanceFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { JoinedUserDoc } from '../user/userDbService';
 import { TeacherBalanceDbService } from './teacherBalanceDbService';
 
 let teacherBalanceDbService: TeacherBalanceDbService;

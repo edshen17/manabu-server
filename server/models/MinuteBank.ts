@@ -1,6 +1,5 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { JoinedUserDoc } from '../components/dataAccess/services/user/userDbService';
-import { UserSchema } from './User';
+import { JoinedUserDoc, UserSchema } from './User';
 
 const MinuteBankSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),

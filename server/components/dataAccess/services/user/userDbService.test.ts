@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
-import { JoinedUserDoc, UserDbService } from './userDbService';
+import { UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
@@ -14,6 +14,7 @@ import { makeAppointmentDbService } from '../appointment';
 import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
 import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
 import { AppointmentDoc } from '../../../../models/Appointment';
+import { JoinedUserDoc } from '../../../../models/User';
 
 let userDbService: UserDbService;
 let packageTransactionDbService: PackageTransactionDbService;

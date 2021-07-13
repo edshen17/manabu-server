@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { makeFakeDbPackageFactory } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
 import { makePackageDbService } from '../../services/package';
 import { PackageDbService } from '../../services/package/packageDbService';
-import { JoinedUserDoc } from '../../services/user/userDbService';
 import { makeFakeDbUserFactory } from '../fakeDbUserFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 import { FakeDbPackageFactory } from './fakeDbPackageFactory';

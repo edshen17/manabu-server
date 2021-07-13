@@ -1,5 +1,6 @@
+import { JoinedUserDoc } from '../../../../models/User';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
-import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';

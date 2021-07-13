@@ -1,5 +1,5 @@
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -8,6 +8,7 @@ import {
   CreateUserUsecase,
   CreateUserUsecaseResponse,
 } from '../createUserUsecase/createUserUsecase';
+import { JoinedUserDoc } from '../../../../models/User';
 
 type LoginUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;

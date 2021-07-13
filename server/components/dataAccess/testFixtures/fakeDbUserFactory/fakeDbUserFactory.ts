@@ -1,5 +1,5 @@
+import { JoinedUserDoc } from '../../../../models/User';
 import { UserEntityBuildParams, UserEntityBuildResponse } from '../../../entities/user/userEntity';
-import { JoinedUserDoc } from '../../services/user/userDbService';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFactory';
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';

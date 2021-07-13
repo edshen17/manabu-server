@@ -1,7 +1,8 @@
 import { PackageTransactionDoc } from '../../../models/PackageTransaction';
+import { JoinedUserDoc } from '../../../models/User';
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { PackageTransactionDbService } from '../../dataAccess/services/packageTransaction/packageTransactionDbService';
-import { JoinedUserDoc, UserDbService } from '../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { UserContactMethod } from '../user/userEntity';

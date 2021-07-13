@@ -6,7 +6,7 @@ import { EditUserUsecase } from './editUserUsecase';
 import { makeEditUserUsecase } from '.';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { CurrentAPIUser, RouteData } from '../../abstractions/IUsecase';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
+import { JoinedUserDoc } from '../../../../models/User';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;

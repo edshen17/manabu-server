@@ -6,9 +6,9 @@ import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/
 import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { JoinedUserDoc } from '../../../../models/User';
 
 let getMinuteBankUsecase: GetMinuteBankUsecase;
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;

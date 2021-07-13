@@ -1,3 +1,4 @@
+import { ExtractDoc } from 'ts-mongoose';
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { EntityInitParams, IEntity } from './IEntity';
@@ -18,7 +19,7 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
     dbService: IDbService<any, any>;
     _id: string;
     overrideDbServiceAccessOptions?: DbServiceAccessOptions;
-  }): Promise<any> => {
+  }): Promise<ExtractDoc<any>> => {
     const { dbService, _id, overrideDbServiceAccessOptions } = props;
     const dbServiceAccessOptions = overrideDbServiceAccessOptions || this._dbServiceAccessOptions;
     const dbData = await dbService.findById({ _id, dbServiceAccessOptions });

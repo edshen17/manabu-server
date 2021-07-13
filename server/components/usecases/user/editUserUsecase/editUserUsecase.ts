@@ -1,10 +1,10 @@
-import { DbServiceAccessOptions, IDbService } from '../../../dataAccess/abstractions/IDbService';
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
-import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { JoinedUserDoc } from '../../../../models/User';
 
 type EditUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;

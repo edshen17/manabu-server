@@ -5,8 +5,8 @@ import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFa
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { JoinedUserDoc } from '../../../dataAccess/services/user/userDbService';
 import { CurrentAPIUser, RouteData } from '../../abstractions/IUsecase';
+import { JoinedUserDoc } from '../../../../models/User';
 
 let getUserUsecase: GetUserUsecase;
 let fakeDbUserFactory: FakeDbUserFactory;

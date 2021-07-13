@@ -1,7 +1,6 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { UserSchema } from './User';
+import { JoinedUserDoc, UserSchema } from './User';
 import { PackageDoc, PackageSchema } from './Package';
-import { JoinedUserDoc } from '../components/dataAccess/services/user/userDbService';
 
 const PackageTransactionSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),

@@ -8,7 +8,7 @@ import { PackageDbService } from '../../../dataAccess/services/package/packageDb
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
-import { JoinedUserDoc, UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
@@ -21,6 +21,7 @@ import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBa
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity, PackageEntityBuildParams } from '../../../entities/package/packageEntity';
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
+import { JoinedUserDoc } from '../../../../models/User';
 
 type CreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;

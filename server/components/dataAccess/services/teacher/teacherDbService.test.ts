@@ -1,11 +1,11 @@
 import { expect } from 'chai';
 import { makeTeacherDbService } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbTeacherFactory } from '../../testFixtures/fakeDbTeacherFactory';
 import { FakeDbTeacherFactory } from '../../testFixtures/fakeDbTeacherFactory/fakeDbTeacherFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { JoinedUserDoc } from '../user/userDbService';
 import { TeacherDbService } from './teacherDbService';
 
 let teacherDbService: TeacherDbService;
