@@ -5,11 +5,15 @@ import { PackageTransactionDbService } from '../../dataAccess/services/packageTr
 import { UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { UserContactMethod } from '../user/userEntity';
+import {
+  LocationData,
+  LocationDataHandler,
+} from '../utils/locationDataHandler/locationDataHandler';
 
 type OptionalAppointmentEntityInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+  makeLocationDataHandler: LocationDataHandler;
 };
 
 type AppointmentEntityBuildParams = {
@@ -33,17 +37,6 @@ type AppointmentEntityBuildResponse = {
   locationData: LocationData;
 };
 
-type LocationData = {
-  locationName: string;
-  locationType: string;
-  matchedContactMethod: MatchedContactMethod;
-};
-
-type MatchedContactMethod = {
-  hostedByContactMethod: UserContactMethod;
-  reservedByContactMethod: UserContactMethod;
-};
-
 class AppointmentEntity extends AbstractEntity<
   OptionalAppointmentEntityInitParams,
   AppointmentEntityBuildParams,
@@ -51,6 +44,7 @@ class AppointmentEntity extends AbstractEntity<
 > {
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
+  private _locationDataHandler!: LocationDataHandler;
   protected _dbServiceAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,
@@ -94,7 +88,7 @@ class AppointmentEntity extends AbstractEntity<
     const hostedByData = this._getRestrictedUserData(overrideHostedByData);
     const reservedByData = this._getRestrictedUserData(overrideReservedByData);
     const packageTransactionData = await this._getPackageTransactionData(packageTransactionId);
-    const locationData = this._getLocationData({
+    const locationData = this._locationDataHandler.getLocationData({
       hostedByData: overrideHostedByData,
       reservedByData: overrideReservedByData,
     });
@@ -131,66 +125,6 @@ class AppointmentEntity extends AbstractEntity<
     return packageTransactionData;
   };
 
-  private _getLocationData = (props: {
-    hostedByData: JoinedUserDoc;
-    reservedByData: JoinedUserDoc;
-  }): LocationData => {
-    const matchedContactMethod = this._getMatchedContactMethod(props);
-    const { hostedByContactMethod, reservedByContactMethod } = matchedContactMethod;
-    const isOnline =
-      hostedByContactMethod.methodType == 'online' &&
-      reservedByContactMethod.methodType == 'online';
-    const locationData = <LocationData>{
-      matchedContactMethod,
-      locationType: isOnline ? 'online' : 'offline',
-    };
-    if (hostedByContactMethod.methodName == reservedByContactMethod.methodName) {
-      locationData.locationName = hostedByContactMethod.methodName;
-    } else {
-      locationData.locationName = 'alternative';
-    }
-    return locationData;
-  };
-
-  private _getMatchedContactMethod = (props: {
-    hostedByData: JoinedUserDoc;
-    reservedByData: JoinedUserDoc;
-  }): MatchedContactMethod => {
-    const { hostedByData, reservedByData } = props;
-    const matchedContactMethod = <MatchedContactMethod>{
-      hostedByContactMethod: {},
-      reservedByContactMethod: {},
-    };
-    const hostedByContactMethods = this._sortByPrimaryContactMethod(hostedByData.contactMethods);
-    const reservedByContactMethods = this._sortByPrimaryContactMethod(
-      reservedByData.contactMethods
-    );
-    hostedByContactMethods.forEach((hostedByContactMethod) => {
-      reservedByContactMethods.forEach((reservedByContactMethod) => {
-        const isSharedContactMethod =
-          hostedByContactMethod.methodName == reservedByContactMethod.methodName;
-        if (isSharedContactMethod) {
-          matchedContactMethod.hostedByContactMethod = hostedByContactMethod;
-          matchedContactMethod.reservedByContactMethod = reservedByContactMethod;
-          return;
-        } else {
-          matchedContactMethod.hostedByContactMethod = hostedByContactMethods[0];
-          matchedContactMethod.reservedByContactMethod = reservedByContactMethods[0];
-        }
-      });
-    });
-    return matchedContactMethod;
-  };
-
-  private _sortByPrimaryContactMethod = (contactMethods: UserContactMethod[]) => {
-    const sortedByPrimaryContactMethod = contactMethods.sort((a, b) => {
-      let aPrefOrder = a.isPrimaryMethod ? 1 : 0;
-      let bPrefOrder = b.isPrimaryMethod ? 1 : 0;
-      return aPrefOrder - bPrefOrder;
-    });
-    return sortedByPrimaryContactMethod;
-  };
-
   protected _initTemplate = async (
     optionalInitParams: Omit<
       {
@@ -199,9 +133,11 @@ class AppointmentEntity extends AbstractEntity<
       'makeEntityValidator'
     >
   ): Promise<void> => {
-    const { makeUserDbService, makePackageTransactionDbService } = optionalInitParams;
+    const { makeUserDbService, makePackageTransactionDbService, makeLocationDataHandler } =
+      optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
+    this._locationDataHandler = makeLocationDataHandler;
   };
 }
 

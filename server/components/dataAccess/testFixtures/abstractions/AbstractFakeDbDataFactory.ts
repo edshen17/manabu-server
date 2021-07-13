@@ -69,7 +69,7 @@ abstract class AbstractFakeDbDataFactory<
     >
   ): void => {};
 
-  public getDbServiceAccessOptions = () => {
+  public getDbServiceAccessOptions = (): DbServiceAccessOptions => {
     const dbServiceAccessOptionsCopy = this._cloneDeep(this._dbServiceAccessOptions);
     return dbServiceAccessOptionsCopy;
   };
