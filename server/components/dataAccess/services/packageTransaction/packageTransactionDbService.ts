@@ -34,14 +34,14 @@ class PackageTransactionDbService extends AbstractDbService<
     const { dbQueryResult, dbServiceAccessOptions } = props;
     const updateAppointmentPromises: Promise<AppointmentDoc>[] = [];
 
-    dbQueryResult.forEach(async (packageTransaction) => {
+    for (const preUpdatedPackageTransaction of dbQueryResult) {
       const updatedPackageTransaction = await this.findById({
-        _id: packageTransaction._id,
+        _id: preUpdatedPackageTransaction._id,
         dbServiceAccessOptions,
       });
       const updatedLocationData = await this._getUpdatedLocationData(updatedPackageTransaction);
       const toUpdateAppointment = this._appointmentDbService.findOneAndUpdate({
-        searchQuery: { packageTransactionId: packageTransaction._id },
+        searchQuery: { packageTransactionId: preUpdatedPackageTransaction._id },
         dbServiceAccessOptions,
         updateParams: {
           packageTransactionData: updatedPackageTransaction,
@@ -49,7 +49,7 @@ class PackageTransactionDbService extends AbstractDbService<
         },
       });
       updateAppointmentPromises.push(toUpdateAppointment);
-    });
+    }
     return updateAppointmentPromises;
   };
 

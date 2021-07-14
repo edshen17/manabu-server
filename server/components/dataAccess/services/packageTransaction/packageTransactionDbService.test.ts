@@ -1,30 +1,48 @@
 import { expect } from 'chai';
 import { makePackageTransactionDbService } from '.';
+import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
+import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
+import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
 import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeAppointmentDbService } from '../appointment';
+import { AppointmentDbService } from '../appointment/appointmentDbService';
 import { PackageTransactionDbService } from './packageTransactionDbService';
+
 let packageTransactionDbService: PackageTransactionDbService;
+let appointmentDbService: AppointmentDbService;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
+let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
 let fakeTeacher: JoinedUserDoc;
-let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakePackageTransaction: PackageTransactionDoc;
+let fakeAppointment: AppointmentDoc;
 
 before(async () => {
   packageTransactionDbService = await makePackageTransactionDbService;
+  appointmentDbService = await makeAppointmentDbService;
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
-  fakeDbUserFactory = await makeFakeDbUserFactory;
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   dbServiceAccessOptions = fakeDbPackageTransactionFactory.getDbServiceAccessOptions();
+  fakeDbUserFactory = await makeFakeDbUserFactory;
+  fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
 });
 
 beforeEach(async () => {
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
+    hostedById: fakePackageTransaction.hostedById.toString(),
+    reservedById: fakePackageTransaction.reservedById.toString(),
+    packageTransactionId: fakePackageTransaction._id.toString(),
+    startTime: new Date(),
+    endTime: new Date(),
+  });
 });
 
 describe('packageTransactionDbService', () => {
@@ -154,9 +172,15 @@ describe('packageTransactionDbService', () => {
         searchQuery: { _id: fakePackageTransaction._id },
         updateParams: { lessonLanguage: 'en' },
         dbServiceAccessOptions,
+        isUpdatingDbDependencies: true,
+      });
+      const updatedAppointment = await appointmentDbService.findOne({
+        searchQuery: { packageTransactionId: updatedPackageTransaction._id },
+        dbServiceAccessOptions,
       });
       expect(updatedPackageTransaction).to.not.deep.equal(fakePackageTransaction);
       expect(updatedPackageTransaction.lessonLanguage).to.equal('en');
+      expect(updatedAppointment.packageTransactionData.lessonLanguage).to.equal('en');
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {

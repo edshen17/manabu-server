@@ -99,24 +99,24 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
     userData: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
-    const userCopy: any = this._cloneDeep(userData);
-    const _id: string = userData._id;
+    const joinedUserDoc: any = this._cloneDeep(userData);
+    const userId: string = userData._id;
     const teacherData: TeacherDoc = await this._teacherDbService.findById({
-      _id,
+      _id: userId,
       dbServiceAccessOptions,
     });
 
     const packages = await this._packageDbService.find({
-      searchQuery: { hostedById: _id },
+      searchQuery: { hostedById: userId },
       dbServiceAccessOptions,
     });
 
     if (teacherData) {
-      userCopy.teacherData = teacherData;
-      userCopy.teacherData.packages = packages;
+      joinedUserDoc.teacherData = teacherData;
+      joinedUserDoc.teacherData.packages = packages;
     }
 
-    return userCopy;
+    return joinedUserDoc;
   };
 
   protected _updateShallowDbDependenciesTemplate = async (props: {

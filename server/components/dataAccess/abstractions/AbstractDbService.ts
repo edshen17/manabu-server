@@ -168,12 +168,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     const isShallowUpdate = this._updateDbDependencyMode == UPDATE_DB_DEPENDENCY_MODE.SHALLOW;
     const isDeepUpdate = this._updateDbDependencyMode == UPDATE_DB_DEPENDENCY_MODE.DEEP;
     const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
+    const isArray = Array.isArray(dbQueryResult);
     if (isShallowUpdate) {
       await this._updateShallowDbDependencies({
         dbQueryResult: <DbDoc>dbQueryResult,
         dbServiceAccessOptions,
       });
     } else if (isDeepUpdate) {
+      if (!isArray) {
+        dbQueryResult = <DbDoc[]>[dbQueryResult];
+      }
       await this._updateDeepDbDependencies({
         dbQueryResult: <DbDoc[]>dbQueryResult,
         dbServiceAccessOptions,

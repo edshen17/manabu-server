@@ -4,11 +4,8 @@ import {
   PackageEntityBuildResponse,
 } from '../../../entities/package/packageEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
-import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
-type PartialFakeDbPackageFactoryInitParams = {
-  makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
-};
+type PartialFakeDbPackageFactoryInitParams = {};
 
 class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   PartialFakeDbPackageFactoryInitParams,
@@ -16,12 +13,9 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   PackageEntityBuildResponse,
   PackageDoc
 > {
-  private _fakeDbUserFactory!: FakeDbUserFactory;
-
   protected _createFakeBuildParams = async (): Promise<PackageEntityBuildParams> => {
-    const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
-      hostedById: fakeUser._id.toString(),
+      hostedById: '605bc5ad9db900001528f77c',
       lessonAmount: 5,
       packageType: 'default',
       packageName: 'light',

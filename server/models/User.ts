@@ -43,4 +43,4 @@ type UserDoc = ExtractDoc<typeof UserSchema>;
 type JoinedTeacherDoc = TeacherDoc & { packages: [PackageDoc] };
 type JoinedUserDoc = UserDoc & { teacherAppPending: boolean; teacherData: JoinedTeacherDoc };
 
-export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed };
+export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed, UserDoc };
