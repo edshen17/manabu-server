@@ -45,10 +45,6 @@ abstract class AbstractEntityValidator extends AbstractValidator<
     }
     return validatedBuildParams;
   };
-
-  protected _initTemplate = (
-    optionalInitParams: Omit<OptionalEntityValidatorInitParams, 'joi'>
-  ): void => {};
 }
 
 export {

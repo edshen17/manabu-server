@@ -1,5 +1,5 @@
 import { MinuteBankEntityValidator } from './minuteBankEntityValidator';
-import { extendedJoi as joi } from '../../utils/joi/extendedJoi';
+import { joi } from '../../../entities/utils/joi';
 
 const makeMinuteBankEntityValidator = new MinuteBankEntityValidator().init({ joi });
 

@@ -2,7 +2,7 @@ import { makePackageTransactionDbService } from '../../dataAccess/services/packa
 import { makeUserDbService } from '../../dataAccess/services/user';
 import { makeLocationDataHandler } from '../utils/locationDataHandler';
 import { AppointmentEntity } from './appointmentEntity';
-import { makeAppointmentEntityValidator } from './validators';
+import { makeAppointmentEntityValidator } from '../../validators/appointment/entity';
 
 const makeAppointmentEntity = new AppointmentEntity().init({
   makePackageTransactionDbService,

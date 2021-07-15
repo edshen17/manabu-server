@@ -1,5 +1,5 @@
 import { TeacherBalanceEntityValidator } from './teacherBalanceEntityValidator';
-import { extendedJoi as joi } from '../../utils/joi/extendedJoi';
+import { joi } from '../../../entities/utils/joi';
 
 const makeTeacherBalanceEntityValidator = new TeacherBalanceEntityValidator().init({ joi });
 

@@ -1,5 +1,5 @@
 import { AppointmentEntityValidator } from './appointmentEntityValidator';
-import { extendedJoi as joi } from '../../utils/joi/extendedJoi';
+import { joi } from '../../../entities/utils/joi';
 const makeAppointmentEntityValidator = new AppointmentEntityValidator().init({ joi });
 
 export { makeAppointmentEntityValidator };

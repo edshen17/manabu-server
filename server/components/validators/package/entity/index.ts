@@ -1,5 +1,5 @@
 import { PackageEntityValidator } from './packageEntityValidator';
-import { extendedJoi as joi } from '../../utils/joi/extendedJoi';
+import { joi } from '../../../entities/utils/joi';
 
 const makePackageEntityValidator = new PackageEntityValidator().init({ joi });
 

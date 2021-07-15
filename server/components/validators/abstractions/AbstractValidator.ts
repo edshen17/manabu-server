@@ -31,9 +31,9 @@ abstract class AbstractValidator<OptionalValidatorInitParams, ValidatorValidateP
     return this;
   };
 
-  protected abstract _initTemplate(
+  protected _initTemplate = (
     optionalInitParams: Omit<ValidatorInitParams<OptionalValidatorInitParams>, 'joi'>
-  ): void;
+  ): void => {};
 
   protected abstract _initValidationSchemas(): void;
 }

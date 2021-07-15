@@ -1,4 +1,4 @@
-import { AbstractEntityValidator } from '../../../validators/abstractions/AbstractEntityValidator';
+import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
 
 class TeacherBalanceEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {

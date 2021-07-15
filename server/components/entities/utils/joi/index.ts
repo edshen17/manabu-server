@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import sanitizeHtml from 'sanitize-html';
 
-const extendedJoi = Joi.extend((joi) => {
+const joi = Joi.extend((joi) => {
   return {
     type: 'string',
     base: joi.string(),
@@ -18,4 +18,4 @@ const extendedJoi = Joi.extend((joi) => {
   };
 });
 
-export { extendedJoi };
+export { joi };
