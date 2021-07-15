@@ -15,26 +15,36 @@ import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFa
 import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { JoinedUserDoc } from '../../../../models/User';
+import { MinuteBankDoc } from '../../../../models/MinuteBank';
+import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
+import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
+import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
+import { makeMinuteBankDbService } from '../minuteBank';
 
 let userDbService: UserDbService;
 let packageTransactionDbService: PackageTransactionDbService;
 let appointmentDbService: AppointmentDbService;
+let minuteBankDbService: MinuteBankDbService;
 let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
+let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
 let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
+let fakeMinuteBank: MinuteBankDoc;
 
 before(async () => {
   userDbService = await makeUserDbService;
   packageTransactionDbService = await makePackageTransactionDbService;
   appointmentDbService = await makeAppointmentDbService;
+  minuteBankDbService = await makeMinuteBankDbService;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
+  fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;
 });
 
 beforeEach(async () => {
@@ -58,6 +68,10 @@ beforeEach(async () => {
     packageTransactionId: fakePackageTransaction._id.toString(),
     startTime: new Date(),
     endTime: new Date(),
+  });
+  fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
+    hostedById: fakeTeacher._id.toString(),
+    reservedById: fakeUser._id.toString(),
   });
 });
 
@@ -286,6 +300,14 @@ describe('userDbService', () => {
                 searchQuery: { hostedById: fakeTeacher._id },
                 dbServiceAccessOptions,
               });
+              const updatedAppointment = await appointmentDbService.findOne({
+                searchQuery: { packageTransactionId: updatedPackageTransaction._id },
+                dbServiceAccessOptions,
+              });
+              const updatedMinuteBank = await minuteBankDbService.findOne({
+                searchQuery: { hostedById: fakeTeacher._id },
+                dbServiceAccessOptions,
+              });
               const packageTransactionHostedByData = updatedPackageTransaction.hostedByData;
               expect(packageTransactionHostedByData.name).to.equal(updatedTeacher.name);
               expect(packageTransactionHostedByData).to.not.have.property('email');
@@ -293,14 +315,12 @@ describe('userDbService', () => {
               expect(packageTransactionHostedByData.teacherData).to.not.have.property(
                 'licensePathUrl'
               );
-              const updatedAppointment = await appointmentDbService.findOne({
-                searchQuery: { packageTransactionId: updatedPackageTransaction._id },
-                dbServiceAccessOptions,
-              });
               expect(updatedAppointment.packageTransactionData.hostedByData.name).to.equal(
                 updatedTeacher.name
               );
               expect(updatedAppointment.locationData.locationName).to.equal('alternative');
+              expect(updatedMinuteBank.hostedByData.name).to.equal(updatedTeacher.name);
+              expect(updatedMinuteBank.hostedByData).to.not.have.property('contactMethods');
             });
           });
           context('updating others', () => {

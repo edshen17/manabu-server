@@ -45,7 +45,6 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
     } & OptionalDbServiceInitParams
   ) => Promise<this>;
   getDbModelViews: () => DbModelViews;
-  updateDbDependencies: (dbQueryResult: ExtractDoc<any> | ExtractDoc<any>[]) => Promise<void>;
 }
 
 export {

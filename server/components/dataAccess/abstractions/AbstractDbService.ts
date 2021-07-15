@@ -150,7 +150,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     }
   };
 
-  public updateDbDependencies = async (
+  private updateDbDependencies = async (
     dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
     const isUpdatingSync = process.env.NODE_ENV != 'production';
