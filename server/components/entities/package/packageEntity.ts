@@ -25,6 +25,7 @@ type PackageEntityBuildResponse = {
   isOffering: boolean;
   packageType: string;
   lessonDurations: number[];
+  lastUpdated: Date;
 };
 
 class PackageEntity extends AbstractEntity<
@@ -48,6 +49,7 @@ class PackageEntity extends AbstractEntity<
       packageType,
       packageName,
       lessonDurations,
+      lastUpdated: new Date(),
     });
     return packageEntity;
   };

@@ -26,6 +26,7 @@ const AppointmentSchema = createSchema({
       reservedByContactMethod: UserContactMethodEmbed,
     }),
   }),
+  lastUpdated: Type.date({ required: true }),
 });
 
 const Appointment = typedModel('Appointment', AppointmentSchema);

@@ -17,6 +17,7 @@ type TeacherEntityBuildResponse = {
   tags: string[];
   lessonCount: number;
   studentCount: number;
+  lastUpdated: Date;
 };
 
 class TeacherEntity extends AbstractEntity<
@@ -39,6 +40,7 @@ class TeacherEntity extends AbstractEntity<
       tags: [],
       lessonCount: 0,
       studentCount: 0,
+      lastUpdated: new Date(),
     });
     return teacherEntity;
   };

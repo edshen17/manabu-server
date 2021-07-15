@@ -25,6 +25,7 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       tags: this._joi.array().items(this._joi.string().max(100)).unique(),
       lessonCount: this._joi.number().forbidden(),
       studentCount: this._joi.number().forbidden(),
+      lastUpdated: this._joi.object().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema.keys({
       isApproved: this._joi.boolean(),

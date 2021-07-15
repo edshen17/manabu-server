@@ -35,6 +35,7 @@ type AppointmentEntityBuildResponse = {
   cancellationReason?: string;
   packageTransactionData: PackageTransactionDoc;
   locationData: LocationData;
+  lastUpdated: Date;
 };
 
 class AppointmentEntity extends AbstractEntity<
@@ -72,6 +73,7 @@ class AppointmentEntity extends AbstractEntity<
       status: 'pending',
       packageTransactionData: packageTransactionData || {},
       locationData: locationData || {},
+      lastUpdated: new Date(),
     });
     return appointmentEntity;
   };

@@ -35,6 +35,7 @@ type UserEntityBuildResponse = {
   contactMethods: UserContactMethod[] | [];
   isEmailVerified: boolean;
   verificationToken: string;
+  lastUpdated: Date;
 };
 
 class UserEntity extends AbstractEntity<
@@ -67,6 +68,7 @@ class UserEntity extends AbstractEntity<
       contactMethods: contactMethods || [],
       isEmailVerified: false,
       verificationToken,
+      lastUpdated: new Date(),
     });
     return userEntity;
   };

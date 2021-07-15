@@ -36,6 +36,7 @@ const UserSchema = createSchema({
   contactMethods: Type.array({ required: true }).of(UserContactMethodEmbed),
   isEmailVerified: Type.boolean({ required: true }),
   verificationToken: Type.string({ required: true }),
+  lastUpdated: Type.date({ required: true }),
 });
 
 const User = typedModel('User', UserSchema);

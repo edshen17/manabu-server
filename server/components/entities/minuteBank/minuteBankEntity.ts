@@ -18,6 +18,7 @@ type MinuteBankEntityBuildResponse = {
   minuteBank: number;
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;
+  lastUpdated: Date;
 };
 
 class MinuteBankEntity extends AbstractEntity<
@@ -45,6 +46,7 @@ class MinuteBankEntity extends AbstractEntity<
       minuteBank: 0,
       hostedByData: hostedByData || {},
       reservedByData: reservedByData || {},
+      lastUpdated: new Date(),
     });
     return minuteBankEntity;
   };

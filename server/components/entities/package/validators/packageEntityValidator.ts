@@ -16,6 +16,7 @@ class PackageEntityValidator extends AbstractEntityValidator {
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi.string().forbidden(),
+      lastUpdated: this._joi.object().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };

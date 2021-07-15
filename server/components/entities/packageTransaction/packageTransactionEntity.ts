@@ -43,6 +43,7 @@ type PackageTransactionEntityBuildResponse = {
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;
   paymentData: PaymentData;
+  lastUpdated: Date;
 };
 
 class PackageTransactionEntity extends AbstractEntity<
@@ -100,6 +101,7 @@ class PackageTransactionEntity extends AbstractEntity<
       packageData,
       hostedByData,
       reservedByData,
+      lastUpdated: new Date(),
     });
     return packageTransactionEntity;
   };
