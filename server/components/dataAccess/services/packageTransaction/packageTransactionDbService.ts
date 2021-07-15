@@ -2,7 +2,7 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { AppointmentDbService } from '../appointment/appointmentDbService';
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { DbServiceAccessOptions } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
 import { LocationDataHandler } from '../../../entities/utils/locationDataHandler/locationDataHandler';
 
 type OptionalPackageTransactionDbServiceInitParams = {
@@ -27,33 +27,29 @@ class PackageTransactionDbService extends AbstractDbService<
   private _userModel!: any;
 
   protected _updateDbDependencyControllerTemplate = async (props: {
-    updatedDependeeDocs: PackageTransactionDoc[];
+    updateDependentPromises: Promise<any>[];
+    updatedDependeeDoc: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
-    const { updatedDependeeDocs } = props;
-    const toUpdateDependentPromises: Promise<any>[] = [];
-    for (const updatedPackageTransactionDoc of updatedDependeeDocs) {
-      const toUpdatePackageTransactionPromises = await this._getToUpdateDependentPromises({
-        ...props,
-        updatedDependentDoc: updatedPackageTransactionDoc,
-        dependencyDbService: this._appointmentDbService,
-      });
-      toUpdateDependentPromises.push(...toUpdatePackageTransactionPromises);
-    }
-    return toUpdateDependentPromises;
+    const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
+    const toUpdatePackageTransactionPromises = await this._getUpdateDependeePromises({
+      ...getUpdateDependeePromisesProps,
+      dependencyDbService: this._appointmentDbService,
+    });
+    updateDependentPromises.push(...toUpdatePackageTransactionPromises);
   };
 
-  private _getToUpdateDependentPromises = async (props: {
-    updatedDependentDoc: PackageTransactionDoc;
+  protected _getUpdateDependeePromises = async (props: {
+    updatedDependeeDoc: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dependencyDbService: AppointmentDbService;
+    dependencyDbService: IDbService<any, any>;
   }): Promise<Promise<any>[]> => {
-    const { updatedDependentDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    const updatedLocationData = await this._getUpdatedLocationData(updatedDependentDoc);
+    const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
+    const updatedLocationData = await this._getUpdatedLocationData(updatedDependeeDoc);
     const toUpdateAppointmentPromises = dependencyDbService.updateMany({
-      searchQuery: { packageTransactionId: updatedDependentDoc._id },
+      searchQuery: { packageTransactionId: updatedDependeeDoc._id },
       updateParams: {
-        packageTransactionData: updatedDependentDoc,
+        packageTransactionData: updatedDependeeDoc,
         locationData: updatedLocationData,
       },
       dbServiceAccessOptions,

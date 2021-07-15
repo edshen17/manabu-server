@@ -1,4 +1,4 @@
-import { DbServiceAccessOptions, DbServiceParams } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, DbServiceParams, IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDbService } from '../teacher/teacherDbService';
 import { PackageDbService } from '../package/packageDbService';
@@ -107,84 +107,73 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
       _id: userId,
       dbServiceAccessOptions,
     });
-
     const packages = await this._packageDbService.find({
       searchQuery: { hostedById: userId },
       dbServiceAccessOptions,
     });
-
     if (teacherData) {
       joinedUserDoc.teacherData = teacherData;
       joinedUserDoc.teacherData.packages = packages;
     }
-
     return joinedUserDoc;
   };
 
   protected _updateDbDependencyControllerTemplate = async (props: {
-    updatedDependeeDocs: JoinedUserDoc[];
+    updateDependentPromises: Promise<any>[];
+    updatedDependeeDoc: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
-    const { updatedDependeeDocs } = props;
-    const toUpdateDependentPromises: Promise<any>[] = [];
-    for (const updatedJoinedUserDoc of updatedDependeeDocs) {
-      const toUpdatePackageTransactionPromises = this._getToUpdateDependeePromises({
-        ...props,
-        updatedJoinedUserDoc,
-        dependencyDbService: this._packageTransactionDbService,
-      });
-      // const toUpdateMinuteBankPromises = this._getToUpdateDependeePromises({
-      //   ...props,
-      //   updatedJoinedUserDoc,
-      //   dependencyDbService: this._minuteBankDbService,
-      // });
-      toUpdateDependentPromises.push(
-        ...toUpdatePackageTransactionPromises
-        // ...toUpdateMinuteBankPromises
-      );
-    }
-    return toUpdateDependentPromises;
+    const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
+    const toUpdatePackageTransactionPromises = await this._getUpdateDependeePromises({
+      ...getUpdateDependeePromisesProps,
+      dependencyDbService: this._packageTransactionDbService,
+    });
+    // const toUpdateMinuteBankPromises = this._getToUpdateDependeePromises({
+    //   ...props,
+    //   updatedJoinedUserDoc,
+    //   dependencyDbService: this._minuteBankDbService,
+    // });
+    updateDependentPromises.push(
+      ...toUpdatePackageTransactionPromises
+      // ...toUpdateMinuteBankPromises
+    );
   };
 
-  private _getToUpdateDependeePromises = (props: {
-    updatedJoinedUserDoc: JoinedUserDoc;
+  protected _getUpdateDependeePromises = async (props: {
+    updatedDependeeDoc: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dependencyDbService: PackageTransactionDbService | MinuteBankDbService;
-  }): Promise<any>[] => {
-    const { updatedJoinedUserDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    console.log(updatedJoinedUserDoc, 'here');
-    const packageTransactionHostedBySearchQuery = { hostedById: updatedJoinedUserDoc._id };
-    const toUpdatePackageTransactionHostedByPromises = dependencyDbService.updateMany({
+    dependencyDbService: IDbService<any, any>;
+  }): Promise<Promise<any>[]> => {
+    const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
+    const packageTransactionHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
+    const updatePackageTransactionHostedByPromises = this._createUpdateDependeePromise({
       searchQuery: packageTransactionHostedBySearchQuery,
-      updateParams: { hostedByData: updatedJoinedUserDoc },
+      updateParams: { hostedByData: updatedDependeeDoc },
       dbServiceAccessOptions,
-      dbDependencyUpdateParams: {
-        updatedDocSearchQuery: packageTransactionHostedBySearchQuery,
-      },
+      dependencyDbService,
+      updatedDependentSearchQuery: packageTransactionHostedBySearchQuery,
     });
-    const packageTransactionReservedBySearchQuery = { reservedById: updatedJoinedUserDoc._id };
-    const toUpdatePackageTransactionReservedByPromises = dependencyDbService.updateMany({
+    const packageTransactionReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
+    const updatePackageTransactionReservedByPromises = this._createUpdateDependeePromise({
       searchQuery: packageTransactionReservedBySearchQuery,
-      updateParams: { reservedByData: updatedJoinedUserDoc },
+      updateParams: { hostedByData: updatedDependeeDoc },
       dbServiceAccessOptions,
-      dbDependencyUpdateParams: {
-        updatedDocSearchQuery: packageTransactionReservedBySearchQuery,
-      },
+      dependencyDbService,
+      updatedDependentSearchQuery: packageTransactionReservedBySearchQuery,
     });
-    return [
-      toUpdatePackageTransactionHostedByPromises,
-      toUpdatePackageTransactionReservedByPromises,
-    ];
+    return [updatePackageTransactionHostedByPromises, updatePackageTransactionReservedByPromises];
   };
 
-  protected _initTemplate = async (partialDbServiceInitParams: OptionalUserDbServiceInitParams) => {
+  protected _initTemplate = async (
+    optionalDbServiceInitParams: OptionalUserDbServiceInitParams
+  ) => {
     const {
       makeTeacherDbService,
       makePackageDbService,
       makePackageTransactionDbService,
       makeMinuteBankDbService,
       comparePassword,
-    } = partialDbServiceInitParams;
+    } = optionalDbServiceInitParams;
     this._teacherDbService = await makeTeacherDbService;
     this._packageDbService = await makePackageDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;

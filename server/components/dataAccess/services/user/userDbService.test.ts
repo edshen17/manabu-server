@@ -279,7 +279,7 @@ describe('userDbService', () => {
                 },
                 dbServiceAccessOptions,
                 dbDependencyUpdateParams: {
-                  updatedDocSearchQuery: { _id: fakeTeacher._id },
+                  updatedDependentSearchQuery: { _id: fakeTeacher._id },
                 },
               });
               const findPackageTransaction = await packageTransactionDbService.findOne({

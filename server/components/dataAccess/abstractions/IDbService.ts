@@ -18,7 +18,7 @@ type DbServiceAccessOptions = {
 };
 
 type DbDependencyUpdateParams = {
-  updatedDocSearchQuery?: {};
+  updatedDependentSearchQuery?: {};
 };
 
 type DbModelViews = {

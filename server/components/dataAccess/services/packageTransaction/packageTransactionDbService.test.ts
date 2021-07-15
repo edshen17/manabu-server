@@ -171,7 +171,7 @@ describe('packageTransactionDbService', () => {
         updateParams: { lessonLanguage: 'en' },
         dbServiceAccessOptions,
         dbDependencyUpdateParams: {
-          updatedDocSearchQuery: {
+          updatedDependentSearchQuery: {
             _id: fakePackageTransaction._id,
           },
         },
