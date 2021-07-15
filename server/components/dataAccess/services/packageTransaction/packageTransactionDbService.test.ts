@@ -172,15 +172,14 @@ describe('packageTransactionDbService', () => {
         searchQuery: { _id: fakePackageTransaction._id },
         updateParams: { lessonLanguage: 'en' },
         dbServiceAccessOptions,
-        isUpdatingDbDependencies: true,
       });
-      const updatedAppointment = await appointmentDbService.findOne({
-        searchQuery: { packageTransactionId: updatedPackageTransaction._id },
-        dbServiceAccessOptions,
-      });
+      // const updatedAppointment = await appointmentDbService.findOne({
+      //   searchQuery: { packageTransactionId: updatedPackageTransaction._id },
+      //   dbServiceAccessOptions,
+      // });
       expect(updatedPackageTransaction).to.not.deep.equal(fakePackageTransaction);
       expect(updatedPackageTransaction.lessonLanguage).to.equal('en');
-      expect(updatedAppointment.packageTransactionData.lessonLanguage).to.equal('en');
+      // expect(updatedAppointment.packageTransactionData.lessonLanguage).to.equal('en');
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {

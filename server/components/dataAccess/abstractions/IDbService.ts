@@ -1,17 +1,12 @@
 import { ExtractDoc } from 'ts-mongoose';
 
-enum UPDATE_DB_DEPENDENCY_MODE {
-  SHALLOW = 'shallow',
-  DEEP = 'deep',
-}
-
 type DbServiceParams = {
   _id?: string;
   searchQuery?: {};
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: {};
   updateParams?: {};
-  isUpdatingDbDependencies?: boolean;
+  dbDependencyUpdateParams?: DbDependencyUpdateParams;
 };
 
 type DbServiceAccessOptions = {
@@ -20,6 +15,10 @@ type DbServiceAccessOptions = {
   currentAPIUserRole: string;
   isSelf: boolean;
   isOverrideView?: boolean;
+};
+
+type DbDependencyUpdateParams = {
+  updatedDocSearchQuery?: {};
 };
 
 type DbModelViews = {
@@ -54,5 +53,5 @@ export {
   DbServiceParams,
   IDbService,
   DbModelViews,
-  UPDATE_DB_DEPENDENCY_MODE,
+  DbDependencyUpdateParams,
 };

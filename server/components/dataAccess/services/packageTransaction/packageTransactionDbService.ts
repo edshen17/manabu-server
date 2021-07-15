@@ -2,7 +2,7 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { AppointmentDbService } from '../appointment/appointmentDbService';
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { DbServiceAccessOptions, UPDATE_DB_DEPENDENCY_MODE } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { LocationDataHandler } from '../../../entities/utils/locationDataHandler/locationDataHandler';
 
 type OptionalPackageTransactionDbServiceInitParams = {
@@ -22,35 +22,43 @@ class PackageTransactionDbService extends AbstractDbService<
     };
   }
 
-  protected _updateDbDependencyMode: string = UPDATE_DB_DEPENDENCY_MODE.DEEP;
   private _appointmentDbService!: AppointmentDbService;
   private _locationDataHandler!: LocationDataHandler;
   private _userModel!: any;
 
-  protected _updateDeepDbDependenciesTemplate = async (props: {
-    dbQueryResult: PackageTransactionDoc[];
+  protected _updateDbDependencyControllerTemplate = async (props: {
+    updatedDependeeDocs: PackageTransactionDoc[];
     dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<Promise<AppointmentDoc>[]> => {
-    const { dbQueryResult, dbServiceAccessOptions } = props;
-    const updateAppointmentPromises: Promise<AppointmentDoc>[] = [];
-
-    for (const preUpdatedPackageTransaction of dbQueryResult) {
-      const updatedPackageTransaction = await this.findById({
-        _id: preUpdatedPackageTransaction._id,
-        dbServiceAccessOptions,
+  }) => {
+    const { updatedDependeeDocs } = props;
+    const toUpdateDependentPromises: Promise<any>[] = [];
+    for (const updatedPackageTransactionDoc of updatedDependeeDocs) {
+      const toUpdatePackageTransactionPromises = await this._getToUpdateDependentPromises({
+        ...props,
+        updatedDependentDoc: updatedPackageTransactionDoc,
+        dependencyDbService: this._appointmentDbService,
       });
-      const updatedLocationData = await this._getUpdatedLocationData(updatedPackageTransaction);
-      const toUpdateAppointment = this._appointmentDbService.findOneAndUpdate({
-        searchQuery: { packageTransactionId: preUpdatedPackageTransaction._id },
-        dbServiceAccessOptions,
-        updateParams: {
-          packageTransactionData: updatedPackageTransaction,
-          locationData: updatedLocationData,
-        },
-      });
-      updateAppointmentPromises.push(toUpdateAppointment);
+      toUpdateDependentPromises.push(...toUpdatePackageTransactionPromises);
     }
-    return updateAppointmentPromises;
+    return toUpdateDependentPromises;
+  };
+
+  private _getToUpdateDependentPromises = async (props: {
+    updatedDependentDoc: PackageTransactionDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    dependencyDbService: AppointmentDbService;
+  }): Promise<Promise<any>[]> => {
+    const { updatedDependentDoc, dbServiceAccessOptions, dependencyDbService } = props;
+    const updatedLocationData = this._getUpdatedLocationData(updatedDependentDoc);
+    const toUpdateAppointmentPromises = dependencyDbService.updateMany({
+      searchQuery: { packageTransactionId: updatedDependentDoc._id },
+      updateParams: {
+        packageTransactionData: updatedDependentDoc,
+        locationData: updatedLocationData,
+      },
+      dbServiceAccessOptions,
+    });
+    return [toUpdateAppointmentPromises];
   };
 
   private _getUpdatedLocationData = async (updatedPackageTransaction: PackageTransactionDoc) => {

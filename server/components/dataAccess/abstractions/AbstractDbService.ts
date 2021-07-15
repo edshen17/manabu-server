@@ -1,9 +1,8 @@
-import { ExtractDoc } from 'ts-mongoose';
 import {
   DbServiceAccessOptions,
   DbModelViews,
   IDbService,
-  UPDATE_DB_DEPENDENCY_MODE,
+  DbDependencyUpdateParams,
 } from './IDbService';
 
 abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasId>
@@ -104,7 +103,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const insertedModel = await this._dbModel.create(modelToInsert);
     // return findById result rather than insertedModel to ensure caller gets correct select view
-    const dbQueryPromise = await this._dbModel.findById(insertedModel._id, selectView).lean();
+    const dbQueryPromise = this._dbModel.findById(insertedModel._id, selectView).lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
     return dbQueryResult;
   };
@@ -115,7 +114,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
   }): Promise<DbDoc[]> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = await this._dbModel.insertMany(modelToInsert, selectView, {
+    const dbQueryPromise = this._dbModel.insertMany(modelToInsert, selectView, {
       lean: true,
     });
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
@@ -126,9 +125,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     searchQuery?: {};
     updateParams?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
-    isUpdatingDbDependencies?: boolean;
+    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions, isUpdatingDbDependencies } =
+    const { searchQuery, updateParams, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
@@ -138,86 +137,55 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       })
       .lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
-    await this._startDbDependencyUpdate({ isUpdatingDbDependencies, dbQueryResult });
+    await this._updateDbDependenciesBranch({ dbDependencyUpdateParams });
     return dbQueryResult;
   };
 
-  private _startDbDependencyUpdate = async (props: {
-    dbQueryResult: Promise<any>;
-    isUpdatingDbDependencies?: boolean;
+  private _updateDbDependenciesBranch = async (props: {
+    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }) => {
-    const { dbQueryResult, isUpdatingDbDependencies } = props;
-    if (dbQueryResult && isUpdatingDbDependencies) {
-      await this.updateDbDependencies(dbQueryResult);
+    const { dbDependencyUpdateParams } = props;
+    if (dbDependencyUpdateParams) {
+      await this.updateDbDependencies({
+        ...dbDependencyUpdateParams,
+      });
     }
   };
 
   public updateDbDependencies = async (
-    dbQueryResult: ExtractDoc<any> | ExtractDoc<any>[]
+    dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
     const isUpdatingSync = process.env.NODE_ENV != 'production';
     const isUpdatingAsync = process.env.NODE_ENV == 'production';
     if (isUpdatingSync) {
-      await this._updateDbDependencyController(dbQueryResult);
+      await this._updateDbDependencyController(dbDependencyUpdateParams);
     } else if (isUpdatingAsync) {
-      this._updateDbDependencyController(dbQueryResult);
+      this._updateDbDependencyController(dbDependencyUpdateParams);
     }
   };
 
-  private _updateDbDependencyController = async (dbQueryResult: DbDoc | DbDoc[]) => {
-    const isShallowUpdate = this._updateDbDependencyMode == UPDATE_DB_DEPENDENCY_MODE.SHALLOW;
-    const isDeepUpdate = this._updateDbDependencyMode == UPDATE_DB_DEPENDENCY_MODE.DEEP;
+  private _updateDbDependencyController = async (
+    dbDependencyUpdateParams: DbDependencyUpdateParams
+  ): Promise<void> => {
+    const { updatedDocSearchQuery } = dbDependencyUpdateParams;
     const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
-    const isArray = Array.isArray(dbQueryResult);
-    if (isShallowUpdate) {
-      await this._updateShallowDbDependencies({
-        dbQueryResult: <DbDoc>dbQueryResult,
-        dbServiceAccessOptions,
-      });
-    } else if (isDeepUpdate) {
-      if (!isArray) {
-        dbQueryResult = <DbDoc[]>[dbQueryResult];
-      }
-      await this._updateDeepDbDependencies({
-        dbQueryResult: <DbDoc[]>dbQueryResult,
-        dbServiceAccessOptions,
-      });
-    }
-  };
-
-  private _updateShallowDbDependencies = async (props: {
-    dbQueryResult: DbDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }) => {
-    const { dbQueryResult, dbServiceAccessOptions } = props;
-    const updatedDependencyData = await this.findById({
-      _id: dbQueryResult._id,
+    const updatedDependeeDocs = await this.find({
+      searchQuery: updatedDocSearchQuery,
       dbServiceAccessOptions,
     });
-    await this._updateShallowDbDependenciesTemplate({
-      updatedDependencyData,
+    const toUpdateDependentPromises = await this._updateDbDependencyControllerTemplate({
+      updatedDependeeDocs,
       dbServiceAccessOptions,
     });
+    console.log(toUpdateDependentPromises, 'here');
+    await Promise.all(toUpdateDependentPromises);
   };
 
-  protected _updateShallowDbDependenciesTemplate = async (props: {
-    updatedDependencyData: DbDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }) => {};
-
-  private _updateDeepDbDependencies = async (props: {
-    dbQueryResult: DbDoc[];
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }) => {
-    const updateDependencyPromises = await this._updateDeepDbDependenciesTemplate(props);
-    await Promise.all(updateDependencyPromises);
-  };
-
-  protected _updateDeepDbDependenciesTemplate = async (props: {
-    dbQueryResult: DbDoc[];
+  protected _updateDbDependencyControllerTemplate = async (props: {
+    updatedDependeeDocs: DbDoc[];
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<Promise<any>[]> => {
-    return new Promise(() => {});
+    return [new Promise(() => {})];
   };
 
   protected _getBaseDbServiceAccessOptions = () => {
@@ -234,9 +202,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     searchQuery?: {};
     updateParams?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
-    isUpdatingDbDependencies?: boolean;
+    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions, isUpdatingDbDependencies } =
+    const { searchQuery, updateParams, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
@@ -246,7 +214,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       })
       .lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
-    await this._startDbDependencyUpdate({ isUpdatingDbDependencies, dbQueryResult });
+    await this._updateDbDependenciesBranch({ dbDependencyUpdateParams });
     return dbQueryResult;
   };
 
