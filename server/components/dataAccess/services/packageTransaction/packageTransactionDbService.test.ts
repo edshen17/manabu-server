@@ -20,7 +20,6 @@ let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
-let fakeTeacher: JoinedUserDoc;
 let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
 
@@ -31,7 +30,6 @@ before(async () => {
   dbServiceAccessOptions = fakeDbPackageTransactionFactory.getDbServiceAccessOptions();
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
 });
 
 beforeEach(async () => {
@@ -172,14 +170,19 @@ describe('packageTransactionDbService', () => {
         searchQuery: { _id: fakePackageTransaction._id },
         updateParams: { lessonLanguage: 'en' },
         dbServiceAccessOptions,
+        dbDependencyUpdateParams: {
+          updatedDocSearchQuery: {
+            _id: fakePackageTransaction._id,
+          },
+        },
       });
-      // const updatedAppointment = await appointmentDbService.findOne({
-      //   searchQuery: { packageTransactionId: updatedPackageTransaction._id },
-      //   dbServiceAccessOptions,
-      // });
+      const updatedAppointment = await appointmentDbService.findOne({
+        searchQuery: { packageTransactionId: updatedPackageTransaction._id },
+        dbServiceAccessOptions,
+      });
       expect(updatedPackageTransaction).to.not.deep.equal(fakePackageTransaction);
       expect(updatedPackageTransaction.lessonLanguage).to.equal('en');
-      // expect(updatedAppointment.packageTransactionData.lessonLanguage).to.equal('en');
+      expect(updatedAppointment.packageTransactionData.lessonLanguage).to.equal('en');
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {

@@ -177,7 +177,6 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       updatedDependeeDocs,
       dbServiceAccessOptions,
     });
-    console.log(toUpdateDependentPromises, 'here');
     await Promise.all(toUpdateDependentPromises);
   };
 

@@ -133,14 +133,14 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
         updatedJoinedUserDoc,
         dependencyDbService: this._packageTransactionDbService,
       });
-      const toUpdateMinuteBankPromises = this._getToUpdateDependeePromises({
-        ...props,
-        updatedJoinedUserDoc,
-        dependencyDbService: this._minuteBankDbService,
-      });
+      // const toUpdateMinuteBankPromises = this._getToUpdateDependeePromises({
+      //   ...props,
+      //   updatedJoinedUserDoc,
+      //   dependencyDbService: this._minuteBankDbService,
+      // });
       toUpdateDependentPromises.push(
-        ...toUpdatePackageTransactionPromises,
-        ...toUpdateMinuteBankPromises
+        ...toUpdatePackageTransactionPromises
+        // ...toUpdateMinuteBankPromises
       );
     }
     return toUpdateDependentPromises;
@@ -152,23 +152,24 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
     dependencyDbService: PackageTransactionDbService | MinuteBankDbService;
   }): Promise<any>[] => {
     const { updatedJoinedUserDoc, dbServiceAccessOptions, dependencyDbService } = props;
+    console.log(updatedJoinedUserDoc, 'here');
     const packageTransactionHostedBySearchQuery = { hostedById: updatedJoinedUserDoc._id };
     const toUpdatePackageTransactionHostedByPromises = dependencyDbService.updateMany({
       searchQuery: packageTransactionHostedBySearchQuery,
       updateParams: { hostedByData: updatedJoinedUserDoc },
       dbServiceAccessOptions,
-      // dbDependencyUpdateParams: {
-      //   updatedDocSearchQuery: packageTransactionHostedBySearchQuery,
-      // },
+      dbDependencyUpdateParams: {
+        updatedDocSearchQuery: packageTransactionHostedBySearchQuery,
+      },
     });
     const packageTransactionReservedBySearchQuery = { reservedById: updatedJoinedUserDoc._id };
     const toUpdatePackageTransactionReservedByPromises = dependencyDbService.updateMany({
       searchQuery: packageTransactionReservedBySearchQuery,
       updateParams: { reservedByData: updatedJoinedUserDoc },
       dbServiceAccessOptions,
-      // dbDependencyUpdateParams: {
-      //   updatedDocSearchQuery: packageTransactionReservedBySearchQuery,
-      // },
+      dbDependencyUpdateParams: {
+        updatedDocSearchQuery: packageTransactionReservedBySearchQuery,
+      },
     });
     return [
       toUpdatePackageTransactionHostedByPromises,

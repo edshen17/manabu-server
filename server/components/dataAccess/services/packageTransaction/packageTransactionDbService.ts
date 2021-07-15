@@ -49,7 +49,7 @@ class PackageTransactionDbService extends AbstractDbService<
     dependencyDbService: AppointmentDbService;
   }): Promise<Promise<any>[]> => {
     const { updatedDependentDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    const updatedLocationData = this._getUpdatedLocationData(updatedDependentDoc);
+    const updatedLocationData = await this._getUpdatedLocationData(updatedDependentDoc);
     const toUpdateAppointmentPromises = dependencyDbService.updateMany({
       searchQuery: { packageTransactionId: updatedDependentDoc._id },
       updateParams: {
