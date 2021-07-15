@@ -1,29 +1,51 @@
 import { expect } from 'chai';
 import { makePackageDbService } from '.';
+import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageDoc } from '../../../../models/Package';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
+import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
+import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
 import { makeFakeDbPackageFactory } from '../../testFixtures/fakeDbPackageFactory';
 import { FakeDbPackageFactory } from '../../testFixtures/fakeDbPackageFactory/fakeDbPackageFactory';
+import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
+import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeAppointmentDbService } from '../appointment';
+import { AppointmentDbService } from '../appointment/appointmentDbService';
+import { makePackageTransactionDbService } from '../packageTransaction';
+import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 import { PackageDbService } from './packageDbService';
 
 let packageDbService: PackageDbService;
+let packageTransactionDbService: PackageTransactionDbService;
+let appointmentDbService: AppointmentDbService;
 let fakeDbPackageFactory: FakeDbPackageFactory;
 let fakeDbUserFactory: FakeDbUserFactory;
+let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
+let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
+let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
-let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakePackage: PackageDoc;
+let fakePackageTransaction: PackageTransactionDoc;
+let fakeAppointment: AppointmentDoc;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 
 before(async () => {
   packageDbService = await makePackageDbService;
+  packageTransactionDbService = await makePackageTransactionDbService;
+  appointmentDbService = await makeAppointmentDbService;
   fakeDbPackageFactory = await makeFakeDbPackageFactory;
   fakeDbUserFactory = await makeFakeDbUserFactory;
+  fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+  fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
 });
 
 beforeEach(async () => {
   dbServiceAccessOptions = fakeDbPackageFactory.getDbServiceAccessOptions();
+  fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakePackage = await fakeDbPackageFactory.createFakeDbData({
     hostedById: fakeTeacher._id.toString(),
@@ -32,6 +54,24 @@ beforeEach(async () => {
     packageName: 'light',
     isOffering: true,
     lessonDurations: [30, 60],
+  });
+  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
+    hostedById: fakeTeacher._id.toString(),
+    reservedById: fakeUser._id.toString(),
+    packageId: fakePackage._id.toString(),
+    lessonDuration: 60,
+    priceData: { currency: 'SGD', subTotal: 0, total: 0 },
+    remainingAppointments: 0,
+    lessonLanguage: 'ja',
+    isSubscription: false,
+    paymentData: {},
+  });
+  fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
+    hostedById: fakePackageTransaction.hostedById.toString(),
+    reservedById: fakePackageTransaction.reservedById.toString(),
+    packageTransactionId: fakePackageTransaction._id.toString(),
+    startTime: new Date(),
+    endTime: new Date(),
   });
 });
 
@@ -155,9 +195,26 @@ describe('packageDbService', () => {
         searchQuery: { _id: fakePackage._id },
         updateParams: { packageType: 'custom' },
         dbServiceAccessOptions,
+        dbDependencyUpdateParams: {
+          updatedDependentSearchQuery: {
+            _id: fakePackage._id,
+          },
+        },
+      });
+      const updatedPackageTransaction = await packageTransactionDbService.findOne({
+        searchQuery: { packageId: fakePackage._id },
+        dbServiceAccessOptions,
+      });
+      const updatedAppointment = await appointmentDbService.findOne({
+        searchQuery: {
+          packageTransactionId: updatedPackageTransaction._id,
+        },
+        dbServiceAccessOptions,
       });
       expect(updatedPackage).to.not.deep.equal(fakePackage);
       expect(updatedPackage.packageType).to.equal('custom');
+      expect(updatedPackageTransaction.packageData.packageType).to.equal('custom');
+      expect(updatedAppointment.packageTransactionData.packageData.packageType).to.equal('custom');
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {

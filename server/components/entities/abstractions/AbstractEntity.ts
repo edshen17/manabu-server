@@ -1,6 +1,10 @@
 import { ExtractDoc } from 'ts-mongoose';
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
-import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
+import {
+  AbstractEntityValidator,
+  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+} from '../../validators/abstractions/AbstractEntityValidator';
 import { EntityInitParams, IEntity } from './IEntity';
 
 abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse>
@@ -29,7 +33,11 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   public build = (
     buildParams: EntityBuildParams
   ): Promise<EntityBuildResponse> | EntityBuildResponse => {
-    this._entityValidator.validate({ buildParams, userRole: 'user', validationMode: 'create' });
+    this._entityValidator.validate({
+      buildParams,
+      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+    });
     const builtEntity = this._buildTemplate(buildParams);
     return builtEntity;
   };

@@ -51,4 +51,8 @@ abstract class AbstractEntityValidator extends AbstractValidator<
   ): void => {};
 }
 
-export { AbstractEntityValidator };
+export {
+  AbstractEntityValidator,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+  ENTITY_VALIDATOR_VALIDATE_MODES,
+};

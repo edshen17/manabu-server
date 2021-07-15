@@ -282,27 +282,25 @@ describe('userDbService', () => {
                   updatedDependentSearchQuery: { _id: fakeTeacher._id },
                 },
               });
-              const findPackageTransaction = await packageTransactionDbService.findOne({
+              const updatedPackageTransaction = await packageTransactionDbService.findOne({
                 searchQuery: { hostedById: fakeTeacher._id },
                 dbServiceAccessOptions,
               });
-              const packageTransactionHostedByData = findPackageTransaction.hostedByData;
+              const packageTransactionHostedByData = updatedPackageTransaction.hostedByData;
               expect(packageTransactionHostedByData.name).to.equal(updatedTeacher.name);
               expect(packageTransactionHostedByData).to.not.have.property('email');
               expect(packageTransactionHostedByData).to.not.have.property('contactMethods');
               expect(packageTransactionHostedByData.teacherData).to.not.have.property(
                 'licensePathUrl'
               );
-              const findAppointmentWithDependency = await appointmentDbService.findOne({
-                searchQuery: { packageTransactionId: findPackageTransaction._id },
+              const updatedAppointment = await appointmentDbService.findOne({
+                searchQuery: { packageTransactionId: updatedPackageTransaction._id },
                 dbServiceAccessOptions,
               });
-              expect(
-                findAppointmentWithDependency.packageTransactionData.hostedByData.name
-              ).to.equal(updatedTeacher.name);
-              expect(findAppointmentWithDependency.locationData.locationName).to.equal(
-                'alternative'
+              expect(updatedAppointment.packageTransactionData.hostedByData.name).to.equal(
+                updatedTeacher.name
               );
+              expect(updatedAppointment.locationData.locationName).to.equal('alternative');
             });
           });
           context('updating others', () => {
