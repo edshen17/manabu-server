@@ -188,7 +188,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<void> => {};
 
-  protected _getUpdateDependeePromises = async (props: {
+  protected _getUpdateManyDependeePromises = async (props: {
     updatedDependeeDoc: DbDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
@@ -196,12 +196,12 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     return [];
   };
 
-  protected _createUpdateDependeePromise = (props: {
+  protected _getUpdateManyDependeePromise = (props: {
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
     searchQuery: {};
     updateParams: {};
-    updatedDependentSearchQuery: {};
+    updatedDependentSearchQuery?: {};
   }) => {
     const {
       dependencyDbService,

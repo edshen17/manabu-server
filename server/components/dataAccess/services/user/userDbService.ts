@@ -124,44 +124,44 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-    const toUpdatePackageTransactionPromises = await this._getUpdateDependeePromises({
+    const updatePackageTransactionPromises = await this._getUpdateManyDependeePromises({
       ...getUpdateDependeePromisesProps,
       dependencyDbService: this._packageTransactionDbService,
     });
-    // const toUpdateMinuteBankPromises = this._getToUpdateDependeePromises({
-    //   ...props,
-    //   updatedJoinedUserDoc,
-    //   dependencyDbService: this._minuteBankDbService,
-    // });
-    updateDependentPromises.push(
-      ...toUpdatePackageTransactionPromises
-      // ...toUpdateMinuteBankPromises
-    );
+    const updateMinuteBankPromises = await this._getUpdateManyDependeePromises({
+      ...getUpdateDependeePromisesProps,
+      dependencyDbService: this._minuteBankDbService,
+    });
+    updateDependentPromises.push(...updatePackageTransactionPromises, ...updateMinuteBankPromises);
   };
 
-  protected _getUpdateDependeePromises = async (props: {
+  protected _getUpdateManyDependeePromises = async (props: {
     updatedDependeeDoc: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
   }): Promise<Promise<any>[]> => {
     const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    const packageTransactionHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
-    const updatePackageTransactionHostedByPromises = this._createUpdateDependeePromise({
-      searchQuery: packageTransactionHostedBySearchQuery,
+    const updatedDependentHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
+    const updateManyDependeeHostedByPromise = this._getUpdateManyDependeePromise({
+      searchQuery: updatedDependentHostedBySearchQuery,
       updateParams: { hostedByData: updatedDependeeDoc },
       dbServiceAccessOptions,
       dependencyDbService,
-      updatedDependentSearchQuery: packageTransactionHostedBySearchQuery,
+      updatedDependentSearchQuery: updatedDependentHostedBySearchQuery,
     });
-    const packageTransactionReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
-    const updatePackageTransactionReservedByPromises = this._createUpdateDependeePromise({
-      searchQuery: packageTransactionReservedBySearchQuery,
-      updateParams: { hostedByData: updatedDependeeDoc },
+    const updatedDependentReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
+    const updateManyDependeeReservedByPromise = this._getUpdateManyDependeePromise({
+      searchQuery: updatedDependentReservedBySearchQuery,
+      updateParams: { reservedByData: updatedDependeeDoc },
       dbServiceAccessOptions,
       dependencyDbService,
-      updatedDependentSearchQuery: packageTransactionReservedBySearchQuery,
+      updatedDependentSearchQuery: updatedDependentReservedBySearchQuery,
     });
-    return [updatePackageTransactionHostedByPromises, updatePackageTransactionReservedByPromises];
+    const updateManyDependeePromises = [
+      updateManyDependeeHostedByPromise,
+      updateManyDependeeReservedByPromise,
+    ];
+    return updateManyDependeePromises;
   };
 
   protected _initTemplate = async (

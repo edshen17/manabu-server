@@ -1,7 +1,6 @@
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { AppointmentDbService } from '../appointment/appointmentDbService';
-import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
 import { LocationDataHandler } from '../../../entities/utils/locationDataHandler/locationDataHandler';
 
@@ -32,29 +31,30 @@ class PackageTransactionDbService extends AbstractDbService<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-    const toUpdatePackageTransactionPromises = await this._getUpdateDependeePromises({
+    const updateAppointmentPromises = await this._getUpdateManyDependeePromises({
       ...getUpdateDependeePromisesProps,
       dependencyDbService: this._appointmentDbService,
     });
-    updateDependentPromises.push(...toUpdatePackageTransactionPromises);
+    updateDependentPromises.push(...updateAppointmentPromises);
   };
 
-  protected _getUpdateDependeePromises = async (props: {
+  protected _getUpdateManyDependeePromises = async (props: {
     updatedDependeeDoc: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
   }): Promise<Promise<any>[]> => {
     const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
     const updatedLocationData = await this._getUpdatedLocationData(updatedDependeeDoc);
-    const toUpdateAppointmentPromises = dependencyDbService.updateMany({
+    const updateManyAppointmentPromise = this._getUpdateManyDependeePromise({
       searchQuery: { packageTransactionId: updatedDependeeDoc._id },
       updateParams: {
         packageTransactionData: updatedDependeeDoc,
         locationData: updatedLocationData,
       },
       dbServiceAccessOptions,
+      dependencyDbService,
     });
-    return [toUpdateAppointmentPromises];
+    return [updateManyAppointmentPromise];
   };
 
   private _getUpdatedLocationData = async (updatedPackageTransaction: PackageTransactionDoc) => {
