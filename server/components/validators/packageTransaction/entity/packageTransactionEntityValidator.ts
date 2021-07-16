@@ -31,7 +31,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       remainingReschedules: this._joi.number().forbidden(),
       lessonLanguage: this._joi.string().forbidden(),
       isSubscription: this._joi.boolean().forbidden(),
-      methodData: this._joi.object().forbidden(),
+      paymentData: this._joi.object().forbidden(),
       isTerminated: this._joi.boolean().forbidden(),
       terminationDate: this._joi.date().forbidden(),
       transactionDate: this._joi.date().forbidden(),

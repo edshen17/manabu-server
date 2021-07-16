@@ -50,8 +50,10 @@ describe('teacherBalanceEntityValidator', () => {
       }
     };
     context('valid inputs', () => {
-      it('should return a valid object', () => {
-        testValidInputs({ validationMode: 'create', userRole: 'user' });
+      context('create entity', () => {
+        it('should return a valid object', () => {
+          testValidInputs({ validationMode: 'create', userRole: 'user' });
+        });
       });
     });
     context('invalid inputs', () => {

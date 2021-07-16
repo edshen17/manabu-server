@@ -54,18 +54,35 @@ describe('packageEntityValidator', () => {
         });
       });
       context('edit entity', () => {
-        buildParams = {
-          priceData: {
-            currency: 'SGD',
-            hourlyRate: 20,
-          },
-          lessonAmount: 5,
-          isOffering: false,
-          packageType: 'custom',
-          lessonDurations: [30],
-        };
-        it('should return a valid object', () => {
-          testValidInputs({ validationMode: 'create', userRole: 'user' });
+        context('as a non-admin user', () => {
+          it('should return a valid object', () => {
+            buildParams = {
+              priceData: {
+                currency: 'SGD',
+                hourlyRate: 20,
+              },
+              lessonAmount: 5,
+              isOffering: false,
+              packageType: 'custom',
+              lessonDurations: [30],
+            };
+            testValidInputs({ validationMode: 'edit', userRole: 'user' });
+          });
+        });
+        context('as an admin user', () => {
+          it('should return a valid object', () => {
+            buildParams = {
+              priceData: {
+                currency: 'SGD',
+                hourlyRate: 20,
+              },
+              lessonAmount: 5,
+              isOffering: false,
+              packageType: 'custom',
+              lessonDurations: [30],
+            };
+            testValidInputs({ validationMode: 'edit', userRole: 'admin' });
+          });
         });
       });
     });
