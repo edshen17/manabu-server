@@ -1,25 +1,27 @@
 import { expect } from 'chai';
-import { makeBaseParamsValidator } from '.';
-import { BaseParamsValidator } from './baseParamsValidator';
+import { makeUserParamsValidator } from '.';
+import { UserParamsValidator } from './userParamsValidator';
 
-let baseParamsValidator: BaseParamsValidator;
+let userParamsValidator: UserParamsValidator;
 let props: {
   params: {};
 };
 
 before(() => {
-  baseParamsValidator = makeBaseParamsValidator;
+  userParamsValidator = makeUserParamsValidator;
   props = {
-    params: {},
+    params: {
+      uId: '605bc5ad9db900001528f77c',
+    },
   };
 });
 
-describe('baseParamsValidator', () => {
+describe('userParamsValidator', () => {
   describe('validate', () => {
     const testValidate = (props: { params: {} }) => {
       const { params } = props;
       try {
-        const validatedObj = baseParamsValidator.validate(props);
+        const validatedObj = userParamsValidator.validate(props);
         expect(validatedObj).to.deep.equal(params);
         expect(validatedObj).to.not.have.property('error');
       } catch (err) {
@@ -27,7 +29,7 @@ describe('baseParamsValidator', () => {
       }
     };
     context('valid inputs', () => {
-      it('should return an empty object', () => {
+      it('should return a valid object', () => {
         testValidate(props);
       });
     });
