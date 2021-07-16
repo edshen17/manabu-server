@@ -6,7 +6,7 @@ type OptionalQueryValidatorInitParams = {
 };
 
 type QueryValidatorValidateParams = {
-  encodedQueryStringObj: {};
+  query: {};
 };
 
 abstract class AbstractQueryValidator extends AbstractValidator<
@@ -15,12 +15,12 @@ abstract class AbstractQueryValidator extends AbstractValidator<
 > {
   protected _queryValidationSchema!: any;
   protected _queryStringHandler!: QueryStringHandler;
+
   protected _validateProps = (props: QueryValidatorValidateParams): JoiValidationObject => {
-    const { encodedQueryStringObj } = props;
-    const decodedQueryStringObj =
-      this._queryStringHandler.decodeQueryStringObj(encodedQueryStringObj);
-    return this._queryValidationSchema.validate(decodedQueryStringObj);
+    const { query } = props;
+    return this._queryValidationSchema.validate(query);
   };
+
   protected _initTemplate = (optionalInitParams: OptionalQueryValidatorInitParams): void => {
     const { makeQueryStringHandler } = optionalInitParams;
     this._queryStringHandler = makeQueryStringHandler;

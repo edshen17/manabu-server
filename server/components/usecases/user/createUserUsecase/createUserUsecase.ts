@@ -84,6 +84,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { role, _id, dateRegistered, verificationToken } = body || {};
     return !role && !_id && !dateRegistered && !verificationToken;
     //this._queryValidator.validate(controllerData.query)
+    //this._paramsValidator.validate(controllerData.params)
   };
 
   protected _makeRequestTemplate = async (

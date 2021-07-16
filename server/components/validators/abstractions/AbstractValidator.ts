@@ -16,8 +16,8 @@ abstract class AbstractValidator<OptionalValidatorInitParams, ValidatorValidateP
       const errMessage = validationObj.error;
       throw new Error(errMessage);
     } else {
-      const validatedBuildParams = validationObj.value;
-      return validatedBuildParams;
+      const validatedProps = validationObj.value;
+      return validatedProps;
     }
   };
 

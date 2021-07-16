@@ -179,23 +179,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     return googleLoginRes;
   };
 
-  private _parseGoogleQuery = (query: { code: string; state: string }) => {
-    const { code, state } = query || {};
-    let parsedState, isTeacherApp, hostedBy;
-    if (state) {
-      const decodedClientState = Buffer.from(state, 'base64').toString();
-
-      try {
-        parsedState = JSON.parse(decodedClientState);
-      } catch (err) {
-        console.log(err);
-      }
-      ({ isTeacherApp, hostedBy } = parsedState);
-    }
-
-    return { code, isTeacherApp, hostedBy };
-  };
-
   private _getGoogleUserData = async (tokens: any): Promise<any> => {
     this._oauth2Client.setCredentials({
       access_token: tokens.access_token,
