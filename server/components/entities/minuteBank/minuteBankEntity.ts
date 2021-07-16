@@ -52,12 +52,7 @@ class MinuteBankEntity extends AbstractEntity<
   };
 
   protected _initTemplate = async (
-    optionalInitParams: Omit<
-      {
-        makeEntityValidator: AbstractEntityValidator;
-      } & OptionalMinuteBankEntityInitParams,
-      'makeEntityValidator'
-    >
+    optionalInitParams: OptionalMinuteBankEntityInitParams
   ): Promise<void> => {
     const { makeUserDbService } = optionalInitParams;
     this._userDbService = await makeUserDbService;

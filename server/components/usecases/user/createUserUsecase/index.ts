@@ -15,6 +15,8 @@ import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
 import { makeMinuteBankEntity } from '../../../entities/minuteBank';
 import { makeTeacherEntity } from '../../../entities/teacher';
 import { makePackageEntity } from '../../../entities/package';
+import { makeBaseParamsValidator } from '../../../validators/base/params';
+import { makeUserQueryValidator } from '../../../validators/user/query';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserEntity,
@@ -33,6 +35,8 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   emailHandler,
   makeRedirectPathBuilder,
   cloneDeep,
+  makeParamsValidator: makeBaseParamsValidator,
+  makeQueryValidator: makeUserQueryValidator,
 });
 
 export { makeCreateUserUsecase };

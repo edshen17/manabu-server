@@ -1,3 +1,6 @@
+import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
+import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
+
 type CurrentAPIUser = {
   userId?: string;
   role: string;
@@ -11,9 +14,17 @@ type ControllerData = {
   routeData: RouteData;
 };
 
-interface IUsecase<UsecaseInitParams, UsecaseResponse> {
+type UsecaseInitParams<OptionalUsecaseInitParams> = RequiredUsecaseInitParams &
+  OptionalUsecaseInitParams;
+
+type RequiredUsecaseInitParams = {
+  makeQueryValidator: AbstractQueryValidator;
+  makeParamsValidator: AbstractParamsValidator;
+};
+
+interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
   makeRequest: (controllerData: ControllerData) => Promise<UsecaseResponse>;
-  init: (usecaseInitParams: UsecaseInitParams) => Promise<this>;
+  init: (usecaseInitParams: UsecaseInitParams<OptionalUsecaseInitParams>) => Promise<this>;
 }
 
-export { CurrentAPIUser, ControllerData, IUsecase, RouteData };
+export { CurrentAPIUser, ControllerData, IUsecase, RouteData, UsecaseInitParams };

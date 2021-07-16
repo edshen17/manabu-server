@@ -46,6 +46,5 @@ describe('getMinuteBankUsecase', () => {
         expect(minuteBankRes.minuteBanks.length > 0).to.equal(true);
       }
     });
-    // invalid input no current api user
   });
 });

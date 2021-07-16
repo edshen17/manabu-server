@@ -1,12 +1,12 @@
-import { makeMinuteBankDbService } from '../../../dataAccess/services/minuteBank';
-import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makeUserDbService } from '../../../dataAccess/services/user';
+import { makeBaseQueryValidator } from '../../../validators/base/query';
+import { makeUserParamsValidator } from '../../../validators/user/params';
 import { EditUserUsecase } from './editUserUsecase';
 
 const makeEditUserUsecase = new EditUserUsecase().init({
   makeUserDbService,
-  makePackageTransactionDbService,
-  makeMinuteBankDbService,
+  makeQueryValidator: makeBaseQueryValidator,
+  makeParamsValidator: makeUserParamsValidator,
 });
 
 export { makeEditUserUsecase };

@@ -23,7 +23,7 @@ import { PackageEntity, PackageEntityBuildParams } from '../../../entities/packa
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
 import { JoinedUserDoc } from '../../../../models/User';
 
-type CreateUserUsecaseInitParams = {
+type OptionalCreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
   makePackageEntity: Promise<PackageEntity>;
   makePackageTransactionEntity: Promise<PackageTransactionEntity>;
@@ -59,7 +59,7 @@ type CreateUserUsecaseResponse = {
 };
 
 class CreateUserUsecase extends AbstractCreateUsecase<
-  CreateUserUsecaseInitParams,
+  OptionalCreateUserUsecaseInitParams,
   CreateUserUsecaseResponse
 > {
   private _userEntity!: UserEntity;
@@ -80,9 +80,16 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _cloneDeep!: any;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { body } = controllerData.routeData;
-    const { role, _id, dateRegistered, verificationToken } = body || {};
-    return !role && !_id && !dateRegistered && !verificationToken;
+    const { routeData } = controllerData;
+    const { query, params } = routeData;
+    try {
+      this._queryValidator.validate(query);
+      this._paramsValidator.validate(params);
+      return true;
+    } catch (err) {
+      console.log(err, 'here');
+      return false;
+    }
     //this._queryValidator.validate(controllerData.query)
     //this._paramsValidator.validate(controllerData.params)
   };
@@ -338,7 +345,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return cookieOptions;
   };
 
-  public init = async (usecaseInitParams: CreateUserUsecaseInitParams): Promise<this> => {
+  protected _initTemplate = async (
+    optionalInitParams: OptionalCreateUserUsecaseInitParams
+  ): Promise<void> => {
     const {
       makeUserEntity,
       makePackageEntity,
@@ -356,7 +365,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       emailHandler,
       makeRedirectPathBuilder,
       cloneDeep,
-    } = usecaseInitParams;
+    } = optionalInitParams;
     this._userEntity = await makeUserEntity;
     this._packageEntity = await makePackageEntity;
     this._packageTransactionEntity = await makePackageTransactionEntity;
@@ -373,7 +382,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._emailHandler = emailHandler;
     this._redirectPathBuilder = makeRedirectPathBuilder;
     this._cloneDeep = cloneDeep;
-    return this;
   };
 }
 

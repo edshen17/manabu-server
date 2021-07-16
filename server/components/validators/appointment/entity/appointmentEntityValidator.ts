@@ -20,7 +20,7 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
       locationData: this._joi.object().forbidden(),
       lastUpdated: this._joi.object().forbidden(),
     });
-    this._adminValidationSchema - this._editValidationSchema;
+    this._adminValidationSchema = this._editValidationSchema;
   };
 }
 

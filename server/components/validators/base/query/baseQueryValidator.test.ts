@@ -14,19 +14,22 @@ before(() => {
 
 describe('baseQueryValidator', () => {
   describe('validate', () => {
-    const testValidate = (props: { query: {} }) => {
+    const testValidInputs = (props: { query: {} }) => {
       const { query } = props;
+      const validatedObj = baseQueryValidator.validate(props);
+      expect(validatedObj).to.deep.equal(query);
+      expect(validatedObj).to.not.have.property('error');
+    };
+    const testInvalidInputs = (props: { query: {} }) => {
       try {
         const validatedObj = baseQueryValidator.validate(props);
-        expect(validatedObj).to.deep.equal(query);
-        expect(validatedObj).to.not.have.property('error');
       } catch (err) {
         expect(err).be.an('error');
       }
     };
     context('valid inputs', () => {
       it('should return an empty object', () => {
-        testValidate(props);
+        testValidInputs(props);
       });
     });
     context('invalid inputs', () => {
@@ -34,7 +37,7 @@ describe('baseQueryValidator', () => {
         props.query = {
           someField: 'some value',
         };
-        testValidate(props);
+        testInvalidInputs(props);
       });
     });
   });

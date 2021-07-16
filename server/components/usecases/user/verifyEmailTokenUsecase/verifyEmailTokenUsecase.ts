@@ -6,14 +6,14 @@ import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
 
-type VerifyEmailTokenUsecaseInitParams = {
+type OptionalVerifyEmailTokenUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeRedirectPathBuilder: RedirectPathBuilder;
 };
 type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: string };
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<
-  VerifyEmailTokenUsecaseInitParams,
+  OptionalVerifyEmailTokenUsecaseInitParams,
   VerifyEmailTokenUsecaseResponse
 > {
   private _userDbService!: UserDbService;
@@ -77,11 +77,12 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
     }
   };
 
-  public init = async (usecaseInitParams: VerifyEmailTokenUsecaseInitParams): Promise<this> => {
-    const { makeUserDbService, makeRedirectPathBuilder } = usecaseInitParams;
+  protected _initTemplate = async (
+    optionalInitParams: OptionalVerifyEmailTokenUsecaseInitParams
+  ): Promise<void> => {
+    const { makeUserDbService, makeRedirectPathBuilder } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._redirectPathBuilder = makeRedirectPathBuilder;
-    return this;
   };
 }
 

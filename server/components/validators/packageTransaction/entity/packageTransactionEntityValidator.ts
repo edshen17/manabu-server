@@ -6,7 +6,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       hostedById: this._joi.string().alphanum().min(24).max(24),
       reservedById: this._joi.string().alphanum().min(24).max(24),
       packageId: this._joi.string().alphanum().min(24).max(24),
-      lessonDuration: this._joi.number().min(30).max(120),
+      lessonDuration: this._joi.number().min(30).max(120).valid(30, 60, 90, 120),
       priceData: this._joi.object({
         currency: this._joi.string().max(5),
         subTotal: this._joi.number().min(0),

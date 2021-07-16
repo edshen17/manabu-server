@@ -5,14 +5,14 @@ import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
 
-type EditTeacherUsecaseUsecaseInitParams = {
+type OptionalEditTeacherUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeTeacherDbService: Promise<TeacherDbService>;
 };
 type EditTeacherUsecaseResponse = { user: JoinedUserDoc };
 
 class EditTeacherUsecase extends AbstractEditUsecase<
-  EditTeacherUsecaseUsecaseInitParams,
+  OptionalEditTeacherUsecaseInitParams,
   EditTeacherUsecaseResponse
 > {
   private _userDbService!: UserDbService;
@@ -42,11 +42,10 @@ class EditTeacherUsecase extends AbstractEditUsecase<
     return usecaseRes;
   };
 
-  public init = async (usecaseInitParams: EditTeacherUsecaseUsecaseInitParams): Promise<this> => {
-    const { makeUserDbService, makeTeacherDbService } = usecaseInitParams;
+  protected _initTemplate = async (optionalInitParams: OptionalEditTeacherUsecaseInitParams) => {
+    const { makeUserDbService, makeTeacherDbService } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._teacherDbService = await makeTeacherDbService;
-    return this;
   };
 }
 

@@ -1,25 +1,19 @@
-import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
-import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
 
-type EditUserUsecaseInitParams = {
+type OptionalEditUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
-  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-  makeMinuteBankDbService: Promise<MinuteBankDbService>;
 };
 type EditUserUsecaseResponse = { user: JoinedUserDoc };
 
 class EditUserUsecase extends AbstractEditUsecase<
-  EditUserUsecaseInitParams,
+  OptionalEditUserUsecaseInitParams,
   EditUserUsecaseResponse
 > {
   private _userDbService!: UserDbService;
-  private _packageTransactionDbService!: PackageTransactionDbService;
-  private _minuteBankDbService!: MinuteBankDbService;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
     const { body } = controllerData.routeData;
@@ -43,13 +37,11 @@ class EditUserUsecase extends AbstractEditUsecase<
     return { user: savedDbUser };
   };
 
-  public init = async (usecaseInitParams: EditUserUsecaseInitParams): Promise<this> => {
-    const { makeUserDbService, makePackageTransactionDbService, makeMinuteBankDbService } =
-      usecaseInitParams;
+  protected _initTemplate = async (
+    optionalInitParams: OptionalEditUserUsecaseInitParams
+  ): Promise<void> => {
+    const { makeUserDbService } = optionalInitParams;
     this._userDbService = await makeUserDbService;
-    this._packageTransactionDbService = await makePackageTransactionDbService;
-    this._minuteBankDbService = await makeMinuteBankDbService;
-    return this;
   };
 }
 

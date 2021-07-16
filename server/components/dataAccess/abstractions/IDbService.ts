@@ -1,5 +1,3 @@
-import { ExtractDoc } from 'ts-mongoose';
-
 type DbServiceParams = {
   _id?: string;
   searchQuery?: {};

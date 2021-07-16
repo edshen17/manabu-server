@@ -10,9 +10,25 @@ before(() => {
   teacherEntityValidator = makeTeacherEntityValidator;
 });
 
+beforeEach(() => {
+  buildParams = {
+    userId: '5d6ede6a0ba62570afcedd3a',
+  };
+});
+
 describe('teacherEntityValidator', () => {
   describe('validate', () => {
-    const testValidate = (props: { validationMode: string; userRole: string }) => {
+    const testValidInputs = (props: { validationMode: string; userRole: string }) => {
+      const { validationMode, userRole } = props;
+      const validatedObj = teacherEntityValidator.validate({
+        validationMode: validationMode,
+        userRole,
+        buildParams,
+      });
+      expect(validatedObj).to.deep.equal(buildParams);
+      expect(validatedObj).to.not.have.property('error');
+    };
+    const testInvalidInputs = (props: { validationMode: string; userRole: string }) => {
       const { validationMode, userRole } = props;
       try {
         const validatedObj = teacherEntityValidator.validate({
@@ -20,26 +36,14 @@ describe('teacherEntityValidator', () => {
           userRole,
           buildParams,
         });
-        expect(validatedObj).to.deep.equal(buildParams);
-        expect(validatedObj).to.not.have.property('error');
       } catch (err) {
         expect(err).be.an('error');
       }
     };
     context('valid inputs', () => {
       context('create entity', () => {
-        buildParams = {
-          userId: '5d6ede6a0ba62570afcedd3a',
-        };
-        context('as a non-admin user', () => {
-          it('should return a valid object', () => {
-            testValidate({ validationMode: 'create', userRole: 'user' });
-          });
-        });
-        context('as an admin', () => {
-          it('should return a valid object', () => {
-            testValidate({ validationMode: 'create', userRole: 'admin' });
-          });
+        it('should return a valid object', () => {
+          testValidInputs({ validationMode: 'create', userRole: 'user' });
         });
       });
       context('edit entity', () => {
@@ -50,9 +54,9 @@ describe('teacherEntityValidator', () => {
                 amount: 35,
                 currency: 'SGD',
               },
-              licensePath: faker.image.dataUri(),
+              licensePathUrl: faker.image.dataUri(),
             };
-            testValidate({ validationMode: 'create', userRole: 'user' });
+            testValidInputs({ validationMode: 'edit', userRole: 'user' });
           });
         });
         context('as an admin', () => {
@@ -61,7 +65,7 @@ describe('teacherEntityValidator', () => {
               isApproved: true,
               isHidden: false,
             };
-            testValidate({ validationMode: 'create', userRole: 'admin' });
+            testValidInputs({ validationMode: 'edit', userRole: 'admin' });
           });
         });
       });
@@ -75,15 +79,8 @@ describe('teacherEntityValidator', () => {
             currency: 'SGDDDDD',
           },
         };
-        context('as a non-admin user', () => {
-          it('should throw an error', () => {
-            testValidate({ validationMode: 'create', userRole: 'user' });
-          });
-        });
-        context('as an admin', () => {
-          it('should throw an error', () => {
-            testValidate({ validationMode: 'create', userRole: 'admin' });
-          });
+        it('should throw an error', () => {
+          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
         });
       });
       context('edit entity', () => {
@@ -93,12 +90,12 @@ describe('teacherEntityValidator', () => {
         };
         context('as a non-admin user', () => {
           it('should throw an error', () => {
-            testValidate({ validationMode: 'edit', userRole: 'user' });
+            testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
           });
         });
         context('as an admin', () => {
           it('should throw an error', () => {
-            testValidate({ validationMode: 'edit', userRole: 'admin' });
+            testInvalidInputs({ validationMode: 'edit', userRole: 'admin' });
           });
         });
       });

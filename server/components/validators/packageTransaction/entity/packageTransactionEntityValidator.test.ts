@@ -9,9 +9,33 @@ before(() => {
   packageTransactionEntityValidator = makePackageTransactionEntityValidator;
 });
 
+beforeEach(() => {
+  buildParams = {
+    hostedById: '5d6ede6a0ba62570afcedd3a',
+    reservedById: '5d6ede6a0ba62570afcedd3a',
+    packageId: '5d6ede6a0ba62570afcedd3a',
+    lessonDuration: 30,
+    remainingAppointments: 5,
+    remainingReschedules: 5,
+    lessonLanguage: 'ja',
+    isSubscription: true,
+  };
+});
+
 describe('packageTransactionEntityValidator', () => {
   describe('validate', () => {
-    const testValidate = (props: { validationMode: string; userRole: string }) => {
+    const testValidInputs = (props: { validationMode: string; userRole: string }) => {
+      const { validationMode, userRole } = props;
+      const validatedObj = packageTransactionEntityValidator.validate({
+        validationMode: validationMode,
+        userRole,
+        buildParams,
+      });
+      expect(validatedObj).to.deep.equal(buildParams);
+      expect(validatedObj).to.not.have.property('error');
+    };
+
+    const testInvalidInputs = (props: { validationMode: string; userRole: string }) => {
       const { validationMode, userRole } = props;
       try {
         const validatedObj = packageTransactionEntityValidator.validate({
@@ -19,61 +43,32 @@ describe('packageTransactionEntityValidator', () => {
           userRole,
           buildParams,
         });
-        expect(validatedObj).to.deep.equal(buildParams);
-        expect(validatedObj).to.not.have.property('error');
       } catch (err) {
         expect(err).be.an('error');
       }
     };
     context('valid inputs', () => {
       context('create entity', () => {
-        buildParams = {
-          hostedBy: '5d6ede6a0ba62570afcedd3a',
-          reservedBy: '5d6ede6a0ba62570afcedd3a',
-          packageId: '5d6ede6a0ba62570afcedd3a',
-          reservationLength: 5,
-          transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
-          terminationDate: new Date(),
-          remainingAppointments: 5,
-          remainingReschedules: 5,
-          lessonLanguage: 'ja',
-          isSubscription: true,
-          methodData: { method: 'Paypal', paymentId: '5d6ede6a0ba62570afcedd3a' },
-        };
-        context('as a non-admin user', () => {
-          it('should return a valid object', () => {
-            testValidate({ validationMode: 'create', userRole: 'user' });
-          });
-        });
-        context('as an admin', () => {
-          it('should return a valid object', () => {
-            testValidate({ validationMode: 'create', userRole: 'admin' });
-          });
+        it('should return a valid object', () => {
+          testValidInputs({ validationMode: 'create', userRole: 'user' });
         });
       });
     });
     context('invalid inputs', () => {
       context('create entity', () => {
         buildParams = {
-          hostedBy: '5d6ede6a0ba62570afssscedd3a',
-          reservedBy: '5d6ede6a0ba62570afasdcedd3a',
+          hostedById: '5d6ede6a0ba62570afssscedd3a',
+          reservedById: '5d6ede6a0ba62570afasdcedd3a',
           packageId: '5d6ede6a0ba62570afcsaddedd3a',
           transactionDate: 'new Date()',
-          reservationLength: '5',
+          lessonDuration: '5',
           transactionDetails: { currency: 'SGD', subTotal: 0, total: 0 },
           terminationDate: null,
           isTerminated: false,
           remainingAppointments: 5,
         };
-        context('as a non-admin user', () => {
-          it('should throw an error', () => {
-            testValidate({ validationMode: 'create', userRole: 'user' });
-          });
-        });
-        context('as an admin', () => {
-          it('should throw an error', () => {
-            testValidate({ validationMode: 'create', userRole: 'admin' });
-          });
+        it('should throw an error', () => {
+          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
         });
       });
       context('edit entity', () => {
@@ -83,12 +78,12 @@ describe('packageTransactionEntityValidator', () => {
         };
         context('as a non-admin user', () => {
           it('should throw an error', () => {
-            testValidate({ validationMode: 'edit', userRole: 'user' });
+            testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
           });
         });
         context('as an admin', () => {
           it('should throw an error', () => {
-            testValidate({ validationMode: 'edit', userRole: 'admin' });
+            testInvalidInputs({ validationMode: 'edit', userRole: 'admin' });
           });
         });
       });

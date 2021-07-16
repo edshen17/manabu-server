@@ -9,9 +9,33 @@ before(() => {
   teacherBalanceEntityValidator = makeTeacherBalanceEntityValidator;
 });
 
+beforeEach(() => {
+  buildParams = {
+    userId: '5d6ede6a0ba62570afcedd3a',
+    balanceDetails: {
+      balance: 0,
+      currency: 'SGD',
+    },
+  };
+});
+
 describe('teacherBalanceEntityValidator', () => {
   describe('validate', () => {
-    const testValidate = (props: { validationMode: string; userRole: string }) => {
+    const testValidInputs = (props: { validationMode: string; userRole: string }) => {
+      const { validationMode, userRole } = props;
+      try {
+        const validatedObj = teacherBalanceEntityValidator.validate({
+          validationMode: validationMode,
+          userRole,
+          buildParams,
+        });
+        expect(validatedObj).to.deep.equal(buildParams);
+        expect(validatedObj).to.not.have.property('error');
+      } catch (err) {
+        expect(err).be.an('error');
+      }
+    };
+    const testInvalidInputs = (props: { validationMode: string; userRole: string }) => {
       const { validationMode, userRole } = props;
       try {
         const validatedObj = teacherBalanceEntityValidator.validate({
@@ -26,24 +50,8 @@ describe('teacherBalanceEntityValidator', () => {
       }
     };
     context('valid inputs', () => {
-      context('create entity', () => {
-        buildParams = {
-          userId: '5d6ede6a0ba62570afcedd3a',
-          balanceDetails: {
-            balance: 0,
-            currency: 'SGD',
-          },
-        };
-        context('as a non-admin user', () => {
-          it('should return a valid object', () => {
-            testValidate({ validationMode: 'create', userRole: 'user' });
-          });
-        });
-        context('as an admin', () => {
-          it('should return a valid object', () => {
-            testValidate({ validationMode: 'create', userRole: 'admin' });
-          });
-        });
+      it('should return a valid object', () => {
+        testValidInputs({ validationMode: 'create', userRole: 'user' });
       });
     });
     context('invalid inputs', () => {
@@ -55,15 +63,8 @@ describe('teacherBalanceEntityValidator', () => {
             currency: 'SGDDDDD',
           },
         };
-        context('as a non-admin user', () => {
-          it('should throw an error', () => {
-            testValidate({ validationMode: 'create', userRole: 'user' });
-          });
-        });
-        context('as an admin', () => {
-          it('should throw an error', () => {
-            testValidate({ validationMode: 'create', userRole: 'admin' });
-          });
+        it('should throw an error', () => {
+          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
         });
       });
       context('edit entity', () => {
@@ -76,7 +77,7 @@ describe('teacherBalanceEntityValidator', () => {
                 currency: 'SGD',
               },
             };
-            testValidate({ validationMode: 'edit', userRole: 'user' });
+            testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
           });
         });
         context('as an admin', () => {
@@ -85,7 +86,7 @@ describe('teacherBalanceEntityValidator', () => {
               verificationToken: 'some token',
               role: 'admin',
             };
-            testValidate({ validationMode: 'edit', userRole: 'admin' });
+            testInvalidInputs({ validationMode: 'edit', userRole: 'admin' });
           });
         });
       });

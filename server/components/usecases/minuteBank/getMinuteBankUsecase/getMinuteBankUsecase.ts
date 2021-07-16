@@ -5,12 +5,14 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
-type GetMinuteBankUsecaseInitParams = {};
+type OptionalGetMinuteBankUsecaseInitParams = {
+  makeMinuteBankDbService: Promise<MinuteBankDbService>;
+};
 
 type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] } | Error;
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<
-  GetMinuteBankUsecaseInitParams,
+  OptionalGetMinuteBankUsecaseInitParams,
   GetMinuteBankUsecaseResponse
 > {
   private _minuteBankDbService!: MinuteBankDbService;
@@ -87,12 +89,9 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
     return usecaseResponse;
   };
 
-  public init = async (usecaseInitParams: {
-    makeMinuteBankDbService: Promise<MinuteBankDbService>;
-  }): Promise<this> => {
-    const { makeMinuteBankDbService } = usecaseInitParams;
+  protected _initTemplate = async (optionalInitParams: OptionalGetMinuteBankUsecaseInitParams) => {
+    const { makeMinuteBankDbService } = optionalInitParams;
     this._minuteBankDbService = await makeMinuteBankDbService;
-    return this;
   };
 }
 

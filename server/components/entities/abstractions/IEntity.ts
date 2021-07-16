@@ -1,11 +1,11 @@
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
-import { IEntityValidator } from './IEntityValidator';
+import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 
 type EntityInitParams<OptionalEntityInitParams> = RequiredEntityInitParams &
   OptionalEntityInitParams;
 
 type RequiredEntityInitParams = {
-  makeEntityValidator: IEntityValidator;
+  makeEntityValidator: AbstractEntityValidator;
 };
 
 interface IEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse> {

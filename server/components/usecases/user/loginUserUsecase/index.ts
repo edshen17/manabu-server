@@ -1,6 +1,8 @@
 import cloneDeep from 'clone-deep';
 import { google } from 'googleapis';
 import { makeUserDbService } from '../../../dataAccess/services/user';
+import { makeBaseParamsValidator } from '../../../validators/base/params';
+import { makeUserQueryValidator } from '../../../validators/user/query';
 import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
 import { makeCreateUserUsecase } from '../createUserUsecase';
 import { LoginUserUsecase } from './loginUserUsecase';
@@ -23,6 +25,8 @@ const makeLoginUserUsecase = new LoginUserUsecase().init({
   google,
   makeRedirectPathBuilder,
   cloneDeep,
+  makeQueryValidator: makeUserQueryValidator,
+  makeParamsValidator: makeBaseParamsValidator,
 });
 
 export { makeLoginUserUsecase };

@@ -1,5 +1,7 @@
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
-import { ControllerData, CurrentAPIUser, IUsecase } from './IUsecase';
+import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
+import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
+import { ControllerData, CurrentAPIUser, IUsecase, UsecaseInitParams } from './IUsecase';
 
 type MakeRequestTemplateParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
@@ -13,9 +15,11 @@ type MakeRequestTemplateParams = {
   controllerData: ControllerData;
 };
 
-abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
-  implements IUsecase<UsecaseInitParams, UsecaseResponse>
+abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
+  implements IUsecase<OptionalUsecaseInitParams, UsecaseResponse>
 {
+  protected _queryValidator!: AbstractQueryValidator;
+  protected _paramsValidator!: AbstractParamsValidator;
   private _makeRequestErrorMsg: string;
   constructor(makeRequestErrorMsg: string) {
     this._makeRequestErrorMsg = makeRequestErrorMsg;
@@ -100,7 +104,20 @@ abstract class AbstractUsecase<UsecaseInitParams, UsecaseResponse>
     props: MakeRequestTemplateParams
   ): Promise<UsecaseResponse>;
 
-  abstract init(initParams: UsecaseInitParams): Promise<this>;
+  public init = async (initParams: UsecaseInitParams<OptionalUsecaseInitParams>): Promise<this> => {
+    const { makeQueryValidator, makeParamsValidator, ...optionalInitParams } = initParams;
+    this._queryValidator = makeQueryValidator;
+    this._paramsValidator = makeParamsValidator;
+    await this._initTemplate(optionalInitParams);
+    return this;
+  };
+
+  protected _initTemplate = (
+    optionalInitParams: Omit<
+      UsecaseInitParams<OptionalUsecaseInitParams>,
+      'makeQueryValidator' | 'makeParamsValidator'
+    >
+  ): Promise<void> | void => {};
 }
 
 export { AbstractUsecase, MakeRequestTemplateParams };

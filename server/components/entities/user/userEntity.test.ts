@@ -37,6 +37,15 @@ describe('user entity', () => {
         }
       });
     });
-    context('invalid inputs', () => {});
+    context('invalid inputs', () => {
+      it('should throw an error', () => {
+        defaultTestUserEntityParams.password = 'weak password';
+        try {
+          userEntity.build(defaultTestUserEntityParams);
+        } catch (err) {
+          expect(err).to.be.an('error');
+        }
+      });
+    });
   });
 });

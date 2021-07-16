@@ -5,10 +5,13 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
 
-type GetUserUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
+type OptionalGetUserUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
 
-class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseInitParams, GetUserUsecaseResponse> {
+class GetUserUsecase extends AbstractGetUsecase<
+  OptionalGetUserUsecaseInitParams,
+  GetUserUsecaseResponse
+> {
   private _userDbService!: UserDbService;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
@@ -62,10 +65,11 @@ class GetUserUsecase extends AbstractGetUsecase<GetUserUsecaseInitParams, GetUse
     });
   };
 
-  public init = async (usecaseInitParams: GetUserUsecaseInitParams): Promise<this> => {
-    const { makeUserDbService } = usecaseInitParams;
+  protected _initTemplate = async (
+    optionalInitParams: OptionalGetUserUsecaseInitParams
+  ): Promise<void> => {
+    const { makeUserDbService } = optionalInitParams;
     this._userDbService = await makeUserDbService;
-    return this;
   };
 }
 

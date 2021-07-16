@@ -10,7 +10,7 @@ import {
 } from '../createUserUsecase/createUserUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
 
-type LoginUserUsecaseInitParams = {
+type OptionalLoginUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeCreateUserUsecase: Promise<CreateUserUsecase>;
   oauth2Client: any;
@@ -26,7 +26,7 @@ enum SERVER_LOGIN_ENDPOINTS {
 }
 
 class LoginUserUsecase extends AbstractCreateUsecase<
-  LoginUserUsecaseInitParams,
+  OptionalLoginUserUsecaseInitParams,
   LoginUserUsecaseResponse
 > {
   private _userDbService!: UserDbService;
@@ -47,7 +47,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   };
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    // query string handler here?
     return true;
   };
 
@@ -151,15 +150,12 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { dbServiceAccessOptions, body, controllerData, query } = props;
     const { code } = query;
     const { tokens } = await this._oauth2Client.getToken(code);
-    const { email, name, picture, locale } = await this._getGoogleUserData(tokens);
-
+    const { email, name, picture } = await this._getGoogleUserData(tokens);
     let savedDbUser = await this._userDbService.findOne({
       searchQuery: { email },
       dbServiceAccessOptions,
     });
-
     const handleNoSavedDbUser = async () => {
-      // mutate controller data body
       body.name = name;
       body.email = email;
       body.profilePicture = picture;
@@ -169,7 +165,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       }
       return userRes;
     };
-
     const googleLoginRes = await this._loginUser({
       savedDbUser,
       dbServiceAccessOptions,
@@ -191,7 +186,9 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     return googleRes.data;
   };
 
-  public init = async (initParams: LoginUserUsecaseInitParams): Promise<this> => {
+  protected _initTemplate = async (
+    optionalInitParams: OptionalLoginUserUsecaseInitParams
+  ): Promise<void> => {
     const {
       makeUserDbService,
       makeCreateUserUsecase,
@@ -199,7 +196,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       google,
       makeRedirectPathBuilder,
       cloneDeep,
-    } = initParams;
+    } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._createUserUsecase = await makeCreateUserUsecase;
     this._oauth2Client = oauth2Client;
@@ -210,7 +207,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       .endpointPath('/dashboard')
       .build();
     this._cloneDeep = cloneDeep;
-    return this;
   };
 }
 
