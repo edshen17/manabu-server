@@ -1,28 +1,25 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
-import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
+import {
+  AbstractEditUsecase,
+  AbstractEditUsecaseInitParams,
+} from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData } from '../../abstractions/IUsecase';
 
 type OptionalEditTeacherUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeTeacherDbService: Promise<TeacherDbService>;
 };
+
 type EditTeacherUsecaseResponse = { user: JoinedUserDoc };
 
 class EditTeacherUsecase extends AbstractEditUsecase<
-  OptionalEditTeacherUsecaseInitParams,
+  AbstractEditUsecaseInitParams<OptionalEditTeacherUsecaseInitParams>,
   EditTeacherUsecaseResponse
 > {
   private _userDbService!: UserDbService;
   private _teacherDbService!: TeacherDbService;
-
-  protected _isValidRequest = (controllerData: ControllerData) => {
-    const { body } = controllerData.routeData.body;
-    const { userId, _id, lessonCount, studentCount } = body || {};
-    return !userId && !_id && !lessonCount && !studentCount;
-  };
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -42,10 +39,13 @@ class EditTeacherUsecase extends AbstractEditUsecase<
     return usecaseRes;
   };
 
-  protected _initTemplate = async (optionalInitParams: OptionalEditTeacherUsecaseInitParams) => {
-    const { makeUserDbService, makeTeacherDbService } = optionalInitParams;
+  protected _initTemplate = async (
+    optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditTeacherUsecaseInitParams>
+  ) => {
+    const { makeUserDbService, makeTeacherDbService, makeEditEntityValidator } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._teacherDbService = await makeTeacherDbService;
+    this._editEntityValidator = makeEditEntityValidator;
   };
 }
 

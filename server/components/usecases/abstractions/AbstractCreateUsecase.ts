@@ -1,11 +1,11 @@
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { AbstractUsecase } from './AbstractUsecase';
-import { CurrentAPIUser } from './IUsecase';
+import { ControllerData, CurrentAPIUser } from './IUsecase';
 
-abstract class AbstractCreateUsecase<UsecaseInitParams, UsecaseResponse> extends AbstractUsecase<
-  UsecaseInitParams,
+abstract class AbstractCreateUsecase<
+  OptionalUsecaseInitParams,
   UsecaseResponse
-> {
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
   constructor() {
     super('Access denied.');
   }

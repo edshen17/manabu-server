@@ -18,7 +18,8 @@ class GetUserUsecase extends AbstractGetUsecase<
     const { routeData, currentAPIUser } = controllerData;
     const { params } = routeData;
     const searchIdExists = params.uId || currentAPIUser.userId;
-    return searchIdExists;
+    const isValidRequest = searchIdExists && this._isValidRouteData(routeData);
+    return isValidRequest;
   };
 
   protected _makeRequestTemplate = async (

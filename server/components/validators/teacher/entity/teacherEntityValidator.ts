@@ -16,8 +16,8 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         language: this._joi.string().max(5),
         level: this._joi.string().max(5),
       }),
-      introductionVideoUrl: this._joi.string().dataUri().allow('').max(2048),
-      licensePathUrl: this._joi.string().dataUri().allow('').max(2048),
+      introductionVideoUrl: this._joi.string().uri().allow('').max(2048),
+      licensePathUrl: this._joi.string().uri().allow('').max(2048),
       hourlyRate: this._joi.object({
         amount: this._joi.number().min(0),
         currency: this._joi.string().max(5),

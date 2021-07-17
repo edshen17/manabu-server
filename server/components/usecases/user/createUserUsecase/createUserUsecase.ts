@@ -10,7 +10,6 @@ import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBal
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { EmailHandler } from '../../utils/emailHandler/emailHandler';
-import { ControllerData } from '../../abstractions/IUsecase';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -78,21 +77,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _emailHandler!: EmailHandler;
   private _redirectPathBuilder!: RedirectPathBuilder;
   private _cloneDeep!: any;
-
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { routeData } = controllerData;
-    const { query, params } = routeData;
-    try {
-      this._queryValidator.validate(query);
-      this._paramsValidator.validate(params);
-      return true;
-    } catch (err) {
-      console.log(err, 'here');
-      return false;
-    }
-    //this._queryValidator.validate(controllerData.query)
-    //this._paramsValidator.validate(controllerData.params)
-  };
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

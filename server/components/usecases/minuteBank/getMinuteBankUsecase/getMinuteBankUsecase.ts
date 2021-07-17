@@ -18,10 +18,11 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
   private _minuteBankDbService!: MinuteBankDbService;
 
   protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { endpointPath } = controllerData;
-    const isValidRequest = this._isCurrentAPIUserPermitted({
-      endpointPath,
-    });
+    const { endpointPath, routeData } = controllerData;
+    const isValidRequest =
+      this._isCurrentAPIUserPermitted({
+        endpointPath,
+      }) && this._isValidRouteData(routeData);
     return isValidRequest;
   };
 

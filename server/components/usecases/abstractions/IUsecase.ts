@@ -1,18 +1,18 @@
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
 import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
 
+type ControllerData = {
+  currentAPIUser: CurrentAPIUser;
+  endpointPath: string;
+  routeData: RouteData;
+};
+
 type CurrentAPIUser = {
   userId?: string;
   role: string;
 };
 
 type RouteData = { params: any; body: any; query: any };
-
-type ControllerData = {
-  currentAPIUser: CurrentAPIUser;
-  endpointPath: string;
-  routeData: RouteData;
-};
 
 type UsecaseInitParams<OptionalUsecaseInitParams> = RequiredUsecaseInitParams &
   OptionalUsecaseInitParams;

@@ -2,10 +2,10 @@ import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService
 import { AbstractUsecase } from './AbstractUsecase';
 import { CurrentAPIUser } from './IUsecase';
 
-abstract class AbstractGetUsecase<UsecaseInitParams, UsecaseResponse> extends AbstractUsecase<
-  UsecaseInitParams,
+abstract class AbstractGetUsecase<
+  OptionalUsecaseInitParams,
   UsecaseResponse
-> {
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
   constructor() {
     super('Resource not found.');
   }

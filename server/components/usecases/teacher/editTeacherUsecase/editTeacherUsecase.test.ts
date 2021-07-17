@@ -6,17 +6,31 @@ import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuil
 import { EditTeacherUsecase } from './editTeacherUsecase';
 import { makeEditTeacherUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { RouteData } from '../../abstractions/IUsecase';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeTeacher: JoinedUserDoc;
 let editTeacherUsecase: EditTeacherUsecase;
+let routeData: RouteData;
 
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
   controllerDataBuilder = makeControllerDataBuilder;
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   editTeacherUsecase = await makeEditTeacherUsecase;
+});
+
+beforeEach(() => {
+  routeData = {
+    body: {
+      licensePathUrl: 'https://fakeimg.pl/300/',
+    },
+    params: {
+      uId: fakeTeacher._id,
+    },
+    query: {},
+  };
 });
 
 describe('editTeacherUsecase', () => {
@@ -28,19 +42,13 @@ describe('editTeacherUsecase', () => {
             userId: fakeTeacher._id,
             role: fakeTeacher.role,
           })
-          .routeData({
-            body: {
-              licensePathUrl: 'new license path',
-            },
-            params: {
-              uId: fakeTeacher._id,
-            },
-            query: {},
-          })
+          .routeData(routeData)
           .build();
         const editTeacherRes = await editTeacherUsecase.makeRequest(buildEditTeacherControllerData);
         if ('user' in editTeacherRes) {
-          expect(editTeacherRes.user.teacherData.licensePathUrl).to.equal('new license path');
+          expect(editTeacherRes.user.teacherData.licensePathUrl).to.equal(
+            'https://fakeimg.pl/300/'
+          );
         }
       });
 
@@ -49,18 +57,10 @@ describe('editTeacherUsecase', () => {
           const fakeUser = await fakeDbUserFactory.createFakeDbUser();
           const buildEditTeacherControllerData = controllerDataBuilder
             .currentAPIUser({
-              userId: fakeTeacher._id,
-              role: fakeTeacher.role,
+              userId: fakeUser._id,
+              role: fakeUser.role,
             })
-            .routeData({
-              body: {
-                userId: fakeUser._id,
-              },
-              params: {
-                uId: fakeTeacher._id,
-              },
-              query: {},
-            })
+            .routeData(routeData)
             .build();
           const editTeacherRes = await editTeacherUsecase.makeRequest(
             buildEditTeacherControllerData
@@ -72,17 +72,8 @@ describe('editTeacherUsecase', () => {
       it('should deny access when trying to update restricted properties (not self)', async () => {
         try {
           const otherFakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-          const buildEditTeacherControllerData = controllerDataBuilder
-            .routeData({
-              body: {
-                userId: 'new user id',
-              },
-              params: {
-                uId: otherFakeTeacher._id,
-              },
-              query: {},
-            })
-            .build();
+          routeData.params.uId = otherFakeTeacher._id;
+          const buildEditTeacherControllerData = controllerDataBuilder.routeData(routeData).build();
           const editTeacherRes = await editTeacherUsecase.makeRequest(
             buildEditTeacherControllerData
           );
@@ -97,15 +88,7 @@ describe('editTeacherUsecase', () => {
               userId: undefined,
               role: 'user',
             })
-            .routeData({
-              body: {
-                licensePathUrl: 'new license path',
-              },
-              params: {
-                uId: fakeTeacher._id,
-              },
-              query: {},
-            })
+            .routeData(routeData)
             .build();
           const editTeacherRes = await editTeacherUsecase.makeRequest(
             buildEditTeacherControllerData

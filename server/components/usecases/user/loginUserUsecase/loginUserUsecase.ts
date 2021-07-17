@@ -46,10 +46,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     return true;
   };
 
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    return true;
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {

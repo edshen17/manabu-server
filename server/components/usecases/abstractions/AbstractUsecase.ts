@@ -1,7 +1,7 @@
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
 import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
-import { ControllerData, CurrentAPIUser, IUsecase, UsecaseInitParams } from './IUsecase';
+import { ControllerData, CurrentAPIUser, IUsecase, RouteData, UsecaseInitParams } from './IUsecase';
 
 type MakeRequestTemplateParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
@@ -98,11 +98,28 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return dbServiceAccessOptions;
   };
 
-  protected abstract _isValidRequest(controllerData: ControllerData): boolean;
+  protected _isValidRequest = (controllerData: ControllerData): boolean => {
+    const { routeData } = controllerData;
+    const isValidRequest = this._isValidRouteData(routeData);
+    return isValidRequest;
+  };
 
   protected abstract _makeRequestTemplate(
     props: MakeRequestTemplateParams
   ): Promise<UsecaseResponse>;
+
+  protected _isValidRouteData = (routeData: RouteData): boolean => {
+    let isValidRouteData: boolean;
+    try {
+      const { query, params } = routeData;
+      this._queryValidator.validate(query);
+      this._paramsValidator.validate(params);
+      isValidRouteData = true;
+    } catch (err) {
+      isValidRouteData = false;
+    }
+    return isValidRouteData;
+  };
 
   public init = async (initParams: UsecaseInitParams<OptionalUsecaseInitParams>): Promise<this> => {
     const { makeQueryValidator, makeParamsValidator, ...optionalInitParams } = initParams;
