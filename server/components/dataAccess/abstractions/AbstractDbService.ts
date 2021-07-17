@@ -3,6 +3,7 @@ import {
   DbModelViews,
   IDbService,
   DbDependencyUpdateParams,
+  DbServiceInitParams,
 } from './IDbService';
 
 abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasId>
@@ -262,11 +263,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
   };
 
   public init = async (
-    initParams: {
-      makeDb: () => Promise<any>;
-      cloneDeep: any;
-      dbModel: any;
-    } & OptionalDbServiceInitParams
+    initParams: DbServiceInitParams<OptionalDbServiceInitParams>
   ): Promise<this> => {
     const { makeDb, cloneDeep, dbModel, ...OptionalDbServiceInitParams } = initParams;
     await makeDb();

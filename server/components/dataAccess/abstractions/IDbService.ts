@@ -1,3 +1,12 @@
+type DbServiceInitParams<OptionalDbServiceInitParams> = RequiredDbServiceInitParams &
+  OptionalDbServiceInitParams;
+
+type RequiredDbServiceInitParams = {
+  makeDb: () => Promise<any>;
+  cloneDeep: any;
+  dbModel: any;
+};
+
 type DbServiceParams = {
   _id?: string;
   searchQuery?: {};
@@ -35,13 +44,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findOneAndUpdate: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   updateMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  init: (
-    initParams: {
-      makeDb: () => Promise<any>;
-      cloneDeep: any;
-      dbModel: DbDoc;
-    } & OptionalDbServiceInitParams
-  ) => Promise<this>;
+  init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbModelViews: () => DbModelViews;
 }
 
@@ -51,4 +54,5 @@ export {
   IDbService,
   DbModelViews,
   DbDependencyUpdateParams,
+  DbServiceInitParams,
 };
