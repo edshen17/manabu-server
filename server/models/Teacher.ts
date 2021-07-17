@@ -1,12 +1,8 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import { UserSchema } from './User';
 
 const TeacherSchema = createSchema({
-  userId: Type.ref(Type.objectId({ required: true, index: true, unique: true })).to(
-    'User',
-    UserSchema
-  ),
+  userId: Type.objectId({ required: true, index: true, unique: true }),
   dateApproved: Type.date({ required: false }),
   teachingLanguages: Type.array({ required: true }).of({
     language: Type.string(),
