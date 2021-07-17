@@ -14,7 +14,8 @@ abstract class AbstractParamsValidator extends AbstractValidator<
 
   protected _validateProps = (props: ParamsValidatorValidateParams): JoiValidationObject => {
     const { params } = props;
-    return this._paramsValidationSchema.validate(params);
+    const validatedProps = this._paramsValidationSchema.validate(params);
+    return validatedProps;
   };
 }
 

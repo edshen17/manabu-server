@@ -14,7 +14,8 @@ abstract class AbstractQueryValidator extends AbstractValidator<
 
   protected _validateProps = (props: QueryValidatorValidateParams): JoiValidationObject => {
     const { query } = props;
-    return this._queryValidationSchema.validate(query);
+    const validatedProps = this._queryValidationSchema.validate(query);
+    return validatedProps;
   };
 }
 

@@ -18,19 +18,23 @@ before(() => {
 
 describe('userParamsValidator', () => {
   describe('validate', () => {
-    const testValidate = (props: { params: {} }) => {
+    const testValidInputs = (props: { params: {} }) => {
+      const { params } = props;
+      const validatedObj = userParamsValidator.validate(props);
+      expect(validatedObj).to.deep.equal(params);
+      expect(validatedObj).to.not.have.property('error');
+    };
+    const testInvalidInputs = (props: { params: {} }) => {
       const { params } = props;
       try {
         const validatedObj = userParamsValidator.validate(props);
-        expect(validatedObj).to.deep.equal(params);
-        expect(validatedObj).to.not.have.property('error');
       } catch (err) {
         expect(err).be.an('error');
       }
     };
     context('valid inputs', () => {
       it('should return a valid object', () => {
-        testValidate(props);
+        testValidInputs(props);
       });
     });
     context('invalid inputs', () => {
@@ -38,13 +42,13 @@ describe('userParamsValidator', () => {
         props.params = {
           someField: 'some value',
         };
-        testValidate(props);
+        testInvalidInputs(props);
       });
       it('should throw an error', () => {
         props.params = {
           uId: 'some value',
         };
-        testValidate(props);
+        testInvalidInputs(props);
       });
     });
   });

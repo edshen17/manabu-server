@@ -31,19 +31,19 @@ abstract class AbstractEntityValidator extends AbstractValidator<
 
   protected _validateProps = (props: EntityValidatorValidateParams): JoiValidationObject => {
     const { validationMode, userRole, buildParams } = props;
-    let validatedBuildParams;
+    let validatedProps;
     if (userRole == ENTITY_VALIDATOR_VALIDATE_USER_ROLES.ADMIN) {
-      validatedBuildParams = this._adminValidationSchema.validate(buildParams);
+      validatedProps = this._adminValidationSchema.validate(buildParams);
     } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.CREATE) {
-      validatedBuildParams = this._createValidationSchema.validate(buildParams);
+      validatedProps = this._createValidationSchema.validate(buildParams);
     } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.EDIT) {
-      validatedBuildParams = this._editValidationSchema.validate(buildParams);
+      validatedProps = this._editValidationSchema.validate(buildParams);
     } else {
-      validatedBuildParams = {
+      validatedProps = {
         error: 'Unsupported function argument.',
       };
     }
-    return validatedBuildParams;
+    return validatedProps;
   };
 }
 

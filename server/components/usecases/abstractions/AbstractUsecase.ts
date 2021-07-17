@@ -112,8 +112,8 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     let isValidRouteData: boolean;
     try {
       const { query, params } = routeData;
-      this._queryValidator.validate(query);
-      this._paramsValidator.validate(params);
+      this._queryValidator.validate({ query });
+      this._paramsValidator.validate({ params });
       isValidRouteData = true;
     } catch (err) {
       isValidRouteData = false;

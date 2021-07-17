@@ -3,8 +3,10 @@ import { AbstractQueryValidator } from '../../abstractions/AbstractQueryValidato
 class UserQueryValidator extends AbstractQueryValidator {
   protected _initValidationSchemas = () => {
     this._queryValidationSchema = this._joi.object().keys({
-      redirectUId: this._joi.string().alphanum().min(24).max(24),
-      isTeacherApp: this._joi.boolean(),
+      state: this._joi.object({
+        redirectUserId: this._joi.string().alphanum().min(24).max(24),
+        isTeacherApp: this._joi.boolean(),
+      }),
     });
   };
 }

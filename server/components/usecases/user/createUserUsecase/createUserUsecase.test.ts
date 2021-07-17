@@ -65,7 +65,6 @@ describe('createUserUsecase', () => {
           }
         });
       });
-
       context('valid inputs', () => {
         const validResOutput = (createUserRes: CreateUserUsecaseResponse) => {
           expect(createUserRes).to.have.property('user');

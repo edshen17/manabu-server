@@ -27,7 +27,7 @@ beforeEach(() => {
       licensePathUrl: 'https://fakeimg.pl/300/',
     },
     params: {
-      uId: fakeTeacher._id,
+      uId: fakeTeacher._id.toString(),
     },
     query: {},
   };
@@ -39,7 +39,7 @@ describe('editTeacherUsecase', () => {
       it('should update the teacher in the db and return the correct properties (self)', async () => {
         const buildEditTeacherControllerData = controllerDataBuilder
           .currentAPIUser({
-            userId: fakeTeacher._id,
+            userId: fakeTeacher._id.toString(),
             role: fakeTeacher.role,
           })
           .routeData(routeData)
@@ -57,7 +57,7 @@ describe('editTeacherUsecase', () => {
           const fakeUser = await fakeDbUserFactory.createFakeDbUser();
           const buildEditTeacherControllerData = controllerDataBuilder
             .currentAPIUser({
-              userId: fakeUser._id,
+              userId: fakeUser._id.toString(),
               role: fakeUser.role,
             })
             .routeData(routeData)

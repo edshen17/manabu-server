@@ -28,13 +28,13 @@ beforeEach(async () => {
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   routeData = {
     params: {
-      uId: fakeTeacher._id,
+      uId: fakeTeacher._id.toString(),
     },
     body: {},
     query: {},
   };
   currentAPIUser = {
-    userId: fakeTeacher._id,
+    userId: fakeTeacher._id.toString(),
     role: fakeTeacher.role,
   };
   endpointPath = '';
@@ -80,7 +80,7 @@ describe('getUserUsecase', () => {
             routeData.params = '60979db0bb31ed001589a1ea';
             await getUser();
           } catch (err) {
-            expect(err.message).to.equal('User not found.');
+            expect(err.message).to.equal('Resource not found.');
           }
         });
         it('should throw an error if an invalid id is given', async () => {
@@ -100,9 +100,9 @@ describe('getUserUsecase', () => {
               testUserViews(savedDbUser!, 'self');
             });
             it('should get the user and return a less restricted view on the self endpoint', async () => {
-              const { params } = routeData;
+              let { params } = routeData;
               endpointPath = '/self/me';
-              params.uId = '';
+              params = {};
               const savedDbUser = await getUser();
               testUserViews(savedDbUser!, 'self');
             });
