@@ -1,9 +1,10 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
 
 type OptionalGetMinuteBankUsecaseInitParams = {
   makeMinuteBankDbService: Promise<MinuteBankDbService>;

@@ -1,6 +1,6 @@
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
+import { CurrentAPIUser } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractUsecase } from './AbstractUsecase';
-import { CurrentAPIUser } from './IUsecase';
 
 abstract class AbstractCreateUsecase<
   OptionalUsecaseInitParams,

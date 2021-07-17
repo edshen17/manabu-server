@@ -1,9 +1,10 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData, CurrentAPIUser } from '../../abstractions/IUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
 
 type OptionalGetUserUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;

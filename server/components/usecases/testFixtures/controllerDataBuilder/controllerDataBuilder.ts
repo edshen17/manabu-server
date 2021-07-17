@@ -1,4 +1,5 @@
-import { ControllerData, CurrentAPIUser, RouteData } from '../../abstractions/IUsecase';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { ControllerData, RouteData } from '../../abstractions/IUsecase';
 
 class ControllerDataBuilder {
   private _currentAPIUser!: CurrentAPIUser;

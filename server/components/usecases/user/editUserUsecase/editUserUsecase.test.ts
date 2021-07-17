@@ -5,8 +5,9 @@ import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/
 import { EditUserUsecase } from './editUserUsecase';
 import { makeEditUserUsecase } from '.';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { CurrentAPIUser, RouteData } from '../../abstractions/IUsecase';
+import { RouteData } from '../../abstractions/IUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;

@@ -1,7 +1,8 @@
 import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
 import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
-import { ControllerData, CurrentAPIUser, IUsecase, RouteData, UsecaseInitParams } from './IUsecase';
+import { CurrentAPIUser } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { ControllerData, IUsecase, RouteData, UsecaseInitParams } from './IUsecase';
 
 type MakeRequestTemplateParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;

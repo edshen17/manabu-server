@@ -1,5 +1,7 @@
-import { IHttpRequest } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { CurrentAPIUser } from '../../../usecases/abstractions/IUsecase';
+import {
+  CurrentAPIUser,
+  IHttpRequest,
+} from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 class IHttpRequestBuilder {
   private _body!: {};

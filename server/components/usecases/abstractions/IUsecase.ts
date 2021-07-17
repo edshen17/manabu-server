@@ -1,15 +1,11 @@
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
 import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
+import { CurrentAPIUser } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 type ControllerData = {
   currentAPIUser: CurrentAPIUser;
   endpointPath: string;
   routeData: RouteData;
-};
-
-type CurrentAPIUser = {
-  userId?: string;
-  role: string;
 };
 
 type RouteData = { params: any; body: any; query: any };
@@ -27,4 +23,4 @@ interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
   init: (usecaseInitParams: UsecaseInitParams<OptionalUsecaseInitParams>) => Promise<this>;
 }
 
-export { CurrentAPIUser, ControllerData, IUsecase, RouteData, UsecaseInitParams };
+export { ControllerData, IUsecase, RouteData, UsecaseInitParams };

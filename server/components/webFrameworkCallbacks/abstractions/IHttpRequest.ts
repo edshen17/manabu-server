@@ -1,11 +1,15 @@
 import { Request } from 'express';
-export interface IHttpRequest {
+interface IHttpRequest {
   body: Request['body'];
   path: Request['path'];
   query: Request['query'];
   params: Request['params'];
-  currentAPIUser: {
-    userId?: string;
-    role: string;
-  };
+  currentAPIUser: CurrentAPIUser;
 }
+
+type CurrentAPIUser = {
+  userId?: string;
+  role: string;
+};
+
+export { IHttpRequest, CurrentAPIUser };
