@@ -262,6 +262,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     return dbQueryResult;
   };
 
+  public findOneAndDelete = async (dbServiceParams: {
+    searchQuery?: {};
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<DbDoc> => {
+    const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
+    const dbQueryPromise = this._dbModel.findOneAndDelete(searchQuery).lean();
+    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    return dbQueryResult;
+  };
+
   public init = async (
     initParams: DbServiceInitParams<OptionalDbServiceInitParams>
   ): Promise<this> => {

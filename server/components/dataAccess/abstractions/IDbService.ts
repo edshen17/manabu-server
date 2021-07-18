@@ -44,6 +44,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findOneAndUpdate: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   updateMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
+  findOneAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbModelViews: () => DbModelViews;
 }
