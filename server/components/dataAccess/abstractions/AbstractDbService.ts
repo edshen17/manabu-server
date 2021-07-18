@@ -6,7 +6,7 @@ import {
   DbServiceInitParams,
 } from './IDbService';
 
-abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasId>
+abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   implements IDbService<OptionalDbServiceInitParams, DbDoc>
 {
   protected _dbModel!: any;

@@ -6,7 +6,7 @@ import { makeUserDbService } from '../user';
 const makeTeacherDbService = new TeacherDbService().init({
   makeDb,
   cloneDeep,
-  makeUserDbService,
+  makeParentDbService: makeUserDbService,
   dbModel: null,
 });
 
