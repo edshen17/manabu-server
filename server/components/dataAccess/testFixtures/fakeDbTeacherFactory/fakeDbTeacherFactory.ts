@@ -13,11 +13,14 @@ class FakeDbTeacherFactory extends AbstractFakeDbDataFactory<
   TeacherEntityBuildResponse,
   TeacherDoc
 > {
+  public createFakeData = async (): Promise<TeacherEntityBuildResponse> => {
+    const fakeBuildParams = await this._createFakeBuildParams();
+    const fakeData = this._entity.build(fakeBuildParams);
+    return fakeData;
+  };
+
   protected _createFakeBuildParams = async (): Promise<TeacherEntityBuildParams> => {
-    // cannot use fakeDbUserFactory because it will create a cycle and thus be undefined
-    const fakeBuildParams = {
-      userId: 'some user id',
-    };
+    const fakeBuildParams = {};
     return fakeBuildParams;
   };
 }

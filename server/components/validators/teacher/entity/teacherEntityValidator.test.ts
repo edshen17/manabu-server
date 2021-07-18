@@ -11,9 +11,7 @@ before(() => {
 });
 
 beforeEach(() => {
-  buildParams = {
-    userId: '5d6ede6a0ba62570afcedd3a',
-  };
+  buildParams = {};
 });
 
 describe('teacherEntityValidator', () => {
@@ -50,8 +48,8 @@ describe('teacherEntityValidator', () => {
         context('as a non-admin user', () => {
           it('should return a valid object', () => {
             buildParams = {
-              hourlyRate: {
-                amount: 35,
+              priceData: {
+                hourlyRate: 35,
                 currency: 'SGD',
               },
               licensePathUrl: faker.image.dataUri(),
@@ -62,7 +60,7 @@ describe('teacherEntityValidator', () => {
         context('as an admin', () => {
           it('should return a valid object', () => {
             buildParams = {
-              isApproved: true,
+              applicationStatus: 'approved',
               isHidden: false,
             };
             testValidInputs({ validationMode: 'edit', userRole: 'admin' });

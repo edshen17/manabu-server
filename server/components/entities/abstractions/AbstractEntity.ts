@@ -33,13 +33,17 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   public build = (
     buildParams: EntityBuildParams
   ): Promise<EntityBuildResponse> | EntityBuildResponse => {
+    this._validate(buildParams);
+    const builtEntity = this._buildTemplate(buildParams);
+    return builtEntity;
+  };
+
+  protected _validate = (buildParams: EntityBuildParams) => {
     this._entityValidator.validate({
       buildParams,
       userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
       validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
     });
-    const builtEntity = this._buildTemplate(buildParams);
-    return builtEntity;
   };
 
   protected abstract _buildTemplate(

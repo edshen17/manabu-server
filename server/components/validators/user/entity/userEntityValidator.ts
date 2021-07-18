@@ -33,7 +33,7 @@ class UserEntityValidator extends AbstractEntityValidator {
       }),
       verificationToken: this._joi.string().forbidden(),
       isEmailVerified: this._joi.boolean().forbidden(),
-      lastUpdated: this._joi.object().forbidden(),
+      lastUpdated: this._joi.date(),
     });
     this._adminValidationSchema = this._editValidationSchema.keys({
       memberships: this._joi.array().items({

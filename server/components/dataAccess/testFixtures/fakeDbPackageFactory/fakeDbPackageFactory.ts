@@ -1,4 +1,3 @@
-import { PackageDoc } from '../../../../models/Package';
 import {
   PackageEntityBuildParams,
   PackageEntityBuildResponse,
@@ -11,7 +10,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   PartialFakeDbPackageFactoryInitParams,
   PackageEntityBuildParams,
   PackageEntityBuildResponse,
-  PackageDoc
+  PackageEntityBuildParams
 > {
   protected _createFakeBuildParams = async (): Promise<PackageEntityBuildParams> => {
     const fakeBuildParams = {
@@ -25,36 +24,27 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
     return fakeBuildParams;
   };
 
-  public createFakePackages = async (buildParams: { hostedById: string }) => {
-    const fakePackages = await this._createFakePackages(buildParams);
-    const dbServiceAccessOptions = this.getDbServiceAccessOptions();
-    const fakeInsertedPackages = await this._dbService.insertMany({
-      modelToInsert: fakePackages,
-      dbServiceAccessOptions,
-    });
-    return fakeInsertedPackages;
+  public createFakePackages = async () => {
+    const fakePackages = this._createFakePackages();
+    return fakePackages;
   };
 
-  private _createFakePackages = async (buildParams: { hostedById: string }) => {
-    const { hostedById } = buildParams;
-    const lightPackage = await this._entity.build({
-      hostedById: hostedById,
+  private _createFakePackages = () => {
+    const lightPackage = this._entity.build({
       lessonAmount: 5,
       packageType: 'default',
       packageName: 'light',
       isOffering: true,
       lessonDurations: [30, 60],
     });
-    const moderatePackage = await this._entity.build({
-      hostedById,
+    const moderatePackage = this._entity.build({
       lessonAmount: 12,
       packageType: 'default',
       packageName: 'moderate',
       isOffering: true,
       lessonDurations: [30, 60],
     });
-    const mainichiPackage = await this._entity.build({
-      hostedById,
+    const mainichiPackage = this._entity.build({
       lessonAmount: 22,
       packageType: 'default',
       packageName: 'mainichi',

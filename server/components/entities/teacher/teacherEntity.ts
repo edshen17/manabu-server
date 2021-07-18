@@ -1,11 +1,13 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { PackageEntity, PackageEntityBuildResponse } from '../package/packageEntity';
 
-type OptionalTeacherEntityInitParams = {};
+type OptionalTeacherEntityInitParams = {
+  makePackageEntity: Promise<PackageEntity>;
+};
 
-type TeacherEntityBuildParams = { userId: string };
+type TeacherEntityBuildParams = {};
 
 type TeacherEntityBuildResponse = {
-  userId: string;
   teachingLanguages: { language: string; level: string }[];
   alsoSpeaks: { language: string; level: string }[];
   introductionVideoUrl: string;
@@ -18,6 +20,7 @@ type TeacherEntityBuildResponse = {
   lessonCount: number;
   studentCount: number;
   lastUpdated: Date;
+  packages: PackageEntityBuildResponse[];
 };
 
 class TeacherEntity extends AbstractEntity<
@@ -25,10 +28,12 @@ class TeacherEntity extends AbstractEntity<
   TeacherEntityBuildParams,
   TeacherEntityBuildResponse
 > {
-  protected _buildTemplate = (buildParams: { userId: string }): TeacherEntityBuildResponse => {
-    const { userId } = buildParams;
+  private _packageEntity!: PackageEntity;
+
+  protected _buildTemplate = (
+    buildParams: TeacherEntityBuildParams
+  ): TeacherEntityBuildResponse => {
     const teacherEntity = Object.freeze({
-      userId,
       teachingLanguages: [],
       alsoSpeaks: [],
       introductionVideoUrl: '',
@@ -41,8 +46,41 @@ class TeacherEntity extends AbstractEntity<
       lessonCount: 0,
       studentCount: 0,
       lastUpdated: new Date(),
+      packages: this._createDefaultPackages(),
     });
     return teacherEntity;
+  };
+
+  private _createDefaultPackages = (): PackageEntityBuildResponse[] => {
+    const lightPackage = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 5,
+      packageType: 'default',
+      packageName: 'light',
+      isOffering: true,
+      lessonDurations: [30, 60],
+    });
+    const moderatePackage = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 12,
+      packageType: 'default',
+      packageName: 'moderate',
+      isOffering: true,
+      lessonDurations: [30, 60],
+    });
+    const mainichiPackage = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 22,
+      packageType: 'default',
+      packageName: 'mainichi',
+      isOffering: true,
+      lessonDurations: [30, 60],
+    });
+    return [lightPackage, moderatePackage, mainichiPackage];
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalTeacherEntityInitParams
+  ): Promise<void> => {
+    const { makePackageEntity } = optionalInitParams;
+    this._packageEntity = await makePackageEntity;
   };
 }
 

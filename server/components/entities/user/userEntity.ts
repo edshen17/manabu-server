@@ -1,11 +1,19 @@
 import { UserContactMethodEmbed } from '../../../models/User';
-import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
+import {
+  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+} from '../../validators/abstractions/AbstractEntityValidator';
+import { PackageEntityValidator } from '../../validators/package/entity/packageEntityValidator';
+import { TeacherEntityValidator } from '../../validators/teacher/entity/teacherEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { TeacherEntityBuildResponse } from '../teacher/teacherEntity';
 
 type OptionalUserEntityInitParams = {
   hashPassword: any;
   cryptoRandomString: any;
   signJwt: any;
+  makeTeacherEntityValidator: TeacherEntityValidator;
+  makePackageEntityValidator: PackageEntityValidator;
 };
 
 type UserEntityBuildParams = {
@@ -14,6 +22,7 @@ type UserEntityBuildParams = {
   password?: string;
   profileImageUrl?: string;
   contactMethods?: UserContactMethod[] | [];
+  teacherData?: TeacherEntityBuildResponse;
 };
 
 type UserContactMethod = typeof UserContactMethodEmbed;
@@ -46,9 +55,36 @@ class UserEntity extends AbstractEntity<
   private _hashPassword!: any;
   private _cryptoRandomString!: any;
   private _signJwt!: any;
+  private _teacherEntityValidator!: TeacherEntityValidator;
+  private _packageEntityValidator!: PackageEntityValidator;
+
+  protected _validate = (buildParams: UserEntityBuildParams) => {
+    const { teacherData, ...userData } = buildParams;
+    this._entityValidator.validate({
+      buildParams: userData,
+      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+    });
+    if (teacherData) {
+      const { packages, ...toValidateTeacherData } = teacherData;
+      this._teacherEntityValidator.validate({
+        buildParams: toValidateTeacherData,
+        userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
+        validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+      });
+      packages.map((pkg) => {
+        this._packageEntityValidator.validate({
+          buildParams: pkg,
+          userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
+          validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+        });
+      });
+    }
+  };
 
   protected _buildTemplate = (buildParams: UserEntityBuildParams): UserEntityBuildResponse => {
-    const { name, email, password, profileImageUrl, contactMethods } = buildParams || {};
+    const { name, email, password, profileImageUrl, contactMethods, teacherData } =
+      buildParams || {};
     const encryptedPassword = this._encryptPassword(password);
     const verificationToken = this._createVerificationToken(name, email);
     const userEntity = Object.freeze({
@@ -69,6 +105,7 @@ class UserEntity extends AbstractEntity<
       isEmailVerified: false,
       verificationToken,
       lastUpdated: new Date(),
+      teacherData,
     });
     return userEntity;
   };
@@ -93,17 +130,20 @@ class UserEntity extends AbstractEntity<
   };
 
   protected _initTemplate = async (
-    optionalInitParams: Omit<
-      {
-        makeEntityValidator: AbstractEntityValidator;
-      } & OptionalUserEntityInitParams,
-      'makeEntityValidator'
-    >
+    optionalInitParams: OptionalUserEntityInitParams
   ): Promise<void> => {
-    const { hashPassword, signJwt, cryptoRandomString } = optionalInitParams;
+    const {
+      hashPassword,
+      signJwt,
+      cryptoRandomString,
+      makeTeacherEntityValidator,
+      makePackageEntityValidator,
+    } = optionalInitParams;
     this._hashPassword = hashPassword;
     this._signJwt = signJwt;
     this._cryptoRandomString = cryptoRandomString;
+    this._teacherEntityValidator = makeTeacherEntityValidator;
+    this._packageEntityValidator = makePackageEntityValidator;
   };
 }
 

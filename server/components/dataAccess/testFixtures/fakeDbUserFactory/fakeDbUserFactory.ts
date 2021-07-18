@@ -1,13 +1,11 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { UserEntityBuildParams, UserEntityBuildResponse } from '../../../entities/user/userEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
-import { FakeDbPackageFactory } from '../fakeDbPackageFactory/fakeDbPackageFactory';
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
 type OptionalFakeDbUserFactoryInitParams = {
   faker: any;
   makeFakeDbTeacherFactory: Promise<FakeDbTeacherFactory>;
-  makeFakeDbPackageFactory: Promise<FakeDbPackageFactory>;
 };
 
 class FakeDbUserFactory extends AbstractFakeDbDataFactory<
@@ -18,22 +16,12 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
 > {
   private _faker: any;
   private _fakeDbTeacherFactory!: FakeDbTeacherFactory;
-  private _fakeDbPackageFactory!: FakeDbPackageFactory;
 
   public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
-    const fakeDbUser = await this.createFakeDbUser();
-    const fakeDbTeacher = await this._fakeDbTeacherFactory.createFakeDbData({
-      userId: fakeDbUser._id.toString(),
-    });
-    const fakeDbPackages = await this._fakeDbPackageFactory.createFakePackages({
-      hostedById: fakeDbUser._id.toString(),
-    });
-
-    const fakeDbUserData = await this._dbService.findById({
-      _id: fakeDbUser._id.toString(),
-      dbServiceAccessOptions: this._dbServiceAccessOptions,
-    });
-    return fakeDbUserData;
+    const fakeBuildParams = await this._createFakeBuildParams();
+    fakeBuildParams.teacherData = await this._fakeDbTeacherFactory.createFakeData();
+    const fakeDbTeacher = this.createFakeDbData(fakeBuildParams);
+    return fakeDbTeacher;
   };
 
   public createFakeDbUser = async (): Promise<JoinedUserDoc> => {
@@ -60,10 +48,9 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   };
 
   protected _initTemplate = async (optionalInitParams: OptionalFakeDbUserFactoryInitParams) => {
-    const { faker, makeFakeDbTeacherFactory, makeFakeDbPackageFactory } = optionalInitParams;
+    const { faker, makeFakeDbTeacherFactory } = optionalInitParams;
     this._faker = faker;
     this._fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
-    this._fakeDbPackageFactory = await makeFakeDbPackageFactory;
   };
 }
 

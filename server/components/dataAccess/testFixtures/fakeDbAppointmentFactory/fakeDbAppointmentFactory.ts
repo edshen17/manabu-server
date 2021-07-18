@@ -1,41 +1,41 @@
-import { AppointmentDoc } from '../../../../models/Appointment';
-import {
-  AppointmentEntityBuildParams,
-  AppointmentEntityBuildResponse,
-} from '../../../entities/appointment/appointmentEntity';
-import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
-import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
+// import { AppointmentDoc } from '../../../../models/Appointment';
+// import {
+//   AppointmentEntityBuildParams,
+//   AppointmentEntityBuildResponse,
+// } from '../../../entities/appointment/appointmentEntity';
+// import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
+// import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 
-type OptionalFakeDbAppointmentFactoryInitParams = {
-  makeFakeDbPackageTransactionFactory: Promise<FakeDbPackageTransactionFactory>;
-};
+// type OptionalFakeDbAppointmentFactoryInitParams = {
+//   makeFakeDbPackageTransactionFactory: Promise<FakeDbPackageTransactionFactory>;
+// };
 
-class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
-  OptionalFakeDbAppointmentFactoryInitParams,
-  AppointmentEntityBuildParams,
-  AppointmentEntityBuildResponse,
-  AppointmentDoc
-> {
-  private _fakeDbPackageTransactionFactory!: FakeDbPackageTransactionFactory;
+// class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
+//   OptionalFakeDbAppointmentFactoryInitParams,
+//   AppointmentEntityBuildParams,
+//   AppointmentEntityBuildResponse,
+//   AppointmentDoc
+// > {
+//   private _fakeDbPackageTransactionFactory!: FakeDbPackageTransactionFactory;
 
-  protected _createFakeBuildParams = async (): Promise<AppointmentEntityBuildParams> => {
-    const fakePackageTransaction = await this._fakeDbPackageTransactionFactory.createFakeDbData();
-    const fakeBuildParams = {
-      hostedById: fakePackageTransaction.hostedById.toString(),
-      reservedById: fakePackageTransaction.reservedById.toString(),
-      packageTransactionId: fakePackageTransaction._id.toString(),
-      startTime: new Date(),
-      endTime: new Date(),
-    };
-    return fakeBuildParams;
-  };
+//   protected _createFakeBuildParams = async (): Promise<AppointmentEntityBuildParams> => {
+//     const fakePackageTransaction = await this._fakeDbPackageTransactionFactory.createFakeDbData();
+//     const fakeBuildParams = {
+//       hostedById: fakePackageTransaction.hostedById.toString(),
+//       reservedById: fakePackageTransaction.reservedById.toString(),
+//       packageTransactionId: fakePackageTransaction._id.toString(),
+//       startTime: new Date(),
+//       endTime: new Date(),
+//     };
+//     return fakeBuildParams;
+//   };
 
-  protected _initTemplate = async (
-    optionalInitParams: OptionalFakeDbAppointmentFactoryInitParams
-  ) => {
-    const { makeFakeDbPackageTransactionFactory } = optionalInitParams;
-    this._fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
-  };
-}
+//   protected _initTemplate = async (
+//     optionalInitParams: OptionalFakeDbAppointmentFactoryInitParams
+//   ) => {
+//     const { makeFakeDbPackageTransactionFactory } = optionalInitParams;
+//     this._fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+//   };
+// }
 
-export { FakeDbAppointmentFactory };
+// export { FakeDbAppointmentFactory };

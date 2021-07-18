@@ -1,13 +1,6 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 
 const PackageSchema = createSchema({
-  hostedById: Type.objectId({ required: true, index: true }),
-  priceData: Type.object({
-    required: true,
-  }).of({
-    hourlyPrice: Type.string(),
-    currency: Type.string(),
-  }),
   lessonAmount: Type.number({ required: true }),
   packageDesc: Type.string({ required: false }),
   packageName: Type.string({ required: true }),

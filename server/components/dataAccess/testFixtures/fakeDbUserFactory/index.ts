@@ -12,7 +12,6 @@ const makeFakeDbUserFactory = new FakeDbUserFactory().init({
   makeEntity: makeUserEntity,
   makeDbService: makeUserDbService,
   makeFakeDbTeacherFactory,
-  makeFakeDbPackageFactory,
 });
 
 export { makeFakeDbUserFactory };

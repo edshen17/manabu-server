@@ -1,8 +1,9 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import { PackageSchema } from './Package';
 
 const TeacherSchema = createSchema({
-  userId: Type.objectId({ required: true, index: true, unique: true }),
+  // userId: Type.objectId({ required: true, index: true, unique: true }),
   dateApproved: Type.date({ required: false }),
   teachingLanguages: Type.array({ required: true }).of({
     language: Type.string(),
@@ -13,7 +14,7 @@ const TeacherSchema = createSchema({
     level: Type.string(),
   }),
   introductionVideoUrl: Type.string({ required: false }),
-  applicationStatus: Type.string({ required: true }),
+  applicationStatus: Type.string({ required: true, enum: ['pending', 'approved', 'rejected'] }),
   isHidden: Type.boolean({ required: true }),
   teacherType: Type.string({
     required: true,
@@ -29,6 +30,7 @@ const TeacherSchema = createSchema({
   lessonCount: Type.number({ required: true }),
   studentCount: Type.number({ required: true }),
   lastUpdated: Type.date({ required: true }),
+  packages: Type.array({ required: true }).of(PackageSchema),
 });
 
 TeacherSchema.plugin(aggregatePaginate);

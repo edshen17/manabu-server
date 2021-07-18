@@ -1,68 +1,68 @@
-import { expect } from 'chai';
-import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
-import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
-import { makeGetMinuteBankController } from '.';
-import { GetMinuteBankController } from './getMinuteBankController';
-import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
-import { JoinedUserDoc } from '../../../../models/User';
+// import { expect } from 'chai';
+// import { MinuteBankDoc } from '../../../../models/MinuteBank';
+// import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
+// import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
+// import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+// import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+// import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
+// import { makeGetMinuteBankController } from '.';
+// import { GetMinuteBankController } from './getMinuteBankController';
+// import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
+// import { JoinedUserDoc } from '../../../../models/User';
 
-let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
-let fakeDbUserFactory: FakeDbUserFactory;
-let getMinuteBankController: GetMinuteBankController;
-let fakeUser: JoinedUserDoc;
-let fakeTeacher: JoinedUserDoc;
-let fakeMinuteBank: MinuteBankDoc;
-let iHttpRequestBuilder: IHttpRequestBuilder;
+// let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
+// let fakeDbUserFactory: FakeDbUserFactory;
+// let getMinuteBankController: GetMinuteBankController;
+// let fakeUser: JoinedUserDoc;
+// let fakeTeacher: JoinedUserDoc;
+// let fakeMinuteBank: MinuteBankDoc;
+// let iHttpRequestBuilder: IHttpRequestBuilder;
 
-before(async () => {
-  fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;
-  fakeDbUserFactory = await makeFakeDbUserFactory;
-  getMinuteBankController = await makeGetMinuteBankController;
-  fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-  fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
-    hostedById: fakeTeacher._id.toString(),
-    reservedById: fakeUser._id.toString(),
-  });
-  iHttpRequestBuilder = makeIHttpRequestBuilder;
-});
+// before(async () => {
+//   fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;
+//   fakeDbUserFactory = await makeFakeDbUserFactory;
+//   getMinuteBankController = await makeGetMinuteBankController;
+//   fakeUser = await fakeDbUserFactory.createFakeDbUser();
+//   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+//   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
+//     hostedById: fakeTeacher._id.toString(),
+//     reservedById: fakeUser._id.toString(),
+//   });
+//   iHttpRequestBuilder = makeIHttpRequestBuilder;
+// });
 
-describe('getMinuteBankController', () => {
-  describe('makeRequest', () => {
-    it('should get the minute bank (related party -- hostedById)', async () => {
-      const getMinuteBankHttpRequest = iHttpRequestBuilder
-        .currentAPIUser({
-          userId: fakeUser._id.toString(),
-          role: fakeUser.role,
-        })
-        .path('/self/minuteBanks')
-        .build();
-      const getMinuteBankRes = await getMinuteBankController.makeRequest(getMinuteBankHttpRequest);
-      if ('minuteBanks' in getMinuteBankRes.body) {
-        expect(getMinuteBankRes.body.minuteBanks[0]._id.toString()).to.deep.equal(
-          fakeMinuteBank._id.toString()
-        );
-      }
-    });
+// describe('getMinuteBankController', () => {
+//   describe('makeRequest', () => {
+//     it('should get the minute bank (related party -- hostedById)', async () => {
+//       const getMinuteBankHttpRequest = iHttpRequestBuilder
+//         .currentAPIUser({
+//           userId: fakeUser._id.toString(),
+//           role: fakeUser.role,
+//         })
+//         .path('/self/minuteBanks')
+//         .build();
+//       const getMinuteBankRes = await getMinuteBankController.makeRequest(getMinuteBankHttpRequest);
+//       if ('minuteBanks' in getMinuteBankRes.body) {
+//         expect(getMinuteBankRes.body.minuteBanks[0]._id.toString()).to.deep.equal(
+//           fakeMinuteBank._id.toString()
+//         );
+//       }
+//     });
 
-    it('should get the minute bank (related party -- reservedById)', async () => {
-      const getMinuteBankHttpRequest = iHttpRequestBuilder
-        .currentAPIUser({
-          userId: fakeTeacher._id.toString(),
-          role: fakeTeacher.role,
-        })
-        .path('/self/minuteBanks')
-        .build();
-      const getMinuteBankRes = await getMinuteBankController.makeRequest(getMinuteBankHttpRequest);
-      if ('minuteBanks' in getMinuteBankRes.body) {
-        expect(getMinuteBankRes.body.minuteBanks[0]._id.toString()).to.deep.equal(
-          fakeMinuteBank._id.toString()
-        );
-      }
-    });
-  });
-});
+//     it('should get the minute bank (related party -- reservedById)', async () => {
+//       const getMinuteBankHttpRequest = iHttpRequestBuilder
+//         .currentAPIUser({
+//           userId: fakeTeacher._id.toString(),
+//           role: fakeTeacher.role,
+//         })
+//         .path('/self/minuteBanks')
+//         .build();
+//       const getMinuteBankRes = await getMinuteBankController.makeRequest(getMinuteBankHttpRequest);
+//       if ('minuteBanks' in getMinuteBankRes.body) {
+//         expect(getMinuteBankRes.body.minuteBanks[0]._id.toString()).to.deep.equal(
+//           fakeMinuteBank._id.toString()
+//         );
+//       }
+//     });
+//   });
+// });

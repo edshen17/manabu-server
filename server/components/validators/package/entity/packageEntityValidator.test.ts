@@ -11,7 +11,6 @@ before(() => {
 
 beforeEach(() => {
   buildParams = {
-    hostedById: '5d6ede6a0ba62570afcedd3a',
     priceData: {
       currency: 'SGD',
       hourlyRate: 10,

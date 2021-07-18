@@ -18,7 +18,7 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
       cancellationReason: this._joi.string().max(256),
       packageTransactionData: this._joi.object().forbidden(),
       locationData: this._joi.object().forbidden(),
-      lastUpdated: this._joi.object().forbidden(),
+      lastUpdated: this._joi.date(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };
