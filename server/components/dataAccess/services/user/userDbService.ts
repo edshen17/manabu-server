@@ -3,7 +3,7 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherDoc } from '../../../../models/Teacher';
 // import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
-import { JoinedUserDoc, UserDoc } from '../../../../models/User';
+import { JoinedUserDoc } from '../../../../models/User';
 
 type OptionalUserDbServiceInitParams = {
   // makePackageTransactionDbService: Promise<PackageTransactionDbService>;

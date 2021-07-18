@@ -1,5 +1,5 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { TeacherDoc, TeacherSchema } from './Teacher';
+import { TeacherSchema } from './Teacher';
 
 const UserContactMethodEmbed = {
   methodName: Type.string({ required: true }),
@@ -40,8 +40,5 @@ const UserSchema = createSchema({
 });
 
 const User = typedModel('User', UserSchema);
-type UserDoc = ExtractDoc<typeof UserSchema>;
-type JoinedTeacherDoc = TeacherDoc;
-type JoinedUserDoc = UserDoc & { teacherAppPending: boolean };
-
-export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed, UserDoc };
+type JoinedUserDoc = ExtractDoc<typeof UserSchema>;
+export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed };

@@ -138,32 +138,32 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       })
       .lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
-    await this._updateDbDependenciesBranch({ dbDependencyUpdateParams });
+    await this._updateDbDependencyHandler({ dbDependencyUpdateParams });
     return dbQueryResult;
   };
 
-  private _updateDbDependenciesBranch = async (props: {
+  protected _updateDbDependencyHandler = async (props: {
     dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }) => {
     const { dbDependencyUpdateParams } = props;
     if (dbDependencyUpdateParams) {
-      await this.updateDbDependencies(dbDependencyUpdateParams);
+      await this._updateDbDependencyBrancher(dbDependencyUpdateParams);
     }
   };
 
-  private updateDbDependencies = async (
+  private _updateDbDependencyBrancher = async (
     dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
     const isUpdatingSync = process.env.NODE_ENV != 'production';
     const isUpdatingAsync = process.env.NODE_ENV == 'production';
     if (isUpdatingSync) {
-      await this._updateDbDependencyController(dbDependencyUpdateParams);
+      await this._updateDbDependencies(dbDependencyUpdateParams);
     } else if (isUpdatingAsync) {
-      this._updateDbDependencyController(dbDependencyUpdateParams);
+      this._updateDbDependencies(dbDependencyUpdateParams);
     }
   };
 
-  private _updateDbDependencyController = async (
+  private _updateDbDependencies = async (
     dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
     const { updatedDependentSearchQuery } = dbDependencyUpdateParams;
@@ -174,7 +174,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     });
     const updateDependentPromises: Promise<any>[] = [];
     for (const updatedDependeeDoc of updatedDependeeDocs) {
-      await this._updateDbDependencyControllerTemplate({
+      await this._updateDbDependenciesTemplate({
         updateDependentPromises,
         updatedDependeeDoc,
         dbServiceAccessOptions,
@@ -183,7 +183,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
     await Promise.all(updateDependentPromises);
   };
 
-  protected _updateDbDependencyControllerTemplate = async (props: {
+  protected _updateDbDependenciesTemplate = async (props: {
     updateDependentPromises: Promise<any>[];
     updatedDependeeDoc: DbDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
@@ -248,7 +248,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc extends HasI
       })
       .lean();
     const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
-    await this._updateDbDependenciesBranch({ dbDependencyUpdateParams });
+    await this._updateDbDependencyHandler({ dbDependencyUpdateParams });
     return dbQueryResult;
   };
 

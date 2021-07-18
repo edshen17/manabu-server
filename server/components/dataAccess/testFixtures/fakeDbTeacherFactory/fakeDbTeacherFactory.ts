@@ -1,19 +1,14 @@
-import { TeacherDoc } from '../../../../models/Teacher';
 import {
   TeacherEntityBuildParams,
   TeacherEntityBuildResponse,
 } from '../../../entities/teacher/teacherEntity';
-import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
+import { AbstractFakeDbEmbeddedDataFactory } from '../abstractions/AbstractFakeDbEmbeddedDataFactory';
 
-type PartialFakeDbTeacherFactoryInitParams = {};
-
-class FakeDbTeacherFactory extends AbstractFakeDbDataFactory<
-  PartialFakeDbTeacherFactoryInitParams,
+class FakeDbTeacherFactory extends AbstractFakeDbEmbeddedDataFactory<
   TeacherEntityBuildParams,
-  TeacherEntityBuildResponse,
-  TeacherDoc
+  TeacherEntityBuildResponse
 > {
-  public createFakeData = async (): Promise<TeacherEntityBuildResponse> => {
+  public createFakeDbData = async (): Promise<TeacherEntityBuildResponse> => {
     const fakeBuildParams = await this._createFakeBuildParams();
     const fakeData = this._entity.build(fakeBuildParams);
     return fakeData;
