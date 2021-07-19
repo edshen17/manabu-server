@@ -28,6 +28,7 @@ class TeacherDbService extends AbstractEmbeddedDbService<
     this._deepEqual = deepEqual;
     this._embeddedFieldData = {
       parentFieldName: 'teacherData',
+      childFieldName: 'packages',
       embedType: DB_SERVICE_EMBED_TYPE.SINGLE,
     };
   };
