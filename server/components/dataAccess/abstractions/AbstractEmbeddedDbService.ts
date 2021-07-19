@@ -3,6 +3,7 @@ import { DbDependencyUpdateParams, DbServiceAccessOptions, IDbService } from './
 
 type AbstractEmbeddedDbServiceInitParams<OptionalDbServiceInitParams> = {
   makeParentDbService: Promise<IDbService<any, any>>;
+  deepEqual: any;
 } & OptionalDbServiceInitParams;
 
 enum DB_SERVICE_EMBED_TYPE {
@@ -18,8 +19,9 @@ abstract class AbstractEmbeddedDbService<
   DbDoc
 > {
   protected _parentDbService!: IDbService<any, any>;
+  protected _deepEqual!: any;
   protected _embeddedFieldData!: {
-    fieldName: string;
+    parentFieldName: string;
     embedType: string;
   };
 
@@ -33,36 +35,71 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    const dbQueryResult = await this._dbQueryReturnTemplate({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
     return dbQueryResult;
   };
 
   protected _convertToEmbeddedQuery = (query?: StringKeyObject): {} => {
     const embeddedSearchQuery: StringKeyObject = {};
     for (const property in query) {
-      const embeddedProperty = `teacherData.${property}`;
+      const embeddedProperty = `${this._embeddedFieldData.parentFieldName}.${property}`;
       embeddedSearchQuery[embeddedProperty] = query[property];
     }
     return embeddedSearchQuery;
   };
 
-  protected _dbQueryReturnTemplate = async (
-    dbServiceAccessOptions: DbServiceAccessOptions,
-    dbQueryPromise: any
-  ): Promise<any> => {
+  protected _dbQueryReturnTemplate = async (props: {
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    dbQueryPromise: any;
+    searchQuery?: {};
+  }): Promise<any> => {
+    const { dbQueryPromise, searchQuery } = props;
     const dbQueryResult = await dbQueryPromise;
-    const embeddedFieldName = this._embeddedFieldData.fieldName;
+    const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
+    const isResultArray = Array.isArray(dbQueryResult);
+    const isEmbeddedArray = dbQueryResult && Array.isArray(dbQueryResult[embeddedParentFieldName]);
+    let processedResult;
     if (!dbQueryResult) {
       return null;
-    }
-    if (Array.isArray(dbQueryResult)) {
-      const savedDbDocs = dbQueryResult.map((dbDoc) => {
-        return dbDoc[embeddedFieldName];
+    } else if (isResultArray) {
+      processedResult = dbQueryResult
+        .map((dbDoc: any) => {
+          if (dbDoc)
+            return this._handleEmbeddedArray({
+              dbQueryResult: dbDoc[embeddedParentFieldName],
+              searchQuery,
+            });
+        })
+        .flat();
+    } else if (isEmbeddedArray) {
+      processedResult = this._handleEmbeddedArray({
+        dbQueryResult: dbQueryResult[embeddedParentFieldName],
+        searchQuery,
       });
-      return savedDbDocs;
     } else {
-      const savedDbDoc = dbQueryResult[embeddedFieldName];
-      return savedDbDoc;
+      processedResult = dbQueryResult[embeddedParentFieldName];
+    }
+    return processedResult;
+  };
+
+  private _handleEmbeddedArray = (props: { dbQueryResult: any; searchQuery?: StringKeyObject }) => {
+    const { dbQueryResult, searchQuery } = props;
+    if (Array.isArray(dbQueryResult)) {
+      const dbDoc = dbQueryResult.find((pkg) => {
+        let isMatchedEmbeddedDoc = true;
+        for (const property in searchQuery) {
+          isMatchedEmbeddedDoc =
+            isMatchedEmbeddedDoc && this._deepEqual(pkg[property], searchQuery[property]);
+        }
+        return isMatchedEmbeddedDoc;
+      });
+      return dbDoc || dbQueryResult;
+    } else {
+      return dbQueryResult;
     }
   };
 
@@ -71,13 +108,19 @@ abstract class AbstractEmbeddedDbService<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
-    const embeddedSearchQuery = this._convertToEmbeddedQuery({ _id });
+    const searchQuery = { _id };
+    const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOne({
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
-    return dbQueryResult;
+    const dbQueryResult = await this._dbQueryReturnTemplate({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
+    const processedResult = this._handleEmbeddedArray({ dbQueryResult, searchQuery });
+    return processedResult;
   };
 
   public find = async (dbServiceParams: {
@@ -90,7 +133,11 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    const dbQueryResult = await this._dbQueryReturnTemplate({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
     return dbQueryResult;
   };
 
@@ -124,7 +171,11 @@ abstract class AbstractEmbeddedDbService<
       updateParams: embeddedUpdateQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    const dbQueryResult = await this._dbQueryReturnTemplate({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
     await this._updateDbDependencyHandler({
       dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
     });
@@ -148,7 +199,11 @@ abstract class AbstractEmbeddedDbService<
       dbServiceAccessOptions,
       dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    const dbQueryResult = await this._dbQueryReturnTemplate({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
     await this._updateDbDependencyHandler({ dbDependencyUpdateParams });
     return dbQueryResult;
   };
@@ -181,20 +236,24 @@ abstract class AbstractEmbeddedDbService<
       dbServiceAccessOptions,
       dbDependencyUpdateParams,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate(dbServiceAccessOptions, dbQueryPromise);
+    const dbQueryResult = await this._dbQueryReturnTemplate({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
     return dbQueryResult;
   };
 
   private _configureDeleteUpdateParams = (searchQuery?: {}) => {
     const isMultiEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
-    const embeddedFieldName = this._embeddedFieldData.fieldName;
+    const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
     if (isMultiEmbed) {
       const updateDeleteParams: StringKeyObject = { $unset: {} };
-      updateDeleteParams.$unset[embeddedFieldName] = true;
+      updateDeleteParams.$unset[embeddedParentFieldName] = true;
       return updateDeleteParams;
     } else {
       const updateDeleteParams: StringKeyObject = { $pull: {} };
-      updateDeleteParams.$pull[embeddedFieldName] = searchQuery;
+      updateDeleteParams.$pull[embeddedParentFieldName] = searchQuery;
       return updateDeleteParams;
     }
   };

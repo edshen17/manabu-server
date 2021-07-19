@@ -1,15 +1,15 @@
-import { TeacherDoc } from '../../../../models/Teacher';
+import { PackageDoc } from '../../../../models/Package';
 import {
   AbstractEmbeddedDbService,
   AbstractEmbeddedDbServiceInitParams,
   DB_SERVICE_EMBED_TYPE,
 } from '../../abstractions/AbstractEmbeddedDbService';
 
-type OptionalTeacherDbServiceInitParams = {};
+type OptionalPackageDbServiceInitParams = {};
 
-class TeacherDbService extends AbstractEmbeddedDbService<
-  OptionalTeacherDbServiceInitParams,
-  TeacherDoc
+class PackageDbService extends AbstractEmbeddedDbService<
+  OptionalPackageDbServiceInitParams,
+  PackageDoc
 > {
   constructor() {
     super();
@@ -20,17 +20,18 @@ class TeacherDbService extends AbstractEmbeddedDbService<
       overrideView: {},
     };
   }
+
   protected _initTemplate = async (
-    optionalDbServiceInitParams: AbstractEmbeddedDbServiceInitParams<OptionalTeacherDbServiceInitParams>
+    optionalDbServiceInitParams: AbstractEmbeddedDbServiceInitParams<OptionalPackageDbServiceInitParams>
   ) => {
     const { makeParentDbService, deepEqual } = optionalDbServiceInitParams;
     this._parentDbService = await makeParentDbService;
     this._deepEqual = deepEqual;
     this._embeddedFieldData = {
-      parentFieldName: 'teacherData',
-      embedType: DB_SERVICE_EMBED_TYPE.SINGLE,
+      parentFieldName: 'packages',
+      embedType: DB_SERVICE_EMBED_TYPE.MULTI,
     };
   };
 }
 
-export { TeacherDbService };
+export { PackageDbService };
