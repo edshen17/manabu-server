@@ -47,7 +47,7 @@ abstract class AbstractEmbeddedDbService<
   protected _convertToEmbeddedQuery = (query?: StringKeyObject): {} => {
     const embeddedSearchQuery: StringKeyObject = {};
     for (const property in query) {
-      const hasReserved$ = property.startsWith('$');
+      const hasReserved$ = this._hasReserved$(property);
       if (hasReserved$) {
         embeddedSearchQuery[property] = this._convertToEmbeddedQuery(query[property]);
       } else {
@@ -56,6 +56,11 @@ abstract class AbstractEmbeddedDbService<
       }
     }
     return embeddedSearchQuery;
+  };
+
+  private _hasReserved$ = (str: string): boolean => {
+    let hasReserved$ = str.startsWith('$');
+    return hasReserved$;
   };
 
   protected _dbQueryReturnTemplate = async (props: {
@@ -67,7 +72,7 @@ abstract class AbstractEmbeddedDbService<
     const dbQueryResult = await dbQueryPromise;
     const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
     const isResultArray = Array.isArray(dbQueryResult);
-    const isEmbeddedArray = dbQueryResult && Array.isArray(dbQueryResult[embeddedParentFieldName]);
+    const isEmbeddedField = dbQueryResult && Array.isArray(dbQueryResult[embeddedParentFieldName]);
     let processedResult;
     if (!dbQueryResult) {
       return null;
@@ -75,14 +80,14 @@ abstract class AbstractEmbeddedDbService<
       processedResult = dbQueryResult
         .map((dbDoc: any) => {
           if (dbDoc)
-            return this._handleEmbeddedArray({
+            return this._handleEmbeddedField({
               dbQueryResult: dbDoc[embeddedParentFieldName],
               searchQuery,
             });
         })
         .flat();
-    } else if (isEmbeddedArray) {
-      processedResult = this._handleEmbeddedArray({
+    } else if (isEmbeddedField) {
+      processedResult = this._handleEmbeddedField({
         dbQueryResult: dbQueryResult[embeddedParentFieldName],
         searchQuery,
       });
@@ -92,14 +97,15 @@ abstract class AbstractEmbeddedDbService<
     return processedResult;
   };
 
-  private _handleEmbeddedArray = (props: { dbQueryResult: any; searchQuery?: StringKeyObject }) => {
+  private _handleEmbeddedField = (props: { dbQueryResult: any; searchQuery?: StringKeyObject }) => {
     const { dbQueryResult, searchQuery } = props;
-    if (Array.isArray(dbQueryResult)) {
-      const dbDoc = dbQueryResult.find((pkg) => {
+    const isResultArray = Array.isArray(dbQueryResult);
+    if (isResultArray) {
+      const dbDoc = dbQueryResult.find((childDbDoc: any) => {
         let isMatchedEmbeddedDoc = true;
         for (const property in searchQuery) {
           isMatchedEmbeddedDoc =
-            isMatchedEmbeddedDoc && this._deepEqual(pkg[property], searchQuery[property]);
+            isMatchedEmbeddedDoc && this._deepEqual(childDbDoc[property], searchQuery[property]);
         }
         return isMatchedEmbeddedDoc;
       });
@@ -125,8 +131,7 @@ abstract class AbstractEmbeddedDbService<
       dbQueryPromise,
       searchQuery,
     });
-    const processedResult = this._handleEmbeddedArray({ dbQueryResult, searchQuery });
-    return processedResult;
+    return dbQueryResult;
   };
 
   public find = async (dbServiceParams: {
@@ -174,7 +179,9 @@ abstract class AbstractEmbeddedDbService<
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateParams);
     const processedUpdateParams = this._configureUpdateParams(embeddedUpdateQuery);
-    // const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams); //needs to be updateparams.searchQuery
+    const embeddedDbDependencyUpdateQuery = dbDependencyUpdateParams
+      ? this._convertToEmbeddedQuery(dbDependencyUpdateParams.updatedDependentSearchQuery)
+      : dbDependencyUpdateParams;
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateParams: processedUpdateParams,
@@ -185,29 +192,26 @@ abstract class AbstractEmbeddedDbService<
       dbQueryPromise,
       searchQuery,
     });
-    // await this._updateDbDependencyHandler({
-    //   dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
-    // });
+    await this._updateDbDependencyHandler({
+      dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
+    });
     return dbQueryResult;
   };
 
   private _configureUpdateParams = (updateQuery?: StringKeyObject) => {
     const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedChildFieldName = this._embeddedFieldData.childFieldName;
-    const hasReserved$ = this._hasReserved$(updateQuery);
     if (isSingleEmbed) {
-      const updateParams: StringKeyObject = hasReserved$
-        ? {}
-        : {
-            $set: {},
-          };
+      const updateParams: StringKeyObject = {
+        $set: {},
+      };
       for (const property in updateQuery) {
         if (embeddedChildFieldName) {
           const embeddedFieldRef = `${property.replace(
             embeddedChildFieldName,
             `${embeddedChildFieldName}.$`
           )}`;
-          if (hasReserved$) {
+          if (this._hasReserved$(property)) {
             updateParams[embeddedFieldRef] = updateQuery[property];
           } else {
             updateParams.$set[embeddedFieldRef] = updateQuery[property];
@@ -218,14 +222,6 @@ abstract class AbstractEmbeddedDbService<
     } else {
       return updateQuery;
     }
-  };
-
-  private _hasReserved$ = (updateQuery?: StringKeyObject): boolean => {
-    let hasReserved$ = updateQuery ? true : false;
-    for (const property in updateQuery) {
-      hasReserved$ = hasReserved$ && property.startsWith('$');
-    }
-    return hasReserved$;
   };
 
   public updateMany = async (dbServiceParams: {

@@ -184,7 +184,6 @@ describe('packageDbService', () => {
       //   },
       //   dbServiceAccessOptions,
       // });
-      console.log(updatedPackage, fakePackage, 'here finish');
       expect(updatedPackage).to.not.deep.equal(fakePackage);
       expect(updatedPackage.packageType).to.equal('custom');
       // expect(updatedPackageTransaction.packageData.packageType).to.equal('custom');
@@ -257,7 +256,6 @@ describe('packageDbService', () => {
         _id: fakePackage._id,
         dbServiceAccessOptions,
       });
-      console.log(deletedPackage, foundPackage, 'here');
       expect(foundPackage).to.not.deep.equal(deletedPackage);
       expect(foundPackage).to.be.equal(null);
     };
