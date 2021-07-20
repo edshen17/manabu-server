@@ -113,7 +113,7 @@ describe('teacherDbService', () => {
           dbServiceAccessOptions,
         });
       } catch (err) {
-        expect(err.message).to.equal('Cannot insert an embedded document.');
+        expect(err).to.be.an('error');
       }
     });
   });

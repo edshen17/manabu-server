@@ -146,14 +146,16 @@ abstract class AbstractEmbeddedDbService<
     modelToInsert?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
-    throw new Error('Cannot insert an embedded document.');
+    throw new Error('Cannot insert an embedded document. Use findOneAndUpdate/updateMany instead.');
   };
 
   public insertMany = async (dbServiceParams: {
     modelToInsert?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
-    throw new Error('Cannot insert many embedded documents.');
+    throw new Error(
+      'Cannot insert many embedded documents. Use findOneAndUpdate/updateMany instead.'
+    );
   };
 
   public findOneAndUpdate = async (dbServiceParams: {
@@ -166,8 +168,8 @@ abstract class AbstractEmbeddedDbService<
       dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateParams);
+    console.log(embeddedUpdateQuery, 'here');
     const processedUpdateParams = this._configureUpdateParams(embeddedUpdateQuery);
-    console.log(processedUpdateParams, 'here proces');
     // const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams); //needs to be updateparams.searchQuery
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
@@ -254,6 +256,7 @@ abstract class AbstractEmbeddedDbService<
     const { searchQuery, dbServiceAccessOptions, dbDependencyUpdateParams } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const updateParams = this._configureDeleteUpdateParams(searchQuery);
+    console.log(updateParams, 'here updateparams');
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateParams,
@@ -268,16 +271,22 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  private _configureDeleteUpdateParams = (searchQuery?: {}) => {
+  private _configureDeleteUpdateParams = (searchQuery?: StringKeyObject) => {
     const isMultiEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.MULTI;
     const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
-    if (!isMultiEmbed) {
-      const updateDeleteParams: StringKeyObject = { $unset: {} };
-      updateDeleteParams.$unset[embeddedParentFieldName] = true;
-      return updateDeleteParams;
-    } else {
+    const embeddedChildFieldName = this._embeddedFieldData.childFieldName;
+    console.log(
+      embeddedParentFieldName,
+      embeddedChildFieldName,
+      'here _configureDeleteUpdateParams'
+    );
+    if (isMultiEmbed) {
       const updateDeleteParams: StringKeyObject = { $pull: {} };
       updateDeleteParams.$pull[embeddedParentFieldName] = searchQuery;
+      return updateDeleteParams;
+    } else {
+      const updateDeleteParams: StringKeyObject = { $unset: {} };
+      updateDeleteParams.$unset[embeddedParentFieldName] = true;
       return updateDeleteParams;
     }
   };
