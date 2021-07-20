@@ -165,7 +165,7 @@
 //     const updateAppointment = async () => {
 //       const updatedAppointment = await appointmentDbService.findOneAndUpdate({
 //         searchQuery: { _id: fakeAppointment._id },
-//         updateParams: { status: 'cancelled' },
+//         updateQuery: { status: 'cancelled' },
 //         dbServiceAccessOptions,
 //       });
 //       expect(updatedAppointment).to.not.deep.equal(fakeAppointment);
@@ -178,7 +178,7 @@
 //             searchQuery: {
 //               hostedById: fakeAppointment.hostedById,
 //             },
-//             updateParams: {
+//             updateQuery: {
 //               nonExistentField: 'some non-existent field',
 //             },
 //             dbServiceAccessOptions,
@@ -190,7 +190,7 @@
 //             searchQuery: {
 //               _id: fakeAppointment.hostedById,
 //             },
-//             updateParams: { status: 'cancelled' },
+//             updateQuery: { status: 'cancelled' },
 //             dbServiceAccessOptions,
 //           });
 //           expect(updatedAppointment).to.equal(null);

@@ -166,7 +166,7 @@ describe('packageDbService', () => {
     const updatePackage = async () => {
       const updatedPackage = await packageDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackage._id },
-        updateParams: { packageType: 'custom' },
+        updateQuery: { packageType: 'custom' },
         dbServiceAccessOptions,
         // dbDependencyUpdateParams: {
         //   updatedDependentSearchQuery: {
@@ -194,7 +194,7 @@ describe('packageDbService', () => {
         it('should return the original package if update field does not exist', async () => {
           const updatedPackage = await packageDbService.findOneAndUpdate({
             searchQuery: { _id: fakePackage._id },
-            updateParams: {
+            updateQuery: {
               nonExistentField: 'some non-existent field',
             },
             dbServiceAccessOptions,
@@ -206,7 +206,7 @@ describe('packageDbService', () => {
             searchQuery: {
               _id: '608c09b0f12568001535df9a',
             },
-            updateParams: { packageType: 'custom' },
+            updateQuery: { packageType: 'custom' },
             dbServiceAccessOptions,
           });
           expect(updatedPackage).to.equal(null);

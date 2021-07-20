@@ -138,7 +138,7 @@ describe('minuteBankDbService', () => {
     const updateMinuteBank = async () => {
       const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
         searchQuery: { _id: fakeMinuteBank._id },
-        updateParams: { minuteBank: 10 },
+        updateQuery: { minuteBank: 10 },
         dbServiceAccessOptions,
       });
       expect(updatedMinuteBank).to.not.deep.equal(fakeMinuteBank);
@@ -151,7 +151,7 @@ describe('minuteBankDbService', () => {
             searchQuery: {
               hostedById: fakeMinuteBank.hostedById,
             },
-            updateParams: {
+            updateQuery: {
               nonExistentField: 'some non-existent field',
             },
             dbServiceAccessOptions,
@@ -163,7 +163,7 @@ describe('minuteBankDbService', () => {
             searchQuery: {
               _id: fakeMinuteBank.hostedById,
             },
-            updateParams: { minuteBank: 10 },
+            updateQuery: { minuteBank: 10 },
             dbServiceAccessOptions,
           });
           expect(updatedMinuteBank).to.equal(null);

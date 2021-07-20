@@ -141,15 +141,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
 
   public findOneAndUpdate = async (dbServiceParams: {
     searchQuery?: {};
-    updateParams?: {};
+    updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions, dbDependencyUpdateParams } =
+    const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
-      .findOneAndUpdate(searchQuery, updateParams, {
+      .findOneAndUpdate(searchQuery, updateQuery, {
         fields: selectView,
         new: true,
       })
@@ -221,19 +221,19 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
     searchQuery: {};
-    updateParams: {};
+    updateQuery: {};
     updatedDependentSearchQuery?: {};
   }) => {
     const {
       dependencyDbService,
       dbServiceAccessOptions,
       searchQuery,
-      updateParams,
+      updateQuery,
       updatedDependentSearchQuery,
     } = props;
     const updateDependeePromise = dependencyDbService.updateMany({
       searchQuery,
-      updateParams,
+      updateQuery,
       dbServiceAccessOptions,
       dbDependencyUpdateParams: {
         updatedDependentSearchQuery,
@@ -254,15 +254,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
 
   public updateMany = async (dbServiceParams: {
     searchQuery?: {};
-    updateParams?: {};
+    updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions, dbDependencyUpdateParams } =
+    const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
-      .updateMany(searchQuery, updateParams, {
+      .updateMany(searchQuery, updateQuery, {
         fields: selectView,
         new: true,
       })

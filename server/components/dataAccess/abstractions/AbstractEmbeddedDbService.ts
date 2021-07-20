@@ -170,21 +170,21 @@ abstract class AbstractEmbeddedDbService<
 
   public findOneAndUpdate = async (dbServiceParams: {
     searchQuery?: {};
-    updateParams?: {};
+    updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions, dbDependencyUpdateParams } =
+    const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
-    const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateParams);
-    const processedUpdateParams = this._configureUpdateParams(embeddedUpdateQuery);
+    const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
+    const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
     const embeddedDbDependencyUpdateQuery = dbDependencyUpdateParams
       ? this._convertToEmbeddedQuery(dbDependencyUpdateParams.updatedDependentSearchQuery)
       : dbDependencyUpdateParams;
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
-      updateParams: processedUpdateParams,
+      updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
     });
     const dbQueryResult = await this._dbQueryReturnTemplate({
@@ -198,11 +198,11 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  private _configureUpdateParams = (updateQuery?: StringKeyObject) => {
+  private _configureEmbeddedUpdateQuery = (updateQuery?: StringKeyObject) => {
     const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedChildFieldName = this._embeddedFieldData.childFieldName;
     if (isSingleEmbed) {
-      const updateParams: StringKeyObject = {
+      const processedUpdateQuery: StringKeyObject = {
         $set: {},
       };
       for (const property in updateQuery) {
@@ -212,13 +212,13 @@ abstract class AbstractEmbeddedDbService<
             `${embeddedChildFieldName}.$`
           )}`;
           if (this._hasReserved$(property)) {
-            updateParams[embeddedFieldRef] = updateQuery[property];
+            processedUpdateQuery[embeddedFieldRef] = updateQuery[property];
           } else {
-            updateParams.$set[embeddedFieldRef] = updateQuery[property];
+            processedUpdateQuery.$set[embeddedFieldRef] = updateQuery[property];
           }
         }
       }
-      return updateParams;
+      return processedUpdateQuery;
     } else {
       return updateQuery;
     }
@@ -226,19 +226,19 @@ abstract class AbstractEmbeddedDbService<
 
   public updateMany = async (dbServiceParams: {
     searchQuery?: {};
-    updateParams?: {};
+    updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateParams, dbServiceAccessOptions, dbDependencyUpdateParams } =
+    const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
-    const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateParams);
-    const processedUpdateParams = this._configureUpdateParams(embeddedUpdateQuery);
+    const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
+    const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
     const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams);
     const dbQueryPromise = this._parentDbService.updateMany({
       searchQuery: embeddedSearchQuery,
-      updateParams: processedUpdateParams,
+      updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
       dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
     });
@@ -272,10 +272,10 @@ abstract class AbstractEmbeddedDbService<
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions, dbDependencyUpdateParams } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
-    const updateParams = this._configureDeleteUpdateParams(searchQuery);
+    const updateQuery = this._configureDeleteUpdateQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
-      updateParams,
+      updateQuery,
       dbServiceAccessOptions,
       dbDependencyUpdateParams,
     });
@@ -287,7 +287,7 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  private _configureDeleteUpdateParams = (searchQuery?: StringKeyObject) => {
+  private _configureDeleteUpdateQuery = (searchQuery?: StringKeyObject) => {
     const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
     if (isSingleEmbed) {

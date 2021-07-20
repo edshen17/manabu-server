@@ -60,7 +60,7 @@ class GetUserUsecase extends AbstractGetUsecase<
       searchQuery: {
         _id,
       },
-      updateParams: {
+      updateQuery: {
         lastOnline: new Date(),
       },
       dbServiceAccessOptions,

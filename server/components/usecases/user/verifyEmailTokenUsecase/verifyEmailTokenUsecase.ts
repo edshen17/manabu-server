@@ -62,7 +62,7 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
     if (user) {
       const updatedDbUser = await this._userDbService.findOneAndUpdate({
         searchQuery: { _id: user._id },
-        updateParams: { isEmailVerified: true },
+        updateQuery: { isEmailVerified: true },
         dbServiceAccessOptions,
       });
       const redirectURI = this._redirectPathBuilder

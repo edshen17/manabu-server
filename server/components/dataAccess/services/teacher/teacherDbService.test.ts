@@ -121,7 +121,7 @@ describe('teacherDbService', () => {
     const updateTeacher = async () => {
       const updatedTeacher = await teacherDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacher.teacherData!._id },
-        updateParams: { studentCount: 5 },
+        updateQuery: { studentCount: 5 },
         dbServiceAccessOptions,
       });
       expect(updatedTeacher).to.not.deep.equal(fakeTeacher);
@@ -135,7 +135,7 @@ describe('teacherDbService', () => {
             searchQuery: {
               _id: fakeTeacher.teacherData!._id,
             },
-            updateParams: {
+            updateQuery: {
               nonExistentField: 'some non-existent field',
             },
             dbServiceAccessOptions,
@@ -148,7 +148,7 @@ describe('teacherDbService', () => {
             searchQuery: {
               _id: fakeTeacher.teacherData!.packages[0]._id,
             },
-            updateParams: { studentCount: 5 },
+            updateQuery: { studentCount: 5 },
             dbServiceAccessOptions,
           });
           expect(updatedTeacher).to.equal(null);

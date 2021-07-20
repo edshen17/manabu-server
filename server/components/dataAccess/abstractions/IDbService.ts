@@ -12,7 +12,7 @@ type DbServiceParams = {
   searchQuery?: {};
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: {};
-  updateParams?: {};
+  updateQuery?: {};
   dbDependencyUpdateParams?: DbDependencyUpdateParams;
 };
 

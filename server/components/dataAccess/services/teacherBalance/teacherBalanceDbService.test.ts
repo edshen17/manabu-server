@@ -148,7 +148,7 @@ describe('teacherBalanceService', () => {
     const updateTeacherBalance = async () => {
       const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacherBalance._id },
-        updateParams: { balance: 5 },
+        updateQuery: { balance: 5 },
         dbServiceAccessOptions,
       });
       expect(updatedTeacherBalance).to.not.deep.equal(fakeTeacherBalance);
@@ -159,7 +159,7 @@ describe('teacherBalanceService', () => {
         it('should return the original teacherBalance if update field does not exist', async () => {
           const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
             searchQuery: { _id: fakeTeacherBalance._id },
-            updateParams: {
+            updateQuery: {
               nonExistentField: 'some non-existent field',
             },
             dbServiceAccessOptions,
@@ -171,7 +171,7 @@ describe('teacherBalanceService', () => {
             searchQuery: {
               _id: fakeTeacherBalance.userId,
             },
-            updateParams: { 'balanceDetails.balance': 5 },
+            updateQuery: { 'balanceDetails.balance': 5 },
             dbServiceAccessOptions,
           });
           expect(updatedTeacherBalance).to.equal(null);
@@ -302,7 +302,7 @@ describe('teacherBalanceDbService', () => {
       expect(fakeTeacherBalance.balance).to.equal(0);
       const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
         searchQuery: { userId: fakeTeacher._id },
-        updateParams: { balance: 10 },
+        updateQuery: { balance: 10 },
         dbServiceAccessOptions,
       });
       expect(updatedTeacherBalance.balance).to.equal(10);

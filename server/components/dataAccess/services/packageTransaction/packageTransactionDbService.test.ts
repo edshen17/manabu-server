@@ -167,7 +167,7 @@
 //     const updatePackageTransaction = async () => {
 //       const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
 //         searchQuery: { _id: fakePackageTransaction._id },
-//         updateParams: { lessonLanguage: 'en' },
+//         updateQuery: { lessonLanguage: 'en' },
 //         dbServiceAccessOptions,
 //         dbDependencyUpdateParams: {
 //           updatedDependentSearchQuery: {
@@ -190,7 +190,7 @@
 //             searchQuery: {
 //               hostedById: fakePackageTransaction.hostedById,
 //             },
-//             updateParams: {
+//             updateQuery: {
 //               nonExistentField: 'some non-existent field',
 //             },
 //             dbServiceAccessOptions,
@@ -202,7 +202,7 @@
 //             searchQuery: {
 //               _id: fakePackageTransaction.hostedById,
 //             },
-//             updateParams: { lessonLanguage: 'en' },
+//             updateQuery: { lessonLanguage: 'en' },
 //             dbServiceAccessOptions,
 //           });
 //           expect(updatedPackageTransaction).to.equal(null);
