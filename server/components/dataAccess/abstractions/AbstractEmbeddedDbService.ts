@@ -47,8 +47,13 @@ abstract class AbstractEmbeddedDbService<
   protected _convertToEmbeddedQuery = (query?: StringKeyObject): {} => {
     const embeddedSearchQuery: StringKeyObject = {};
     for (const property in query) {
-      const embeddedProperty = `${this._embeddedFieldData.parentFieldName}.${property}`;
-      embeddedSearchQuery[embeddedProperty] = query[property];
+      const hasReserved$ = property.startsWith('$');
+      if (hasReserved$) {
+        embeddedSearchQuery[property] = this._convertToEmbeddedQuery(query[property]);
+      } else {
+        const embeddedProperty = `${this._embeddedFieldData.parentFieldName}.${property}`;
+        embeddedSearchQuery[embeddedProperty] = query[property];
+      }
     }
     return embeddedSearchQuery;
   };
@@ -168,7 +173,6 @@ abstract class AbstractEmbeddedDbService<
       dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateParams);
-    console.log(embeddedUpdateQuery, 'here');
     const processedUpdateParams = this._configureUpdateParams(embeddedUpdateQuery);
     // const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams); //needs to be updateparams.searchQuery
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
@@ -188,23 +192,40 @@ abstract class AbstractEmbeddedDbService<
   };
 
   private _configureUpdateParams = (updateQuery?: StringKeyObject) => {
-    const isMultiEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
+    const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedChildFieldName = this._embeddedFieldData.childFieldName;
-    if (isMultiEmbed && embeddedChildFieldName) {
-      const updateParams: StringKeyObject = {
-        $set: {},
-      };
+    const hasReserved$ = this._hasReserved$(updateQuery);
+    if (isSingleEmbed) {
+      const updateParams: StringKeyObject = hasReserved$
+        ? {}
+        : {
+            $set: {},
+          };
       for (const property in updateQuery) {
-        const embeddedFieldRef = `${property.replace(
-          embeddedChildFieldName,
-          `${embeddedChildFieldName}.$`
-        )}`;
-        updateParams.$set[embeddedFieldRef] = updateQuery[property];
+        if (embeddedChildFieldName) {
+          const embeddedFieldRef = `${property.replace(
+            embeddedChildFieldName,
+            `${embeddedChildFieldName}.$`
+          )}`;
+          if (hasReserved$) {
+            updateParams[embeddedFieldRef] = updateQuery[property];
+          } else {
+            updateParams.$set[embeddedFieldRef] = updateQuery[property];
+          }
+        }
       }
       return updateParams;
     } else {
       return updateQuery;
     }
+  };
+
+  private _hasReserved$ = (updateQuery?: StringKeyObject): boolean => {
+    let hasReserved$ = updateQuery ? true : false;
+    for (const property in updateQuery) {
+      hasReserved$ = hasReserved$ && property.startsWith('$');
+    }
+    return hasReserved$;
   };
 
   public updateMany = async (dbServiceParams: {
@@ -256,7 +277,6 @@ abstract class AbstractEmbeddedDbService<
     const { searchQuery, dbServiceAccessOptions, dbDependencyUpdateParams } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const updateParams = this._configureDeleteUpdateParams(searchQuery);
-    console.log(updateParams, 'here updateparams');
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateParams,
@@ -272,21 +292,15 @@ abstract class AbstractEmbeddedDbService<
   };
 
   private _configureDeleteUpdateParams = (searchQuery?: StringKeyObject) => {
-    const isMultiEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.MULTI;
+    const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
-    const embeddedChildFieldName = this._embeddedFieldData.childFieldName;
-    console.log(
-      embeddedParentFieldName,
-      embeddedChildFieldName,
-      'here _configureDeleteUpdateParams'
-    );
-    if (isMultiEmbed) {
-      const updateDeleteParams: StringKeyObject = { $pull: {} };
-      updateDeleteParams.$pull[embeddedParentFieldName] = searchQuery;
-      return updateDeleteParams;
-    } else {
+    if (isSingleEmbed) {
       const updateDeleteParams: StringKeyObject = { $unset: {} };
       updateDeleteParams.$unset[embeddedParentFieldName] = true;
+      return updateDeleteParams;
+    } else {
+      const updateDeleteParams: StringKeyObject = { $pull: {} };
+      updateDeleteParams.$pull[embeddedParentFieldName] = searchQuery;
       return updateDeleteParams;
     }
   };

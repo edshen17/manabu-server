@@ -270,7 +270,14 @@ describe('userDbService', () => {
               dbServiceAccessOptions.isSelf = true;
               const updatedTeacher = await userDbService.findOneAndUpdate({
                 searchQuery: { _id: fakeTeacher._id },
-                updateParams: { name: 'updated name' },
+                updateParams: {
+                  name: 'updated name',
+                  $pull: {
+                    'teacherData.packages': {
+                      _id: fakeTeacher.teacherData!.packages[0]._id,
+                    },
+                  },
+                },
                 dbServiceAccessOptions,
               });
               expect(updatedTeacher.name).to.equal('updated name');

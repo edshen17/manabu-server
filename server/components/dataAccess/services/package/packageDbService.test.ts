@@ -148,131 +148,104 @@ describe('packageDbService', () => {
     });
   });
 
-  // describe('insert', () => {
-  //   context('db access permitted', () => {
-  //     context('invalid inputs', () => {
-  //       it('should throw an error if required fields are not given', async () => {
-  //         try {
-  //           const fakePackage = await packageDbService.insert({
-  //             modelToInsert: {},
-  //             dbServiceAccessOptions,
-  //           });
-  //         } catch (err) {
-  //           expect(err).to.be.an('error');
-  //         }
-  //       });
-  //     });
-  //     context('valid inputs', () => {
-  //       it('should insert a new package', async () => {
-  //         const findPackage = await packageDbService.findById({
-  //           _id: fakePackage._id,
-  //           dbServiceAccessOptions,
-  //         });
-  //         expect(fakePackage).to.not.equal(null);
-  //         expect(findPackage).to.deep.equal(fakePackage);
-  //       });
-  //     });
-  //   });
-  //   context('db access denied', () => {
-  //     it('should throw an error', async () => {
-  //       dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-  //       const { _id, ...modelToInsert } = fakePackage;
-  //       try {
-  //         fakePackage = await packageDbService.insert({
-  //           modelToInsert,
-  //           dbServiceAccessOptions,
-  //         });
-  //       } catch (err) {
-  //         expect(err.message).to.equal('Access denied.');
-  //       }
-  //     });
-  //   });
-  // });
+  describe('insert', () => {
+    it('should throw an error', async () => {
+      const { _id, ...modelToInsert } = fakePackage;
+      try {
+        fakePackage = await packageDbService.insert({
+          modelToInsert,
+          dbServiceAccessOptions,
+        });
+      } catch (err) {
+        expect(err).to.be.an('error');
+      }
+    });
+  });
 
-  // describe('update', () => {
-  //   const updatePackage = async () => {
-  //     const updatedPackage = await packageDbService.findOneAndUpdate({
-  //       searchQuery: { _id: fakePackage._id },
-  //       updateParams: { packageType: 'custom' },
-  //       dbServiceAccessOptions,
-  //       // dbDependencyUpdateParams: {
-  //       //   updatedDependentSearchQuery: {
-  //       //     _id: fakePackage._id,
-  //       //   },
-  //       // },
-  //     });
-  //     // const updatedPackageTransaction = await packageTransactionDbService.findOne({
-  //     //   searchQuery: { packageId: fakePackage._id },
-  //     //   dbServiceAccessOptions,
-  //     // });
-  //     // const updatedAppointment = await appointmentDbService.findOne({
-  //     //   searchQuery: {
-  //     //     packageTransactionId: updatedPackageTransaction._id,
-  //     //   },
-  //     //   dbServiceAccessOptions,
-  //     // });
-  //     expect(updatedPackage).to.not.deep.equal(fakePackage);
-  //     expect(updatedPackage.packageType).to.equal('custom');
-  //     // expect(updatedPackage.packageType).to.equal('custom');
-  //     // expect(updatedPackageTransaction.packageData.packageType).to.equal('custom');
-  //     // expect(updatedAppointment.packageTransactionData.packageData.packageType).to.equal('custom');
-  //   };
-  //   context('db access permitted', () => {
-  //     context('invalid inputs', () => {
-  //       it('should return the original package if update field does not exist', async () => {
-  //         const updatedPackage = await packageDbService.findOneAndUpdate({
-  //           searchQuery: { _id: fakePackage._id },
-  //           updateParams: {
-  //             nonExistentField: 'some non-existent field',
-  //           },
-  //           dbServiceAccessOptions,
-  //         });
-  //         expect(updatedPackage).to.deep.equal(fakePackage);
-  //       });
-  //       it('should return null if the package to update does not exist', async () => {
-  //         const updatedPackage = await packageDbService.findOneAndUpdate({
-  //           searchQuery: {
-  //             _id: '608c09b0f12568001535df9a',
-  //           },
-  //           updateParams: { packageType: 'custom' },
-  //           dbServiceAccessOptions,
-  //         });
-  //         expect(updatedPackage).to.equal(null);
-  //       });
-  //     });
-  //     context('valid inputs', () => {
-  //       context('as a non-admin user', () => {
-  //         context('updating self', () => {
-  //           it('should update the package', async () => {
-  //             dbServiceAccessOptions.isSelf = true;
-  //             await updatePackage();
-  //           });
-  //         });
-  //         context('updating other', async () => {
-  //           it('should update the package', async () => {
-  //             await updatePackage();
-  //           });
-  //         });
-  //       });
-  //       context('as an admin', async () => {
-  //         it('should update the package', async () => {
-  //           dbServiceAccessOptions.currentAPIUserRole = 'admin';
-  //           await updatePackage();
-  //         });
-  //       });
-  //     });
-  //   });
-  //   context('db access denied', () => {
-  //     it('should throw an error', async () => {
-  //       dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-  //       try {
-  //         await updatePackage();
-  //       } catch (err) {
-  //         expect(err.message).to.equal('Access denied.');
-  //       }
-  //     });
-  //   });
-  // });
+  describe('update', () => {
+    const updatePackage = async () => {
+      const updatedPackage = await packageDbService.findOneAndUpdate({
+        searchQuery: { _id: fakePackage._id },
+        updateParams: { packageType: 'custom' },
+        dbServiceAccessOptions,
+        // dbDependencyUpdateParams: {
+        //   updatedDependentSearchQuery: {
+        //     _id: fakePackage._id,
+        //   },
+        // },
+      });
+      // const updatedPackageTransaction = await packageTransactionDbService.findOne({
+      //   searchQuery: { packageId: fakePackage._id },
+      //   dbServiceAccessOptions,
+      // });
+      // const updatedAppointment = await appointmentDbService.findOne({
+      //   searchQuery: {
+      //     packageTransactionId: updatedPackageTransaction._id,
+      //   },
+      //   dbServiceAccessOptions,
+      // });
+      console.log(updatedPackage, fakePackage, 'here finish');
+      expect(updatedPackage).to.not.deep.equal(fakePackage);
+      expect(updatedPackage.packageType).to.equal('custom');
+      // expect(updatedPackageTransaction.packageData.packageType).to.equal('custom');
+      // expect(updatedAppointment.packageTransactionData.packageData.packageType).to.equal('custom');
+    };
+    context('db access permitted', () => {
+      context('invalid inputs', () => {
+        it('should return the original package if update field does not exist', async () => {
+          const updatedPackage = await packageDbService.findOneAndUpdate({
+            searchQuery: { _id: fakePackage._id },
+            updateParams: {
+              nonExistentField: 'some non-existent field',
+            },
+            dbServiceAccessOptions,
+          });
+          expect(updatedPackage).to.deep.equal(fakePackage);
+        });
+        it('should return null if the package to update does not exist', async () => {
+          const updatedPackage = await packageDbService.findOneAndUpdate({
+            searchQuery: {
+              _id: '608c09b0f12568001535df9a',
+            },
+            updateParams: { packageType: 'custom' },
+            dbServiceAccessOptions,
+          });
+          expect(updatedPackage).to.equal(null);
+        });
+      });
+      context('valid inputs', () => {
+        context('as a non-admin user', () => {
+          context('updating self', () => {
+            it('should update the package', async () => {
+              dbServiceAccessOptions.isSelf = true;
+              await updatePackage();
+            });
+          });
+          context('updating other', async () => {
+            it('should update the package', async () => {
+              await updatePackage();
+            });
+          });
+        });
+        context('as an admin', async () => {
+          it('should update the package', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            await updatePackage();
+          });
+        });
+      });
+    });
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          await updatePackage();
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+    });
+  });
 
   describe('delete', () => {
     const deletePackage = async () => {
@@ -289,15 +262,15 @@ describe('packageDbService', () => {
       expect(foundPackage).to.be.equal(null);
     };
     context('db access permitted', () => {
-      // context('invalid inputs', () => {
-      //   it('should return null if the package to delete does not exist', async () => {
-      //     const deletedPackage = await packageDbService.findByIdAndDelete({
-      //       _id: null,
-      //       dbServiceAccessOptions,
-      //     });
-      //     expect(deletedPackage).to.equal(null);
-      //   });
-      // });
+      context('invalid inputs', () => {
+        it('should return null if the package to delete does not exist', async () => {
+          const deletedPackage = await packageDbService.findByIdAndDelete({
+            _id: null,
+            dbServiceAccessOptions,
+          });
+          expect(deletedPackage).to.equal(null);
+        });
+      });
       context('valid inputs', () => {
         context('as a non-admin user', () => {
           context('deleting self', () => {
@@ -306,29 +279,29 @@ describe('packageDbService', () => {
               await deletePackage();
             });
           });
-          // context('deleting other', async () => {
-          //   it('should update the package', async () => {
-          //     await deletePackage();
-          //   });
-          // });
+          context('deleting other', async () => {
+            it('should update the package', async () => {
+              await deletePackage();
+            });
+          });
         });
-        // context('as an admin', async () => {
-        //   it('should update the package', async () => {
-        //     dbServiceAccessOptions.currentAPIUserRole = 'admin';
-        //     await deletePackage();
-        //   });
-        // });
+        context('as an admin', async () => {
+          it('should update the package', async () => {
+            dbServiceAccessOptions.currentAPIUserRole = 'admin';
+            await deletePackage();
+          });
+        });
       });
     });
-    // context('db access denied', () => {
-    //   it('should throw an error', async () => {
-    //     dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-    //     try {
-    //       await deletePackage();
-    //     } catch (err) {
-    //       expect(err.message).to.equal('Access denied.');
-    //     }
-    //   });
-    // });
+    context('db access denied', () => {
+      it('should throw an error', async () => {
+        dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        try {
+          await deletePackage();
+        } catch (err) {
+          expect(err.message).to.equal('Access denied.');
+        }
+      });
+    });
   });
 });
