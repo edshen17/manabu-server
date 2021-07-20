@@ -1,11 +1,12 @@
+import { ObjectId } from 'mongoose';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type OptionalTeacherBalanceEntityInitParams = {};
 
-type TeacherBalanceEntityBuildParams = { userId: string };
+type TeacherBalanceEntityBuildParams = { userId: ObjectId };
 
 type TeacherBalanceEntityBuildResponse = {
-  userId: string;
+  userId: ObjectId;
   balance: number;
   currency: string;
 };

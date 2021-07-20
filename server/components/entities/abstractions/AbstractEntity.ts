@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { ExtractDoc } from 'ts-mongoose';
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import {
@@ -21,7 +22,7 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
 
   public getDbDataById = async (props: {
     dbService: IDbService<any, any>;
-    _id: string;
+    _id: ObjectId;
     overrideDbServiceAccessOptions?: DbServiceAccessOptions;
   }): Promise<ExtractDoc<any>> => {
     const { dbService, _id, overrideDbServiceAccessOptions } = props;

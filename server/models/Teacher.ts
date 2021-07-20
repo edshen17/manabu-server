@@ -3,7 +3,6 @@ import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { PackageSchema } from './Package';
 
 const TeacherSchema = createSchema({
-  // userId: Type.objectId({ required: true, index: true, unique: true }),
   dateApproved: Type.date({ required: false }),
   teachingLanguages: Type.array({ required: true }).of({
     language: Type.string(),

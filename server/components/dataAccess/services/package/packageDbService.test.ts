@@ -28,7 +28,7 @@ let fakeDbUserFactory: FakeDbUserFactory;
 // let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
-let fakePackage: PackageDoc;
+let fakePackage: any;
 let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
 let dbServiceAccessOptions: DbServiceAccessOptions;

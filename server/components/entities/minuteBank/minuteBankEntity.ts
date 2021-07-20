@@ -1,6 +1,6 @@
+import { ObjectId } from 'mongoose';
 import { JoinedUserDoc } from '../../../models/User';
 import { UserDbService } from '../../dataAccess/services/user/userDbService';
-import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type OptionalMinuteBankEntityInitParams = {
@@ -8,13 +8,13 @@ type OptionalMinuteBankEntityInitParams = {
 };
 
 type MinuteBankEntityBuildParams = {
-  hostedById: string;
-  reservedById: string;
+  hostedById: ObjectId;
+  reservedById: ObjectId;
 };
 
 type MinuteBankEntityBuildResponse = {
-  hostedById: string;
-  reservedById: string;
+  hostedById: ObjectId;
+  reservedById: ObjectId;
   minuteBank: number;
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;

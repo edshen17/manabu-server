@@ -27,7 +27,7 @@
 //       licensePathUrl: 'https://fakeimg.pl/300/',
 //     },
 //     params: {
-//       uId: fakeTeacher._id.toString(),
+//       uId: fakeTeacher._id,
 //     },
 //     query: {},
 //   };
@@ -39,14 +39,14 @@
 //       it('should update the teacher in the db and return the correct properties (self)', async () => {
 //         const buildEditTeacherControllerData = controllerDataBuilder
 //           .currentAPIUser({
-//             userId: fakeTeacher._id.toString(),
+//             userId: fakeTeacher._id,
 //             role: fakeTeacher.role,
 //           })
 //           .routeData(routeData)
 //           .build();
 //         const editTeacherRes = await editTeacherUsecase.makeRequest(buildEditTeacherControllerData);
 //         if ('user' in editTeacherRes) {
-//           expect(editTeacherRes.user.teacherData.licensePathUrl).to.equal(
+//           expect(editTeacherRes.user.teacherData!.licensePathUrl).to.equal(
 //             'https://fakeimg.pl/300/'
 //           );
 //         }
@@ -57,7 +57,7 @@
 //           const fakeUser = await fakeDbUserFactory.createFakeDbUser();
 //           const buildEditTeacherControllerData = controllerDataBuilder
 //             .currentAPIUser({
-//               userId: fakeUser._id.toString(),
+//               userId: fakeUser._id,
 //               role: fakeUser.role,
 //             })
 //             .routeData(routeData)

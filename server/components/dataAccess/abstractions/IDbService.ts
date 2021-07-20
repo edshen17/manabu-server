@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongoose';
+
 type DbServiceInitParams<OptionalDbServiceInitParams> = RequiredDbServiceInitParams &
   OptionalDbServiceInitParams;
 
@@ -8,7 +10,7 @@ type RequiredDbServiceInitParams = {
 };
 
 type DbServiceParams = {
-  _id?: string;
+  _id?: ObjectId;
   searchQuery?: {};
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: {};

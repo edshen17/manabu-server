@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 
@@ -12,7 +13,7 @@ interface IEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildRespon
   build: (buildParams: EntityBuildParams) => Promise<EntityBuildResponse> | EntityBuildResponse;
   getDbDataById?: (props: {
     dbService: IDbService<any, any>;
-    _id: string;
+    _id: ObjectId;
     overrideDbServiceAccessOptions?: DbServiceAccessOptions;
   }) => Promise<any>;
   init: (initParams: EntityInitParams<OptionalEntityInitParams>) => Promise<this>;
