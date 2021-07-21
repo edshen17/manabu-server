@@ -179,9 +179,6 @@ abstract class AbstractEmbeddedDbService<
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
-    const embeddedDbDependencyUpdateQuery = dbDependencyUpdateParams
-      ? this._convertToEmbeddedQuery(dbDependencyUpdateParams.updatedDependentSearchQuery)
-      : dbDependencyUpdateParams;
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
@@ -193,7 +190,7 @@ abstract class AbstractEmbeddedDbService<
       searchQuery,
     });
     await this._updateDbDependencyHandler({
-      dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
+      dbDependencyUpdateParams,
     });
     return dbQueryResult;
   };

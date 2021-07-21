@@ -25,7 +25,7 @@ class PackageTransactionDbService extends AbstractDbService<
   private _locationDataHandler!: LocationDataHandler;
   private _userModel!: any;
 
-  protected _updateDbDependencyControllerTemplate = async (props: {
+  protected _updateDbDependenciesTemplate = async (props: {
     updateDependentPromises: Promise<any>[];
     updatedDependeeDoc: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;

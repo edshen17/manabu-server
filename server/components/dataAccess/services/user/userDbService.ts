@@ -1,18 +1,17 @@
 import { DbServiceAccessOptions, DbServiceParams, IDbService } from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import { TeacherDoc } from '../../../../models/Teacher';
-// import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
+import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
 import { JoinedUserDoc } from '../../../../models/User';
 
 type OptionalUserDbServiceInitParams = {
-  // makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeMinuteBankDbService: Promise<MinuteBankDbService>;
   comparePassword: any;
 };
 
 class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
-  // private _packageTransactionDbService!: PackageTransactionDbService;
+  private _packageTransactionDbService!: PackageTransactionDbService;
   private _minuteBankDbService!: MinuteBankDbService;
   private _comparePassword!: any;
 
@@ -65,57 +64,58 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
     }
   };
 
-  // protected _updateDbDependencyControllerTemplate = async (props: {
-  //   updateDependentPromises: Promise<any>[];
-  //   updatedDependeeDoc: JoinedUserDoc;
-  //   dbServiceAccessOptions: DbServiceAccessOptions;
-  // }) => {
-  //   const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-  //   const updatePackageTransactionPromises = await this._getUpdateManyDependeePromises({
-  //     ...getUpdateDependeePromisesProps,
-  //     dependencyDbService: this._packageTransactionDbService,
-  //   });
-  //   const updateMinuteBankPromises = await this._getUpdateManyDependeePromises({
-  //     ...getUpdateDependeePromisesProps,
-  //     dependencyDbService: this._minuteBankDbService,
-  //   });
-  //   updateDependentPromises.push(...updatePackageTransactionPromises, ...updateMinuteBankPromises);
-  // };
+  protected _updateDbDependenciesTemplate = async (props: {
+    updateDependentPromises: Promise<any>[];
+    updatedDependeeDoc: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }) => {
+    const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
+    const updatePackageTransactionPromises = await this._getUpdateManyDependeePromises({
+      ...getUpdateDependeePromisesProps,
+      dependencyDbService: this._packageTransactionDbService,
+    });
+    const updateMinuteBankPromises = await this._getUpdateManyDependeePromises({
+      ...getUpdateDependeePromisesProps,
+      dependencyDbService: this._minuteBankDbService,
+    });
+    updateDependentPromises.push(...updatePackageTransactionPromises, ...updateMinuteBankPromises);
+  };
 
-  // protected _getUpdateManyDependeePromises = async (props: {
-  //   updatedDependeeDoc: JoinedUserDoc;
-  //   dbServiceAccessOptions: DbServiceAccessOptions;
-  //   dependencyDbService: IDbService<any, any>;
-  // }): Promise<Promise<any>[]> => {
-  //   const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
-  //   const updatedDependentHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
-  //   const updateManyDependeeHostedByPromise = this._getUpdateManyDependeePromise({
-  //     searchQuery: updatedDependentHostedBySearchQuery,
-  //     updateParams: { hostedByData: updatedDependeeDoc },
-  //     dbServiceAccessOptions,
-  //     dependencyDbService,
-  //     updatedDependentSearchQuery: updatedDependentHostedBySearchQuery,
-  //   });
-  //   const updatedDependentReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
-  //   const updateManyDependeeReservedByPromise = this._getUpdateManyDependeePromise({
-  //     searchQuery: updatedDependentReservedBySearchQuery,
-  //     updateParams: { reservedByData: updatedDependeeDoc },
-  //     dbServiceAccessOptions,
-  //     dependencyDbService,
-  //     updatedDependentSearchQuery: updatedDependentReservedBySearchQuery,
-  //   });
-  //   const updateManyDependeePromises = [
-  //     updateManyDependeeHostedByPromise,
-  //     updateManyDependeeReservedByPromise,
-  //   ];
-  //   return updateManyDependeePromises;
-  // };
+  protected _getUpdateManyDependeePromises = async (props: {
+    updatedDependeeDoc: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    dependencyDbService: IDbService<any, any>;
+  }): Promise<Promise<any>[]> => {
+    const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
+    const updatedDependentHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
+    const updateManyDependeeHostedByPromise = this._getUpdateManyDependeePromise({
+      searchQuery: updatedDependentHostedBySearchQuery,
+      updateQuery: { hostedByData: updatedDependeeDoc },
+      dbServiceAccessOptions,
+      dependencyDbService,
+      updatedDependentSearchQuery: updatedDependentHostedBySearchQuery,
+    });
+    const updatedDependentReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
+    const updateManyDependeeReservedByPromise = this._getUpdateManyDependeePromise({
+      searchQuery: updatedDependentReservedBySearchQuery,
+      updateQuery: { reservedByData: updatedDependeeDoc },
+      dbServiceAccessOptions,
+      dependencyDbService,
+      updatedDependentSearchQuery: updatedDependentReservedBySearchQuery,
+    });
+    const updateManyDependeePromises = [
+      updateManyDependeeHostedByPromise,
+      updateManyDependeeReservedByPromise,
+    ];
+    return updateManyDependeePromises;
+  };
 
   protected _initTemplate = async (
     optionalDbServiceInitParams: OptionalUserDbServiceInitParams
   ) => {
-    const { makeMinuteBankDbService, comparePassword } = optionalDbServiceInitParams;
-    // this._packageTransactionDbService = await makePackageTransactionDbService;
+    const { makePackageTransactionDbService, makeMinuteBankDbService, comparePassword } =
+      optionalDbServiceInitParams;
+    this._packageTransactionDbService = await makePackageTransactionDbService;
     this._minuteBankDbService = await makeMinuteBankDbService;
     this._comparePassword = comparePassword;
   };
