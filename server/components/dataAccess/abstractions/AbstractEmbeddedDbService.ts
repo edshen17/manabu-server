@@ -179,10 +179,12 @@ abstract class AbstractEmbeddedDbService<
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
+    const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
+      dbDependencyUpdateParams,
     });
     const dbQueryResult = await this._dbQueryReturnTemplate({
       dbServiceAccessOptions,
@@ -237,7 +239,7 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
-      dbDependencyUpdateParams: embeddedDbDependencyUpdateQuery,
+      dbDependencyUpdateParams,
     });
     const dbQueryResult = await this._dbQueryReturnTemplate({
       dbServiceAccessOptions,

@@ -1,6 +1,4 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { PackageDoc } from '../../../../models/Package';
-import { TeacherDoc } from '../../../../models/Teacher';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
@@ -17,7 +15,7 @@ import { UserEntity } from '../../../entities/user/userEntity';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
-import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
+import { TeacherEntity, TeacherEntityBuildResponse } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity } from '../../../entities/package/packageEntity';
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
 import { JoinedUserDoc } from '../../../../models/User';
@@ -63,21 +61,17 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   CreateUserUsecaseResponse
 > {
   private _userEntity!: UserEntity;
-  private _packageEntity!: PackageEntity;
   private _packageTransactionEntity!: PackageTransactionEntity;
   private _teacherBalanceEntity!: TeacherBalanceEntity;
   private _teacherEntity!: TeacherEntity;
   private _minuteBankEntity!: MinuteBankEntity;
   private _userDbService!: UserDbService;
-  private _teacherDbService!: TeacherDbService;
-  private _packageDbService!: PackageDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _minuteBankDbService!: MinuteBankDbService;
   private _teacherBalanceDbService!: TeacherBalanceDbService;
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
   private _redirectPathBuilder!: RedirectPathBuilder;
-  private _cloneDeep!: any;
   private _convertStringToObjectId!: any;
 
   protected _makeRequestTemplate = async (
@@ -124,26 +118,24 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
-    const joinedUserData = this._cloneDeep(savedDbUser);
-    const teacherData = await this._createDbTeacher(savedDbUser, dbServiceAccessOptions);
-
+    const joinedUserData = await this._addTeacherData({ savedDbUser, dbServiceAccessOptions });
     await this._createDbAdminPackageTransaction(savedDbUser, dbServiceAccessOptions);
     await this._createDbAdminMinuteBank(savedDbUser, dbServiceAccessOptions);
     await this._createDbTeacherBalance(savedDbUser, dbServiceAccessOptions);
-
-    joinedUserData.teacherData = teacherData;
-    joinedUserData.teacherAppPending = true;
     return joinedUserData;
   };
 
-  private _createDbTeacher = async (
-    savedDbUser: JoinedUserDoc,
-    dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<TeacherDoc> => {
-    const userId = savedDbUser._id;
-    const modelToInsert = this._teacherEntity.build({});
-    const savedDbTeacher = await this._teacherDbService.insert({
-      modelToInsert,
+  private _addTeacherData = async (props: {
+    savedDbUser: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<JoinedUserDoc> => {
+    const { savedDbUser, dbServiceAccessOptions } = props;
+    const teacherData = this._teacherEntity.build({});
+    const savedDbTeacher = await this._userDbService.findOneAndUpdate({
+      searchQuery: { _id: savedDbUser._id },
+      updateQuery: {
+        teacherData,
+      },
       dbServiceAccessOptions,
     });
     return savedDbTeacher;
@@ -289,39 +281,31 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   ): Promise<void> => {
     const {
       makeUserEntity,
-      makePackageEntity,
       makePackageTransactionEntity,
       makeTeacherBalanceEntity,
       makeTeacherEntity,
       makeUserDbService,
-      makeTeacherDbService,
       makeMinuteBankEntity,
-      makePackageDbService,
       makePackageTransactionDbService,
       makeMinuteBankDbService,
       makeTeacherBalanceDbService,
       signJwt,
       emailHandler,
       makeRedirectPathBuilder,
-      cloneDeep,
       convertStringToObjectId,
     } = optionalInitParams;
     this._userEntity = await makeUserEntity;
-    this._packageEntity = await makePackageEntity;
     this._packageTransactionEntity = await makePackageTransactionEntity;
     this._teacherBalanceEntity = await makeTeacherBalanceEntity;
     this._teacherEntity = await makeTeacherEntity;
     this._minuteBankEntity = await makeMinuteBankEntity;
     this._userDbService = await makeUserDbService;
-    this._teacherDbService = await makeTeacherDbService;
-    this._packageDbService = await makePackageDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._minuteBankDbService = await makeMinuteBankDbService;
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
     this._redirectPathBuilder = makeRedirectPathBuilder;
-    this._cloneDeep = cloneDeep;
     this._convertStringToObjectId = convertStringToObjectId;
   };
 }
