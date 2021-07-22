@@ -8,6 +8,7 @@ import { makeVerifyEmailTokenController } from '../../../components/controllers/
 
 import {
   makeCookieRedirectExpressCallback,
+  makeJSONCookieExpressCallback,
   makeJSONExpressCallback,
   makeRedirectExpressCallback,
 } from '../../../components/webFrameworkCallbacks/callbacks/expressCallback';
@@ -22,8 +23,8 @@ users.get(
 );
 
 users.get('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
-// change back to cookie redirect
-users.post('/create', makeJSONExpressCallback.consume(makeCreateUserController));
+// make it cookieredirect...
+users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 users.put('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeEditUserController));
 users.get(
   '/auth/emailToken/:verificationToken/verify',

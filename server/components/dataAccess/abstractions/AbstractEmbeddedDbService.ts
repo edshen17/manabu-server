@@ -224,6 +224,24 @@ abstract class AbstractEmbeddedDbService<
     }
   };
 
+  private _configureDependencyUpdateParams = (
+    dbDependencyUpdateParams?: DbDependencyUpdateParams
+  ) => {
+    if (dbDependencyUpdateParams) {
+      const { updatedDependentSearchQuery, embeddedUpdatedDependentSearchQuery } =
+        dbDependencyUpdateParams;
+      const updatedDependentSearchQueryCopy = this._cloneDeep(updatedDependentSearchQuery);
+      if (!embeddedUpdatedDependentSearchQuery) {
+        dbDependencyUpdateParams.embeddedUpdatedDependentSearchQuery =
+          updatedDependentSearchQueryCopy;
+      }
+      dbDependencyUpdateParams.updatedDependentSearchQuery = this._convertToEmbeddedQuery(
+        updatedDependentSearchQuery
+      );
+    }
+    return dbDependencyUpdateParams;
+  };
+
   public updateMany = async (dbServiceParams: {
     searchQuery?: {};
     updateQuery?: {};
@@ -315,23 +333,6 @@ abstract class AbstractEmbeddedDbService<
       });
     }
     await Promise.all(updateDependentPromises);
-  };
-
-  private _configureDependencyUpdateParams = (
-    dbDependencyUpdateParams?: DbDependencyUpdateParams
-  ) => {
-    if (dbDependencyUpdateParams) {
-      const updatedDependentSearchQuery = JSON.parse(
-        JSON.stringify(dbDependencyUpdateParams.updatedDependentSearchQuery)
-      );
-      if (!dbDependencyUpdateParams.embeddedUpdatedDependentSearchQuery) {
-        dbDependencyUpdateParams.embeddedUpdatedDependentSearchQuery = updatedDependentSearchQuery;
-      }
-      dbDependencyUpdateParams.updatedDependentSearchQuery = this._convertToEmbeddedQuery(
-        updatedDependentSearchQuery
-      );
-    }
-    return dbDependencyUpdateParams;
   };
 
   private _configureDeleteUpdateQuery = (searchQuery?: StringKeyObject) => {

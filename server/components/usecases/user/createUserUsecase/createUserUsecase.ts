@@ -247,12 +247,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   private _signClientJwt = (savedDbUser: any): string => {
-    const { role, name } = savedDbUser;
     const token = this._signJwt(
       {
-        _id: savedDbUser._id,
-        role,
-        name,
+        ...savedDbUser,
       },
       process.env.JWT_SECRET,
       {
