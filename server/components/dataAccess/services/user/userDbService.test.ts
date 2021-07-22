@@ -130,6 +130,13 @@
 //                 _id: fakeTeacher._id,
 //                 dbServiceAccessOptions,
 //               });
+//               const t = await userDbService.findOne({
+//                 searchQuery: {
+//                   'teacherData.packages._id': fakeTeacher.teacherData!.packages[0]._id,
+//                 },
+//                 dbServiceAccessOptions,
+//               });
+//               console.log(t, 'here hihihi');
 //               expect(findByIdTeacher).to.have.property('teacherData');
 //               expect(findByIdTeacher.teacherData).to.have.property('packages');
 //               expect(findByIdTeacher.teacherData).to.not.have.property('licensePathUrl');

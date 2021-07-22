@@ -1,28 +1,82 @@
 // import { expect } from 'chai';
 // import { makeTeacherDbService } from '.';
+// import { AppointmentDoc } from '../../../../models/Appointment';
+// import { MinuteBankDoc } from '../../../../models/MinuteBank';
+// import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 // import { JoinedUserDoc } from '../../../../models/User';
 // import { DbServiceAccessOptions } from '../../abstractions/IDbService';
+// import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
+// import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
+// import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
+// import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
+// import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
+// import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 // import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+// import { makeAppointmentDbService } from '../appointment';
+// import { AppointmentDbService } from '../appointment/appointmentDbService';
+// import { makeMinuteBankDbService } from '../minuteBank';
+// import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
+// import { makePackageTransactionDbService } from '../packageTransaction';
+// import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 // import { makeUserDbService } from '../user';
 // import { UserDbService } from '../user/userDbService';
 // import { TeacherDbService } from './teacherDbService';
 
 // let userDbService: UserDbService;
 // let teacherDbService: TeacherDbService;
-// let fakeDbUserFactory: FakeDbUserFactory;
+// let packageTransactionDbService: PackageTransactionDbService;
+// let appointmentDbService: AppointmentDbService;
+// let minuteBankDbService: MinuteBankDbService;
 // let dbServiceAccessOptions: DbServiceAccessOptions;
+// let fakeDbUserFactory: FakeDbUserFactory;
+// let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
+// let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
+// let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
+// let fakeUser: JoinedUserDoc;
 // let fakeTeacher: JoinedUserDoc;
+// let fakePackageTransaction: PackageTransactionDoc;
+// let fakeAppointment: AppointmentDoc;
+// let fakeMinuteBank: MinuteBankDoc;
 
 // before(async () => {
 //   userDbService = await makeUserDbService;
 //   teacherDbService = await makeTeacherDbService;
+//   packageTransactionDbService = await makePackageTransactionDbService;
+//   appointmentDbService = await makeAppointmentDbService;
+//   minuteBankDbService = await makeMinuteBankDbService;
 //   fakeDbUserFactory = await makeFakeDbUserFactory;
+//   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+//   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
+//   fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;
 // });
 
 // beforeEach(async () => {
 //   dbServiceAccessOptions = fakeDbUserFactory.getDbServiceAccessOptions();
+//   fakeUser = await fakeDbUserFactory.createFakeDbUser();
 //   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+//   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
+//     hostedById: fakeTeacher._id,
+//     reservedById: fakeUser._id,
+//     packageId: fakeTeacher.teacherData!.packages[0]._id,
+//     lessonDuration: 60,
+//     priceData: { currency: 'SGD', subTotal: 0, total: 0 },
+//     remainingAppointments: 0,
+//     lessonLanguage: 'ja',
+//     isSubscription: false,
+//     paymentData: {},
+//   });
+//   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
+//     hostedById: fakePackageTransaction.hostedById,
+//     reservedById: fakePackageTransaction.reservedById,
+//     packageTransactionId: fakePackageTransaction._id,
+//     startTime: new Date(),
+//     endTime: new Date(),
+//   });
+//   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
+//     hostedById: fakeTeacher._id,
+//     reservedById: fakeUser._id,
+//   });
 // });
 
 // describe('teacherDbService', () => {
@@ -123,9 +177,23 @@
 //         searchQuery: { _id: fakeTeacher.teacherData!._id },
 //         updateQuery: { studentCount: 5 },
 //         dbServiceAccessOptions,
+//         dbDependencyUpdateParams: {
+//           updatedDependentSearchQuery: {
+//             _id: fakeTeacher.teacherData!._id,
+//           },
+//         },
+//       });
+//       const findAppointment = await appointmentDbService.findOne({
+//         searchQuery: {
+//           hostedById: fakeTeacher._id,
+//         },
+//         dbServiceAccessOptions,
 //       });
 //       expect(updatedTeacher).to.not.deep.equal(fakeTeacher);
 //       expect(updatedTeacher.studentCount).to.equal(5);
+//       expect(
+//         findAppointment.packageTransactionData.hostedByData.teacherData!.studentCount
+//       ).to.equal(5);
 //       return updatedTeacher;
 //     };
 //     context('db access permitted', () => {

@@ -179,12 +179,13 @@ abstract class AbstractEmbeddedDbService<
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
-    const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams);
+    const embeddedDbDependencyUpdateParams =
+      this._configureDependencyUpdateParams(dbDependencyUpdateParams);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
-      dbDependencyUpdateParams,
+      dbDependencyUpdateParams: embeddedDbDependencyUpdateParams,
     });
     const dbQueryResult = await this._dbQueryReturnTemplate({
       dbServiceAccessOptions,
@@ -234,12 +235,13 @@ abstract class AbstractEmbeddedDbService<
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
-    const embeddedDbDependencyUpdateQuery = this._convertToEmbeddedQuery(dbDependencyUpdateParams);
+    const embeddedDbDependencyUpdateParams =
+      this._configureDependencyUpdateParams(dbDependencyUpdateParams);
     const dbQueryPromise = this._parentDbService.updateMany({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
-      dbDependencyUpdateParams,
+      dbDependencyUpdateParams: embeddedDbDependencyUpdateParams,
     });
     const dbQueryResult = await this._dbQueryReturnTemplate({
       dbServiceAccessOptions,
@@ -286,17 +288,73 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
+  protected _updateDbDependencies = async (
+    dbDependencyUpdateParams: DbDependencyUpdateParams
+  ): Promise<void> => {
+    const { updatedDependentSearchQuery, embeddedUpdatedDependentSearchQuery } =
+      dbDependencyUpdateParams;
+    const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
+    let updatedDependeeDocs;
+    if (this._embeddedFieldData.childFieldName) {
+      const { _id, ...otherProps } = <any>embeddedUpdatedDependentSearchQuery;
+      const newObj = { 'packages._id': _id, ...otherProps };
+      updatedDependeeDocs = await this.find({
+        searchQuery: newObj,
+        dbServiceAccessOptions,
+      });
+      console.log(
+        embeddedUpdatedDependentSearchQuery,
+        updatedDependeeDocs.length,
+        'here teacherDbService'
+      );
+    } else {
+      updatedDependentSearchQuery!._id = updatedDependentSearchQuery!['teacherData.packages._id'];
+      delete updatedDependentSearchQuery!['teacherData.packages._id'];
+      updatedDependeeDocs = await this.find({
+        searchQuery: updatedDependentSearchQuery,
+        dbServiceAccessOptions,
+      });
+      console.log(updatedDependentSearchQuery, updatedDependeeDocs.length, 'here packageDbService');
+    }
+    const updateDependentPromises: Promise<any>[] = [];
+    for (const updatedDependeeDoc of updatedDependeeDocs) {
+      await this._updateDbDependenciesTemplate({
+        updateDependentPromises,
+        updatedDependeeDoc,
+        dbServiceAccessOptions,
+      });
+    }
+    await Promise.all(updateDependentPromises);
+  };
+
+  private _configureDependencyUpdateParams = (
+    dbDependencyUpdateParams?: DbDependencyUpdateParams
+  ) => {
+    if (dbDependencyUpdateParams) {
+      const updatedDependentSearchQuery = JSON.parse(
+        JSON.stringify(dbDependencyUpdateParams.updatedDependentSearchQuery)
+      );
+      if (!dbDependencyUpdateParams.embeddedUpdatedDependentSearchQuery) {
+        dbDependencyUpdateParams.embeddedUpdatedDependentSearchQuery = updatedDependentSearchQuery;
+      }
+      dbDependencyUpdateParams.updatedDependentSearchQuery = this._convertToEmbeddedQuery(
+        updatedDependentSearchQuery
+      );
+    }
+    return dbDependencyUpdateParams;
+  };
+
   private _configureDeleteUpdateQuery = (searchQuery?: StringKeyObject) => {
     const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
     if (isSingleEmbed) {
-      const updateDeleteParams: StringKeyObject = { $unset: {} };
-      updateDeleteParams.$unset[embeddedParentFieldName] = true;
-      return updateDeleteParams;
+      const deleteUpdateQuery: StringKeyObject = { $unset: {} };
+      deleteUpdateQuery.$unset[embeddedParentFieldName] = true;
+      return deleteUpdateQuery;
     } else {
-      const updateDeleteParams: StringKeyObject = { $pull: {} };
-      updateDeleteParams.$pull[embeddedParentFieldName] = searchQuery;
-      return updateDeleteParams;
+      const deleteUpdateQuery: StringKeyObject = { $pull: {} };
+      deleteUpdateQuery.$pull[embeddedParentFieldName] = searchQuery;
+      return deleteUpdateQuery;
     }
   };
 }

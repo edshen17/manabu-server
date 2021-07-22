@@ -183,7 +183,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     }
   };
 
-  private _updateDbDependencies = async (
+  protected _updateDbDependencies = async (
     dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
     const { updatedDependentSearchQuery } = dbDependencyUpdateParams;

@@ -11,10 +11,10 @@ type RequiredDbServiceInitParams = {
 
 type DbServiceParams = {
   _id?: ObjectId;
-  searchQuery?: {};
+  searchQuery?: StringKeyObject;
   dbServiceAccessOptions: DbServiceAccessOptions;
-  modelToInsert?: {};
-  updateQuery?: {};
+  modelToInsert?: StringKeyObject;
+  updateQuery?: StringKeyObject;
   dbDependencyUpdateParams?: DbDependencyUpdateParams;
 };
 
@@ -27,7 +27,8 @@ type DbServiceAccessOptions = {
 };
 
 type DbDependencyUpdateParams = {
-  updatedDependentSearchQuery?: {};
+  updatedDependentSearchQuery?: StringKeyObject;
+  embeddedUpdatedDependentSearchQuery?: StringKeyObject;
 };
 
 type DbModelViews = {

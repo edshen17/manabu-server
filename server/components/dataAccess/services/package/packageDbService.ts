@@ -31,6 +31,7 @@ class PackageDbService extends AbstractEmbeddedDbService<
     updatedDependeeDoc: PackageDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
+    console.log('here package 1');
     const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
     const updatePackageTransactionPromises = await this._getUpdateManyDependeePromises({
       ...getUpdateDependeePromisesProps,
@@ -45,6 +46,7 @@ class PackageDbService extends AbstractEmbeddedDbService<
     dependencyDbService: IDbService<any, any>;
   }): Promise<Promise<any>[]> => {
     const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
+    console.log('here package 2');
     const updateManyAppointmentPromise = this._getUpdateManyDependeePromise({
       searchQuery: { packageId: updatedDependeeDoc._id },
       updateQuery: {
