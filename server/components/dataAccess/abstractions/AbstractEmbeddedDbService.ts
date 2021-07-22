@@ -295,26 +295,16 @@ abstract class AbstractEmbeddedDbService<
       dbDependencyUpdateParams;
     const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
     let updatedDependeeDocs;
-    if (this._embeddedFieldData.childFieldName) {
-      const { _id, ...otherProps } = <any>embeddedUpdatedDependentSearchQuery;
-      const newObj = { 'packages._id': _id, ...otherProps };
+    if (!this._embeddedFieldData.childFieldName) {
       updatedDependeeDocs = await this.find({
-        searchQuery: newObj,
+        searchQuery: embeddedUpdatedDependentSearchQuery,
         dbServiceAccessOptions,
       });
-      console.log(
-        embeddedUpdatedDependentSearchQuery,
-        updatedDependeeDocs.length,
-        'here teacherDbService'
-      );
     } else {
-      updatedDependentSearchQuery!._id = updatedDependentSearchQuery!['teacherData.packages._id'];
-      delete updatedDependentSearchQuery!['teacherData.packages._id'];
       updatedDependeeDocs = await this.find({
         searchQuery: updatedDependentSearchQuery,
         dbServiceAccessOptions,
       });
-      console.log(updatedDependentSearchQuery, updatedDependeeDocs.length, 'here packageDbService');
     }
     const updateDependentPromises: Promise<any>[] = [];
     for (const updatedDependeeDoc of updatedDependeeDocs) {
