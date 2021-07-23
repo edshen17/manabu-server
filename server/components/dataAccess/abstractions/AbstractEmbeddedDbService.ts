@@ -306,13 +306,14 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  protected _updateDbDependencies = async (
-    dbDependencyUpdateParams: DbDependencyUpdateParams
-  ): Promise<void> => {
-    const { updatedDependentSearchQuery, embeddedUpdatedDependentSearchQuery } =
+  protected _getUpdatedDependeeDocs = async (props: {
+    dbDependencyUpdateParams: DbDependencyUpdateParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }) => {
+    const { dbDependencyUpdateParams, dbServiceAccessOptions } = props;
+    const { embeddedUpdatedDependentSearchQuery, updatedDependentSearchQuery } =
       dbDependencyUpdateParams;
-    const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
-    let updatedDependeeDocs;
+    let updatedDependeeDocs: any[];
     if (!this._embeddedFieldData.childFieldName) {
       updatedDependeeDocs = await this.find({
         searchQuery: embeddedUpdatedDependentSearchQuery,
@@ -324,15 +325,7 @@ abstract class AbstractEmbeddedDbService<
         dbServiceAccessOptions,
       });
     }
-    const updateDependentPromises: Promise<any>[] = [];
-    for (const updatedDependeeDoc of updatedDependeeDocs) {
-      await this._updateDbDependenciesTemplate({
-        updateDependentPromises,
-        updatedDependeeDoc,
-        dbServiceAccessOptions,
-      });
-    }
-    await Promise.all(updateDependentPromises);
+    return updatedDependeeDocs;
   };
 
   private _configureDeleteUpdateQuery = (searchQuery?: StringKeyObject) => {

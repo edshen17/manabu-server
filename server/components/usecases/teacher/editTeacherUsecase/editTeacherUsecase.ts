@@ -26,7 +26,7 @@ class EditTeacherUsecase extends AbstractEditUsecase<
   ): Promise<EditTeacherUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions } = props;
     const updatedDbTeacher = await this._teacherDbService.findOneAndUpdate({
-      searchQuery: { userId: params.uId },
+      searchQuery: { _id: params.uId },
       updateQuery: body,
       dbServiceAccessOptions,
     });

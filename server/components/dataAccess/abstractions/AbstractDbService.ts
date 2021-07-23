@@ -186,10 +186,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   protected _updateDbDependencies = async (
     dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
-    const { updatedDependentSearchQuery } = dbDependencyUpdateParams;
     const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
-    const updatedDependeeDocs = await this.find({
-      searchQuery: updatedDependentSearchQuery,
+    const updatedDependeeDocs = await this._getUpdatedDependeeDocs({
+      dbDependencyUpdateParams,
       dbServiceAccessOptions,
     });
     const updateDependentPromises: Promise<any>[] = [];
@@ -201,6 +200,19 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       });
     }
     await Promise.all(updateDependentPromises);
+  };
+
+  protected _getUpdatedDependeeDocs = async (props: {
+    dbDependencyUpdateParams: DbDependencyUpdateParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }) => {
+    const { dbDependencyUpdateParams, dbServiceAccessOptions } = props;
+    const { updatedDependentSearchQuery } = dbDependencyUpdateParams;
+    const updatedDependeeDocs = await this.find({
+      searchQuery: updatedDependentSearchQuery,
+      dbServiceAccessOptions,
+    });
+    return updatedDependeeDocs;
   };
 
   protected _updateDbDependenciesTemplate = async (props: {
