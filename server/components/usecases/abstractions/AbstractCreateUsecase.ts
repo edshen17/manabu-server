@@ -1,4 +1,3 @@
-import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { CurrentAPIUser } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractUsecase } from './AbstractUsecase';
 
@@ -16,24 +15,19 @@ abstract class AbstractCreateUsecase<
     currentAPIUser: any;
     endpointPath: string;
   }): boolean => {
-    const isCurrentAPIUserPermitted = true;
-    return isCurrentAPIUserPermitted;
+    return true;
   };
 
-  protected _getDbServiceAccessOptions = (props: {
-    currentAPIUser: CurrentAPIUser;
-    isCurrentAPIUserPermitted: boolean;
+  protected _isSelf = (props: {
     params: any;
+    currentAPIUser: CurrentAPIUser;
     endpointPath: string;
-  }) => {
-    const { currentAPIUser, isCurrentAPIUserPermitted } = props;
-    const dbServiceAccessOptions: DbServiceAccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted,
-      currentAPIUserRole: currentAPIUser.role,
-      isSelf: true,
-    };
-    return dbServiceAccessOptions;
+  }): boolean => {
+    return true;
+  };
+
+  protected _isProtectedResource = (): boolean => {
+    return false;
   };
 }
 

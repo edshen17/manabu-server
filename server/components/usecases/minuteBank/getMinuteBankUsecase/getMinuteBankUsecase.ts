@@ -18,37 +18,6 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
 > {
   private _minuteBankDbService!: MinuteBankDbService;
 
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { endpointPath, routeData } = controllerData;
-    const isValidRequest =
-      this._isCurrentAPIUserPermitted({
-        endpointPath,
-      }) && this._isValidRouteData(routeData);
-    return isValidRequest;
-  };
-
-  protected _isCurrentAPIUserPermitted = (props: { endpointPath: string }): boolean => {
-    const { endpointPath } = props;
-    const isCurrentAPIUserPermitted = endpointPath == '/self/minuteBanks';
-    return isCurrentAPIUserPermitted;
-  };
-
-  protected _getDbServiceAccessOptions = (props: {
-    currentAPIUser: CurrentAPIUser;
-    isCurrentAPIUserPermitted: boolean;
-    params: any;
-    endpointPath: string;
-  }) => {
-    const { currentAPIUser, isCurrentAPIUserPermitted } = props;
-    const dbServiceAccessOptions: DbServiceAccessOptions = {
-      isProtectedResource: true,
-      isCurrentAPIUserPermitted,
-      currentAPIUserRole: currentAPIUser.role,
-      isSelf: isCurrentAPIUserPermitted,
-    };
-    return dbServiceAccessOptions;
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetMinuteBankUsecaseResponse> => {

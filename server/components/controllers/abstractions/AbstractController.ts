@@ -24,7 +24,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
       'Content-Type': 'application/json',
     };
     try {
-      const usecaseRes = await this._awaitUsecaseRes(httpRequest);
+      const usecaseRes = await this._getUsecaseRes(httpRequest);
       return {
         headers,
         statusCode: this._successStatusCode,
@@ -39,7 +39,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
     }
   };
 
-  private _awaitUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
+  private _getUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
     const { currentAPIUser, path, params, body } = httpRequest;
     const query = this._queryStringHandler.decodeQueryStringObj(httpRequest.query);
     const controllerData = {

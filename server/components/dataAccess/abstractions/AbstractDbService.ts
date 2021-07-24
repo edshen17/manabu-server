@@ -21,7 +21,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.findOne(searchQuery, selectView).lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -48,7 +48,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbModelView || defaultView;
   };
 
-  protected _dbQueryReturnTemplate = async (props: {
+  protected _getDbQueryResult = async (props: {
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbQueryPromise: any;
     searchQuery?: {};
@@ -86,7 +86,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.findById(_id, selectView).lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -100,7 +100,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const selectView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.find(searchQuery, selectView).lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -116,7 +116,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const insertedModel = await this._dbModel.create(modelToInsert);
     // return findById result rather than insertedModel to ensure caller gets correct select view
     const dbQueryPromise = this._dbModel.findById(insertedModel._id, selectView).lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -132,7 +132,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const dbQueryPromise = this._dbModel.insertMany(modelToInsert, selectView, {
       lean: true,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -154,7 +154,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
         new: true,
       })
       .lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -279,7 +279,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
         new: true,
       })
       .lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -293,7 +293,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const dbQueryPromise = this._dbModel.findByIdAndDelete(_id).lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
@@ -306,7 +306,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const dbQueryPromise = this._dbModel.findOneAndDelete(searchQuery).lean();
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });

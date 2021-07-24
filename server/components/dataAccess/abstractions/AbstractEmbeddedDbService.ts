@@ -36,7 +36,7 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
@@ -63,7 +63,7 @@ abstract class AbstractEmbeddedDbService<
     return hasReserved$;
   };
 
-  protected _dbQueryReturnTemplate = async (props: {
+  protected _getDbQueryResult = async (props: {
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbQueryPromise: any;
     searchQuery?: {};
@@ -129,7 +129,7 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
@@ -147,7 +147,7 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
@@ -190,7 +190,7 @@ abstract class AbstractEmbeddedDbService<
       dbServiceAccessOptions,
       dbDependencyUpdateParams: embeddedDbDependencyUpdateParams,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
@@ -264,7 +264,7 @@ abstract class AbstractEmbeddedDbService<
       dbServiceAccessOptions,
       dbDependencyUpdateParams: embeddedDbDependencyUpdateParams,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
@@ -301,7 +301,7 @@ abstract class AbstractEmbeddedDbService<
       dbServiceAccessOptions,
       dbDependencyUpdateParams,
     });
-    const dbQueryResult = await this._dbQueryReturnTemplate({
+    const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,

@@ -4,7 +4,6 @@ import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData } from '../../abstractions/IUsecase';
 
 type OptionalGetUserUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
 type GetUserUsecaseResponse = { user: JoinedUserDoc } | Error | undefined;
@@ -15,21 +14,19 @@ class GetUserUsecase extends AbstractGetUsecase<
 > {
   private _userDbService!: UserDbService;
 
-  protected _isValidRequest = (controllerData: ControllerData): boolean => {
-    const { routeData, currentAPIUser } = controllerData;
-    const { params } = routeData;
-    const searchIdExists = params.uId || currentAPIUser.userId;
-    const isValidRequest = searchIdExists && this._isValidRouteData(routeData);
-    return isValidRequest;
+  protected _isProtectedResource = () => {
+    return false;
   };
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetUserUsecaseResponse> => {
     const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
+    const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
     const user = await this._getUser(currentAPIUser, endpointPath, params, dbServiceAccessOptions);
+
     if (user) {
-      if (endpointPath == '/self/me') {
+      if (isSelf) {
         this._updateOnlineTimestamp(currentAPIUser.userId, dbServiceAccessOptions);
       }
       return { user };

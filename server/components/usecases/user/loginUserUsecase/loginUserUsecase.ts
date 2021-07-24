@@ -35,15 +35,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _redirectPathBuilder!: RedirectPathBuilder;
   private _CLIENT_DASHBOARD_URI!: string;
 
-  protected _isCurrentAPIUserPermitted = (props: {
-    params: any;
-    query?: any;
-    currentAPIUser: any;
-    endpointPath: string;
-  }): boolean => {
-    return true;
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
