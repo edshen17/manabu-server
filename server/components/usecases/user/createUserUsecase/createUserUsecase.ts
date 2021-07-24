@@ -36,7 +36,6 @@ type OptionalCreateUserUsecaseInitParams = {
   signJwt: any;
   emailHandler: EmailHandler;
   makeRedirectPathBuilder: RedirectPathBuilder;
-  cloneDeep: any;
   convertStringToObjectId: any;
 };
 

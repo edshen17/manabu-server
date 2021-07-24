@@ -21,6 +21,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
 {
   protected _queryValidator!: AbstractQueryValidator;
   protected _paramsValidator!: AbstractParamsValidator;
+  protected _cloneDeep!: any;
   private _makeRequestErrorMsg: string;
   constructor(makeRequestErrorMsg: string) {
     this._makeRequestErrorMsg = makeRequestErrorMsg;
@@ -49,7 +50,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
       currentAPIUser,
       endpointPath,
     });
-    const dbServiceAccessOptions: DbServiceAccessOptions = this._getDbServiceAccessOptions({
+    const dbServiceAccessOptions = this._getDbServiceAccessOptions({
       isCurrentAPIUserPermitted,
       currentAPIUser,
       params,
@@ -79,6 +80,9 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     const { params, currentAPIUser } = props;
     const isCurrentAPIUserPermitted =
       (params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId) ||
+      (params.teacherId &&
+        currentAPIUser.teacherId &&
+        params.teacherId == currentAPIUser.teacherId) ||
       currentAPIUser.role == 'admin';
     return isCurrentAPIUserPermitted;
   };
@@ -94,7 +98,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
       isProtectedResource: true,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
-      isSelf: params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId,
+      isSelf:
+        (params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId) ||
+        (params.teacherId &&
+          currentAPIUser.teacherId &&
+          params.teacherId == currentAPIUser.teacherId),
     };
     return dbServiceAccessOptions;
   };
@@ -123,9 +131,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   };
 
   public init = async (initParams: UsecaseInitParams<OptionalUsecaseInitParams>): Promise<this> => {
-    const { makeQueryValidator, makeParamsValidator, ...optionalInitParams } = initParams;
+    const { makeQueryValidator, makeParamsValidator, cloneDeep, ...optionalInitParams } =
+      initParams;
     this._queryValidator = makeQueryValidator;
     this._paramsValidator = makeParamsValidator;
+    this._cloneDeep = cloneDeep;
     await this._initTemplate(optionalInitParams);
     return this;
   };
@@ -133,7 +143,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   protected _initTemplate = (
     optionalInitParams: Omit<
       UsecaseInitParams<OptionalUsecaseInitParams>,
-      'makeQueryValidator' | 'makeParamsValidator'
+      'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep'
     >
   ): Promise<void> | void => {};
 }

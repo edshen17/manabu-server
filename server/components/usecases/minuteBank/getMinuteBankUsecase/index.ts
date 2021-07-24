@@ -1,3 +1,4 @@
+import cloneDeep from 'clone-deep';
 import { makeMinuteBankDbService } from '../../../dataAccess/services/minuteBank';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
@@ -7,6 +8,7 @@ const makeGetMinuteBankUsecase = new GetMinuteBankUsecase().init({
   makeMinuteBankDbService,
   makeQueryValidator: makeBaseQueryValidator,
   makeParamsValidator: makeBaseParamsValidator,
+  cloneDeep,
 });
 
 export { makeGetMinuteBankUsecase };

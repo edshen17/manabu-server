@@ -42,6 +42,8 @@ describe('getMinuteBankController', () => {
         .path('/self/minuteBanks')
         .build();
       const getMinuteBankRes = await getMinuteBankController.makeRequest(getMinuteBankHttpRequest);
+      expect(getMinuteBankRes.statusCode).to.equal(200);
+      expect(getMinuteBankRes.body).to.have.property('minuteBanks');
       if ('minuteBanks' in getMinuteBankRes.body) {
         expect(getMinuteBankRes.body.minuteBanks[0]._id).to.deep.equal(fakeMinuteBank._id);
       }
@@ -56,6 +58,8 @@ describe('getMinuteBankController', () => {
         .path('/self/minuteBanks')
         .build();
       const getMinuteBankRes = await getMinuteBankController.makeRequest(getMinuteBankHttpRequest);
+      expect(getMinuteBankRes.statusCode).to.equal(200);
+      expect(getMinuteBankRes.body).to.have.property('minuteBanks');
       if ('minuteBanks' in getMinuteBankRes.body) {
         expect(getMinuteBankRes.body.minuteBanks[0]._id).to.deep.equal(fakeMinuteBank._id);
       }

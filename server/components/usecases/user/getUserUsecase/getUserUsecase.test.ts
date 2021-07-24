@@ -29,13 +29,13 @@ beforeEach(async () => {
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   routeData = {
     params: {
-      uId: fakeTeacher._id.toString(),
+      uId: fakeTeacher._id,
     },
     body: {},
     query: {},
   };
   currentAPIUser = {
-    userId: fakeTeacher._id.toString(),
+    userId: fakeTeacher._id,
     role: fakeTeacher.role,
   };
   endpointPath = '';

@@ -26,9 +26,9 @@ beforeEach(async () => {
   dbServiceAccessOptions = fakeDbAppointmentFactory.getDbServiceAccessOptions();
   fakeAppointmentTransaction = await fakeDbAppointmentTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-    hostedById: fakeAppointmentTransaction.hostedById.toString(),
-    reservedById: fakeAppointmentTransaction.reservedById.toString(),
-    packageTransactionId: fakeAppointmentTransaction._id.toString(),
+    hostedById: fakeAppointmentTransaction.hostedById,
+    reservedById: fakeAppointmentTransaction.reservedById,
+    packageTransactionId: fakeAppointmentTransaction._id,
     startTime: new Date(),
     endTime: new Date(),
   });

@@ -29,8 +29,8 @@ before(async () => {
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
-    hostedById: fakeUser._id.toString(),
-    reservedById: fakeUser._id.toString(),
+    hostedById: fakeUser._id,
+    reservedById: fakeUser._id,
   });
 });
 
@@ -41,13 +41,13 @@ describe('getMinuteBankUsecase', () => {
         const buildControllerData = controllerDataBuilder
           .endpointPath('/self/minuteBanks')
           .currentAPIUser({
-            userId: fakeUser._id.toString(),
+            userId: fakeUser._id,
             role: 'admin',
           })
           .build();
         const minuteBankRes = await getMinuteBankUsecase.makeRequest(buildControllerData);
+        expect(minuteBankRes).to.have.property('minuteBanks');
         if ('minuteBanks' in minuteBankRes) {
-          expect(minuteBankRes).to.have.property('minuteBanks');
           expect(minuteBankRes.minuteBanks).to.be.an('array');
           expect(minuteBankRes.minuteBanks.length > 0).to.equal(true);
         }

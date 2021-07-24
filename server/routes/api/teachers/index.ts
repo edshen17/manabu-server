@@ -6,6 +6,10 @@ const teachers = express.Router();
 const VerifyToken = require('../../../components/VerifyToken'); // TODO: turn into ts + import statement
 
 //teachers.get('/')
-teachers.put('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeEditTeacherController));
+teachers.put(
+  '/:teacherId',
+  VerifyToken,
+  makeJSONExpressCallback.consume(makeEditTeacherController)
+);
 
 export default teachers;

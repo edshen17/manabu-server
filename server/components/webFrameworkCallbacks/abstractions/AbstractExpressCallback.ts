@@ -38,6 +38,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
       currentAPIUser: {
         userId: req.userId,
         role: req.role || 'user',
+        teacherId: req.teacherId,
       },
       headers: {
         'Content-Type': req.get('Content-Type'),

@@ -31,8 +31,8 @@ describe('getUserController', () => {
         .path('/self/me')
         .build();
       const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
+      expect(getUserRes.statusCode).to.equal(200);
       if ('user' in getUserRes.body!) {
-        expect(getUserRes.statusCode).to.equal(200);
         expect(getUserRes.body.user).to.have.property('settings');
         expect(getUserRes.body.user).to.have.property('email');
       }
@@ -50,8 +50,8 @@ describe('getUserController', () => {
         })
         .build();
       const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
+      expect(getUserRes.statusCode).to.equal(200);
       if ('user' in getUserRes.body!) {
-        expect(getUserRes.statusCode).to.equal(200);
         expect(getUserRes.body.user).to.not.have.property('settings');
         expect(getUserRes.body.user).to.not.have.property('email');
       }
@@ -67,9 +67,7 @@ describe('getUserController', () => {
         })
         .build();
       const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
-      if ('user' in getUserRes.body!) {
-        expect(getUserRes.statusCode).to.equal(404);
-      }
+      expect(getUserRes.statusCode).to.equal(404);
     });
   });
 });

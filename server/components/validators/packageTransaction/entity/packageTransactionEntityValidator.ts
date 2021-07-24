@@ -3,9 +3,15 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 class PackageTransactionEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
-      hostedById: this._joi.objectId(),
-      reservedById: this._joi.objectId(),
-      packageId: this._joi.objectId(),
+      hostedById: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
+      reservedById: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
+      packageId: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       lessonDuration: this._joi.number().min(30).max(120).valid(30, 60, 90, 120),
       priceData: this._joi.object({
         currency: this._joi.string().max(5),
@@ -22,9 +28,18 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       }),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      hostedById: this._joi.objectId().forbidden(),
-      reservedById: this._joi.objectId().forbidden(),
-      packageId: this._joi.objectId().forbidden(),
+      hostedById: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
+        .forbidden(),
+      reservedById: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
+        .forbidden(),
+      packageId: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
+        .forbidden(),
       lessonDuration: this._joi.number().forbidden(),
       priceData: this._joi.object().forbidden(),
       remainingAppointments: this._joi.number().forbidden(),

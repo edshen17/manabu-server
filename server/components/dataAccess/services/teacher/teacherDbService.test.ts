@@ -3,6 +3,7 @@ import { makeTeacherDbService } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { TeacherDoc } from '../../../../models/Teacher';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
@@ -173,7 +174,7 @@ describe('teacherDbService', () => {
   });
   describe('update', () => {
     const updateTeacher = async () => {
-      const updatedTeacher = await teacherDbService.findOneAndUpdate({
+      const updatedTeacher = <TeacherDoc>await teacherDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacher.teacherData!._id },
         updateQuery: { studentCount: 5 },
         dbServiceAccessOptions,

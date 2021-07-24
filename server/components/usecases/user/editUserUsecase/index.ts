@@ -1,3 +1,4 @@
+import cloneDeep from 'clone-deep';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { makeUserEntityValidator } from '../../../validators/user/entity';
@@ -9,6 +10,7 @@ const makeEditUserUsecase = new EditUserUsecase().init({
   makeQueryValidator: makeBaseQueryValidator,
   makeParamsValidator: makeUserParamsValidator,
   makeEditEntityValidator: makeUserEntityValidator,
+  cloneDeep,
 });
 
 export { makeEditUserUsecase };

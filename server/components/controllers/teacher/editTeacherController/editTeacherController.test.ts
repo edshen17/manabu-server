@@ -31,16 +31,19 @@ describe('editTeacherController', () => {
         .currentAPIUser({
           userId: fakeTeacher._id,
           role: fakeTeacher.role,
+          teacherId: fakeTeacher.teacherData!._id,
         })
-        .params({ uId: fakeTeacher._id })
+        .params({ teacherId: fakeTeacher.teacherData!._id })
         .body({
-          licensePathUrl: 'new license path',
+          licensePathUrl: 'https://fakeimg.pl/300/',
         })
         .build();
       const editTeacherRes = await editTeacherController.makeRequest(editTeacherHttpRequest);
+      expect(editTeacherRes.statusCode).to.equal(200);
       if ('user' in editTeacherRes.body) {
-        expect(editTeacherRes.body.user.teacherData!.licensePathUrl).to.equal('new license path');
-        expect(editTeacherRes.statusCode).to.equal(200);
+        expect(editTeacherRes.body.user.teacherData!.licensePathUrl).to.equal(
+          'https://fakeimg.pl/300/'
+        );
       }
     });
     it('should not edit the user and deny access (editing other)', async () => {
@@ -82,7 +85,7 @@ describe('editTeacherController', () => {
         })
         .params({ uId: undefined })
         .body({
-          licensePath: 'new license path',
+          licensePathUrl: 'new license path',
         })
         .build();
       const editTeacherRes = await editTeacherController.makeRequest(editTeacherHttpRequest);

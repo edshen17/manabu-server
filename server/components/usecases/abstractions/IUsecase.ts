@@ -16,6 +16,7 @@ type UsecaseInitParams<OptionalUsecaseInitParams> = RequiredUsecaseInitParams &
 type RequiredUsecaseInitParams = {
   makeQueryValidator: AbstractQueryValidator;
   makeParamsValidator: AbstractParamsValidator;
+  cloneDeep: any;
 };
 
 interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse> {

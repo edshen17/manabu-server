@@ -26,13 +26,13 @@ before(async () => {
 beforeEach(() => {
   routeData = {
     params: {
-      uId: fakeTeacher._id.toString(),
+      uId: fakeTeacher._id,
     },
     body: {},
     query: {},
   };
   currentAPIUser = {
-    userId: fakeTeacher._id.toString(),
+    userId: fakeTeacher._id,
     role: fakeTeacher.role,
   };
 });
@@ -102,8 +102,8 @@ describe('editUserUsecase', () => {
               const { body, params } = routeData;
               expect(updateeUser.profileBio).to.equal('');
               body.profileBio = 'new profile bio';
-              params.uId = updateeUser._id.toString();
-              currentAPIUser.userId = updaterUser._id.toString();
+              params.uId = updateeUser._id;
+              currentAPIUser.userId = updaterUser._id;
               currentAPIUser.role = 'admin';
               const updatedUser = await editUser();
               expect(updatedUser.profileBio).to.equal('new profile bio');
@@ -119,8 +119,8 @@ describe('editUserUsecase', () => {
         const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const { body, params } = routeData;
         body.profileBio = 'new profile bio';
-        params.uId = updateeUser._id.toString();
-        currentAPIUser.userId = updaterUser._id.toString();
+        params.uId = updateeUser._id;
+        currentAPIUser.userId = updaterUser._id;
         try {
           const updatedUser = await editUser();
         } catch (err) {

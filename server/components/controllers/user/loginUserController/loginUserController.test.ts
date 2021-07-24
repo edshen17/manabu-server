@@ -31,6 +31,7 @@ describe('loginUserController', () => {
         .body(fakeUserEntityData)
         .build();
       const loginUserRes = await loginUserController.makeRequest(loginUserHttpRequest);
+      expect(loginUserRes.statusCode).to.equal(200);
       if ('user' in loginUserRes.body!) {
         expect(loginUserRes.body.user).to.have.property('email');
         expect(loginUserRes.body.user).to.have.property('settings');

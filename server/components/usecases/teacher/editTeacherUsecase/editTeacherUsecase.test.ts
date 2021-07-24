@@ -27,7 +27,7 @@ beforeEach(() => {
       licensePathUrl: 'https://fakeimg.pl/300/',
     },
     params: {
-      uId: fakeTeacher._id,
+      teacherId: fakeTeacher.teacherData!._id,
     },
     query: {},
   };
@@ -41,17 +41,18 @@ describe('editTeacherUsecase', () => {
           .currentAPIUser({
             userId: fakeTeacher._id,
             role: fakeTeacher.role,
+            teacherId: fakeTeacher.teacherData!._id,
           })
           .routeData(routeData)
           .build();
         const editTeacherRes = await editTeacherUsecase.makeRequest(buildEditTeacherControllerData);
+        expect(editTeacherRes).to.have.property('user');
         if ('user' in editTeacherRes) {
           expect(editTeacherRes.user.teacherData!.licensePathUrl).to.equal(
             'https://fakeimg.pl/300/'
           );
         }
       });
-
       it('should deny access when updating restricted properties (self)', async () => {
         try {
           const fakeUser = await fakeDbUserFactory.createFakeDbUser();

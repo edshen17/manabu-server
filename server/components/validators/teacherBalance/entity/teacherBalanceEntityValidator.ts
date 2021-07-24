@@ -3,12 +3,17 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 class TeacherBalanceEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
-      userId: this._joi.objectId(),
+      userId: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       balance: this._joi.number().min(0),
       currency: this._joi.string().max(5),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      userId: this._joi.objectId().forbidden(),
+      userId: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
+        .forbidden(),
       balance: this._joi.object().forbidden(),
       currency: this._joi.object().forbidden(),
     });

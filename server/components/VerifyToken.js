@@ -8,7 +8,9 @@ const verifyToken = (req, res, next) => {
       if (decoded) {
         req.userId = decoded._id;
         req.role = decoded.role || 'user';
-        req.isVerified = true;
+        if (decoded.teacherData) {
+          req.teacherId = decoded.teacherData._id;
+        }
       }
     });
   } else {

@@ -1,4 +1,5 @@
 import { TeacherDoc } from '../../../../models/Teacher';
+import { JoinedUserDoc } from '../../../../models/User';
 import {
   AbstractEmbeddedDbService,
   AbstractEmbeddedDbServiceInitParams,
@@ -9,7 +10,7 @@ type OptionalTeacherDbServiceInitParams = {};
 
 class TeacherDbService extends AbstractEmbeddedDbService<
   OptionalTeacherDbServiceInitParams,
-  TeacherDoc
+  TeacherDoc | JoinedUserDoc
 > {
   constructor() {
     super();

@@ -68,7 +68,8 @@ abstract class AbstractEmbeddedDbService<
     dbQueryPromise: any;
     searchQuery?: {};
   }): Promise<any> => {
-    const { dbQueryPromise, searchQuery } = props;
+    const { dbQueryPromise, searchQuery, dbServiceAccessOptions } = props;
+    const { isReturningParent } = dbServiceAccessOptions;
     const dbQueryResult = await dbQueryPromise;
     const embeddedParentFieldName = this._embeddedFieldData.parentFieldName;
     const isResultArray = Array.isArray(dbQueryResult);
@@ -91,6 +92,8 @@ abstract class AbstractEmbeddedDbService<
         dbQueryResult: dbQueryResult[embeddedParentFieldName],
         searchQuery,
       });
+    } else if (isReturningParent) {
+      processedResult = dbQueryResult;
     } else {
       processedResult = dbQueryResult[embeddedParentFieldName];
     }

@@ -26,7 +26,7 @@ beforeEach(async () => {
   dbServiceAccessOptions = fakeDbTeacherBalanceFactory.getDbServiceAccessOptions();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakeTeacherBalance = await fakeDbTeacherBalanceFactory.createFakeDbData({
-    userId: fakeTeacher._id.toString(),
+    userId: fakeTeacher._id,
   });
 });
 

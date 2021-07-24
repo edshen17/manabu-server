@@ -16,7 +16,6 @@ type OptionalLoginUserUsecaseInitParams = {
   oauth2Client: any;
   google: any;
   makeRedirectPathBuilder: RedirectPathBuilder;
-  cloneDeep: any;
 };
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
@@ -35,7 +34,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _google!: any;
   private _redirectPathBuilder!: RedirectPathBuilder;
   private _CLIENT_DASHBOARD_URI!: string;
-  private _cloneDeep!: any;
 
   protected _isCurrentAPIUserPermitted = (props: {
     params: any;
@@ -191,7 +189,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       oauth2Client,
       google,
       makeRedirectPathBuilder,
-      cloneDeep,
     } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._createUserUsecase = await makeCreateUserUsecase;
@@ -202,7 +199,6 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       .host('client')
       .endpointPath('/dashboard')
       .build();
-    this._cloneDeep = cloneDeep;
   };
 }
 

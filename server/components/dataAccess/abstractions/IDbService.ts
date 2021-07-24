@@ -24,6 +24,7 @@ type DbServiceAccessOptions = {
   currentAPIUserRole: string;
   isSelf: boolean;
   isOverrideView?: boolean;
+  isReturningParent?: boolean;
 };
 
 type DbDependencyUpdateParams = {
