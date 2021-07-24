@@ -7,7 +7,6 @@ import {
   AbstractEditUsecaseInitParams,
 } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData, RouteData } from '../../abstractions/IUsecase';
 
 type OptionalEditTeacherUsecaseInitParams = {
   makeTeacherDbService: Promise<TeacherDbService>;
@@ -32,6 +31,11 @@ class EditTeacherUsecase extends AbstractEditUsecase<
       searchQuery: { _id: params.teacherId },
       updateQuery: body,
       dbServiceAccessOptions: dbServiceAccessOptionsCopy,
+      dbDependencyUpdateParams: {
+        updatedDependentSearchQuery: {
+          _id: params.teacherId,
+        },
+      },
     });
     const usecaseRes = { user: savedDbTeacher };
     return usecaseRes;

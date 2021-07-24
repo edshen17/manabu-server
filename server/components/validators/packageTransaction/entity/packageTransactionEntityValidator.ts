@@ -53,6 +53,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       packageData: this._joi.object().forbidden(),
       hostedByData: this._joi.object().forbidden(),
       reservedByData: this._joi.object().forbidden(),
+      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       lastUpdated: this._joi.date(),
     });
     this._adminValidationSchema = this._editValidationSchema;

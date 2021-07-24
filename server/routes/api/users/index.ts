@@ -5,7 +5,6 @@ import { makeEditUserController } from '../../../components/controllers/user/edi
 import { makeGetUserController } from '../../../components/controllers/user/getUserController';
 import { makeLoginUserController } from '../../../components/controllers/user/loginUserController';
 import { makeVerifyEmailTokenController } from '../../../components/controllers/user/verifyEmailTokenController';
-
 import {
   makeCookieRedirectExpressCallback,
   makeJSONCookieExpressCallback,
@@ -13,14 +12,14 @@ import {
   makeRedirectExpressCallback,
 } from '../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 const users = express.Router();
-const VerifyToken = require('../../../components/VerifyToken'); // TODO: turn into ts + import statement
+const VerifyToken = require('../../../components/VerifyToken');
 
 users.get('/self/me', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
-users.get(
-  '/self/minuteBanks',
-  VerifyToken,
-  makeJSONExpressCallback.consume(makeGetMinuteBankController)
-);
+// users.get(
+//   '/self/minuteBank',
+//   VerifyToken,
+//   makeJSONExpressCallback.consume(makeGetMinuteBankController)
+// );
 
 users.get('/:uId', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
 // make it cookieredirect...

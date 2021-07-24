@@ -26,6 +26,10 @@ const PackageTransactionSchema = createSchema({
   packageData: Type.object({ required: true }).of({}),
   hostedByData: Type.object({ required: true }).of({}),
   reservedByData: Type.object({ required: true }).of({}),
+  status: Type.string({
+    required: true,
+    enum: ['pending', 'confirmed', 'cancelled'],
+  }),
   lastUpdated: Type.date({ required: true }),
 });
 

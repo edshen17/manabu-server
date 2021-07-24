@@ -50,10 +50,8 @@ describe('getUserUsecase', () => {
         .endpointPath(endpointPath)
         .build();
       const getUserRes = await getUserUsecase.makeRequest(controllerData);
-      if ('user' in getUserRes!) {
-        const savedDbUser = getUserRes.user;
-        return savedDbUser;
-      }
+      const savedDbUser = getUserRes.user;
+      return savedDbUser;
     };
 
     const testUserViews = (savedDbUser: JoinedUserDoc, viewingAsRole: string) => {
@@ -98,39 +96,40 @@ describe('getUserUsecase', () => {
           context('viewing self', () => {
             it('should get the user and return a less restricted view', async () => {
               const savedDbUser = await getUser();
-              testUserViews(savedDbUser!, 'self');
+              testUserViews(savedDbUser, 'self');
             });
             it('should get the user and return a less restricted view on the self endpoint', async () => {
               let { params } = routeData;
               endpointPath = '/self/me';
               params = {};
               const savedDbUser = await getUser();
-              testUserViews(savedDbUser!, 'self');
+              testUserViews(savedDbUser, 'self');
             });
           });
           context('viewing other', () => {
             it('should get the user and return a restricted view', async () => {
-              const fakeUser = await fakeDbUserFactory.createFakeDbUser();
               currentAPIUser.userId = fakeUser._id;
               const savedDbUser = await getUser();
-              testUserViews(savedDbUser!, savedDbUser!.role);
+              testUserViews(savedDbUser, savedDbUser.role);
             });
           });
         });
         context('as an admin', () => {
           context('viewing other', () => {
             it('should get the user and return a less restricted view', async () => {
-              currentAPIUser.userId = fakeUser._id;
+              currentAPIUser.userId = fakeTeacher._id;
               currentAPIUser.role = 'admin';
               const savedDbUser = await getUser();
-              testUserViews(savedDbUser!, currentAPIUser.role);
+              testUserViews(savedDbUser, currentAPIUser.role);
             });
           });
         });
         context('as an unlogged-in user', async () => {
-          currentAPIUser = { role: 'user', userId: undefined };
-          const savedDbUser = await getUser();
-          testUserViews(savedDbUser!, currentAPIUser.role);
+          it('should get the user and return a restricted view', async () => {
+            currentAPIUser = { role: 'user', userId: undefined };
+            const savedDbUser = await getUser();
+            testUserViews(savedDbUser, currentAPIUser.role);
+          });
         });
       });
     });

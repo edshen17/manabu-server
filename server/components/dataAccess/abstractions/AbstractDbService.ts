@@ -19,8 +19,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.findOne(searchQuery, selectView).lean();
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
+    const dbQueryPromise = this._dbModel.findOne(searchQuery, modelView).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -37,11 +37,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     if (isSelf) {
       dbModelView = selfView;
     }
-
     if (isAdmin) {
       dbModelView = adminView;
     }
-
     if (isOverrideView) {
       dbModelView = overrideView;
     }
@@ -62,21 +60,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions,
     dbQueryPromise: Promise<any>
   ): Promise<any | Error> => {
-    try {
-      let dbQueryResult;
-      const { isProtectedResource, isCurrentAPIUserPermitted } = dbServiceAccessOptions;
-      const isAccessPermitted =
-        (isProtectedResource && isCurrentAPIUserPermitted) || !isProtectedResource;
-
-      if (isAccessPermitted) {
-        dbQueryResult = await dbQueryPromise;
-        return dbQueryResult;
-      } else {
-        throw new Error('Access denied.');
-      }
-    } catch (err) {
-      throw err;
+    let dbQueryResult;
+    const { isProtectedResource, isCurrentAPIUserPermitted } = dbServiceAccessOptions;
+    const isAccessPermitted =
+      (isProtectedResource && isCurrentAPIUserPermitted) || !isProtectedResource;
+    if (!isAccessPermitted) {
+      throw new Error('Access denied.');
     }
+    dbQueryResult = await dbQueryPromise;
+    return dbQueryResult;
   };
 
   public findById = async (dbServiceParams: {
@@ -84,8 +76,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.findById(_id, selectView).lean();
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
+    const dbQueryPromise = this._dbModel.findById(_id, modelView).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -98,8 +90,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.find(searchQuery, selectView).lean();
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
+    const dbQueryPromise = this._dbModel.find(searchQuery, modelView).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -112,10 +104,10 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
     const insertedModel = await this._dbModel.create(modelToInsert);
     // return findById result rather than insertedModel to ensure caller gets correct select view
-    const dbQueryPromise = this._dbModel.findById(insertedModel._id, selectView).lean();
+    const dbQueryPromise = this._dbModel.findById(insertedModel._id, modelView).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -128,8 +120,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.insertMany(modelToInsert, selectView, {
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
+    const dbQueryPromise = this._dbModel.insertMany(modelToInsert, modelView, {
       lean: true,
     });
     const dbQueryResult = await this._getDbQueryResult({
@@ -147,10 +139,10 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<DbDoc> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
       .findOneAndUpdate(searchQuery, updateQuery, {
-        fields: selectView,
+        fields: modelView,
         new: true,
       })
       .lean();
@@ -272,10 +264,10 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<DbDoc[]> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
       dbServiceParams;
-    const selectView = this._getDbModelView(dbServiceAccessOptions);
+    const modelView = this._getDbModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
       .updateMany(searchQuery, updateQuery, {
-        fields: selectView,
+        fields: modelView,
         new: true,
       })
       .lean();

@@ -45,6 +45,8 @@ class PackageTransactionDbService extends AbstractDbService<
   }): Promise<Promise<any>[]> => {
     const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
     const updatedLocationData = await this._getUpdatedLocationData(updatedDependeeDoc);
+    // TODO: separate out the promises so one updates only package transaction data and another
+    // updates only location data (if isPast, do not update locationData)
     const updateManyAppointmentPromise = this._getUpdateManyDependeePromise({
       searchQuery: { packageTransactionId: updatedDependeeDoc._id },
       updateQuery: {
