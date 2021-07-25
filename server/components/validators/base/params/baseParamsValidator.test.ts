@@ -43,7 +43,7 @@ describe('baseParamsValidator', () => {
       });
       it('should throw an error', () => {
         props.params = {
-          uId: 'some value',
+          userId: 'some value',
         };
         testInvalidInputs(props);
       });

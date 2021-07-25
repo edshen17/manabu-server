@@ -26,7 +26,7 @@ before(async () => {
 beforeEach(() => {
   routeData = {
     params: {
-      uId: fakeTeacher._id,
+      userId: fakeTeacher._id,
     },
     body: {},
     query: {},
@@ -102,7 +102,7 @@ describe('editUserUsecase', () => {
               const { body, params } = routeData;
               expect(updateeUser.profileBio).to.equal('');
               body.profileBio = 'new profile bio';
-              params.uId = updateeUser._id;
+              params.userId = updateeUser._id;
               currentAPIUser.userId = updaterUser._id;
               currentAPIUser.role = 'admin';
               const updatedUser = await editUser();
@@ -119,7 +119,7 @@ describe('editUserUsecase', () => {
         const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
         const { body, params } = routeData;
         body.profileBio = 'new profile bio';
-        params.uId = updateeUser._id;
+        params.userId = updateeUser._id;
         currentAPIUser.userId = updaterUser._id;
         try {
           const updatedUser = await editUser();

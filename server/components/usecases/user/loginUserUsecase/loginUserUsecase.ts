@@ -20,8 +20,8 @@ type OptionalLoginUserUsecaseInitParams = {
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
 enum SERVER_LOGIN_ENDPOINTS {
-  BASE_LOGIN = '/auth/login',
-  GOOGLE_LOGIN = '/auth/google',
+  BASE_LOGIN = '/base/login',
+  GOOGLE_LOGIN = '/google/login',
 }
 
 class LoginUserUsecase extends AbstractCreateUsecase<

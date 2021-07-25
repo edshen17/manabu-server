@@ -5,11 +5,10 @@ import { makeJSONExpressCallback } from '../../../components/webFrameworkCallbac
 const teachers = express.Router();
 const VerifyToken = require('../../../components/VerifyToken'); // TODO: turn into ts + import statement
 
-//teachers.get('/')
 teachers.put(
   '/:teacherId',
   VerifyToken,
   makeJSONExpressCallback.consume(makeEditTeacherController)
 );
 
-export default teachers;
+export { teachers };

@@ -27,7 +27,7 @@ describe('loginUserController', () => {
       };
       const fakeUser = await fakeDbUserFactory.createFakeDbData(fakeUserEntityData);
       const loginUserHttpRequest = iHttpRequestBuilder
-        .path('/auth/login')
+        .path('/base/login')
         .body(fakeUserEntityData)
         .build();
       const loginUserRes = await loginUserController.makeRequest(loginUserHttpRequest);

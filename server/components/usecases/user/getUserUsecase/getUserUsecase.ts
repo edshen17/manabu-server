@@ -22,7 +22,7 @@ class GetUserUsecase extends AbstractGetUsecase<
   ): Promise<GetUserUsecaseResponse> => {
     const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
     const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
-    const _id: string = isSelf ? currentAPIUser.userId : params.uId;
+    const _id: string = isSelf ? currentAPIUser.userId : params.userId;
     const user = await this._getUser({
       _id,
       dbServiceAccessOptions,

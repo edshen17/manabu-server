@@ -26,9 +26,9 @@ describe('getUserController', () => {
           role: fakeUser.role,
         })
         .params({
-          uId: fakeUser._id,
+          userId: fakeUser._id,
         })
-        .path('/self/me')
+        .path('/self')
         .build();
       const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
       expect(getUserRes.statusCode).to.equal(200);
@@ -46,7 +46,7 @@ describe('getUserController', () => {
           role: fakeUser.role,
         })
         .params({
-          uId: fakeOtherUser._id,
+          userId: fakeOtherUser._id,
         })
         .build();
       const getUserRes = await getUserController.makeRequest(getUserHttpRequest);
@@ -63,7 +63,7 @@ describe('getUserController', () => {
           role: 'user',
         })
         .params({
-          uId: undefined,
+          userId: undefined,
         })
         .build();
       const getUserRes = await getUserController.makeRequest(getUserHttpRequest);

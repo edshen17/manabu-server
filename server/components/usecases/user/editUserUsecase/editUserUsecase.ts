@@ -23,11 +23,11 @@ class EditUserUsecase extends AbstractEditUsecase<
   ): Promise<EditUserUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions } = props;
     const savedDbUser = await this._userDbService.findOneAndUpdate({
-      searchQuery: { _id: params.uId },
+      searchQuery: { _id: params.userId },
       updateQuery: body,
       dbServiceAccessOptions,
       dbDependencyUpdateParams: {
-        updatedDependeeSearchQuery: { _id: params.uId },
+        updatedDependeeSearchQuery: { _id: params.userId },
       },
     });
 

@@ -93,7 +93,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   }): boolean => {
     const { params, currentAPIUser, endpointPath } = props;
     const isSameUserId: boolean =
-      params.uId && currentAPIUser.userId && params.uId == currentAPIUser.userId;
+      params.userId && currentAPIUser.userId && params.userId == currentAPIUser.userId;
     const isSameTeacherId: boolean =
       params.teacherId && currentAPIUser.teacherId && params.teacherId == currentAPIUser.teacherId;
     const isSelfRoute = endpointPath.includes('self');

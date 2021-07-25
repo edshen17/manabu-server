@@ -11,7 +11,7 @@ before(() => {
   userParamsValidator = makeUserParamsValidator;
   props = {
     params: {
-      uId: '605bc5ad9db900001528f77c',
+      userId: '605bc5ad9db900001528f77c',
     },
   };
 });
@@ -46,7 +46,7 @@ describe('userParamsValidator', () => {
       });
       it('should throw an error', () => {
         props.params = {
-          uId: 'some value',
+          userId: 'some value',
         };
         testInvalidInputs(props);
       });

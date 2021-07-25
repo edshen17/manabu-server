@@ -33,7 +33,7 @@ describe('loginUserUsecase', () => {
             params: {},
             query: {},
           })
-          .endpointPath('/auth/login')
+          .endpointPath('/base/login')
           .build();
         const loginUserRes = await loginUserUsecase.makeRequest(buildLoginUserControllerData);
         if ('user' in loginUserRes) {

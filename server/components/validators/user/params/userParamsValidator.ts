@@ -3,7 +3,7 @@ import { AbstractParamsValidator } from '../../abstractions/AbstractParamsValida
 class UserParamsValidator extends AbstractParamsValidator {
   protected _initValidationSchemas = () => {
     this._paramsValidationSchema = this._joi.object().keys({
-      uId: this._joi
+      userId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       verificationToken: this._joi.string(),

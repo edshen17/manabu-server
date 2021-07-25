@@ -27,7 +27,7 @@ describe('editUserController', () => {
         })
         .body({ name: 'new name' })
         .params({
-          uId: fakeUser._id,
+          userId: fakeUser._id,
         })
         .build();
       const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
@@ -46,7 +46,7 @@ describe('editUserController', () => {
         })
         .body({ name: 'new name' })
         .params({
-          uId: fakeUpdatee._id,
+          userId: fakeUpdatee._id,
         })
         .build();
       const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
@@ -62,7 +62,7 @@ describe('editUserController', () => {
         })
         .body({ name: 'new name' })
         .params({
-          uId: fakeUpdatee._id,
+          userId: fakeUpdatee._id,
         })
         .build();
       const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
