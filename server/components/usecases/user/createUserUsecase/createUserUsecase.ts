@@ -12,10 +12,10 @@ import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase'
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { UserEntity } from '../../../entities/user/userEntity';
-import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
+import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
-import { TeacherEntity, TeacherEntityBuildResponse } from '../../../entities/teacher/teacherEntity';
+import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity } from '../../../entities/package/packageEntity';
 import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
 import { JoinedUserDoc } from '../../../../models/User';
@@ -35,7 +35,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   signJwt: any;
   emailHandler: EmailHandler;
-  makeRedirectPathBuilder: RedirectPathBuilder;
+  makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: any;
 };
 
@@ -52,7 +52,7 @@ type CookieData = {
 type CreateUserUsecaseResponse = {
   user: JoinedUserDoc;
   cookies: CookieData[];
-  redirectPath: string;
+  redirectUrl: string;
 };
 
 class CreateUserUsecase extends AbstractCreateUsecase<
@@ -70,7 +70,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _teacherBalanceDbService!: TeacherBalanceDbService;
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
-  private _redirectPathBuilder!: RedirectPathBuilder;
+  private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _convertStringToObjectId!: any;
 
   protected _makeRequestTemplate = async (
@@ -89,7 +89,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       this._sendInternalEmail(userInstance, isTeacherApp);
     }
     const cookies = this.splitLoginCookies(savedDbUser);
-    const redirectPath = this._redirectPathBuilder
+    const redirectUrl = this._redirectUrlBuilder
       .host('client')
       .endpointPath('/dashboard')
       .stringifyQueryStringObj(query)
@@ -97,7 +97,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const usecaseRes = {
       user: savedDbUser,
       cookies,
-      redirectPath,
+      redirectUrl,
     };
     return usecaseRes;
   };
@@ -287,7 +287,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makeTeacherBalanceDbService,
       signJwt,
       emailHandler,
-      makeRedirectPathBuilder,
+      makeRedirectUrlBuilder,
       convertStringToObjectId,
     } = optionalInitParams;
     this._userEntity = await makeUserEntity;
@@ -301,7 +301,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
-    this._redirectPathBuilder = makeRedirectPathBuilder;
+    this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;
   };
 }

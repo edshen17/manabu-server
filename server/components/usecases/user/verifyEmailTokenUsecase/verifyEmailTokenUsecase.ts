@@ -1,5 +1,5 @@
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
-import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
+import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
@@ -7,16 +7,16 @@ import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHtt
 
 type OptionalVerifyEmailTokenUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
-  makeRedirectPathBuilder: RedirectPathBuilder;
+  makeRedirectUrlBuilder: RedirectUrlBuilder;
 };
-type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectURI: string };
+type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectUrl: string };
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   OptionalVerifyEmailTokenUsecaseInitParams,
   VerifyEmailTokenUsecaseResponse
 > {
   private _userDbService!: UserDbService;
-  private _redirectPathBuilder!: RedirectPathBuilder;
+  private _redirectUrlBuilder!: RedirectUrlBuilder;
 
   protected _isSelf = (props: {
     params: any;
@@ -29,22 +29,22 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   protected _makeRequestTemplate = async (props: MakeRequestTemplateParams) => {
     const { dbServiceAccessOptions, params } = props;
     const { verificationToken } = params;
-    const user = await this._userDbService.findOne({
+    const savedDbUser = await this._userDbService.findOne({
       searchQuery: { verificationToken },
       dbServiceAccessOptions,
     });
-    if (user) {
+    if (savedDbUser) {
       const updatedDbUser = await this._userDbService.findOneAndUpdate({
-        searchQuery: { _id: user._id },
+        searchQuery: { _id: savedDbUser._id },
         updateQuery: { isEmailVerified: true },
         dbServiceAccessOptions,
       });
-      const redirectURI = this._redirectPathBuilder
+      const redirectUrl = this._redirectUrlBuilder
         .host('client')
         .endpointPath('/dashboard')
         .build();
       return {
-        redirectURI,
+        redirectUrl,
         user: updatedDbUser,
       };
     } else {
@@ -55,9 +55,9 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalVerifyEmailTokenUsecaseInitParams
   ): Promise<void> => {
-    const { makeUserDbService, makeRedirectPathBuilder } = optionalInitParams;
+    const { makeUserDbService, makeRedirectUrlBuilder } = optionalInitParams;
     this._userDbService = await makeUserDbService;
-    this._redirectPathBuilder = makeRedirectPathBuilder;
+    this._redirectUrlBuilder = makeRedirectUrlBuilder;
   };
 }
 

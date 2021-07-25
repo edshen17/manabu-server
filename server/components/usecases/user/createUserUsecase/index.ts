@@ -9,7 +9,7 @@ import { makeMinuteBankDbService } from '../../../dataAccess/services/minuteBank
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { emailHandler } from '../../utils/emailHandler/emailHandler';
 import { CreateUserUsecase } from './createUserUsecase';
-import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
+import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
 import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
 import { makeMinuteBankEntity } from '../../../entities/minuteBank';
@@ -34,7 +34,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeTeacherBalanceDbService,
   signJwt,
   emailHandler,
-  makeRedirectPathBuilder,
+  makeRedirectUrlBuilder,
   cloneDeep,
   makeParamsValidator: makeBaseParamsValidator,
   makeQueryValidator: makeUserQueryValidator,

@@ -1,6 +1,6 @@
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
-import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
+import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
@@ -15,7 +15,7 @@ type OptionalLoginUserUsecaseInitParams = {
   makeCreateUserUsecase: Promise<CreateUserUsecase>;
   oauth2Client: any;
   google: any;
-  makeRedirectPathBuilder: RedirectPathBuilder;
+  makeRedirectUrlBuilder: RedirectUrlBuilder;
 };
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
@@ -32,8 +32,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _createUserUsecase!: CreateUserUsecase;
   private _oauth2Client!: any;
   private _google!: any;
-  private _redirectPathBuilder!: RedirectPathBuilder;
-  private _CLIENT_DASHBOARD_URI!: string;
+  private _redirectUrlBuilder!: RedirectUrlBuilder;
+  private _CLIENT_DASHBOARD_URL!: string;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -122,7 +122,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     return {
       user: savedDbUser,
       cookies: this._createUserUsecase.splitLoginCookies(savedDbUser),
-      redirectPath: this._CLIENT_DASHBOARD_URI,
+      redirectUrl: this._CLIENT_DASHBOARD_URL,
     };
   };
 
@@ -146,7 +146,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       body.profilePicture = picture;
       const userRes = await this._createUserUsecase.makeRequest(controllerData);
       if ('user' in userRes) {
-        userRes.redirectPath = this._CLIENT_DASHBOARD_URI;
+        userRes.redirectUrl = this._CLIENT_DASHBOARD_URL;
       }
       return userRes;
     };
@@ -179,14 +179,14 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       makeCreateUserUsecase,
       oauth2Client,
       google,
-      makeRedirectPathBuilder,
+      makeRedirectUrlBuilder,
     } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._createUserUsecase = await makeCreateUserUsecase;
     this._oauth2Client = oauth2Client;
     this._google = google;
-    this._redirectPathBuilder = makeRedirectPathBuilder;
-    this._CLIENT_DASHBOARD_URI = this._redirectPathBuilder
+    this._redirectUrlBuilder = makeRedirectUrlBuilder;
+    this._CLIENT_DASHBOARD_URL = this._redirectUrlBuilder
       .host('client')
       .endpointPath('/dashboard')
       .build();

@@ -3,11 +3,11 @@ import { google } from 'googleapis';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeUserQueryValidator } from '../../../validators/user/query';
-import { makeRedirectPathBuilder } from '../../utils/redirectPathBuilder';
+import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { makeCreateUserUsecase } from '../createUserUsecase';
 import { LoginUserUsecase } from './loginUserUsecase';
 
-const oauthRedirectURI = makeRedirectPathBuilder
+const oauthRedirectURI = makeRedirectUrlBuilder
   .host('server')
   .endpointPath('/users/auth/google')
   .build();
@@ -23,7 +23,7 @@ const makeLoginUserUsecase = new LoginUserUsecase().init({
   makeCreateUserUsecase,
   oauth2Client,
   google,
-  makeRedirectPathBuilder,
+  makeRedirectUrlBuilder,
   cloneDeep,
   makeQueryValidator: makeUserQueryValidator,
   makeParamsValidator: makeBaseParamsValidator,

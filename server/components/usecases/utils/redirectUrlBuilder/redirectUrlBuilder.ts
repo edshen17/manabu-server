@@ -1,6 +1,6 @@
 import { QueryStringHandler } from '../queryStringHandler/queryStringHandler';
 
-class RedirectPathBuilder {
+class RedirectUrlBuilder {
   private _redirectExpressCallbackOptions!: {
     host: string;
     endpointPath: string;
@@ -74,4 +74,4 @@ class RedirectPathBuilder {
   };
 }
 
-export { RedirectPathBuilder };
+export { RedirectUrlBuilder };

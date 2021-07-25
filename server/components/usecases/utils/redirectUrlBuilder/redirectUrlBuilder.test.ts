@@ -1,11 +1,11 @@
 import { expect } from 'chai';
-import { makeRedirectPathBuilder } from '.';
-import { RedirectPathBuilder } from './redirectPathBuilder';
+import { makeRedirectUrlBuilder } from '.';
+import { RedirectUrlBuilder } from './redirectUrlBuilder';
 
-let redirectPathBuilder: RedirectPathBuilder;
+let redirectUrlBuilder: RedirectUrlBuilder;
 let defaultQueryStrings: {};
 before(() => {
-  redirectPathBuilder = makeRedirectPathBuilder;
+  redirectUrlBuilder = makeRedirectUrlBuilder;
 });
 
 beforeEach(() => {
@@ -15,31 +15,31 @@ beforeEach(() => {
   };
 });
 
-describe('redirectPathBuilder', () => {
+describe('redirectUrlBuilder', () => {
   describe('build', () => {
     context('given valid inputs', () => {
-      it('should build an empty redirectPath from no inputs', () => {
-        const redirectPath = redirectPathBuilder.build();
-        expect(redirectPath).to.equal('');
+      it('should build an empty redirectUrl from no inputs', () => {
+        const redirectUrl = redirectUrlBuilder.build();
+        expect(redirectUrl).to.equal('');
       });
       context('server redirect', () => {
         context('without query strings', () => {
           it('should redirect to the server', () => {
-            const redirectPath = redirectPathBuilder
+            const redirectUrl = redirectUrlBuilder
               .host('server')
               .endpointPath('/users/register')
               .build();
-            expect(redirectPath).to.equal('http://localhost:5000/api/users/register');
+            expect(redirectUrl).to.equal('http://localhost:5000/api/users/register');
           });
         });
         context('with query strings', () => {
           it('should redirect to the server', () => {
-            const redirectPath = redirectPathBuilder
+            const redirectUrl = redirectUrlBuilder
               .host('server')
               .endpointPath('/users/register')
               .encodeQueryStringObj(defaultQueryStrings)
               .build();
-            expect(redirectPath).to.equal(
+            expect(redirectUrl).to.equal(
               'http://localhost:5000/api/users/register?id=c29tZSBpZA%3D%3D&state=c29tZSBzdGF0ZQ%3D%3D'
             );
           });
@@ -48,21 +48,21 @@ describe('redirectPathBuilder', () => {
       context('client redirect', () => {
         context('without query strings', () => {
           it('should redirect to the client', () => {
-            const redirectPath = redirectPathBuilder
+            const redirectUrl = redirectUrlBuilder
               .host('client')
               .endpointPath('/dashboard')
               .build();
-            expect(redirectPath).to.equal('http://localhost:8080/dashboard');
+            expect(redirectUrl).to.equal('http://localhost:8080/dashboard');
           });
         });
         context('with query strings', () => {
           it('should redirect to the client', () => {
-            const redirectPath = redirectPathBuilder
+            const redirectUrl = redirectUrlBuilder
               .host('client')
               .endpointPath('/dashboard')
               .encodeQueryStringObj(defaultQueryStrings)
               .build();
-            expect(redirectPath).to.equal(
+            expect(redirectUrl).to.equal(
               'http://localhost:8080/dashboard?id=c29tZSBpZA%3D%3D&state=c29tZSBzdGF0ZQ%3D%3D'
             );
           });

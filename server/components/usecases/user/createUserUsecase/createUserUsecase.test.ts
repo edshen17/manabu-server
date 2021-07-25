@@ -69,16 +69,16 @@ describe('createUserUsecase', () => {
         const validResOutput = (createUserRes: CreateUserUsecaseResponse) => {
           expect(createUserRes).to.have.property('user');
           expect(createUserRes.user).to.not.equal(null);
-          expect(createUserRes).to.have.property('redirectPath');
-          expect(createUserRes.redirectPath).to.not.equal(null);
+          expect(createUserRes).to.have.property('redirectUrl');
+          expect(createUserRes.redirectUrl).to.not.equal(null);
           expect(createUserRes).to.have.property('cookies');
           expect(createUserRes.cookies).to.not.equal(null);
         };
-        it('should return a new user, auth cookies, and a redirect path', async () => {
+        it('should return a new user, auth cookies, and a redirect url', async () => {
           const createUserRes = await getUser();
           validResOutput(createUserRes);
         });
-        it('should return a joined user, auth cookies, and a redirect path', async () => {
+        it('should return a joined user, auth cookies, and a redirect url', async () => {
           const createUserRes = await getUser();
           const savedDbUser = createUserRes.user;
           expect(savedDbUser).to.have.property('settings');
