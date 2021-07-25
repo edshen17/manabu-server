@@ -198,9 +198,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { dbDependencyUpdateParams, dbServiceAccessOptions } = props;
-    const { updatedDependentSearchQuery } = dbDependencyUpdateParams;
+    const { updatedDependeeSearchQuery } = dbDependencyUpdateParams;
     const updatedDependeeDocs = await this.find({
-      searchQuery: updatedDependentSearchQuery,
+      searchQuery: updatedDependeeSearchQuery,
       dbServiceAccessOptions,
     });
     return updatedDependeeDocs;
@@ -212,7 +212,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<void> => {};
 
-  protected _getUpdateManyDependeePromises = async (props: {
+  protected _getUpdateManyDependentPromises = async (props: {
     updatedDependeeDoc: DbDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
@@ -220,29 +220,29 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return [];
   };
 
-  protected _getUpdateManyDependeePromise = (props: {
+  protected _getUpdateManyDependentPromise = (props: {
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
     searchQuery: {};
     updateQuery: {};
-    updatedDependentSearchQuery?: {};
+    updatedDependeeSearchQuery?: {};
   }) => {
     const {
       dependencyDbService,
       dbServiceAccessOptions,
       searchQuery,
       updateQuery,
-      updatedDependentSearchQuery,
+      updatedDependeeSearchQuery,
     } = props;
-    const updateDependeePromise = dependencyDbService.updateMany({
+    const updateDependentPromise = dependencyDbService.updateMany({
       searchQuery,
       updateQuery,
       dbServiceAccessOptions,
       dbDependencyUpdateParams: {
-        updatedDependentSearchQuery,
+        updatedDependeeSearchQuery,
       },
     });
-    return updateDependeePromise;
+    return updateDependentPromise;
   };
 
   protected _getBaseDbServiceAccessOptions = () => {

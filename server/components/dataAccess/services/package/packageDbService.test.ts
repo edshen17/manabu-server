@@ -169,7 +169,7 @@ describe('packageDbService', () => {
         updateQuery: { packageType: 'custom' },
         dbServiceAccessOptions,
         dbDependencyUpdateParams: {
-          updatedDependentSearchQuery: {
+          updatedDependeeSearchQuery: {
             _id: fakePackage._id,
           },
         },

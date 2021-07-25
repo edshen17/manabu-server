@@ -300,7 +300,7 @@ describe('userDbService', () => {
                 },
                 dbServiceAccessOptions,
                 dbDependencyUpdateParams: {
-                  updatedDependentSearchQuery: { _id: fakeTeacher._id },
+                  updatedDependeeSearchQuery: { _id: fakeTeacher._id },
                 },
               });
               expect(updatedTeacher.name).to.equal('updated name');

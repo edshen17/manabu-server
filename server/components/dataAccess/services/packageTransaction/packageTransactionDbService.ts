@@ -31,14 +31,14 @@ class PackageTransactionDbService extends AbstractDbService<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-    const updateAppointmentPromises = await this._getUpdateManyDependeePromises({
+    const updateAppointmentPromises = await this._getUpdateManyDependentPromises({
       ...getUpdateDependeePromisesProps,
       dependencyDbService: this._appointmentDbService,
     });
     updateDependentPromises.push(...updateAppointmentPromises);
   };
 
-  protected _getUpdateManyDependeePromises = async (props: {
+  protected _getUpdateManyDependentPromises = async (props: {
     updatedDependeeDoc: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
@@ -47,7 +47,7 @@ class PackageTransactionDbService extends AbstractDbService<
     const updatedLocationData = await this._getUpdatedLocationData(updatedDependeeDoc);
     // TODO: separate out the promises so one updates only package transaction data and another
     // updates only location data (if isPast, do not update locationData)
-    const updateManyAppointmentPromise = this._getUpdateManyDependeePromise({
+    const updateManyAppointmentPromise = this._getUpdateManyDependentPromise({
       searchQuery: { packageTransactionId: updatedDependeeDoc._id },
       updateQuery: {
         packageTransactionData: updatedDependeeDoc,

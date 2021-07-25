@@ -27,7 +27,7 @@ class EditUserUsecase extends AbstractEditUsecase<
       updateQuery: body,
       dbServiceAccessOptions,
       dbDependencyUpdateParams: {
-        updatedDependentSearchQuery: { _id: params.uId },
+        updatedDependeeSearchQuery: { _id: params.uId },
       },
     });
 

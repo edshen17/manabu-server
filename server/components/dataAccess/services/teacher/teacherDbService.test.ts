@@ -179,7 +179,7 @@ describe('teacherDbService', () => {
         updateQuery: { studentCount: 5 },
         dbServiceAccessOptions,
         dbDependencyUpdateParams: {
-          updatedDependentSearchQuery: {
+          updatedDependeeSearchQuery: {
             _id: fakeTeacher.teacherData!._id,
           },
         },

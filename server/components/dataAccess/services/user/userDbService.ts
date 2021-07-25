@@ -70,42 +70,42 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-    const updatePackageTransactionPromises = await this._getUpdateManyDependeePromises({
+    const updatePackageTransactionPromises = await this._getUpdateManyDependentPromises({
       ...getUpdateDependeePromisesProps,
       dependencyDbService: this._packageTransactionDbService,
     });
-    const updateMinuteBankPromises = await this._getUpdateManyDependeePromises({
+    const updateMinuteBankPromises = await this._getUpdateManyDependentPromises({
       ...getUpdateDependeePromisesProps,
       dependencyDbService: this._minuteBankDbService,
     });
     updateDependentPromises.push(...updatePackageTransactionPromises, ...updateMinuteBankPromises);
   };
 
-  protected _getUpdateManyDependeePromises = async (props: {
+  protected _getUpdateManyDependentPromises = async (props: {
     updatedDependeeDoc: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
   }): Promise<Promise<any>[]> => {
     const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    const updatedDependentHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
-    const updateManyDependeeHostedByPromise = this._getUpdateManyDependeePromise({
-      searchQuery: updatedDependentHostedBySearchQuery,
+    const updatedDependeeHostedBySearchQuery = { hostedById: updatedDependeeDoc._id };
+    const updateManyDependentHostedByPromise = this._getUpdateManyDependentPromise({
+      searchQuery: updatedDependeeHostedBySearchQuery,
       updateQuery: { hostedByData: updatedDependeeDoc },
       dbServiceAccessOptions,
       dependencyDbService,
-      updatedDependentSearchQuery: updatedDependentHostedBySearchQuery,
+      updatedDependeeSearchQuery: updatedDependeeHostedBySearchQuery,
     });
-    const updatedDependentReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
-    const updateManyDependeeReservedByPromise = this._getUpdateManyDependeePromise({
-      searchQuery: updatedDependentReservedBySearchQuery,
+    const updatedDependeeReservedBySearchQuery = { reservedById: updatedDependeeDoc._id };
+    const updateManyDependentReservedByPromise = this._getUpdateManyDependentPromise({
+      searchQuery: updatedDependeeReservedBySearchQuery,
       updateQuery: { reservedByData: updatedDependeeDoc },
       dbServiceAccessOptions,
       dependencyDbService,
-      updatedDependentSearchQuery: updatedDependentReservedBySearchQuery,
+      updatedDependeeSearchQuery: updatedDependeeReservedBySearchQuery,
     });
     const updateManyDependeePromises = [
-      updateManyDependeeHostedByPromise,
-      updateManyDependeeReservedByPromise,
+      updateManyDependentHostedByPromise,
+      updateManyDependentReservedByPromise,
     ];
     return updateManyDependeePromises;
   };

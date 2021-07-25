@@ -32,20 +32,20 @@ class PackageDbService extends AbstractEmbeddedDbService<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-    const updatePackageTransactionPromises = await this._getUpdateManyDependeePromises({
+    const updatePackageTransactionPromises = await this._getUpdateManyDependentPromises({
       ...getUpdateDependeePromisesProps,
       dependencyDbService: this._packageTransactionDbService,
     });
     updateDependentPromises.push(...updatePackageTransactionPromises);
   };
 
-  protected _getUpdateManyDependeePromises = async (props: {
+  protected _getUpdateManyDependentPromises = async (props: {
     updatedDependeeDoc: PackageDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     dependencyDbService: IDbService<any, any>;
   }): Promise<Promise<any>[]> => {
     const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    const updateManyAppointmentPromise = this._getUpdateManyDependeePromise({
+    const updateManyPackageTransactionPromise = this._getUpdateManyDependentPromise({
       searchQuery: { packageId: updatedDependeeDoc._id },
       updateQuery: {
         packageData: updatedDependeeDoc,
@@ -53,7 +53,7 @@ class PackageDbService extends AbstractEmbeddedDbService<
       dbServiceAccessOptions,
       dependencyDbService,
     });
-    return [updateManyAppointmentPromise];
+    return [updateManyPackageTransactionPromise];
   };
 
   protected _initTemplate = async (

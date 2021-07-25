@@ -32,7 +32,7 @@ class EditTeacherUsecase extends AbstractEditUsecase<
       updateQuery: body,
       dbServiceAccessOptions: dbServiceAccessOptionsCopy,
       dbDependencyUpdateParams: {
-        updatedDependentSearchQuery: {
+        updatedDependeeSearchQuery: {
           _id: params.teacherId,
         },
       },

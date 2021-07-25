@@ -231,15 +231,15 @@ abstract class AbstractEmbeddedDbService<
     dbDependencyUpdateParams?: DbDependencyUpdateParams
   ) => {
     if (dbDependencyUpdateParams) {
-      const { updatedDependentSearchQuery, embeddedUpdatedDependentSearchQuery } =
+      const { updatedDependeeSearchQuery, embeddedUpdatedDependeeSearchQuery } =
         dbDependencyUpdateParams;
-      const updatedDependentSearchQueryCopy = this._cloneDeep(updatedDependentSearchQuery);
-      if (!embeddedUpdatedDependentSearchQuery) {
-        dbDependencyUpdateParams.embeddedUpdatedDependentSearchQuery =
-          updatedDependentSearchQueryCopy;
+      const updatedDependeeSearchQueryCopy = this._cloneDeep(updatedDependeeSearchQuery);
+      if (!embeddedUpdatedDependeeSearchQuery) {
+        dbDependencyUpdateParams.embeddedUpdatedDependeeSearchQuery =
+          updatedDependeeSearchQueryCopy;
       }
-      dbDependencyUpdateParams.updatedDependentSearchQuery = this._convertToEmbeddedQuery(
-        updatedDependentSearchQuery
+      dbDependencyUpdateParams.updatedDependeeSearchQuery = this._convertToEmbeddedQuery(
+        updatedDependeeSearchQuery
       );
     }
     return dbDependencyUpdateParams;
@@ -314,17 +314,17 @@ abstract class AbstractEmbeddedDbService<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { dbDependencyUpdateParams, dbServiceAccessOptions } = props;
-    const { embeddedUpdatedDependentSearchQuery, updatedDependentSearchQuery } =
+    const { embeddedUpdatedDependeeSearchQuery, updatedDependeeSearchQuery } =
       dbDependencyUpdateParams;
     let updatedDependeeDocs: any[];
     if (!this._embeddedFieldData.childFieldName) {
       updatedDependeeDocs = await this.find({
-        searchQuery: embeddedUpdatedDependentSearchQuery,
+        searchQuery: embeddedUpdatedDependeeSearchQuery,
         dbServiceAccessOptions,
       });
     } else {
       updatedDependeeDocs = await this.find({
-        searchQuery: updatedDependentSearchQuery,
+        searchQuery: updatedDependeeSearchQuery,
         dbServiceAccessOptions,
       });
     }

@@ -28,8 +28,8 @@ type DbServiceAccessOptions = {
 };
 
 type DbDependencyUpdateParams = {
-  updatedDependentSearchQuery?: StringKeyObject;
-  embeddedUpdatedDependentSearchQuery?: StringKeyObject;
+  updatedDependeeSearchQuery?: StringKeyObject;
+  embeddedUpdatedDependeeSearchQuery?: StringKeyObject;
 };
 
 type DbModelViews = {
