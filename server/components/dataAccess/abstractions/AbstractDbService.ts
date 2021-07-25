@@ -166,12 +166,11 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   private _updateDbDependencyBrancher = async (
     dbDependencyUpdateParams: DbDependencyUpdateParams
   ): Promise<void> => {
-    const isUpdatingSync = process.env.NODE_ENV != 'production';
-    const isUpdatingAsync = process.env.NODE_ENV == 'production';
-    if (isUpdatingSync) {
-      await this._updateDbDependencies(dbDependencyUpdateParams);
-    } else if (isUpdatingAsync) {
+    const isProduction = process.env.NODE_ENV == 'production';
+    if (isProduction) {
       this._updateDbDependencies(dbDependencyUpdateParams);
+    } else {
+      await this._updateDbDependencies(dbDependencyUpdateParams);
     }
   };
 

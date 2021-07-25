@@ -29,7 +29,6 @@ describe('editUserController', () => {
         .params({
           uId: fakeUser._id,
         })
-        .path(`/user/${fakeUser._id}/updateProfile`)
         .build();
       const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
       expect(updateUserRes.statusCode).to.equal(200);
@@ -49,7 +48,6 @@ describe('editUserController', () => {
         .params({
           uId: fakeUpdatee._id,
         })
-        .path(`/user/${fakeUpdatee._id}/updateProfile`)
         .build();
       const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
       expect(updateUserRes.statusCode).to.equal(401);
@@ -66,7 +64,6 @@ describe('editUserController', () => {
         .params({
           uId: fakeUpdatee._id,
         })
-        .path(`/user/${fakeUpdatee._id}/updateProfile`)
         .build();
       const updateUserRes = await editUserController.makeRequest(editUserHttpRequest);
       expect(updateUserRes.statusCode).to.equal(200);

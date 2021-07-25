@@ -1,9 +1,7 @@
-import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectPathBuilder } from '../../utils/redirectPathBuilder/redirectPathBuilder';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData } from '../../abstractions/IUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
@@ -20,36 +18,12 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   private _userDbService!: UserDbService;
   private _redirectPathBuilder!: RedirectPathBuilder;
 
-  protected _isCurrentAPIUserPermitted = (props: {
+  protected _isSelf = (props: {
     params: any;
-    query?: any;
-    currentAPIUser: any;
+    currentAPIUser: CurrentAPIUser;
     endpointPath: string;
   }): boolean => {
     return true;
-  };
-
-  protected _getDbServiceAccessOptions = (props: {
-    currentAPIUser: CurrentAPIUser;
-    isCurrentAPIUserPermitted: boolean;
-    params: any;
-    endpointPath: string;
-  }) => {
-    const { isCurrentAPIUserPermitted, currentAPIUser } = props;
-    const dbServiceAccessOptions: DbServiceAccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted,
-      currentAPIUserRole: currentAPIUser.role,
-      isSelf: true,
-    };
-    return dbServiceAccessOptions;
-  };
-
-  protected _isValidRequest = (controllerData: ControllerData) => {
-    const { routeData } = controllerData;
-    const { params } = routeData;
-    const { verificationToken } = params;
-    return verificationToken;
   };
 
   protected _makeRequestTemplate = async (props: MakeRequestTemplateParams) => {
@@ -74,7 +48,7 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
         user: updatedDbUser,
       };
     } else {
-      throw new Error('Resource not found.');
+      throw new Error('User not found.');
     }
   };
 
