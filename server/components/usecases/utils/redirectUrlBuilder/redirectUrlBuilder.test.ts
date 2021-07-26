@@ -27,7 +27,7 @@ describe('redirectUrlBuilder', () => {
           it('should redirect to the server', () => {
             const redirectUrl = redirectUrlBuilder
               .host('server')
-              .endpointPath('/users/register')
+              .endpoint('/users/register')
               .build();
             expect(redirectUrl).to.equal('http://localhost:5000/api/users/register');
           });
@@ -36,7 +36,7 @@ describe('redirectUrlBuilder', () => {
           it('should redirect to the server', () => {
             const redirectUrl = redirectUrlBuilder
               .host('server')
-              .endpointPath('/users/register')
+              .endpoint('/users/register')
               .encodeQueryStringObj(defaultQueryStrings)
               .build();
             expect(redirectUrl).to.equal(
@@ -48,10 +48,7 @@ describe('redirectUrlBuilder', () => {
       context('client redirect', () => {
         context('without query strings', () => {
           it('should redirect to the client', () => {
-            const redirectUrl = redirectUrlBuilder
-              .host('client')
-              .endpointPath('/dashboard')
-              .build();
+            const redirectUrl = redirectUrlBuilder.host('client').endpoint('/dashboard').build();
             expect(redirectUrl).to.equal('http://localhost:8080/dashboard');
           });
         });
@@ -59,7 +56,7 @@ describe('redirectUrlBuilder', () => {
           it('should redirect to the client', () => {
             const redirectUrl = redirectUrlBuilder
               .host('client')
-              .endpointPath('/dashboard')
+              .endpoint('/dashboard')
               .encodeQueryStringObj(defaultQueryStrings)
               .build();
             expect(redirectUrl).to.equal(

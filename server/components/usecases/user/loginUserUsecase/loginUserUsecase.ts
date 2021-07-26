@@ -188,7 +188,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._CLIENT_DASHBOARD_URL = this._redirectUrlBuilder
       .host('client')
-      .endpointPath('/dashboard')
+      .endpoint('/dashboard')
       .build();
   };
 }

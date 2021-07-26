@@ -39,10 +39,7 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
         updateQuery: { isEmailVerified: true },
         dbServiceAccessOptions,
       });
-      const redirectUrl = this._redirectUrlBuilder
-        .host('client')
-        .endpointPath('/dashboard')
-        .build();
+      const redirectUrl = this._redirectUrlBuilder.host('client').endpoint('/dashboard').build();
       return {
         redirectUrl,
         user: updatedDbUser,

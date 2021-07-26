@@ -9,7 +9,7 @@ import { LoginUserUsecase } from './loginUserUsecase';
 
 const oauthRedirectURI = makeRedirectUrlBuilder
   .host('server')
-  .endpointPath('/users/auth/google')
+  .endpoint('/users/auth/google')
   .build();
 
 const oauth2Client = new google.auth.OAuth2(

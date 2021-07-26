@@ -4,9 +4,9 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import http from 'http';
 import helmet from 'helmet';
-import { api } from './routes/api/api';
 import hpp from 'hpp';
 import mongoSanitize from 'express-mongo-sanitize';
+import { v1 } from './routes/api';
 
 const app = express();
 const corsConfig = {
@@ -31,7 +31,7 @@ app.use(
 );
 app.use(compression());
 app.use(mongoSanitize());
-app.use('/api/', api);
+app.use('/api/', v1);
 
 if (process.env.NODE_ENV == 'production') {
   app.use((req: Request, res: Response, next: NextFunction) => {

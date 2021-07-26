@@ -14,7 +14,7 @@ const UserSchema = createSchema({
   password: Type.string({ required: false }),
   profileImageUrl: Type.string({ required: false }),
   profileBio: Type.string({ required: false }),
-  dateRegistered: Type.date({ default: Date.now }),
+  registrationDate: Type.date({ default: Date.now }),
   languages: Type.array({ required: true }).of({
     language: Type.string(),
     level: Type.string(),

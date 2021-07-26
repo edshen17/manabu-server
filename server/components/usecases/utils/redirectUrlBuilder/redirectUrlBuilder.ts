@@ -3,7 +3,7 @@ import { QueryStringHandler } from '../queryStringHandler/queryStringHandler';
 class RedirectUrlBuilder {
   private _redirectExpressCallbackOptions!: {
     host: string;
-    endpointPath: string;
+    endpoint: string;
     queryStrings: string;
   };
   private _queryStringHandler!: QueryStringHandler;
@@ -14,7 +14,7 @@ class RedirectUrlBuilder {
   private _setDefaultProperties = (): void => {
     this._redirectExpressCallbackOptions = {
       host: '',
-      endpointPath: '',
+      endpoint: '',
       queryStrings: '',
     };
   };
@@ -38,9 +38,9 @@ class RedirectUrlBuilder {
     return hostOptions[host][process.env.NODE_ENV!];
   };
 
-  // NOTE: endpointPath string should start with / (eg. /users/someUserId)
-  public endpointPath = (endpointPath: string): this => {
-    this._redirectExpressCallbackOptions.endpointPath = endpointPath;
+  // NOTE: endpoint string should start with / (eg. /users/someUserId)
+  public endpoint = (endpoint: string): this => {
+    this._redirectExpressCallbackOptions.endpoint = endpoint;
     return this;
   };
 
@@ -58,9 +58,9 @@ class RedirectUrlBuilder {
   };
 
   public build = (): string => {
-    const { host, endpointPath, queryStrings } = this._redirectExpressCallbackOptions || {};
+    const { host, endpoint, queryStrings } = this._redirectExpressCallbackOptions || {};
     this._setDefaultProperties();
-    let redirectPath = `${host}${endpointPath}`;
+    let redirectPath = `${host}${endpoint}`;
     if (queryStrings) {
       redirectPath = `${redirectPath}?${queryStrings}`;
     }

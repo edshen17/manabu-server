@@ -18,7 +18,7 @@ class UserEntityValidator extends AbstractEntityValidator {
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       profileBio: this._joi.string().htmlStrip().max(3000),
-      dateRegistered: this._joi.date().forbidden(),
+      registrationDate: this._joi.date().forbidden(),
       languages: this._joi.array().items({
         level: this._joi.string().max(5),
         language: this._joi.string().max(5),

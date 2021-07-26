@@ -33,7 +33,7 @@ type UserEntityBuildResponse = {
   password?: string;
   profileImageUrl: string;
   profileBio: string;
-  dateRegistered: Date;
+  registrationDate: Date;
   languages?: { level: string; language: string }[];
   region: string;
   timezone: string;
@@ -93,7 +93,7 @@ class UserEntity extends AbstractEntity<
       password: encryptedPassword,
       profileImageUrl: profileImageUrl || '',
       profileBio: '',
-      dateRegistered: new Date(),
+      registrationDate: new Date(),
       languages: [],
       region: '',
       timezone: '',

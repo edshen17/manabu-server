@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { makePackageDbService } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';

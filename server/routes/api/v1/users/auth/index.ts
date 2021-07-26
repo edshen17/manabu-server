@@ -1,11 +1,11 @@
 import express from 'express';
-import { makeLoginUserController } from '../../../../components/controllers/user/loginUserController';
-import { makeVerifyEmailTokenController } from '../../../../components/controllers/user/verifyEmailTokenController';
+import { makeLoginUserController } from '../../../../../components/controllers/user/loginUserController';
+import { makeVerifyEmailTokenController } from '../../../../../components/controllers/user/verifyEmailTokenController';
 import {
   makeCookieRedirectExpressCallback,
   makeRedirectExpressCallback,
-} from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
-const VerifyToken = require('../../../../components/VerifyToken');
+} from '../../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
+const VerifyToken = require('../../../../../components/VerifyToken');
 const auth = express.Router();
 
 auth.get(

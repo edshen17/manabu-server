@@ -91,7 +91,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const cookies = this.splitLoginCookies(savedDbUser);
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
-      .endpointPath('/dashboard')
+      .endpoint('/dashboard')
       .stringifyQueryStringObj(query)
       .build();
     const usecaseRes = {
