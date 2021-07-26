@@ -16,6 +16,6 @@ users.put('/:userId', VerifyToken, makeJSONExpressCallback.consume(makeEditUserC
 users.get('/self', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 
-users.use('/auth/', auth);
+users.use('/auth', auth);
 
 export { users };

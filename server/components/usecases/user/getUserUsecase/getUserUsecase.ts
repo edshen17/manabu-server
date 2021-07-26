@@ -13,10 +13,6 @@ class GetUserUsecase extends AbstractGetUsecase<
 > {
   private _userDbService!: UserDbService;
 
-  protected _isProtectedResource = () => {
-    return false;
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetUserUsecaseResponse> => {

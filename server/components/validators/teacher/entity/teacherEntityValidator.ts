@@ -26,6 +26,7 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       lastUpdated: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
+      approvalDate: this._joi.date().forbidden(),
       lessonCount: this._joi.number().forbidden(),
       studentCount: this._joi.number().forbidden(),
       lastUpdated: this._joi.date().forbidden(),
