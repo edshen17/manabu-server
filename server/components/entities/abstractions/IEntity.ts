@@ -11,11 +11,6 @@ type RequiredEntityInitParams = {
 
 interface IEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse> {
   build: (buildParams: EntityBuildParams) => Promise<EntityBuildResponse> | EntityBuildResponse;
-  getDbDataById?: (props: {
-    dbService: IDbService<any, any>;
-    _id: ObjectId;
-    overrideDbServiceAccessOptions?: DbServiceAccessOptions;
-  }) => Promise<any>;
   init: (initParams: EntityInitParams<OptionalEntityInitParams>) => Promise<this>;
 }
 

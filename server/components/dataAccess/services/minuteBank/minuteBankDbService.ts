@@ -14,8 +14,11 @@ class MinuteBankDbService extends AbstractDbService<
   private _userDbService!: UserDbService;
   constructor() {
     super();
-    this._dbModelViews = {
+    this._dbServiceModelViews = {
       defaultView: {},
+      adminView: {},
+      selfView: {},
+      overrideView: {},
     };
   }
 

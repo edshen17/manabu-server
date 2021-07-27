@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import 'dotenv/config';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-const mongod = new MongoMemoryServer();
 
+const mongod = new MongoMemoryServer();
 const makeDb = async (): Promise<mongoose.Mongoose | void> => {
   if (mongoose.connection.readyState != 1) {
     let dbHost: string = 'dev'; // change to users
@@ -10,7 +10,6 @@ const makeDb = async (): Promise<mongoose.Mongoose | void> => {
     if (process.env.NODE_ENV != 'production') {
       dbURI = await mongod.getUri();
     }
-
     return await mongoose.connect(dbURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

@@ -31,12 +31,19 @@ enum DB_SERVICE_JOIN_TYPE {
   LEFT_OUTER = 'left_outer',
 }
 
-type DbModelViews = {
+type DbServiceModelViews = {
   defaultView: {};
-  adminView?: {};
-  selfView?: {};
-  overrideView?: {};
+  adminView: {};
+  selfView: {};
+  overrideView: {};
 };
+
+enum DB_SERVICE_MODEL_VIEWS {
+  DEFAULT = 'default',
+  ADMIN = 'admin',
+  SELF = 'self',
+  OVERRIDE = 'override',
+}
 
 interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findById: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
@@ -49,14 +56,15 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   findOneAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
-  getDbModelViews: () => DbModelViews;
+  getDbServiceModelViews: () => DbServiceModelViews;
 }
 
 export {
   DbServiceAccessOptions,
   DbServiceParams,
   IDbService,
-  DbModelViews,
+  DbServiceModelViews,
   DbServiceInitParams,
   DB_SERVICE_JOIN_TYPE,
+  DB_SERVICE_MODEL_VIEWS,
 };

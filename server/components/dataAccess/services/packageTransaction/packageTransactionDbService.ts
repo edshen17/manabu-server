@@ -17,8 +17,11 @@ class PackageTransactionDbService extends AbstractDbService<
   private _packageDbService!: PackageDbService;
   constructor() {
     super();
-    this._dbModelViews = {
+    this._dbServiceModelViews = {
       defaultView: {},
+      adminView: {},
+      selfView: {},
+      overrideView: {},
     };
   }
 

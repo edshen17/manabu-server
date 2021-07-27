@@ -11,7 +11,7 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
 
   constructor() {
     super();
-    this._dbModelViews = {
+    this._dbServiceModelViews = {
       defaultView: {
         email: 0,
         password: 0,

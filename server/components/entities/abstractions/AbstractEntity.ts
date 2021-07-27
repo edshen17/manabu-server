@@ -1,6 +1,3 @@
-import { ObjectId } from 'mongoose';
-import { ExtractDoc } from 'ts-mongoose';
-import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import {
   AbstractEntityValidator,
   ENTITY_VALIDATOR_VALIDATE_MODES,
@@ -12,23 +9,6 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   implements IEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse>
 {
   protected _entityValidator!: AbstractEntityValidator;
-  protected _dbServiceAccessOptions: DbServiceAccessOptions = {
-    isProtectedResource: false,
-    isCurrentAPIUserPermitted: true,
-    isSelf: false,
-    currentAPIUserRole: 'user',
-  };
-
-  public getDbDataById = async (props: {
-    dbService: IDbService<any, any>;
-    _id: ObjectId;
-    overrideDbServiceAccessOptions?: DbServiceAccessOptions;
-  }): Promise<ExtractDoc<any>> => {
-    const { dbService, _id, overrideDbServiceAccessOptions } = props;
-    const dbServiceAccessOptions = overrideDbServiceAccessOptions || this._dbServiceAccessOptions;
-    const dbData = await dbService.findById({ _id, dbServiceAccessOptions });
-    return dbData;
-  };
 
   public build = (
     buildParams: EntityBuildParams

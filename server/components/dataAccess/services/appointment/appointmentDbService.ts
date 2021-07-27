@@ -14,8 +14,11 @@ class AppointmentDbService extends AbstractDbService<
   private _packageTransactionDbService!: PackageTransactionDbService;
   constructor() {
     super();
-    this._dbModelViews = {
+    this._dbServiceModelViews = {
       defaultView: {},
+      adminView: {},
+      selfView: {},
+      overrideView: {},
     };
   }
 

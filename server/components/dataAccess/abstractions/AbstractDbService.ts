@@ -1,19 +1,22 @@
 import { ObjectId } from 'mongoose';
 import {
   DbServiceAccessOptions,
-  DbModelViews,
+  DbServiceModelViews,
   IDbService,
   DbServiceInitParams,
   DB_SERVICE_JOIN_TYPE,
+  DB_SERVICE_MODEL_VIEWS,
 } from './IDbService';
+enum TTL_MS {
+  WEEK = 24 * 60 * 60 * 7 * 1000,
+}
 
 abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   implements IDbService<OptionalDbServiceInitParams, DbDoc>
 {
   protected _dbModel!: any;
-  protected _dbModelViews!: DbModelViews;
+  protected _dbServiceModelViews!: DbServiceModelViews;
   protected _cloneDeep!: any;
-  protected _updateDbDependencyMode?: string;
   protected _joinType: string = DB_SERVICE_JOIN_TYPE.NONE;
 
   public findOne = async (dbServiceParams: {
@@ -21,8 +24,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.findOne(searchQuery, modelView).lean();
+    const { view, viewName } = this._getDbServiceModelView(dbServiceAccessOptions);
+    const cacheKey = this._getCacheKey({ searchQuery, viewName });
+    const dbQueryPromise = this._dbModel.findOne(searchQuery, view).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -30,22 +34,33 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  protected _getDbModelView = (dbServiceAccessOptions: DbServiceAccessOptions): {} => {
+  protected _getDbServiceModelView = (
+    dbServiceAccessOptions: DbServiceAccessOptions
+  ): { view: {}; viewName: string } => {
     const { isSelf, currentAPIUserRole, isOverrideView } = dbServiceAccessOptions || {};
-    const { defaultView, selfView, adminView, overrideView } = this._dbModelViews;
+    const { defaultView, selfView, adminView, overrideView } = this._dbServiceModelViews;
     const isAdmin = currentAPIUserRole == 'admin';
-    let dbModelView: any = defaultView;
-
+    const dbServiceModelView: { view: {}; viewName: string } = {
+      view: defaultView,
+      viewName: DB_SERVICE_MODEL_VIEWS.DEFAULT,
+    };
     if (isSelf) {
-      dbModelView = selfView;
+      dbServiceModelView.view = selfView;
+      dbServiceModelView.viewName = DB_SERVICE_MODEL_VIEWS.SELF;
     }
     if (isAdmin) {
-      dbModelView = adminView;
+      dbServiceModelView.view = adminView;
+      dbServiceModelView.viewName = DB_SERVICE_MODEL_VIEWS.ADMIN;
     }
     if (isOverrideView) {
-      dbModelView = overrideView;
+      dbServiceModelView.view = overrideView;
+      dbServiceModelView.viewName = DB_SERVICE_MODEL_VIEWS.OVERRIDE;
     }
-    return dbModelView || defaultView;
+    if (!dbServiceModelView.view) {
+      dbServiceModelView.view = defaultView;
+      dbServiceModelView.viewName = DB_SERVICE_MODEL_VIEWS.DEFAULT;
+    }
+    return dbServiceModelView;
   };
 
   protected _getDbQueryResult = async (props: {
@@ -115,13 +130,31 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbData;
   };
 
+  private _getBaseDbServiceAccessOptions = () => {
+    const dbServiceAccessOptions = {
+      isProtectedResource: false,
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: 'user',
+      isSelf: false,
+    };
+    return dbServiceAccessOptions;
+  };
+
+  private _getCacheKey = (props: { searchQuery?: {}; viewName: string }): string => {
+    const { searchQuery, viewName } = props;
+    return `${JSON.stringify(searchQuery)}-${viewName}`;
+  };
+
+  private _clearCacheKey = (props: { searchQuery?: {} }): void => {};
+
   public findById = async (dbServiceParams: {
     _id?: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.findById(_id, modelView).lean();
+    const { view, viewName } = this._getDbServiceModelView(dbServiceAccessOptions);
+    const cacheKey = this._getCacheKey({ searchQuery: { _id }, viewName });
+    const dbQueryPromise = this._dbModel.findById(_id, view).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -134,8 +167,10 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.find(searchQuery, modelView).lean();
+    const { view, viewName } = this._getDbServiceModelView(dbServiceAccessOptions);
+    const cacheKey = this._getCacheKey({ searchQuery, viewName });
+    const dbQueryPromise = this._dbModel.find(searchQuery, view).lean();
+
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -148,14 +183,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
     const insertedModel = await this._dbModel.create(modelToInsert);
     // return findById result rather than insertedModel to ensure caller gets correct select view
-    const dbQueryPromise = this._dbModel.findById(insertedModel._id, modelView).lean();
-    const dbQueryResult = await this._getDbQueryResult({
-      dbServiceAccessOptions,
-      dbQueryPromise,
-    });
+    const dbQueryResult = this.findById({ _id: insertedModel._id, dbServiceAccessOptions });
     return dbQueryResult;
   };
 
@@ -164,8 +194,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel.insertMany(modelToInsert, modelView, {
+    const { view } = this._getDbServiceModelView(dbServiceAccessOptions);
+    const dbQueryPromise = this._dbModel.insertMany(modelToInsert, view, {
       lean: true,
     });
     const dbQueryResult = await this._getDbQueryResult({
@@ -181,10 +211,11 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
+    const { view } = this._getDbServiceModelView(dbServiceAccessOptions);
+    this._clearCacheKey({ searchQuery });
     const dbQueryPromise = this._dbModel
       .findOneAndUpdate(searchQuery, updateQuery, {
-        fields: modelView,
+        fields: view,
         new: true,
       })
       .lean();
@@ -195,26 +226,17 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  protected _getBaseDbServiceAccessOptions = () => {
-    const dbServiceAccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted: true,
-      currentAPIUserRole: 'user',
-      isSelf: false,
-    };
-    return dbServiceAccessOptions;
-  };
-
   public updateMany = async (dbServiceParams: {
     searchQuery?: {};
     updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
-    const modelView = this._getDbModelView(dbServiceAccessOptions);
+    const { view } = this._getDbServiceModelView(dbServiceAccessOptions);
+    this._clearCacheKey({ searchQuery });
     const dbQueryPromise = this._dbModel
       .updateMany(searchQuery, updateQuery, {
-        fields: modelView,
+        fields: view,
         new: true,
       })
       .lean();
@@ -230,6 +252,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
+    this._clearCacheKey({ searchQuery: { _id } });
     const dbQueryPromise = this._dbModel.findByIdAndDelete(_id).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -243,6 +266,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
+    this._clearCacheKey({ searchQuery });
     const dbQueryPromise = this._dbModel.findOneAndDelete(searchQuery).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -254,23 +278,23 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   public init = async (
     initParams: DbServiceInitParams<OptionalDbServiceInitParams>
   ): Promise<this> => {
-    const { makeDb, cloneDeep, dbModel, ...OptionalDbServiceInitParams } = initParams;
+    const { makeDb, cloneDeep, dbModel, ...optionalDbServiceInitParams } = initParams;
     await makeDb();
     this._cloneDeep = cloneDeep;
     this._dbModel = dbModel;
-    await this._initTemplate(OptionalDbServiceInitParams);
+    await this._initTemplate(optionalDbServiceInitParams);
     return this;
   };
 
   protected _initTemplate = async (
     optionalDbServiceInitParams: Omit<
-      { makeDb: any; dbModel: any; cloneDeep: any } & OptionalDbServiceInitParams,
-      'makeDb' | 'dbModel' | 'cloneDeep'
+      DbServiceInitParams<OptionalDbServiceInitParams>,
+      'makeDb' | 'cloneDeep' | 'dbModel'
     >
   ): Promise<void> => {};
 
-  public getDbModelViews = (): DbModelViews => {
-    const dbModelViewsCopy = this._cloneDeep(this._dbModelViews);
+  public getDbServiceModelViews = (): DbServiceModelViews => {
+    const dbModelViewsCopy = this._cloneDeep(this._dbServiceModelViews);
     return dbModelViewsCopy;
   };
 }
