@@ -178,11 +178,6 @@ describe('teacherDbService', () => {
         searchQuery: { _id: fakeTeacher.teacherData!._id },
         updateQuery: { studentCount: 5 },
         dbServiceAccessOptions,
-        dbDependencyUpdateParams: {
-          updatedDependeeSearchQuery: {
-            _id: fakeTeacher.teacherData!._id,
-          },
-        },
       });
       const findAppointment = await appointmentDbService.findOne({
         searchQuery: {

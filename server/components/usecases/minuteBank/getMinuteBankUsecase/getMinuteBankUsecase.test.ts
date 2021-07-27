@@ -47,10 +47,8 @@ describe('getMinuteBankUsecase', () => {
           .build();
         const minuteBankRes = await getMinuteBankUsecase.makeRequest(buildControllerData);
         expect(minuteBankRes).to.have.property('minuteBanks');
-        if ('minuteBanks' in minuteBankRes) {
-          expect(minuteBankRes.minuteBanks).to.be.an('array');
-          expect(minuteBankRes.minuteBanks.length > 0).to.equal(true);
-        }
+        expect(minuteBankRes.minuteBanks).to.be.an('array');
+        expect(minuteBankRes.minuteBanks.length > 0).to.equal(true);
       });
     });
     context('invalid inputs', () => {});

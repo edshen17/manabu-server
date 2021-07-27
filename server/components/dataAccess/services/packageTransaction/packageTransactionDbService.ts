@@ -1,19 +1,20 @@
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { AppointmentDbService } from '../appointment/appointmentDbService';
-import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
-import { LocationDataHandler } from '../../../entities/utils/locationDataHandler/locationDataHandler';
+import { PackageDbService } from '../package/packageDbService';
+import { UserDbService } from '../user/userDbService';
+import { DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
 
 type OptionalPackageTransactionDbServiceInitParams = {
-  makeAppointmentDbService: Promise<AppointmentDbService>;
-  makeLocationDataHandler: LocationDataHandler;
-  userModel: any;
+  makeUserDbService: Promise<UserDbService>;
+  makePackageDbService: Promise<PackageDbService>;
 };
 
 class PackageTransactionDbService extends AbstractDbService<
   OptionalPackageTransactionDbServiceInitParams,
   PackageTransactionDoc
 > {
+  private _userDbService!: UserDbService;
+  private _packageDbService!: PackageDbService;
   constructor() {
     super();
     this._dbModelViews = {
@@ -21,67 +22,30 @@ class PackageTransactionDbService extends AbstractDbService<
     };
   }
 
-  private _appointmentDbService!: AppointmentDbService;
-  private _locationDataHandler!: LocationDataHandler;
-  private _userModel!: any;
-
-  protected _updateDbDependenciesTemplate = async (props: {
-    updateDependentPromises: Promise<any>[];
-    updatedDependeeDoc: PackageTransactionDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }) => {
-    const { updateDependentPromises, ...getUpdateDependeePromisesProps } = props;
-    const updateAppointmentPromises = await this._getUpdateManyDependentPromises({
-      ...getUpdateDependeePromisesProps,
-      dependencyDbService: this._appointmentDbService,
-    });
-    updateDependentPromises.push(...updateAppointmentPromises);
-  };
-
-  protected _getUpdateManyDependentPromises = async (props: {
-    updatedDependeeDoc: PackageTransactionDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-    dependencyDbService: IDbService<any, any>;
-  }): Promise<Promise<any>[]> => {
-    const { updatedDependeeDoc, dbServiceAccessOptions, dependencyDbService } = props;
-    const updatedLocationData = await this._getUpdatedLocationData(updatedDependeeDoc);
-    // TODO: separate out the promises so one updates only package transaction data and another
-    // updates only location data (if isPast, do not update locationData)
-    const updateManyAppointmentPromise = this._getUpdateManyDependentPromise({
-      searchQuery: { packageTransactionId: updatedDependeeDoc._id },
-      updateQuery: {
-        packageTransactionData: updatedDependeeDoc,
-        locationData: updatedLocationData,
+  protected _getForeignKeyObj = (): {} => {
+    return {
+      hostedByData: {
+        dbService: this._userDbService,
+        foreignKeyName: 'hostedById',
       },
-      dbServiceAccessOptions,
-      dependencyDbService,
-    });
-    return [updateManyAppointmentPromise];
-  };
-
-  private _getUpdatedLocationData = async (updatedPackageTransaction: PackageTransactionDoc) => {
-    // use user model instead of userDbService to avoid circular dependency between user > packageTransaction
-    const overrideHostedByData = await this._userModel.findById(
-      updatedPackageTransaction.hostedById
-    );
-    const overrideReservedByData = await this._userModel.findById(
-      updatedPackageTransaction.reservedById
-    );
-    const updatedLocationData = this._locationDataHandler.getLocationData({
-      hostedByData: overrideHostedByData,
-      reservedByData: overrideReservedByData,
-    });
-    return updatedLocationData;
+      reservedByData: {
+        dbService: this._userDbService,
+        foreignKeyName: 'reservedById',
+      },
+      packageData: {
+        dbService: this._packageDbService,
+        foreignKeyName: 'packageId',
+      },
+    };
   };
 
   protected _initTemplate = async (
-    partialDbServiceInitParams: OptionalPackageTransactionDbServiceInitParams
+    optionalDbServiceInitParams: OptionalPackageTransactionDbServiceInitParams
   ) => {
-    const { makeAppointmentDbService, makeLocationDataHandler, userModel } =
-      partialDbServiceInitParams;
-    this._appointmentDbService = await makeAppointmentDbService;
-    this._locationDataHandler = makeLocationDataHandler;
-    this._userModel = userModel;
+    const { makeUserDbService, makePackageDbService } = optionalDbServiceInitParams;
+    this._userDbService = await makeUserDbService;
+    this._packageDbService = await makePackageDbService;
+    this._joinType = DB_SERVICE_JOIN_TYPE.LEFT_OUTER;
   };
 }
 

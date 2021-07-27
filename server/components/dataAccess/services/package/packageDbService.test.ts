@@ -167,11 +167,6 @@ describe('packageDbService', () => {
         searchQuery: { _id: fakePackage._id },
         updateQuery: { packageType: 'custom' },
         dbServiceAccessOptions,
-        dbDependencyUpdateParams: {
-          updatedDependeeSearchQuery: {
-            _id: fakePackage._id,
-          },
-        },
       });
       const updatedPackageTransaction = await packageTransactionDbService.findOne({
         searchQuery: { packageId: fakePackage._id },

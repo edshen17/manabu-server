@@ -50,9 +50,6 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       isTerminated: this._joi.boolean().forbidden(),
       terminationDate: this._joi.date().forbidden(),
       transactionDate: this._joi.date().forbidden(),
-      packageData: this._joi.object().forbidden(),
-      hostedByData: this._joi.object().forbidden(),
-      reservedByData: this._joi.object().forbidden(),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       lastUpdated: this._joi.date(),
     });

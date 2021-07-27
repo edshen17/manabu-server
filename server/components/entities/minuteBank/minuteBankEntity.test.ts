@@ -25,8 +25,6 @@ describe('minuteBank entity', () => {
         expect(fakeMinuteBank.hostedById).to.deep.equal(fakeHostedBy._id);
         expect(fakeMinuteBank.reservedById).to.deep.equal(fakeReservedBy._id);
         expect(fakeMinuteBank.minuteBank).to.equal(0);
-        expect(fakeMinuteBank.hostedByData).to.deep.equal(fakeHostedBy);
-        expect(fakeMinuteBank.reservedByData).to.deep.equal(fakeReservedBy);
       });
     });
     context('given invalid inputs', () => {

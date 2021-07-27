@@ -31,11 +31,6 @@ class EditTeacherUsecase extends AbstractEditUsecase<
       searchQuery: { _id: params.teacherId },
       updateQuery: body,
       dbServiceAccessOptions: dbServiceAccessOptionsCopy,
-      dbDependencyUpdateParams: {
-        updatedDependeeSearchQuery: {
-          _id: params.teacherId,
-        },
-      },
     });
     const usecaseRes = { user: savedDbTeacher };
     return usecaseRes;

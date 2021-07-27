@@ -10,7 +10,7 @@ type OptionalGetMinuteBankUsecaseInitParams = {
   makeMinuteBankDbService: Promise<MinuteBankDbService>;
 };
 
-type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] } | Error;
+type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] };
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<
   OptionalGetMinuteBankUsecaseInitParams,
@@ -21,17 +21,12 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetMinuteBankUsecaseResponse> => {
-    const { dbServiceAccessOptions, endpointPath, currentAPIUser } = props;
-    const isSelfEndpoint = endpointPath == '/self/minuteBanks';
-    if (isSelfEndpoint) {
-      const usecaseRes = await this._getSelfMinuteBanks({
-        currentAPIUser,
-        dbServiceAccessOptions,
-      });
-      return usecaseRes;
-    } else {
-      throw new Error('Access denied.');
-    }
+    const { dbServiceAccessOptions, currentAPIUser } = props;
+    const usecaseRes = await this._getSelfMinuteBanks({
+      currentAPIUser,
+      dbServiceAccessOptions,
+    });
+    return usecaseRes;
   };
 
   private _getSelfMinuteBanks = async (props: {

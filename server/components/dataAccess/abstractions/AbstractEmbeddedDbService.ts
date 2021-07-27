@@ -1,5 +1,5 @@
 import { AbstractDbService } from './AbstractDbService';
-import { DbDependencyUpdateParams, DbServiceAccessOptions, IDbService } from './IDbService';
+import { DbServiceAccessOptions, IDbService } from './IDbService';
 
 type AbstractEmbeddedDbServiceInitParams<OptionalDbServiceInitParams> = {
   makeParentDbService: Promise<IDbService<any, any>>;
@@ -175,28 +175,20 @@ abstract class AbstractEmbeddedDbService<
     searchQuery?: {};
     updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
-      dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
-    const embeddedDbDependencyUpdateParams =
-      this._configureDependencyUpdateParams(dbDependencyUpdateParams);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
-      dbDependencyUpdateParams: embeddedDbDependencyUpdateParams,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
-    });
-    await this._updateDbDependencyHandler({
-      dbDependencyUpdateParams,
     });
     return dbQueryResult;
   };
@@ -227,62 +219,36 @@ abstract class AbstractEmbeddedDbService<
     }
   };
 
-  private _configureDependencyUpdateParams = (
-    dbDependencyUpdateParams?: DbDependencyUpdateParams
-  ) => {
-    if (dbDependencyUpdateParams) {
-      const { updatedDependeeSearchQuery, embeddedUpdatedDependeeSearchQuery } =
-        dbDependencyUpdateParams;
-      const updatedDependeeSearchQueryCopy = this._cloneDeep(updatedDependeeSearchQuery);
-      if (!embeddedUpdatedDependeeSearchQuery) {
-        dbDependencyUpdateParams.embeddedUpdatedDependeeSearchQuery =
-          updatedDependeeSearchQueryCopy;
-      }
-      dbDependencyUpdateParams.updatedDependeeSearchQuery = this._convertToEmbeddedQuery(
-        updatedDependeeSearchQuery
-      );
-    }
-    return dbDependencyUpdateParams;
-  };
-
   public updateMany = async (dbServiceParams: {
     searchQuery?: {};
     updateQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, dbDependencyUpdateParams } =
-      dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
-    const embeddedDbDependencyUpdateParams =
-      this._configureDependencyUpdateParams(dbDependencyUpdateParams);
     const dbQueryPromise = this._parentDbService.updateMany({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
-      dbDependencyUpdateParams: embeddedDbDependencyUpdateParams,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
       searchQuery,
     });
-    await this._updateDbDependencyHandler({ dbDependencyUpdateParams });
     return dbQueryResult;
   };
 
   public findByIdAndDelete = async (dbServiceParams: {
     _id?: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc> => {
-    const { _id, dbServiceAccessOptions, dbDependencyUpdateParams } = dbServiceParams;
+    const { _id, dbServiceAccessOptions } = dbServiceParams;
     const dbQueryResult = await this.findOneAndDelete({
       searchQuery: { _id },
       dbServiceAccessOptions,
-      dbDependencyUpdateParams,
     });
     return dbQueryResult;
   };
@@ -290,16 +256,14 @@ abstract class AbstractEmbeddedDbService<
   public findOneAndDelete = async (dbServiceParams: {
     searchQuery?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
-    dbDependencyUpdateParams?: DbDependencyUpdateParams;
   }): Promise<DbDoc> => {
-    const { searchQuery, dbServiceAccessOptions, dbDependencyUpdateParams } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const updateQuery = this._configureDeleteUpdateQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery,
       dbServiceAccessOptions,
-      dbDependencyUpdateParams,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -307,28 +271,6 @@ abstract class AbstractEmbeddedDbService<
       searchQuery,
     });
     return dbQueryResult;
-  };
-
-  protected _getUpdatedDependeeDocs = async (props: {
-    dbDependencyUpdateParams: DbDependencyUpdateParams;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }) => {
-    const { dbDependencyUpdateParams, dbServiceAccessOptions } = props;
-    const { embeddedUpdatedDependeeSearchQuery, updatedDependeeSearchQuery } =
-      dbDependencyUpdateParams;
-    let updatedDependeeDocs: any[];
-    if (!this._embeddedFieldData.childFieldName) {
-      updatedDependeeDocs = await this.find({
-        searchQuery: embeddedUpdatedDependeeSearchQuery,
-        dbServiceAccessOptions,
-      });
-    } else {
-      updatedDependeeDocs = await this.find({
-        searchQuery: updatedDependeeSearchQuery,
-        dbServiceAccessOptions,
-      });
-    }
-    return updatedDependeeDocs;
   };
 
   private _configureDeleteUpdateQuery = (searchQuery?: StringKeyObject) => {

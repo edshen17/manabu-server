@@ -1,14 +1,8 @@
 import { ObjectId } from 'mongoose';
-import { PackageDoc } from '../../../models/Package';
-import { JoinedUserDoc } from '../../../models/User';
-import { PackageDbService } from '../../dataAccess/services/package/packageDbService';
-import { UserDbService } from '../../dataAccess/services/user/userDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type OptionalPackageTransactionEntityInitParams = {
-  makeUserDbService: Promise<UserDbService>;
-  makePackageDbService: Promise<PackageDbService>;
   dayjs: any;
 };
 
@@ -40,9 +34,6 @@ type PackageTransactionEntityBuildResponse = {
   transactionDate: Date;
   remainingReschedules: number;
   isTerminated: boolean;
-  packageData: PackageDoc;
-  hostedByData: JoinedUserDoc;
-  reservedByData: JoinedUserDoc;
   paymentData: PaymentData;
   status: string;
   lastUpdated: Date;
@@ -53,8 +44,6 @@ class PackageTransactionEntity extends AbstractEntity<
   PackageTransactionEntityBuildParams,
   PackageTransactionEntityBuildResponse
 > {
-  private _userDbService!: UserDbService;
-  private _packageDbService!: PackageDbService;
   private _dayjs!: any;
 
   protected _buildTemplate = async (
@@ -71,21 +60,7 @@ class PackageTransactionEntity extends AbstractEntity<
       isSubscription,
       paymentData,
     } = buildParams;
-    const packageData =
-      (await this.getDbDataById({
-        dbService: this._packageDbService,
-        _id: packageId,
-      })) || {};
-    const hostedByData =
-      (await this.getDbDataById({
-        dbService: this._userDbService,
-        _id: hostedById,
-      })) || {};
-    const reservedByData =
-      (await this.getDbDataById({
-        dbService: this._userDbService,
-        _id: reservedById,
-      })) || {};
+
     const packageTransactionEntity = Object.freeze({
       hostedById,
       reservedById,
@@ -100,9 +75,6 @@ class PackageTransactionEntity extends AbstractEntity<
       lessonLanguage,
       isSubscription,
       paymentData,
-      packageData,
-      hostedByData,
-      reservedByData,
       status: 'confirmed',
       lastUpdated: new Date(),
     });
@@ -117,9 +89,7 @@ class PackageTransactionEntity extends AbstractEntity<
       'makeEntityValidator'
     >
   ): Promise<void> => {
-    const { makeUserDbService, makePackageDbService, dayjs } = optionalInitParams;
-    this._userDbService = await makeUserDbService;
-    this._packageDbService = await makePackageDbService;
+    const { dayjs } = optionalInitParams;
     this._dayjs = dayjs;
   };
 }

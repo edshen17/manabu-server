@@ -15,7 +15,6 @@ type DbServiceParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: StringKeyObject;
   updateQuery?: StringKeyObject;
-  dbDependencyUpdateParams?: DbDependencyUpdateParams;
 };
 
 type DbServiceAccessOptions = {
@@ -27,10 +26,10 @@ type DbServiceAccessOptions = {
   isReturningParent?: boolean;
 };
 
-type DbDependencyUpdateParams = {
-  updatedDependeeSearchQuery?: StringKeyObject;
-  embeddedUpdatedDependeeSearchQuery?: StringKeyObject;
-};
+enum DB_SERVICE_JOIN_TYPE {
+  NONE = 'none',
+  LEFT_OUTER = 'left_outer',
+}
 
 type DbModelViews = {
   defaultView: {};
@@ -58,6 +57,6 @@ export {
   DbServiceParams,
   IDbService,
   DbModelViews,
-  DbDependencyUpdateParams,
   DbServiceInitParams,
+  DB_SERVICE_JOIN_TYPE,
 };

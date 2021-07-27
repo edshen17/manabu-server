@@ -29,11 +29,6 @@ context('packageTransaction entity', () => {
         });
         expect(fakePackageTransaction.lessonLanguage).to.equal('ja');
         expect(fakePackageTransaction.isSubscription).to.equal(false);
-        expect(fakePackageTransaction.packageData).to.deep.equal(
-          fakeTeacher.teacherData!.packages[0]
-        );
-        expect(fakePackageTransaction.hostedByData).to.deep.equal(fakeTeacher);
-        expect(fakePackageTransaction.reservedByData).to.deep.equal(fakeTeacher);
       });
     });
     context('given invalid inputs', () => {

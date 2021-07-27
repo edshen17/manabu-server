@@ -299,17 +299,10 @@ describe('userDbService', () => {
                   },
                 },
                 dbServiceAccessOptions,
-                dbDependencyUpdateParams: {
-                  updatedDependeeSearchQuery: { _id: fakeTeacher._id },
-                },
               });
               expect(updatedTeacher.name).to.equal('updated name');
               const updatedPackageTransaction = await packageTransactionDbService.findOne({
                 searchQuery: { hostedById: fakeTeacher._id },
-                dbServiceAccessOptions,
-              });
-              const updatedAppointment = await appointmentDbService.findOne({
-                searchQuery: { packageTransactionId: updatedPackageTransaction._id },
                 dbServiceAccessOptions,
               });
               const updatedMinuteBank = await minuteBankDbService.findOne({
@@ -323,10 +316,6 @@ describe('userDbService', () => {
               expect(packageTransactionHostedByData.teacherData).to.not.have.property(
                 'licensePathUrl'
               );
-              expect(updatedAppointment.packageTransactionData.hostedByData.name).to.equal(
-                updatedTeacher.name
-              );
-              expect(updatedAppointment.locationData.locationName).to.equal('alternative');
               expect(updatedMinuteBank.hostedByData.name).to.equal(updatedTeacher.name);
               expect(updatedMinuteBank.hostedByData).to.not.have.property('contactMethods');
             });

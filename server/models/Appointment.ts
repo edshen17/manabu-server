@@ -17,15 +17,6 @@ const AppointmentSchema = createSchema({
     enum: ['pending', 'confirmed', 'cancelled'],
   }),
   cancellationReason: Type.string({ required: false }),
-  packageTransactionData: Type.object({ required: true }).of({}),
-  locationData: Type.object({ required: true }).of({
-    locationName: Type.string({ required: true }),
-    locationType: Type.string({ required: true }),
-    matchedContactMethod: Type.object().of({
-      hostedByContactMethod: UserContactMethodEmbed,
-      reservedByContactMethod: UserContactMethodEmbed,
-    }),
-  }),
   lastUpdated: Type.date({ required: true }),
 });
 

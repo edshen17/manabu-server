@@ -21,8 +21,6 @@ class MinuteBankEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
       minuteBank: this._joi.number().forbidden(),
-      hostedByData: this._joi.object().forbidden(),
-      reservedByData: this._joi.object().forbidden(),
       lastUpdated: this._joi.date(),
     });
     this._adminValidationSchema = this._editValidationSchema;

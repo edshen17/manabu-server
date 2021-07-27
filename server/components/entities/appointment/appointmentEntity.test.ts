@@ -42,10 +42,6 @@ describe('appointmentEntity', () => {
         });
         expect(fakeAppointment.hostedById).to.equal(fakeHostedBy._id);
         expect(fakeAppointment.reservedById).to.equal(fakeReservedBy._id);
-        expect(fakeAppointment.packageTransactionData).to.have.property('hostedByData');
-        expect(fakeAppointment.packageTransactionData).to.have.property('reservedByData');
-        expect(fakeAppointment).to.have.property('packageTransactionData');
-        expect(fakeAppointment).to.have.property('locationData');
       });
     });
     context('invalid inputs', () => {

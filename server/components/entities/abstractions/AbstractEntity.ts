@@ -12,7 +12,6 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   implements IEntity<OptionalEntityInitParams, EntityBuildParams, EntityBuildResponse>
 {
   protected _entityValidator!: AbstractEntityValidator;
-
   protected _dbServiceAccessOptions: DbServiceAccessOptions = {
     isProtectedResource: false,
     isCurrentAPIUserPermitted: true,

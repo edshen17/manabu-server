@@ -169,11 +169,6 @@ describe('packageTransactionDbService', () => {
         searchQuery: { _id: fakePackageTransaction._id },
         updateQuery: { lessonLanguage: 'en' },
         dbServiceAccessOptions,
-        dbDependencyUpdateParams: {
-          updatedDependeeSearchQuery: {
-            _id: fakePackageTransaction._id,
-          },
-        },
       });
       const updatedAppointment = await appointmentDbService.findOne({
         searchQuery: { packageTransactionId: updatedPackageTransaction._id },
