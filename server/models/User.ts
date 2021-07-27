@@ -1,3 +1,4 @@
+import mongooseUniqueValidator from 'mongoose-unique-validator';
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { TeacherSchema } from './Teacher';
 
@@ -38,6 +39,8 @@ const UserSchema = createSchema({
   lastUpdated: Type.date({ required: true }),
   teacherData: Type.schema({ required: false }).of(TeacherSchema),
 });
+
+UserSchema.plugin(mongooseUniqueValidator);
 
 const User = typedModel('User', UserSchema);
 type JoinedUserDoc = ExtractDoc<typeof UserSchema>;

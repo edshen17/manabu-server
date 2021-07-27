@@ -1,5 +1,5 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { UserContactMethodEmbed, UserSchema } from './User';
+import { UserSchema } from './User';
 import { PackageTransactionDoc, PackageTransactionSchema } from './PackageTransaction';
 
 const AppointmentSchema = createSchema({
