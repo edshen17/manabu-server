@@ -36,6 +36,10 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });
+    const dbQueryPromise2 = await this._parentDbService.findOne({
+      searchQuery: embeddedSearchQuery,
+      dbServiceAccessOptions,
+    });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
@@ -126,6 +130,10 @@ abstract class AbstractEmbeddedDbService<
     const searchQuery = { _id };
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOne({
+      searchQuery: embeddedSearchQuery,
+      dbServiceAccessOptions,
+    });
+    const dbQueryPromise2 = await this._parentDbService.findOne({
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
     });

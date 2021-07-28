@@ -1,4 +1,6 @@
-import { createNodeRedisClient } from 'handy-redis';
+import cloneDeep from 'clone-deep';
+import Redis from 'ioredis';
+import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CacheDbService } from './cacheDbService';
 
 let clientOptions: {} = {
@@ -13,8 +15,12 @@ if (process.env.NODE_ENV != 'production') {
   };
 }
 
-const redisClient = createNodeRedisClient(clientOptions);
+const redisClient = new Redis(clientOptions);
 
-const makeCacheDbService = new CacheDbService().init({ redisClient });
+const makeCacheDbService = new CacheDbService().init({
+  redisClient,
+  convertStringToObjectId,
+  cloneDeep,
+});
 
 export { makeCacheDbService };
