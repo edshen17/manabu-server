@@ -6,39 +6,50 @@ class CacheDbService {
   private _redisClient!: any;
   private _convertStringToObjectId!: any;
   private _cloneDeep!: any;
+  private _dayjs!: any;
 
   public get = async (key: string): Promise<any> => {
     const value = await this._redisClient.get(key);
     let storedValue;
     try {
       const parsedValueCopy = this._cloneDeep(JSON.parse(value));
-      storedValue = this._convertIds(parsedValueCopy);
+      storedValue = this._processRedisObj(parsedValueCopy);
     } catch (err) {
       storedValue = value;
     }
     return storedValue;
   };
 
-  private _convertIds = (obj: StringKeyObject): StringKeyObject => {
+  // need to process redis object because searching embedded documents by their _ids do not seem to work and dates are strings
+  private _processRedisObj = (obj: StringKeyObject): StringKeyObject => {
     for (const property in obj) {
       const value = obj[property];
       const isObject = !!value && value.constructor === Object;
       const isArray = Array.isArray(value);
       if (isObject) {
-        this._convertIds(value);
+        this._processRedisObj(value);
       } else if (isArray) {
         obj[property] = value.map((embeddedObj: any) => {
-          return this._convertIds(embeddedObj);
+          return this._processRedisObj(embeddedObj);
         });
       } else {
         const endsWithIdRegex = /id$/i;
         const isObjectId = property.match(endsWithIdRegex) && value.length === 24;
+        const isDateStr = this._isDateStr(value);
         if (isObjectId) {
           obj[property] = this._convertStringToObjectId(obj[property]);
+        } else if (isDateStr) {
+          obj[property] = new Date(value);
         }
       }
     }
     return obj;
+  };
+
+  private _isDateStr = (value: any): boolean => {
+    const isStr = typeof value === 'string';
+    const isDate = isStr && this._dayjs(value, 'YYYY-MM-DDTHH:mm:ss', true).isValid();
+    return isDate;
   };
 
   public set = async (props: {
@@ -64,11 +75,13 @@ class CacheDbService {
     redisClient: any;
     convertStringToObjectId: any;
     cloneDeep: any;
+    dayjs: any;
   }): Promise<this> => {
-    const { redisClient, convertStringToObjectId, cloneDeep } = initParams;
+    const { redisClient, convertStringToObjectId, cloneDeep, dayjs } = initParams;
     this._redisClient = redisClient;
     this._convertStringToObjectId = convertStringToObjectId;
     this._cloneDeep = cloneDeep;
+    this._dayjs = dayjs;
     return this;
   };
 }

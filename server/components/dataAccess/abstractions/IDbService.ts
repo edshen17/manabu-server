@@ -40,11 +40,17 @@ type DbServiceModelViews = {
   overrideView: {};
 };
 
-enum DB_SERVICE_MODEL_VIEWS {
+enum DB_SERVICE_MODEL_VIEW {
   DEFAULT = 'default',
   ADMIN = 'admin',
   SELF = 'self',
   OVERRIDE = 'override',
+}
+
+enum DB_SERVICE_CACHE_CLIENT {
+  FIND = 'find',
+  FIND_ONE = 'find_one',
+  FIND_BY_ID = 'find_by_id',
 }
 
 interface IDbService<OptionalDbServiceInitParams, DbDoc> {
@@ -68,5 +74,6 @@ export {
   DbServiceModelViews,
   DbServiceInitParams,
   DB_SERVICE_JOIN_TYPE,
-  DB_SERVICE_MODEL_VIEWS,
+  DB_SERVICE_MODEL_VIEW,
+  DB_SERVICE_CACHE_CLIENT,
 };

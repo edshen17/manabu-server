@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongoose';
-import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import { AbstractEntityValidator } from '../../validators/abstractions/AbstractEntityValidator';
 
 type EntityInitParams<OptionalEntityInitParams> = RequiredEntityInitParams &

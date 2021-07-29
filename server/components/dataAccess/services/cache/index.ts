@@ -1,4 +1,5 @@
 import cloneDeep from 'clone-deep';
+import dayjs from 'dayjs';
 import Redis from 'ioredis';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CacheDbService } from './cacheDbService';
@@ -21,6 +22,7 @@ const makeCacheDbService = new CacheDbService().init({
   redisClient,
   convertStringToObjectId,
   cloneDeep,
+  dayjs,
 });
 
 export { makeCacheDbService };
