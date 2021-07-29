@@ -49,7 +49,7 @@ class CacheDbService {
 
   private _isDateStr = (value: any): boolean => {
     const isStr = typeof value === 'string';
-    const isDate = isStr && this._dayjs(value, 'YYYY-MM-DDTHH:mm:ss', true).isValid();
+    const isDate = isStr && this._dayjs(value, this._dayjs.ISO_8601, true).isValid();
     return isDate;
   };
 

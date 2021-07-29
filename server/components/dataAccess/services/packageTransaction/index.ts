@@ -5,6 +5,7 @@ import cloneDeep from 'clone-deep';
 import { makeUserDbService } from '../user';
 import { makePackageDbService } from '../package';
 import { makeCacheDbService } from '../cache';
+import { makeLocationDataHandler } from '../../../entities/utils/locationDataHandler';
 
 const makePackageTransactionDbService = new PackageTransactionDbService().init({
   makeDb,
@@ -13,6 +14,7 @@ const makePackageTransactionDbService = new PackageTransactionDbService().init({
   makeUserDbService,
   makePackageDbService,
   makeCacheDbService,
+  makeLocationDataHandler,
 });
 
 export { makePackageTransactionDbService };

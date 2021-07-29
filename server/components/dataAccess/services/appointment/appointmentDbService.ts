@@ -1,6 +1,6 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import { DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
 import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 
 type OptionalAppointmentDbServiceInitParams = {
@@ -12,22 +12,20 @@ class AppointmentDbService extends AbstractDbService<
   AppointmentDoc
 > {
   private _packageTransactionDbService!: PackageTransactionDbService;
-  constructor() {
-    super();
-    this._dbServiceModelViews = {
-      defaultView: {},
-      adminView: {},
-      selfView: {},
-      overrideView: {},
-    };
-  }
 
-  protected _getForeignKeyObj = (): {} => {
+  protected _getComputedProps = async (props: {
+    dbDoc: any;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<StringKeyObject> => {
+    const { dbDoc, dbServiceAccessOptions } = props;
+    const packageTransactionId = dbDoc['packageTransactionId'];
+    const packageTransactionData = await this._getDbDataById({
+      dbService: this._packageTransactionDbService,
+      dbServiceAccessOptions,
+      _id: packageTransactionId,
+    });
     return {
-      packageTransactionData: {
-        dbService: this._packageTransactionDbService,
-        foreignKeyName: 'packageTransactionId',
-      },
+      packageTransactionData,
     };
   };
 

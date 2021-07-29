@@ -1,7 +1,7 @@
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { UserDbService } from '../user/userDbService';
-import { DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
 
 type OptionalMinuteBankDbServiceInitParams = {
   makeUserDbService: Promise<UserDbService>;
@@ -12,26 +12,27 @@ class MinuteBankDbService extends AbstractDbService<
   MinuteBankDoc
 > {
   private _userDbService!: UserDbService;
-  constructor() {
-    super();
-    this._dbServiceModelViews = {
-      defaultView: {},
-      adminView: {},
-      selfView: {},
-      overrideView: {},
-    };
-  }
 
-  protected _getForeignKeyObj = (): {} => {
+  protected _getComputedProps = async (props: {
+    dbDoc: any;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<StringKeyObject> => {
+    const { dbDoc, dbServiceAccessOptions } = props;
+    const hostedById = dbDoc['hostedById'];
+    const reservedById = dbDoc['reservedById'];
+    const hostedByData = await this._getDbDataById({
+      dbService: this._userDbService,
+      dbServiceAccessOptions,
+      _id: hostedById,
+    });
+    const reservedByData = await this._getDbDataById({
+      dbService: this._userDbService,
+      dbServiceAccessOptions,
+      _id: reservedById,
+    });
     return {
-      hostedByData: {
-        dbService: this._userDbService,
-        foreignKeyName: 'hostedById',
-      },
-      reservedByData: {
-        dbService: this._userDbService,
-        foreignKeyName: 'reservedById',
-      },
+      hostedByData,
+      reservedByData,
     };
   };
 

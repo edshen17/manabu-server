@@ -1,11 +1,13 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { UserContactMethod } from '../../user/userEntity';
 
-type LocationData = {
-  locationName: string;
-  locationType: string;
-  matchedContactMethod: MatchedContactMethod;
-};
+type LocationData =
+  | {
+      locationName: string;
+      locationType: string;
+      matchedContactMethod: MatchedContactMethod;
+    }
+  | StringKeyObject;
 
 type MatchedContactMethod = {
   hostedByContactMethod: UserContactMethod;
@@ -17,6 +19,10 @@ class LocationDataHandler {
     hostedByData: JoinedUserDoc;
     reservedByData: JoinedUserDoc;
   }): LocationData => {
+    const hasLocationData = this._hasLocationData(props);
+    if (!hasLocationData) {
+      return {};
+    }
     const matchedContactMethod = this._getMatchedContactMethod(props);
     const { hostedByContactMethod, reservedByContactMethod } = matchedContactMethod;
     const isOnline =
@@ -32,6 +38,19 @@ class LocationDataHandler {
       locationData.locationName = 'alternative';
     }
     return locationData;
+  };
+
+  private _hasLocationData = (props: {
+    hostedByData: JoinedUserDoc;
+    reservedByData: JoinedUserDoc;
+  }) => {
+    const { hostedByData, reservedByData } = props;
+    const hasLocationData =
+      hostedByData &&
+      reservedByData &&
+      hostedByData.contactMethods.length > 0 &&
+      reservedByData.contactMethods.length > 0;
+    return hasLocationData;
   };
 
   private _getMatchedContactMethod = (props: {

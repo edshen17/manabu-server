@@ -11,16 +11,6 @@ class PackageDbService extends AbstractEmbeddedDbService<
   OptionalPackageDbServiceInitParams,
   PackageDoc
 > {
-  constructor() {
-    super();
-    this._dbServiceModelViews = {
-      defaultView: {},
-      adminView: {},
-      selfView: {},
-      overrideView: {},
-    };
-  }
-
   protected _initTemplate = async (
     optionalDbServiceInitParams: AbstractEmbeddedDbServiceInitParams<OptionalPackageDbServiceInitParams>
   ) => {

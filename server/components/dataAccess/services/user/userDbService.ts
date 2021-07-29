@@ -9,9 +9,8 @@ type OptionalUserDbServiceInitParams = {
 class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
   private _comparePassword!: any;
 
-  constructor() {
-    super();
-    this._dbServiceModelViews = {
+  protected _getDbServiceModelViews = () => {
+    return {
       defaultView: {
         email: 0,
         password: 0,
@@ -33,7 +32,7 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
         verificationToken: 0,
       },
     };
-  }
+  };
 
   public authenticateUser = async (
     dbServiceParams: DbServiceParams,

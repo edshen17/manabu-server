@@ -15,24 +15,17 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
 {
   protected _dbModel!: any;
   protected _dbModelName!: string;
-  protected _dbServiceModelViews!: DbServiceModelViews;
   protected _cloneDeep!: any;
   protected _joinType: string = DB_SERVICE_JOIN_TYPE.NONE;
   protected _cacheDbService!: CacheDbService;
 
-  private _getCacheData = async (cacheKey: string): Promise<any> => {
-    const cacheData = await this._cacheDbService.get({ hashKey: this._dbModelName, key: cacheKey });
-    return cacheData;
-  };
-
-  private _setCacheData = async (props: {
-    hashKey: string;
-    cacheKey: string;
-    dbQueryResult: any;
-  }): Promise<void> => {
-    const { hashKey, cacheKey, dbQueryResult } = props;
-    const ttlMs = TTL_MS.WEEK;
-    await this._cacheDbService.set({ hashKey, key: cacheKey, value: dbQueryResult, ttlMs });
+  protected _getDbServiceModelViews = (): DbServiceModelViews => {
+    return {
+      defaultView: {},
+      adminView: {},
+      selfView: {},
+      overrideView: {},
+    };
   };
 
   public findOne = async (dbServiceParams: {
@@ -61,7 +54,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions
   ): { modelView: {}; modelViewName: string } => {
     const { isSelf, currentAPIUserRole, isOverrideView } = dbServiceAccessOptions || {};
-    const { defaultView, selfView, adminView, overrideView } = this._dbServiceModelViews;
+    const { defaultView, selfView, adminView, overrideView } = this._getDbServiceModelViews();
     const isAdmin = currentAPIUserRole == 'admin';
     const dbServiceModelView: { modelView: {}; modelViewName: string } = {
       modelView: defaultView,
@@ -93,16 +86,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<any> => {
     const { dbServiceAccessOptions, dbQueryPromise } = props;
     let dbQueryResult = await this._executeQuery({ dbServiceAccessOptions, dbQueryPromise });
-    const hasLeftOuterJoin = this._joinType == DB_SERVICE_JOIN_TYPE.LEFT_OUTER;
+    const hasJoin = this._joinType != DB_SERVICE_JOIN_TYPE.NONE;
     const isResultArray = Array.isArray(dbQueryResult);
-    const foreignKeyMapping = this._getForeignKeyObj();
-    if (hasLeftOuterJoin && isResultArray) {
+    if (hasJoin && isResultArray) {
       const mappedQueryResult = dbQueryResult.map(async (dbDoc: StringKeyObject) => {
-        return await this._joinDbDoc({ dbDoc, foreignKeyMapping });
+        return await this._processDbDoc(dbDoc);
       });
       dbQueryResult = await Promise.all(mappedQueryResult);
-    } else if (hasLeftOuterJoin && !isResultArray) {
-      dbQueryResult = await this._joinDbDoc({ dbDoc: dbQueryResult, foreignKeyMapping });
+    } else if (hasJoin && !isResultArray) {
+      dbQueryResult = await this._processDbDoc(dbQueryResult);
     }
     return dbQueryResult;
   };
@@ -124,45 +116,48 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  protected _getForeignKeyObj = (): {} => {
+  protected _getComputedProps = async (props: {
+    dbDoc: StringKeyObject;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<StringKeyObject> => {
     return {};
   };
 
-  protected _joinDbDoc = async (props: {
-    dbDoc: StringKeyObject;
-    foreignKeyMapping: StringKeyObject;
-  }): Promise<StringKeyObject> => {
-    const { dbDoc, foreignKeyMapping } = props;
+  private _processDbDoc = async (dbDoc: StringKeyObject): Promise<StringKeyObject> => {
     const dbDocCopy: StringKeyObject = this._cloneDeep(dbDoc);
     if (dbDocCopy) {
-      for (const joinProperty in foreignKeyMapping) {
-        const foreignKeyData = foreignKeyMapping[joinProperty];
-        const { foreignKeyName, ...otherForeignKeyData } = foreignKeyData;
-        const props = { _id: dbDocCopy[foreignKeyName], ...otherForeignKeyData };
-        dbDocCopy[joinProperty] = await this._getDbDataById(props);
+      const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
+      const computedProps = await this._getComputedProps({
+        dbDoc: dbDocCopy,
+        dbServiceAccessOptions,
+      });
+      for (const computedProp in computedProps) {
+        const computedData = computedProps[computedProp];
+        dbDocCopy[computedProp] = computedData;
       }
     }
     return dbDocCopy;
   };
 
-  private _getDbDataById = async (props: {
+  protected _getDbDataById = async (props: {
     dbService: IDbService<any, any>;
     _id: ObjectId;
+    dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<any> => {
-    const { dbService, _id } = props;
-    const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
+    const { dbService, _id, dbServiceAccessOptions } = props;
     const dbData = await dbService.findById({ _id, dbServiceAccessOptions });
     return dbData;
   };
 
-  private _getBaseDbServiceAccessOptions = () => {
+  protected _getBaseDbServiceAccessOptions = (): DbServiceAccessOptions => {
     const dbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted: true,
       currentAPIUserRole: 'user',
       isSelf: false,
     };
-    return dbServiceAccessOptions;
+    const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
+    return dbServiceAccessOptionsCopy;
   };
 
   protected _getCacheKey = (props: {
@@ -172,6 +167,11 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): string => {
     const { searchQuery, modelViewName, cacheClient } = props;
     return `${this._dbModelName}-${cacheClient}-${JSON.stringify(searchQuery)}-${modelViewName}`;
+  };
+
+  private _getCacheData = async (cacheKey: string): Promise<any> => {
+    const cacheData = await this._cacheDbService.get({ hashKey: this._dbModelName, key: cacheKey });
+    return cacheData;
   };
 
   private _handleStoredData = async (props: {
@@ -191,6 +191,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       await this._setCacheData({ hashKey: this._dbModelName, cacheKey, dbQueryResult });
       return dbQueryResult;
     }
+  };
+
+  private _setCacheData = async (props: {
+    hashKey: string;
+    cacheKey: string;
+    dbQueryResult: any;
+  }): Promise<void> => {
+    const { hashKey, cacheKey, dbQueryResult } = props;
+    const ttlMs = TTL_MS.WEEK;
+    await this._cacheDbService.set({ hashKey, key: cacheKey, value: dbQueryResult, ttlMs });
   };
 
   private _clearCacheKey = async (props: {
@@ -369,7 +379,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   ): Promise<void> => {};
 
   public getDbServiceModelViews = (): DbServiceModelViews => {
-    const dbModelViewsCopy = this._cloneDeep(this._dbServiceModelViews);
+    const dbServiceModelViews = this._getDbServiceModelViews();
+    const dbModelViewsCopy = this._cloneDeep(dbServiceModelViews);
     return dbModelViewsCopy;
   };
 }

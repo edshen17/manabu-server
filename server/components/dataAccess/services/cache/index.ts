@@ -1,5 +1,7 @@
 import cloneDeep from 'clone-deep';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+dayjs.extend(customParseFormat);
 import Redis from 'ioredis';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CacheDbService } from './cacheDbService';

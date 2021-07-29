@@ -6,16 +6,6 @@ type PartialTeacherBalanceDbServiceInitParams = {};
 class TeacherBalanceDbService extends AbstractDbService<
   PartialTeacherBalanceDbServiceInitParams,
   TeacherBalanceDoc
-> {
-  constructor() {
-    super();
-    this._dbServiceModelViews = {
-      defaultView: {},
-      adminView: {},
-      selfView: {},
-      overrideView: {},
-    };
-  }
-}
+> {}
 
 export { TeacherBalanceDbService };

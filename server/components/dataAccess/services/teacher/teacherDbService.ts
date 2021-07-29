@@ -12,15 +12,6 @@ class TeacherDbService extends AbstractEmbeddedDbService<
   OptionalTeacherDbServiceInitParams,
   TeacherDoc | JoinedUserDoc
 > {
-  constructor() {
-    super();
-    this._dbServiceModelViews = {
-      defaultView: {},
-      adminView: {},
-      selfView: {},
-      overrideView: {},
-    };
-  }
   protected _initTemplate = async (
     optionalDbServiceInitParams: AbstractEmbeddedDbServiceInitParams<OptionalTeacherDbServiceInitParams>
   ) => {
