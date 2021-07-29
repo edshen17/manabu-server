@@ -47,11 +47,11 @@ describe('cacheDbService', () => {
       expect(storedItem).to.equal(null);
     });
   });
-  // describe('clearAll', () => {
-  //   it('should clear everything in the cache', async () => {
-  //     await cacheDbService.clearAll();
-  //     const storedItem = await cacheDbService.get({ hashKey, key: 'storedItem' });
-  //     expect(storedItem).to.equal(null);
-  //   });
-  // });
+  describe('clearAll', () => {
+    it('should clear everything in the cache', async () => {
+      await cacheDbService.clearAll();
+      const storedItem = await cacheDbService.get({ hashKey, key: 'storedItem' });
+      expect(storedItem).to.equal(null);
+    });
+  });
 });

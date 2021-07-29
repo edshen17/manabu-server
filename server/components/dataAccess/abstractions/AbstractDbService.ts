@@ -199,16 +199,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     for (const cacheClient in DB_SERVICE_CACHE_CLIENT) {
       for (const modelViewName in DB_SERVICE_MODEL_VIEW) {
         const keyToUpdate = this._getCacheKey({ searchQuery, modelViewName, cacheClient });
-        // await this._setCacheData({
-        //   hashKey: this._dbModelName,
-        //   cacheKey: keyToUpdate,
-        //   dbQueryResult,
-        // });
-        // await this._cacheDbService.set({
-        //   key: keyToUpdate,
-        //   value: dbQueryResult,
-        //   ttlMs: TTL_MS.WEEK,
-        // });
+        await this._cacheDbService.clearAll();
       }
     }
   };
