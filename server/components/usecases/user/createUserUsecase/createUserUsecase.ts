@@ -129,7 +129,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
     const { savedDbUser, dbServiceAccessOptions } = props;
-    const teacherData = this._teacherEntity.build({});
+    const teacherData = await this._teacherEntity.build({});
     const savedDbTeacher = await this._userDbService.findOneAndUpdate({
       searchQuery: { _id: savedDbUser._id },
       updateQuery: {
@@ -188,7 +188,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const modelToInsert = await this._teacherBalanceEntity.build({
       userId: savedDbUser._id,
     });
-    const newTeacherBalance = this._teacherBalanceDbService.insert({
+    const newTeacherBalance = await this._teacherBalanceDbService.insert({
       modelToInsert,
       dbServiceAccessOptions,
     });

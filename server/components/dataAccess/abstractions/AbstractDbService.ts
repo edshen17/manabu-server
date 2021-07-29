@@ -118,7 +118,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     if (!isAccessPermitted) {
       throw new Error('Access denied.');
     }
-    const dbQueryResult = await dbQueryPromise;
+    const dbQueryResult = await dbQueryPromise.then((doc) => {
+      return doc;
+    });
     return dbQueryResult;
   };
 
