@@ -8,8 +8,9 @@ class CacheDbService {
   private _cloneDeep!: any;
   private _dayjs!: any;
 
-  public get = async (key: string): Promise<any> => {
-    const value = await this._redisClient.get(key);
+  public get = async (props: { hashKey: string; key: string }): Promise<any> => {
+    const { hashKey, key } = props;
+    const value = await this._redisClient.hget(hashKey, key);
     let storedValue;
     try {
       const parsedValueCopy = this._cloneDeep(JSON.parse(value));
@@ -53,18 +54,25 @@ class CacheDbService {
   };
 
   public set = async (props: {
+    hashKey: string;
     key: string;
     value: StringKeyObject;
     ttlMs: number;
   }): Promise<any> => {
-    const { key, value, ttlMs } = props;
-    const isValueString = typeof value == 'string';
+    const { hashKey, key, value, ttlMs } = props;
+    const isValueString = typeof value === 'string';
     let valueToStore = isValueString ? value : JSON.stringify(value);
-    await this._redisClient.set(key, valueToStore, 'PX', ttlMs);
+    await this._redisClient.hset(hashKey, key, valueToStore);
+    this._redisClient.expire(hashKey, ttlMs);
   };
 
-  public clearKey = async (key: string): Promise<void> => {
-    await this._redisClient.del(key);
+  public clearKey = async (props: { hashKey: string; key: string }): Promise<void> => {
+    const { hashKey, key } = props;
+    await this._redisClient.hdel(hashKey, key);
+  };
+
+  public clearHashKey = async (hashKey: string): Promise<void> => {
+    this._redisClient.del(hashKey);
   };
 
   public clearAll = async (): Promise<void> => {
