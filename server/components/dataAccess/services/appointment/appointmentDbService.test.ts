@@ -69,6 +69,7 @@ describe('appointmentDbService', () => {
             dbServiceAccessOptions,
           });
           const findOneAppointment = await appointmentDbService.findOne(findParams);
+          console.log(findOneAppointment, 'here apt');
           const findAppointments = await appointmentDbService.find(findParams);
           const appointmentPackageTransactionData: any = findByIdAppointment.packageTransactionData;
           expect(findByIdAppointment).to.deep.equal(findOneAppointment);
