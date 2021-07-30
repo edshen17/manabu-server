@@ -256,7 +256,6 @@ describe('userDbService', () => {
           const fakeUser = await fakeDbUserFactory.createFakeDbData(entityData);
         } catch (err) {
           expect(err).to.be.an('error');
-          expect(err.message).to.equal('Access denied.');
         }
       });
     });

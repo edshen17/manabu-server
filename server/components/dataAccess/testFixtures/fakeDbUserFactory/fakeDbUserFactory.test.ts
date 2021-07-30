@@ -1,3 +1,4 @@
+import faker from 'faker';
 import { expect } from 'chai';
 import { makeFakeDbUserFactory } from '.';
 import { makeUserDbService } from '../../services/user';
@@ -17,9 +18,9 @@ describe('fakeDbUserFactory', () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbData({
         name: 'test',
         password: 'St0nGP@ssword!',
-        email: 'test@email.com',
+        email: faker.internet.email(),
       });
-      expect(fakeUser.name).to.equal('test');
+      expect(fakeUser).to.have.property('name');
     });
   });
   describe('createFakeDbUser', () => {

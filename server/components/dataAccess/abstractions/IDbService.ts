@@ -53,6 +53,16 @@ enum DB_SERVICE_CACHE_CLIENT {
   FIND_BY_ID = 'find_by_id',
 }
 
+// does not follow snake case because of mongo collection names
+enum DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS {
+  APPOINTMENTS = 'appointments',
+  MINUTE_BANKS = 'minutebanks',
+  PACKAGE_TRANSACTIONS = 'packagetransactions',
+  PACKAGES = 'packages',
+  USERS = 'users',
+  TEACHERS = 'teachers',
+}
+
 interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findById: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   findOne: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
@@ -76,4 +86,5 @@ export {
   DB_SERVICE_JOIN_TYPE,
   DB_SERVICE_MODEL_VIEW,
   DB_SERVICE_CACHE_CLIENT,
+  DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
 };

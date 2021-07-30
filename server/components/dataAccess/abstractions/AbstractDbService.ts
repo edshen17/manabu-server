@@ -17,6 +17,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   protected _dbModelName!: string;
   protected _cloneDeep!: any;
   protected _joinType: string = DB_SERVICE_JOIN_TYPE.NONE;
+  protected _ttlMs: number = TTL_MS.WEEK;
   protected _cacheDbService!: CacheDbService;
 
   protected _getDbServiceModelViews = (): DbServiceModelViews => {
@@ -89,7 +90,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const hasJoin = this._joinType != DB_SERVICE_JOIN_TYPE.NONE;
     const isResultArray = Array.isArray(dbQueryResult);
     if (hasJoin && isResultArray) {
-      const mappedQueryResult = dbQueryResult.map(async (dbDoc: StringKeyObject) => {
+      const mappedQueryResult = dbQueryResult.map(async (dbDoc: any) => {
         return await this._processDbDoc(dbDoc);
       });
       dbQueryResult = await Promise.all(mappedQueryResult);
@@ -117,13 +118,13 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   protected _getComputedProps = async (props: {
-    dbDoc: StringKeyObject;
+    dbDoc: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<StringKeyObject> => {
     return {};
   };
 
-  private _processDbDoc = async (dbDoc: StringKeyObject): Promise<StringKeyObject> => {
+  private _processDbDoc = async (dbDoc: any): Promise<StringKeyObject> => {
     const dbDocCopy: StringKeyObject = this._cloneDeep(dbDoc);
     if (dbDocCopy) {
       const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
@@ -199,21 +200,24 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbQueryResult: any;
   }): Promise<void> => {
     const { hashKey, cacheKey, dbQueryResult } = props;
-    const ttlMs = TTL_MS.WEEK;
-    await this._cacheDbService.set({ hashKey, key: cacheKey, value: dbQueryResult, ttlMs });
+    await this._cacheDbService.set({
+      hashKey,
+      key: cacheKey,
+      value: dbQueryResult,
+      ttlMs: this._ttlMs,
+    });
   };
 
-  private _clearCacheKey = async (props: {
-    searchQuery?: {};
-    dbQueryResult: any;
-  }): Promise<void> => {
-    const { searchQuery, dbQueryResult } = props;
-    for (const cacheClient in DB_SERVICE_CACHE_CLIENT) {
-      for (const modelViewName in DB_SERVICE_MODEL_VIEW) {
-        const keyToUpdate = this._getCacheKey({ searchQuery, modelViewName, cacheClient });
-        await this._cacheDbService.clearAll();
-      }
+  protected _clearCacheDependencies = async (): Promise<void> => {
+    const cacheDependencies = this._getCacheDependencies();
+    await this._cacheDbService.clearHashKey(this._dbModelName);
+    for (const cacheDependency in cacheDependencies) {
+      await this._cacheDbService.clearHashKey(cacheDependencies[cacheDependency]);
     }
+  };
+
+  protected _getCacheDependencies = (): string[] => {
+    return [];
   };
 
   public findById = async (dbServiceParams: {
@@ -304,7 +308,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheKey({ searchQuery, dbQueryResult });
+    await this._clearCacheDependencies();
     return dbQueryResult;
   };
 
@@ -325,7 +329,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheKey({ searchQuery, dbQueryResult });
+    await this._clearCacheDependencies();
     return dbQueryResult;
   };
 
@@ -339,7 +343,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheKey({ searchQuery: { _id }, dbQueryResult });
+    await this._clearCacheDependencies();
     return dbQueryResult;
   };
 
@@ -353,7 +357,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheKey({ searchQuery, dbQueryResult });
+    await this._clearCacheDependencies();
     return dbQueryResult;
   };
 

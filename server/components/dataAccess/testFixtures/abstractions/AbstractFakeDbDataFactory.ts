@@ -52,11 +52,11 @@ abstract class AbstractFakeDbDataFactory<
     this._entity = await makeEntity;
     this._dbService = await makeDbService;
     this._cloneDeep = cloneDeep;
-    this._initTemplate(optionalInitParams);
+    await this._initTemplate(optionalInitParams);
     return this;
   };
 
-  protected _initTemplate = (
+  protected _initTemplate = async (
     optionalInitParams: Omit<
       {
         makeEntity:
@@ -67,7 +67,7 @@ abstract class AbstractFakeDbDataFactory<
       } & OptionalFakeDbDataFactoryInitParams,
       'makeEntity' | 'makeDbService' | 'cloneDeep'
     >
-  ): void => {};
+  ): Promise<void> => {};
 
   public getDbServiceAccessOptions = (): DbServiceAccessOptions => {
     const dbServiceAccessOptionsCopy = this._cloneDeep(this._dbServiceAccessOptions);

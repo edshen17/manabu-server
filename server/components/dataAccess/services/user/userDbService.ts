@@ -1,4 +1,7 @@
-import { DbServiceParams } from '../../abstractions/IDbService';
+import {
+  DbServiceParams,
+  DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
+} from '../../abstractions/IDbService';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { JoinedUserDoc } from '../../../../models/User';
 
@@ -47,7 +50,6 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
         'It seems that you signed up previously through a third-party service like Google.'
       );
     }
-
     const isPasswordValid = this._comparePassword(inputtedPassword, userData.password);
     if (isPasswordValid) {
       const { password, ...partialuserDataWithoutPassword } = userData;
@@ -55,6 +57,14 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
     } else {
       throw new Error('Username or password incorrect.');
     }
+  };
+
+  protected _getCacheDependencies = (): string[] => {
+    return [
+      DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS.APPOINTMENTS,
+      DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS.PACKAGE_TRANSACTIONS,
+      DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS.MINUTE_BANKS,
+    ];
   };
 
   protected _initTemplate = async (

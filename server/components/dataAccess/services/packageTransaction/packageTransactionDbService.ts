@@ -2,7 +2,11 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { PackageDbService } from '../package/packageDbService';
 import { UserDbService } from '../user/userDbService';
-import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
+import {
+  DbServiceAccessOptions,
+  DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
+  DB_SERVICE_JOIN_TYPE,
+} from '../../abstractions/IDbService';
 import {
   LocationData,
   LocationDataHandler,
@@ -75,6 +79,10 @@ class PackageTransactionDbService extends AbstractDbService<
       reservedByData: overrideReservedByData,
     });
     return locationData;
+  };
+
+  protected _getCacheDependencies = (): string[] => {
+    return [DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS.APPOINTMENTS];
   };
 
   protected _initTemplate = async (

@@ -48,8 +48,8 @@ class LocationDataHandler {
     const hasLocationData =
       hostedByData &&
       reservedByData &&
-      hostedByData.contactMethods.length > 0 &&
-      reservedByData.contactMethods.length > 0;
+      hostedByData.contactMethods &&
+      reservedByData.contactMethods;
     return hasLocationData;
   };
 
