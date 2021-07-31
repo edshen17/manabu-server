@@ -18,6 +18,12 @@ type PackageEntityBuildResponse = {
   lastUpdated: Date;
 };
 
+enum PACKAGE_ENTITY_NAME {
+  LIGHT = 'Light Plan',
+  MODERATE = 'Moderate Plan',
+  MAINICHI = 'Mainichi Plan',
+}
+
 class PackageEntity extends AbstractEntity<
   OptionalPackageEntityInitParams,
   PackageEntityBuildParams,
@@ -39,4 +45,4 @@ class PackageEntity extends AbstractEntity<
   };
 }
 
-export { PackageEntity, PackageEntityBuildResponse, PackageEntityBuildParams };
+export { PackageEntity, PackageEntityBuildResponse, PackageEntityBuildParams, PACKAGE_ENTITY_NAME };

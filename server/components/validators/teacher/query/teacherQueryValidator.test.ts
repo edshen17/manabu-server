@@ -1,35 +1,43 @@
 import { expect } from 'chai';
-import { makeUserQueryValidator } from '.';
-import { UserQueryValidator } from './userQueryValidator';
+import { makeTeacherQueryValidator } from '.';
+import { PACKAGE_ENTITY_NAME } from '../../../entities/package/packageEntity';
+import { TeacherQueryValidator } from './teacherQueryValidator';
 
-let userQueryValidator: UserQueryValidator;
+let teacherQueryValidator: TeacherQueryValidator;
 let props: {
   query: {};
 };
 
 before(() => {
-  userQueryValidator = makeUserQueryValidator;
+  teacherQueryValidator = makeTeacherQueryValidator;
   props = {
     query: {
-      state: {
-        redirectUserId: '605bc5ad9db900001528f77c',
-        isTeacherApp: true,
-      },
+      teachingLanguages: ['ja'],
+      alsoSpeaks: ['en'],
+      teacherType: ['licensed'],
+      maxPrice: 40,
+      minPrice: 30,
+      teacherTags: ['kids', 'business', 'exam preparation', 'conversation practice', 'general'],
+      packageTags: ['grammar', 'reading', 'writing', 'pitch accent'],
+      lessonDurations: [30, 60, 90, 120],
+      packageName: PACKAGE_ENTITY_NAME.LIGHT,
+      contactMethodName: ['Skype', 'LINE'],
+      contactMethodType: ['online', 'offline'],
     },
   };
 });
 
-describe('userQueryValidator', () => {
+describe('teacherQueryValidator', () => {
   describe('validate', () => {
     const testValidInputs = (props: { query: {} }) => {
       const { query } = props;
-      const validatedObj = userQueryValidator.validate(props);
+      const validatedObj = teacherQueryValidator.validate(props);
       expect(validatedObj).to.deep.equal(query);
       expect(validatedObj).to.not.have.property('error');
     };
     const testInvalidInputs = (props: { query: {} }) => {
       try {
-        const validatedObj = userQueryValidator.validate(props);
+        const validatedObj = teacherQueryValidator.validate(props);
       } catch (err) {
         expect(err).be.an('error');
       }

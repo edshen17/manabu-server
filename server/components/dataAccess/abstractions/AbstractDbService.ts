@@ -211,8 +211,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   protected _clearCacheDependencies = async (): Promise<void> => {
     const cacheDependencies = this._getCacheDependencies();
     await this._cacheDbService.clearHashKey(this._dbModelName);
-    for (const cacheDependency in cacheDependencies) {
-      await this._cacheDbService.clearHashKey(cacheDependencies[cacheDependency]);
+    for (const cacheDependency of cacheDependencies) {
+      await this._cacheDbService.clearHashKey(cacheDependency);
     }
   };
 
@@ -269,7 +269,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
-    const insertedModel = await this._dbModel.create(modelToInsert);
+    const insertedModel = await this._dbModel.create(modelToInsert).then((doc: any) => {
+      return doc.toObject();
+    });
     // return findById result rather than insertedModel to ensure caller gets correct select modelView
     const dbQueryResult = await this.findById({ _id: insertedModel._id, dbServiceAccessOptions });
     return dbQueryResult;

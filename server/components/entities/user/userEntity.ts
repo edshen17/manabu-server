@@ -39,7 +39,7 @@ type UserEntityBuildResponse = {
   timezone: string;
   lastOnline: Date;
   role: string;
-  settings: { currency: string };
+  settings: { currency: string; locale: string };
   memberships: string[];
   contactMethods: UserContactMethod[] | [];
   isEmailVerified: boolean;
@@ -99,7 +99,7 @@ class UserEntity extends AbstractEntity<
       timezone: '',
       lastOnline: new Date(),
       role: 'user',
-      settings: { currency: 'SGD' },
+      settings: { currency: 'SGD', locale: 'en' },
       memberships: [],
       contactMethods: contactMethods || [],
       isEmailVerified: false,

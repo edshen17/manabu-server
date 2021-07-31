@@ -1,5 +1,9 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
-import { PackageEntity, PackageEntityBuildResponse } from '../package/packageEntity';
+import {
+  PACKAGE_ENTITY_NAME,
+  PackageEntity,
+  PackageEntityBuildResponse,
+} from '../package/packageEntity';
 
 type OptionalTeacherEntityInitParams = {
   makePackageEntity: Promise<PackageEntity>;
@@ -55,21 +59,21 @@ class TeacherEntity extends AbstractEntity<
     const lightPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 5,
       packageType: 'default',
-      packageName: 'light',
+      packageName: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const moderatePackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 12,
       packageType: 'default',
-      packageName: 'moderate',
+      packageName: PACKAGE_ENTITY_NAME.MODERATE,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const mainichiPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 22,
       packageType: 'default',
-      packageName: 'mainichi',
+      packageName: PACKAGE_ENTITY_NAME.MAINICHI,
       isOffering: true,
       lessonDurations: [30, 60],
     });

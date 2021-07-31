@@ -1,6 +1,7 @@
 import {
   PackageEntityBuildParams,
   PackageEntityBuildResponse,
+  PACKAGE_ENTITY_NAME,
 } from '../../../entities/package/packageEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
@@ -17,7 +18,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
       hostedById: '605bc5ad9db900001528f77c',
       lessonAmount: 5,
       packageType: 'default',
-      packageName: 'light',
+      packageName: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     };
@@ -33,21 +34,21 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
     const lightPackage = this._entity.build({
       lessonAmount: 5,
       packageType: 'default',
-      packageName: 'light',
+      packageName: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const moderatePackage = this._entity.build({
       lessonAmount: 12,
       packageType: 'default',
-      packageName: 'moderate',
+      packageName: PACKAGE_ENTITY_NAME.MODERATE,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const mainichiPackage = this._entity.build({
       lessonAmount: 22,
       packageType: 'default',
-      packageName: 'mainichi',
+      packageName: PACKAGE_ENTITY_NAME.MAINICHI,
       isOffering: true,
       lessonDurations: [30, 60],
     });
