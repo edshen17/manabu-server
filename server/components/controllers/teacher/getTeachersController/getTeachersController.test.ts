@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { makeGetUserController } from '.';
+import { makeGetTeachersController } from '.';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
@@ -19,7 +19,7 @@ let teacherDbService: TeacherDbService;
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
   iHttpRequestBuilder = makeIHttpRequestBuilder;
-  getTeachersController = await makeGetUserController;
+  getTeachersController = await makeGetTeachersController;
   queryStringHandler = makeQueryStringHandler;
   teacherDbService = await makeTeacherDbService;
 });
