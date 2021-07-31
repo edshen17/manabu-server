@@ -127,7 +127,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   private _processDbDoc = async (dbDoc: any): Promise<StringKeyObject> => {
     const dbDocCopy: StringKeyObject = this._cloneDeep(dbDoc);
     if (dbDocCopy) {
-      const dbServiceAccessOptions = this._getBaseDbServiceAccessOptions();
+      const dbServiceAccessOptions = this.getBaseDbServiceAccessOptions();
       const computedProps = await this._getComputedProps({
         dbDoc: dbDocCopy,
         dbServiceAccessOptions,
@@ -150,7 +150,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbData;
   };
 
-  protected _getBaseDbServiceAccessOptions = (): DbServiceAccessOptions => {
+  public getBaseDbServiceAccessOptions = (): DbServiceAccessOptions => {
     const dbServiceAccessOptions = {
       isProtectedResource: false,
       isCurrentAPIUserPermitted: true,

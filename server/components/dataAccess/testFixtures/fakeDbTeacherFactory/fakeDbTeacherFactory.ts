@@ -10,7 +10,9 @@ class FakeDbTeacherFactory extends AbstractFakeDbEmbeddedDataFactory<
 > {
   public createFakeDbData = async (): Promise<TeacherEntityBuildResponse> => {
     const fakeBuildParams = await this._createFakeBuildParams();
-    const fakeData = this._entity.build(fakeBuildParams);
+    const fakeData = await this._entity.build(fakeBuildParams);
+    fakeData.teachingLanguages.push({ language: 'ja', level: 'C2' });
+    fakeData.alsoSpeaks.push({ language: 'en', level: 'C2' });
     return fakeData;
   };
 

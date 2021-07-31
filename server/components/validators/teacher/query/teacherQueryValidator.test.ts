@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import { makeTeacherQueryValidator } from '.';
-import { PACKAGE_ENTITY_NAME } from '../../../entities/package/packageEntity';
 import { TeacherQueryValidator } from './teacherQueryValidator';
 
 let teacherQueryValidator: TeacherQueryValidator;
@@ -20,7 +19,6 @@ before(() => {
       teacherTags: ['kids', 'business', 'exam preparation', 'conversation practice', 'general'],
       packageTags: ['grammar', 'reading', 'writing', 'pitch accent'],
       lessonDurations: [30, 60, 90, 120],
-      packageName: PACKAGE_ENTITY_NAME.LIGHT,
       contactMethodName: ['Skype', 'LINE'],
       contactMethodType: ['online', 'offline'],
     },

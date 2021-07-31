@@ -75,6 +75,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findOneAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
+  getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;
 }
 
 export {

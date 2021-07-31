@@ -64,7 +64,7 @@ class PackageTransactionDbService extends AbstractDbService<
     reservedById: ObjectId;
   }): Promise<LocationData> => {
     const { hostedById, reservedById } = props;
-    const overrideDbSerivceAccessOptions = this._getBaseDbServiceAccessOptions();
+    const overrideDbSerivceAccessOptions = this.getBaseDbServiceAccessOptions();
     overrideDbSerivceAccessOptions.isOverrideView = true;
     const overrideHostedByData = await this._userDbService.findById({
       _id: hostedById,

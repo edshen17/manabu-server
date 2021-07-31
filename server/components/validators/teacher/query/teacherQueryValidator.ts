@@ -10,8 +10,7 @@ class TeacherQueryValidator extends AbstractQueryValidator {
       maxPrice: this._joi.number().min(0),
       teacherTags: this._joi.array().items(this._joi.string()),
       packageTags: this._joi.array().items(this._joi.string()),
-      lessonDurations: this._joi.array().items(this._joi.number()),
-      packageName: this._joi.string(),
+      lessonDurations: this._joi.array().items(this._joi.number().valid(30, 60, 90, 120)).unique(),
       contactMethodName: this._joi.array().items(this._joi.string()),
       contactMethodType: this._joi.array().items(this._joi.string()),
     });
