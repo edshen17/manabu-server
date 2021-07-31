@@ -53,11 +53,15 @@ class GetTeachersUsecase extends AbstractGetUsecase<
       lessonDurations,
       contactMethodName,
       contactMethodType,
+      name,
     } = query || {};
     const searchQuery: StringKeyObject = {
-      isHidden: false,
-      applicationStatus: 'approved',
+      'teacherData.isHidden': false,
+      'teacherData.applicationStatus': 'approved',
     };
+    if (name) {
+      searchQuery.$text = { $search: name };
+    }
     if (teachingLanguages) {
       searchQuery['teacherData.teachingLanguages.language'] = {
         $in: teachingLanguages,

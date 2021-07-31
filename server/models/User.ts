@@ -38,9 +38,11 @@ const UserSchema = createSchema({
   verificationToken: Type.string({ required: true }),
   lastUpdated: Type.date({ required: true }),
   teacherData: Type.schema({ required: false }).of(TeacherSchema),
+  nameNGrams: Type.string({ required: true }),
 });
 
 UserSchema.plugin(mongooseUniqueValidator);
+UserSchema.index({ nameNGrams: 'text' });
 
 const User = typedModel('User', UserSchema);
 type JoinedUserDoc = ExtractDoc<typeof UserSchema>;

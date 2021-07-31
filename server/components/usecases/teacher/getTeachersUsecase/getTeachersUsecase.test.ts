@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import { makeGetTeachersUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
+import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -16,31 +18,41 @@ let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
 let routeData: RouteData;
 let currentAPIUser: CurrentAPIUser;
-let endpointPath: string;
+let teacherDbService: TeacherDbService;
 
 before(async () => {
   getTeachersUsecase = await makeGetTeachersUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   controllerDataBuilder = makeControllerDataBuilder;
+  teacherDbService = await makeTeacherDbService;
 });
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  const dbServiceAccessOptions = teacherDbService.getBaseDbServiceAccessOptions();
+  await teacherDbService.findOneAndUpdate({
+    searchQuery: { _id: fakeTeacher.teacherData!._id },
+    updateQuery: {
+      applicationStatus: 'approved',
+      teacherType: 'licensed',
+    },
+    dbServiceAccessOptions,
+  });
   routeData = {
     params: {},
     body: {},
     query: {
-      //   teachingLanguages: ['ja'],
-      //   alsoSpeaks: ['en'],
+      teachingLanguages: ['ja'],
+      alsoSpeaks: ['en'],
       teacherType: ['unlicensed', 'licensed'],
-      //   minPrice: 30,
-      //   maxPrice: 40,
-      //   teacherTags: [],
-      //   packageTags: [],
-      //   lessonDurations: [30, 60, 90, 120],
-      //   contactMethodName: ['Skype', 'LINE'],
-      //   contactMethodType: ['online', 'offline'],
+      minPrice: 30,
+      maxPrice: 40,
+      teacherTags: [],
+      packageTags: [],
+      lessonDurations: [30, 60, 90, 120],
+      contactMethodName: ['Skype', 'LINE'],
+      contactMethodType: ['online', 'offline'],
     },
   };
   currentAPIUser = {

@@ -13,6 +13,7 @@ class TeacherQueryValidator extends AbstractQueryValidator {
       lessonDurations: this._joi.array().items(this._joi.number().valid(30, 60, 90, 120)).unique(),
       contactMethodName: this._joi.array().items(this._joi.string()),
       contactMethodType: this._joi.array().items(this._joi.string()),
+      name: this._joi.string(),
     });
   };
 }

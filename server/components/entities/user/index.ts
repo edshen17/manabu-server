@@ -5,6 +5,7 @@ import { UserEntity } from './userEntity';
 import { makeUserEntityValidator } from '../../validators/user/entity';
 import { makeTeacherEntityValidator } from '../../validators/teacher/entity';
 import { makePackageEntityValidator } from '../../validators/package/entity';
+import { createEdgeNGrams } from '../utils/createEdgeNGrams';
 
 const makeUserEntity = new UserEntity().init({
   hashPassword,
@@ -13,6 +14,7 @@ const makeUserEntity = new UserEntity().init({
   makeEntityValidator: makeUserEntityValidator,
   makeTeacherEntityValidator,
   makePackageEntityValidator,
+  createEdgeNGrams,
 });
 
 export { makeUserEntity };

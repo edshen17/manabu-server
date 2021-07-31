@@ -14,6 +14,7 @@ type OptionalUserEntityInitParams = {
   signJwt: any;
   makeTeacherEntityValidator: TeacherEntityValidator;
   makePackageEntityValidator: PackageEntityValidator;
+  createEdgeNGrams: any;
 };
 
 type UserEntityBuildParams = {
@@ -45,6 +46,7 @@ type UserEntityBuildResponse = {
   isEmailVerified: boolean;
   verificationToken: string;
   lastUpdated: Date;
+  nameNGrams: string;
 };
 
 class UserEntity extends AbstractEntity<
@@ -57,6 +59,7 @@ class UserEntity extends AbstractEntity<
   private _signJwt!: any;
   private _teacherEntityValidator!: TeacherEntityValidator;
   private _packageEntityValidator!: PackageEntityValidator;
+  private _createEdgeNGrams!: any;
 
   protected _validate = (buildParams: UserEntityBuildParams) => {
     const { teacherData, ...userData } = buildParams;
@@ -106,6 +109,7 @@ class UserEntity extends AbstractEntity<
       verificationToken,
       lastUpdated: new Date(),
       teacherData,
+      nameNGrams: this._createEdgeNGrams(name),
     });
     return userEntity;
   };
@@ -138,12 +142,14 @@ class UserEntity extends AbstractEntity<
       cryptoRandomString,
       makeTeacherEntityValidator,
       makePackageEntityValidator,
+      createEdgeNGrams,
     } = optionalInitParams;
     this._hashPassword = hashPassword;
     this._signJwt = signJwt;
     this._cryptoRandomString = cryptoRandomString;
     this._teacherEntityValidator = makeTeacherEntityValidator;
     this._packageEntityValidator = makePackageEntityValidator;
+    this._createEdgeNGrams = createEdgeNGrams;
   };
 }
 

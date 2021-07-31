@@ -11,7 +11,7 @@ const users = express.Router();
 const VerifyToken = require('../../../../components/VerifyToken');
 
 users.get('/:userId', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
-users.put('/:userId', VerifyToken, makeJSONExpressCallback.consume(makeEditUserController));
+users.patch('/:userId', VerifyToken, makeJSONExpressCallback.consume(makeEditUserController));
 
 users.get('/self', VerifyToken, makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));

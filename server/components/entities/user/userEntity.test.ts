@@ -25,6 +25,7 @@ describe('user entity', () => {
           expect(testEntity.email).to.equal('test@gmail.com');
           expect(testEntity.profileImageUrl).to.equal('');
           expect(testEntity.verificationToken).to.not.equal('');
+          expect(testEntity.nameNGrams).to.not.equal('');
         }
       });
       it('should have an undefined password property if no password was given', () => {

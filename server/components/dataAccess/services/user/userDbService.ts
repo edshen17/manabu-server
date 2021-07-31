@@ -21,18 +21,22 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
         settings: 0,
         contactMethods: 0,
         isEmailVerified: 0,
+        nameNGrams: 0,
         'teacherData.licensePathUrl': 0,
       },
       adminView: {
         password: 0,
         verificationToken: 0,
+        nameNGrams: 0,
       },
       selfView: {
         password: 0,
         verificationToken: 0,
+        nameNGrams: 0,
       },
       overrideView: {
         verificationToken: 0,
+        nameNGrams: 0,
       },
     };
   };
