@@ -26,7 +26,8 @@ class EditUserUsecase extends AbstractEditUsecase<
     const { params, body, dbServiceAccessOptions } = props;
     const { name } = body;
     if (name) {
-      body.nameNGrams = this._createEdgeNGrams(name);
+      body.nameNGrams = this._createEdgeNGrams(name, false);
+      body.namePrefixNGrams = this._createEdgeNGrams(name, true);
     }
     const savedDbUser = await this._userDbService.findOneAndUpdate({
       searchQuery: { _id: params.userId },

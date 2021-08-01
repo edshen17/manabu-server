@@ -1,5 +1,4 @@
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import aggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { PackageSchema } from './Package';
 
 const TeacherSchema = createSchema({
@@ -32,7 +31,6 @@ const TeacherSchema = createSchema({
   packages: Type.array({ required: true }).of(PackageSchema),
 });
 
-TeacherSchema.plugin(aggregatePaginate);
 const Teacher = typedModel('Teacher', TeacherSchema);
 type TeacherDoc = ExtractDoc<typeof TeacherSchema>;
 
