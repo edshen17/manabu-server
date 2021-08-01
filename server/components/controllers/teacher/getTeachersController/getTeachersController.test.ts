@@ -29,7 +29,7 @@ describe('getTeachersController', () => {
     it('should get teachers from the filter', async () => {
       const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
       const dbServiceAccessOptions = teacherDbService.getBaseDbServiceAccessOptions();
-      const t = await teacherDbService.findOneAndUpdate({
+      await teacherDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacher.teacherData!._id },
         updateQuery: {
           applicationStatus: 'approved',

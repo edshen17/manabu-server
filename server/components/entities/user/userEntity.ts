@@ -47,6 +47,7 @@ type UserEntityBuildResponse = {
   verificationToken: string;
   lastUpdated: Date;
   nameNGrams: string;
+  namePrefixNGrams: string;
 };
 
 class UserEntity extends AbstractEntity<
@@ -109,7 +110,8 @@ class UserEntity extends AbstractEntity<
       verificationToken,
       lastUpdated: new Date(),
       teacherData,
-      nameNGrams: this._createEdgeNGrams(name),
+      nameNGrams: this._createEdgeNGrams({ str: name, isPrefixOnly: false }),
+      namePrefixNGrams: this._createEdgeNGrams({ str: name, isPrefixOnly: true }),
     });
     return userEntity;
   };

@@ -43,25 +43,77 @@ class GetTeachersUsecase extends AbstractGetUsecase<
 
   private _processQuery = (query: StringKeyObject): StringKeyObject => {
     const {
+      name,
+      contactMethodName,
+      contactMethodType,
       teachingLanguages,
       alsoSpeaks,
       teacherType,
+      teacherTags,
       minPrice,
       maxPrice,
-      teacherTags,
       packageTags,
       lessonDurations,
-      contactMethodName,
-      contactMethodType,
-      name,
     } = query || {};
     const searchQuery: StringKeyObject = {
       'teacherData.isHidden': false,
       'teacherData.applicationStatus': 'approved',
+      // date approved
     };
+    this._handleUserFilters({ name, contactMethodName, contactMethodType, searchQuery });
+    this._handleTeacherFilters({
+      teachingLanguages,
+      alsoSpeaks,
+      teacherType,
+      teacherTags,
+      minPrice,
+      maxPrice,
+      searchQuery,
+    });
+    this._handlePackageFilters({ packageTags, lessonDurations, searchQuery });
+    return searchQuery;
+  };
+
+  private _handleUserFilters = (props: {
+    name?: string;
+    contactMethodName?: string;
+    contactMethodType?: string;
+    searchQuery: StringKeyObject;
+  }) => {
+    const { name, contactMethodName, contactMethodType, searchQuery } = props;
     if (name) {
       searchQuery.$text = { $search: name };
     }
+    if (contactMethodName) {
+      searchQuery['contactMethods.methodName'] = {
+        $in: contactMethodName,
+      };
+    }
+    if (contactMethodType) {
+      searchQuery['contactMethods.methodType'] = {
+        $in: contactMethodType,
+      };
+    }
+  };
+
+  private _handleTeacherFilters = (props: {
+    teachingLanguages?: string[];
+    alsoSpeaks?: string[];
+    teacherType?: string;
+    teacherTags?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+    searchQuery: StringKeyObject;
+  }) => {
+    const {
+      teachingLanguages,
+      alsoSpeaks,
+      teacherType,
+      teacherTags,
+      minPrice,
+      maxPrice,
+      searchQuery,
+    } = props;
     if (teachingLanguages) {
       searchQuery['teacherData.teachingLanguages.language'] = {
         $in: teachingLanguages,
@@ -89,9 +141,17 @@ class GetTeachersUsecase extends AbstractGetUsecase<
         $in: teacherTags,
       };
     }
+  };
+
+  private _handlePackageFilters = (props: {
+    packageTags?: string[];
+    lessonDurations?: number[];
+    searchQuery: StringKeyObject;
+  }) => {
+    const { packageTags, lessonDurations, searchQuery } = props;
     if (packageTags) {
       searchQuery['teacherData.packages.tags'] = {
-        $in: teachingLanguages,
+        $in: packageTags,
       };
     }
     if (lessonDurations) {
@@ -99,17 +159,6 @@ class GetTeachersUsecase extends AbstractGetUsecase<
         $in: lessonDurations,
       };
     }
-    if (contactMethodName) {
-      searchQuery['contactMethods.methodName'] = {
-        $in: contactMethodName,
-      };
-    }
-    if (contactMethodType) {
-      searchQuery['contactMethods.methodType'] = {
-        $in: contactMethodType,
-      };
-    }
-    return searchQuery;
   };
 
   protected _initTemplate = async (

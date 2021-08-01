@@ -39,10 +39,14 @@ const UserSchema = createSchema({
   lastUpdated: Type.date({ required: true }),
   teacherData: Type.schema({ required: false }).of(TeacherSchema),
   nameNGrams: Type.string({ required: true }),
+  namePrefixNGrams: Type.string({ required: true }),
 });
 
 UserSchema.plugin(mongooseUniqueValidator);
-UserSchema.index({ nameNGrams: 'text' });
+UserSchema.index(
+  { nameNGrams: 'text', namePrefixNGrams: 'text' },
+  { weights: { nameNGrams: 100, namePrefixNGrams: 200 } }
+);
 
 const User = typedModel('User', UserSchema);
 type JoinedUserDoc = ExtractDoc<typeof UserSchema>;

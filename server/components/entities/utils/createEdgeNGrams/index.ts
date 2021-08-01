@@ -1,24 +1,38 @@
-const createEdgeNGrams = (str: string) => {
-  if (str && str.length > 3) {
-    const minGram = 3;
-    const maxGram = str.length;
-
-    return str
-      .split(' ')
-      .reduce((ngrams: string[], token) => {
-        if (token.length > minGram) {
-          for (let i = minGram; i <= maxGram && i <= token.length; ++i) {
-            ngrams = [...ngrams, token.substr(0, i)];
-          }
-        } else {
-          ngrams = [...ngrams, token];
-        }
-        return ngrams;
-      }, [])
-      .join(' ');
+const _processNGrams = (str: string, ngrams: string[], token: any) => {
+  const minGram = 1;
+  const maxGram = str.length;
+  if (token.length > minGram) {
+    for (let i = minGram; i <= maxGram && i <= token.length; ++i) {
+      ngrams = [...ngrams, token.substr(0, i)];
+    }
+  } else {
+    ngrams = [...ngrams, token];
   }
+  return ngrams;
+};
 
-  return str;
+const createEdgeNGrams = (props: { str: string; isPrefixOnly: boolean }) => {
+  const { str, isPrefixOnly } = props;
+  if (str && str.length > 1) {
+    const splitOnSpace = str.split(' ');
+    if (isPrefixOnly) {
+      const hasSpace = splitOnSpace.length > 1;
+      const spliceIndex = hasSpace ? 1 : 0;
+      return splitOnSpace
+        .reverse()
+        .splice(spliceIndex)
+        .reduce((ngrams: any, token) => {
+          return _processNGrams(str, ngrams, token);
+        }, [])
+        .join(' ');
+    } else {
+      return splitOnSpace
+        .reduce((ngrams: any, token) => {
+          return _processNGrams(str, ngrams, token);
+        }, [])
+        .join(' ');
+    }
+  }
 };
 
 export { createEdgeNGrams };
