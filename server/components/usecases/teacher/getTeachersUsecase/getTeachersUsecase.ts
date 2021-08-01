@@ -61,8 +61,9 @@ class GetTeachersUsecase extends AbstractGetUsecase<
       lessonDurations,
     } = query || {};
     const searchQuery: StringKeyObject = {
-      // 'teacherData.isHidden': false,
-      // 'teacherData.applicationStatus': 'approved',
+      role: 'teacher',
+      'teacherData.isHidden': false,
+      'teacherData.applicationStatus': 'approved',
     };
     this._handleUserFilters({ name, contactMethodName, contactMethodType, searchQuery });
     this._handleTeacherFilters({
