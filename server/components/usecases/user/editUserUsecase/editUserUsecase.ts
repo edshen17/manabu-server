@@ -5,10 +5,11 @@ import {
 } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
+import { NGramHandler } from '../../../entities/utils/NGramHandler/NGramHandler';
 
 type OptionalEditUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
-  createEdgeNGrams: any;
+  makeNGramHandler: NGramHandler;
 };
 
 type EditUserUsecaseResponse = { user: JoinedUserDoc };
@@ -18,7 +19,7 @@ class EditUserUsecase extends AbstractEditUsecase<
   EditUserUsecaseResponse
 > {
   private _userDbService!: UserDbService;
-  private _createEdgeNGrams!: any;
+  private _nGramHandler!: NGramHandler;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -26,8 +27,11 @@ class EditUserUsecase extends AbstractEditUsecase<
     const { params, body, dbServiceAccessOptions } = props;
     const { name } = body;
     if (name) {
-      body.nameNGrams = this._createEdgeNGrams(name, false);
-      body.namePrefixNGrams = this._createEdgeNGrams(name, true);
+      body.nameNGrams = this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false });
+      body.namePrefixNGrams = this._nGramHandler.createEdgeNGrams({
+        str: name,
+        isPrefixOnly: true,
+      });
     }
     const savedDbUser = await this._userDbService.findOneAndUpdate({
       searchQuery: { _id: params.userId },
@@ -41,10 +45,10 @@ class EditUserUsecase extends AbstractEditUsecase<
   protected _initTemplate = async (
     optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditUserUsecaseInitParams>
   ): Promise<void> => {
-    const { makeUserDbService, makeEditEntityValidator, createEdgeNGrams } = optionalInitParams;
+    const { makeUserDbService, makeEditEntityValidator, makeNGramHandler } = optionalInitParams;
     this._userDbService = await makeUserDbService;
     this._editEntityValidator = makeEditEntityValidator;
-    this._createEdgeNGrams = createEdgeNGrams;
+    this._nGramHandler = makeNGramHandler;
   };
 }
 

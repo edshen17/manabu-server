@@ -7,6 +7,7 @@ import { PackageEntityValidator } from '../../validators/package/entity/packageE
 import { TeacherEntityValidator } from '../../validators/teacher/entity/teacherEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { TeacherEntityBuildResponse } from '../teacher/teacherEntity';
+import { NGramHandler } from '../utils/NGramHandler/NGramHandler';
 
 type OptionalUserEntityInitParams = {
   hashPassword: any;
@@ -14,7 +15,7 @@ type OptionalUserEntityInitParams = {
   signJwt: any;
   makeTeacherEntityValidator: TeacherEntityValidator;
   makePackageEntityValidator: PackageEntityValidator;
-  createEdgeNGrams: any;
+  makeNGramHandler: NGramHandler;
 };
 
 type UserEntityBuildParams = {
@@ -60,7 +61,7 @@ class UserEntity extends AbstractEntity<
   private _signJwt!: any;
   private _teacherEntityValidator!: TeacherEntityValidator;
   private _packageEntityValidator!: PackageEntityValidator;
-  private _createEdgeNGrams!: any;
+  private _nGramHandler!: NGramHandler;
 
   protected _validate = (buildParams: UserEntityBuildParams) => {
     const { teacherData, ...userData } = buildParams;
@@ -110,8 +111,8 @@ class UserEntity extends AbstractEntity<
       verificationToken,
       lastUpdated: new Date(),
       teacherData,
-      nameNGrams: this._createEdgeNGrams({ str: name, isPrefixOnly: false }),
-      namePrefixNGrams: this._createEdgeNGrams({ str: name, isPrefixOnly: true }),
+      nameNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false }),
+      namePrefixNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: true }),
     });
     return userEntity;
   };
@@ -144,14 +145,14 @@ class UserEntity extends AbstractEntity<
       cryptoRandomString,
       makeTeacherEntityValidator,
       makePackageEntityValidator,
-      createEdgeNGrams,
+      makeNGramHandler,
     } = optionalInitParams;
     this._hashPassword = hashPassword;
     this._signJwt = signJwt;
     this._cryptoRandomString = cryptoRandomString;
     this._teacherEntityValidator = makeTeacherEntityValidator;
     this._packageEntityValidator = makePackageEntityValidator;
-    this._createEdgeNGrams = createEdgeNGrams;
+    this._nGramHandler = makeNGramHandler;
   };
 }
 

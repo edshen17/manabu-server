@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { makeGetTeachersController } from '.';
-import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
-import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
+import { makeUserDbService } from '../../../dataAccess/services/user';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
@@ -14,26 +14,27 @@ let fakeDbUserFactory: FakeDbUserFactory;
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let getTeachersController: GetTeachersController;
 let queryStringHandler: QueryStringHandler;
-let teacherDbService: TeacherDbService;
+let userDbService: UserDbService;
 
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
   iHttpRequestBuilder = makeIHttpRequestBuilder;
   getTeachersController = await makeGetTeachersController;
   queryStringHandler = makeQueryStringHandler;
-  teacherDbService = await makeTeacherDbService;
+  userDbService = await makeUserDbService;
 });
 
 describe('getTeachersController', () => {
   describe('makeRequest', () => {
     it('should get teachers from the filter', async () => {
       const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-      const dbServiceAccessOptions = teacherDbService.getBaseDbServiceAccessOptions();
-      await teacherDbService.findOneAndUpdate({
-        searchQuery: { _id: fakeTeacher.teacherData!._id },
+      const dbServiceAccessOptions = userDbService.getBaseDbServiceAccessOptions();
+      await userDbService.findOneAndUpdate({
+        searchQuery: { _id: fakeTeacher._id },
         updateQuery: {
-          applicationStatus: 'approved',
-          teacherType: 'licensed',
+          role: 'teacher',
+          'teacherData.applicationStatus': 'approved',
+          'teacherData.teacherType': 'licensed',
         },
         dbServiceAccessOptions,
       });

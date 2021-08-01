@@ -52,7 +52,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return storedData;
   };
 
-  protected _getDbServiceModelView = (
+  private _getDbServiceModelView = (
     dbServiceAccessOptions: DbServiceAccessOptions
   ): { modelView: {}; modelViewName: string } => {
     const { isSelf, currentAPIUserRole, isOverrideView } = dbServiceAccessOptions || {};
@@ -209,7 +209,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     });
   };
 
-  protected _clearCacheDependencies = async (): Promise<void> => {
+  private _clearCacheBrancher = async (): Promise<void> => {
+    const isAsync = process.env.NODE_ENV != 'production';
+    if (isAsync) {
+      await this._clearCacheDependencies();
+    } else {
+      this._clearCacheDependencies();
+    }
+  };
+
+  private _clearCacheDependencies = async (): Promise<void> => {
     const cacheDependencies = this._getCacheDependencies();
     await this._cacheDbService.clearHashKey(this._dbModelName);
     for (const cacheDependency of cacheDependencies) {
@@ -322,7 +331,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheDependencies();
+    await this._clearCacheBrancher();
     return dbQueryResult;
   };
 
@@ -343,7 +352,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheDependencies();
+    await this._clearCacheBrancher();
     return dbQueryResult;
   };
 
@@ -357,7 +366,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheDependencies();
+    await this._clearCacheBrancher();
     return dbQueryResult;
   };
 
@@ -371,7 +380,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheDependencies();
+    await this._clearCacheBrancher();
     return dbQueryResult;
   };
 
