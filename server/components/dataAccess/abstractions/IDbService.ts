@@ -17,6 +17,7 @@ type DbServiceParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
   modelToInsert?: StringKeyObject;
   updateQuery?: StringKeyObject;
+  paginationOptions?: PaginationOptions;
 };
 
 type DbServiceAccessOptions = {
@@ -26,6 +27,12 @@ type DbServiceAccessOptions = {
   isSelf: boolean;
   isOverrideView?: boolean;
   isReturningParent?: boolean;
+};
+
+type PaginationOptions = {
+  page: number;
+  limit: number;
+  sort: StringKeyObject;
 };
 
 enum DB_SERVICE_JOIN_TYPE {
@@ -82,6 +89,7 @@ export {
   DbServiceAccessOptions,
   DbServiceParams,
   IDbService,
+  PaginationOptions,
   DbServiceModelViews,
   DbServiceInitParams,
   DB_SERVICE_JOIN_TYPE,

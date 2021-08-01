@@ -25,7 +25,6 @@ describe('loginUserController', () => {
         password: `${faker.internet.password()}A1!`,
         email: faker.internet.email(),
       };
-      const fakeUser = await fakeDbUserFactory.createFakeDbData(fakeUserEntityData);
       const loginUserHttpRequest = iHttpRequestBuilder
         .path('/base/login')
         .body(fakeUserEntityData)

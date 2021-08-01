@@ -8,6 +8,7 @@ import {
   DB_SERVICE_JOIN_TYPE,
   DB_SERVICE_MODEL_VIEW,
   DB_SERVICE_CACHE_CLIENT,
+  PaginationOptions,
 } from './IDbService';
 
 abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
@@ -30,7 +31,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public findOne = async (dbServiceParams: {
-    searchQuery?: {};
+    searchQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
@@ -83,7 +84,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   protected _getDbQueryResult = async (props: {
     dbServiceAccessOptions: DbServiceAccessOptions;
     dbQueryPromise: any;
-    searchQuery?: {};
+    searchQuery?: StringKeyObject;
   }): Promise<any> => {
     const { dbServiceAccessOptions, dbQueryPromise } = props;
     let dbQueryResult = await this._executeQuery({ dbServiceAccessOptions, dbQueryPromise });
@@ -162,7 +163,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   protected _getCacheKey = (props: {
-    searchQuery?: {};
+    searchQuery?: StringKeyObject;
     modelViewName: string;
     cacheClient: string;
   }): string => {
@@ -243,18 +244,29 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public find = async (dbServiceParams: {
-    searchQuery?: {};
+    searchQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    paginationOptions?: PaginationOptions;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, paginationOptions, dbServiceAccessOptions } = dbServiceParams;
     const { modelView, modelViewName } = this._getDbServiceModelView(dbServiceAccessOptions);
+    const { page, limit, sort } = paginationOptions || {
+      page: 0,
+      limit: 20,
+      sort: {},
+    };
     const cacheKey = this._getCacheKey({
       searchQuery,
       modelViewName,
       cacheClient: DB_SERVICE_CACHE_CLIENT.FIND,
     });
     const cacheData = await this._getCacheData(cacheKey);
-    const dbQueryPromise = this._dbModel.find(searchQuery, modelView).lean();
+    const dbQueryPromise = this._dbModel
+      .find(searchQuery, modelView)
+      .sort(sort)
+      .skip(page * limit)
+      .limit(limit)
+      .lean();
     const storedData = await this._handleStoredData({
       cacheKey,
       cacheData,
@@ -265,7 +277,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public insert = async (dbServiceParams: {
-    modelToInsert?: {};
+    modelToInsert?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
@@ -278,7 +290,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public insertMany = async (dbServiceParams: {
-    modelToInsert?: {};
+    modelToInsert?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
@@ -294,8 +306,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public findOneAndUpdate = async (dbServiceParams: {
-    searchQuery?: {};
-    updateQuery?: {};
+    searchQuery?: StringKeyObject;
+    updateQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
@@ -315,8 +327,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public updateMany = async (dbServiceParams: {
-    searchQuery?: {};
-    updateQuery?: {};
+    searchQuery?: StringKeyObject;
+    updateQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
@@ -350,7 +362,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public findOneAndDelete = async (dbServiceParams: {
-    searchQuery?: {};
+    searchQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;

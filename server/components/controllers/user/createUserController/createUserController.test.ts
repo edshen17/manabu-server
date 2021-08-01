@@ -42,6 +42,12 @@ describe('createUserController', () => {
             isTeacherApp: true,
           },
         });
+        const t = queryStringHandler.encodeQueryStringObj({
+          name: 't',
+          page: 0,
+          limit: 1,
+        });
+        console.log(t, 'here');
         const query = queryStringHandler.parseQueryString(state);
         const createUserHttpRequest = iHttpRequestBuilder
           .body({

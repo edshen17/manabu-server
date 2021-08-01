@@ -5,18 +5,14 @@ import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuil
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { CreateUserUsecase, CreateUserUsecaseResponse } from './createUserUsecase';
 import { makeCreateUserUsecase } from '.';
-import { QueryStringHandler } from '../../utils/queryStringHandler/queryStringHandler';
-import { makeQueryStringHandler } from '../../utils/queryStringHandler';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let createUserUsecase: CreateUserUsecase;
-let queryStringHandler: QueryStringHandler;
 let routeData: RouteData;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   createUserUsecase = await makeCreateUserUsecase;
-  queryStringHandler = makeQueryStringHandler;
 });
 
 beforeEach(() => {

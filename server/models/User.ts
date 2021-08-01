@@ -1,5 +1,4 @@
 import mongooseUniqueValidator from 'mongoose-unique-validator';
-import mongoosePaginate from 'mongoose-paginate-v2';
 import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
 import { TeacherSchema } from './Teacher';
 
@@ -44,7 +43,6 @@ const UserSchema = createSchema({
 });
 
 UserSchema.plugin(mongooseUniqueValidator);
-UserSchema.plugin(mongoosePaginate);
 UserSchema.index(
   { nameNGrams: 'text', namePrefixNGrams: 'text' },
   { weights: { nameNGrams: 100, namePrefixNGrams: 200 } }

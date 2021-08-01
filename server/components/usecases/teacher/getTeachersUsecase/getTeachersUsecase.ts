@@ -1,5 +1,8 @@
 import { JoinedUserDoc } from '../../../../models/User';
-import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import {
+  DbServiceAccessOptions,
+  PaginationOptions,
+} from '../../../dataAccess/abstractions/IDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -34,9 +37,11 @@ class GetTeachersUsecase extends AbstractGetUsecase<
   }): Promise<JoinedUserDoc[]> => {
     const { query, dbServiceAccessOptions } = props;
     const searchQuery = this._processQuery(query);
+    const paginationOptions = this._getPaginationOptions(query);
     const teachers = await this._userDbService.find({
       searchQuery,
       dbServiceAccessOptions,
+      paginationOptions,
     });
     return teachers;
   };
@@ -56,9 +61,8 @@ class GetTeachersUsecase extends AbstractGetUsecase<
       lessonDurations,
     } = query || {};
     const searchQuery: StringKeyObject = {
-      'teacherData.isHidden': false,
-      'teacherData.applicationStatus': 'approved',
-      // date approved
+      // 'teacherData.isHidden': false,
+      // 'teacherData.applicationStatus': 'approved',
     };
     this._handleUserFilters({ name, contactMethodName, contactMethodType, searchQuery });
     this._handleTeacherFilters({
@@ -159,6 +163,12 @@ class GetTeachersUsecase extends AbstractGetUsecase<
         $in: lessonDurations,
       };
     }
+  };
+
+  private _getPaginationOptions = (query: StringKeyObject): PaginationOptions => {
+    const { page, limit } = query || { page: 0, limit: 20 };
+    const paginationOptions = { page, limit, sort: { 'teacherData.approvalDate': 1 } };
+    return paginationOptions;
   };
 
   protected _initTemplate = async (
