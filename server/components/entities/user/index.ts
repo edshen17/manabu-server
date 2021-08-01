@@ -5,7 +5,7 @@ import { UserEntity } from './userEntity';
 import { makeUserEntityValidator } from '../../validators/user/entity';
 import { makeTeacherEntityValidator } from '../../validators/teacher/entity';
 import { makePackageEntityValidator } from '../../validators/package/entity';
-import { makeNGramHandler } from '../utils/NGramHandler';
+import { makeNGramHandler } from '../utils/nGramHandler';
 
 const makeUserEntity = new UserEntity().init({
   hashPassword,

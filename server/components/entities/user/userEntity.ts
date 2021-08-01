@@ -7,7 +7,7 @@ import { PackageEntityValidator } from '../../validators/package/entity/packageE
 import { TeacherEntityValidator } from '../../validators/teacher/entity/teacherEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { TeacherEntityBuildResponse } from '../teacher/teacherEntity';
-import { NGramHandler } from '../utils/NGramHandler/NGramHandler';
+import { NGramHandler } from '../utils/nGramHandler/NGramHandler';
 
 type OptionalUserEntityInitParams = {
   hashPassword: any;

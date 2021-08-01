@@ -5,7 +5,7 @@ import {
 } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
-import { NGramHandler } from '../../../entities/utils/NGramHandler/NGramHandler';
+import { NGramHandler } from '../../../entities/utils/nGramHandler/NGramHandler';
 
 type OptionalEditUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;

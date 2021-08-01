@@ -1,6 +1,6 @@
 import cloneDeep from 'clone-deep';
 import { makeUserDbService } from '../../../dataAccess/services/user';
-import { makeNGramHandler } from '../../../entities/utils/NGramHandler';
+import { makeNGramHandler } from '../../../entities/utils/nGramHandler';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { makeUserEntityValidator } from '../../../validators/user/entity';
 import { makeUserParamsValidator } from '../../../validators/user/params';
