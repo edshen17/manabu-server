@@ -45,12 +45,7 @@ class CacheDbService {
       } else {
         const endsWithIdRegex = /id$/i;
         const isObjectId = property.match(endsWithIdRegex) && value.length === 24;
-        const isDateProperty =
-          property.includes('startTime') ||
-          property.includes('endTime') ||
-          property.includes('Date') ||
-          property.includes('lastUpdated') ||
-          property.includes('lastOnline');
+        const isDateProperty = property.includes('Date');
         const isDateStr = this._isDateStr(value) && isDateProperty;
         if (isObjectId) {
           obj[property] = this._convertStringToObjectId(obj[property]);

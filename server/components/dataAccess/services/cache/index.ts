@@ -13,14 +13,8 @@ let clientOptions: {} = {
   password: process.env.REDIS_PASS,
 };
 
-// if (process.env.NODE_ENV != 'production') {
-//   clientOptions = {
-//     port: 6379,
-//   };
-// }
-
 const redisClient = new Redis(clientOptions);
-let redisGraph = new Graph('social', redisClient);
+let redisGraph = new Graph('social-network', redisClient);
 
 const makeCacheDbService = new CacheDbService().init({
   redisClient,

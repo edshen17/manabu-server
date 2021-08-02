@@ -76,7 +76,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { state } = query || {};
     const { isTeacherApp } = state || {};
     const userInstance = this._userEntity.build(body);
-    let savedDbUser = await this._createDbUser(userInstance, dbServiceAccessOptions);
+    let savedDbUser = await this._createDbUser({ userInstance, dbServiceAccessOptions });
     if (isTeacherApp) {
       savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
     }
@@ -98,28 +98,21 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return usecaseRes;
   };
 
-  private _createDbUser = async (
-    userInstance: any,
-    dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<JoinedUserDoc> => {
+  private _createDbUser = async (props: {
+    userInstance: any;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<JoinedUserDoc> => {
+    const { userInstance, dbServiceAccessOptions } = props;
     const savedDbUser = await this._userDbService.insert({
       modelToInsert: userInstance,
       dbServiceAccessOptions,
     });
-    const createUserNode = this._cacheDbService.graphQuery(
-      `CREATE (user: User { _id: "${savedDbUser._id}" })`
-    );
-    await this._createGraphQueryBrancher(createUserNode);
+    await this._createUserNode(savedDbUser);
     return savedDbUser;
   };
 
-  private _createGraphQueryBrancher = async (graphQuery: Promise<any>): Promise<void> => {
-    const isAsync = process.env.NODE_ENV != 'production';
-    if (isAsync) {
-      await graphQuery;
-    } else {
-      graphQuery;
-    }
+  private _createUserNode = async (savedDbUser: JoinedUserDoc): Promise<void> => {
+    await this._cacheDbService.graphQuery(`CREATE (user: User { _id: "${savedDbUser._id}" })`);
   };
 
   public handleTeacherCreation = async (
@@ -177,11 +170,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   private _createGraphAdminTeacherEdge = async (savedDbUser: JoinedUserDoc): Promise<void> => {
-    const createAdminTeacherEdge = this._cacheDbService.graphQuery(
+    await this._cacheDbService.graphQuery(
       `MATCH (teacher: User {_id: "${savedDbUser._id}"}), (admin: User {_id:"${process.env
         .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date()}"}]->(teacher)`
     );
-    await this._createGraphQueryBrancher(createAdminTeacherEdge);
   };
 
   private _createDbTeacherBalance = async (props: {

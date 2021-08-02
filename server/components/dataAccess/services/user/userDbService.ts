@@ -29,15 +29,18 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
         password: 0,
         verificationToken: 0,
         nameNGrams: 0,
+        namePrefixNGrams: 0,
       },
       selfView: {
         password: 0,
         verificationToken: 0,
         nameNGrams: 0,
+        namePrefixNGrams: 0,
       },
       overrideView: {
         verificationToken: 0,
         nameNGrams: 0,
+        namePrefixNGrams: 0,
       },
     };
   };
