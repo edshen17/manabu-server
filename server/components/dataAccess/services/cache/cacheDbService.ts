@@ -1,3 +1,11 @@
+type CacheDbServiceInitParams = {
+  redisClient: any;
+  convertStringToObjectId: any;
+  cloneDeep: any;
+  dayjs: any;
+  redisGraph: any;
+};
+
 enum TTL_MS {
   WEEK = 24 * 60 * 60 * 7 * 1000,
 }
@@ -7,6 +15,7 @@ class CacheDbService {
   private _convertStringToObjectId!: any;
   private _cloneDeep!: any;
   private _dayjs!: any;
+  private _redisGraph!: any;
 
   public get = async (props: { hashKey: string; key: string }): Promise<any> => {
     const { hashKey, key } = props;
@@ -85,17 +94,18 @@ class CacheDbService {
     await this._redisClient.flushdb();
   };
 
-  public init = async (initParams: {
-    redisClient: any;
-    convertStringToObjectId: any;
-    cloneDeep: any;
-    dayjs: any;
-  }): Promise<this> => {
-    const { redisClient, convertStringToObjectId, cloneDeep, dayjs } = initParams;
+  public graphQuery = async (query: string): Promise<any> => {
+    const graphRes = await this._redisGraph.query(query);
+    return graphRes;
+  };
+
+  public init = async (initParams: CacheDbServiceInitParams): Promise<this> => {
+    const { redisClient, convertStringToObjectId, cloneDeep, dayjs, redisGraph } = initParams;
     this._redisClient = redisClient;
     this._convertStringToObjectId = convertStringToObjectId;
     this._cloneDeep = cloneDeep;
     this._dayjs = dayjs;
+    this._redisGraph = redisGraph;
     return this;
   };
 }

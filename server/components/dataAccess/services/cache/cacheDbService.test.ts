@@ -54,4 +54,20 @@ describe('cacheDbService', () => {
       expect(storedItem).to.equal(null);
     });
   });
+  describe('graphQuery', () => {
+    it('should make a graph query', async () => {
+      await cacheDbService.graphQuery("CREATE (:person{name:'roi',age:32})");
+      await cacheDbService.graphQuery("CREATE (:person{name:'amit',age:30})");
+      await cacheDbService.graphQuery(
+        "MATCH (a:person), (b:person) WHERE (a.name = 'roi' AND b.name='amit') CREATE (a)-[:knows]->(b)"
+      );
+      const res = await cacheDbService.graphQuery(
+        'MATCH (a:person)-[:knows]->(:person) RETURN a.name'
+      );
+      while (res.hasNext()) {
+        let record = res.next();
+        expect(record.get('a.name')).to.equal('roi');
+      }
+    });
+  });
 });

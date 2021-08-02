@@ -1,36 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const User = require('../../models/User');
-const Teacher = require('../../models/Teacher');
-const AvailableTime = require('../../models/AvailableTime');
-const Appointment = require('../../models/Appointment');
-const Package = require('../../models/Package').Package;
-const PackageTransaction = require('../../models/PackageTransaction');
-const MinuteBank = require('../../models/MinuteBank');
-const TeacherBalance = require('../../models/TeacherBalance');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv').config();
 const VerifyToken = require('../../components/VerifyToken');
 const scheduler = require('../../components/scheduler/schedule');
 const { fetchExchangeRate } = require('../../components/scheduler/exchangeRateFetcher');
-const handleErrors = require('../../components/controllers/errorHandler');
 const verifyTransactionData = require('../../components/verifyTransactionData');
-const getHost = require('../../components/controllers/utils/getHost');
-const { makeExpressCallback } = require('../../components/express-callback/index');
-const { userControllerMain } = require('../../components/controllers/user/index');
-const { google } = require('googleapis');
-
 const fx = require('money');
 let exchangeRate;
 const dayjs = require('dayjs');
 const paypal = require('paypal-rest-sdk');
-const {
-  clearKey,
-  clearSpecificKey,
-  updateSpecificKey,
-} = require('../../components/dataAccess/cache');
 const paypalConfig = {
   mode: 'sandbox', //sandbox or live, change to use process env
   client_id: process.env.PAYPAL_CLIENT_ID_DEV,
@@ -467,19 +443,6 @@ router.post('/transaction/package', VerifyToken, (req, res, next) => {
       } else {
         return res.status(500).send('error');
       }
-    })
-    .catch((err) => handleErrors(err, req, res, next));
-});
-
-// GET route for package details
-router.get('/transaction/package/:hostedBy', (req, res, next) => {
-  Package.find({
-    hostedBy: req.params.hostedBy,
-  })
-    .lean() // TODO TO DO cache here
-    .sort([['lessonAmount', 1]])
-    .then((package) => {
-      return res.status(200).json(package);
     })
     .catch((err) => handleErrors(err, req, res, next));
 });
