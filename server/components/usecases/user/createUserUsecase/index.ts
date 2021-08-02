@@ -18,20 +18,20 @@ import { makePackageEntity } from '../../../entities/package';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeUserQueryValidator } from '../../../validators/user/query';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
+import { makeCacheDbService } from '../../../dataAccess/services/cache';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserEntity,
   makePackageEntity,
   makePackageTransactionEntity,
-  makeMinuteBankEntity,
   makeTeacherEntity,
   makeTeacherBalanceEntity,
   makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,
-  makeMinuteBankDbService,
   makeTeacherBalanceDbService,
+  makeCacheDbService,
   signJwt,
   emailHandler,
   makeRedirectUrlBuilder,

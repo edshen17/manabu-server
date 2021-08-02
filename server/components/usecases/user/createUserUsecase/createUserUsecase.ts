@@ -1,7 +1,5 @@
-import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { PackageDbService } from '../../../dataAccess/services/package/packageDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
@@ -17,22 +15,21 @@ import { PackageTransactionEntity } from '../../../entities/packageTransaction/p
 import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity } from '../../../entities/package/packageEntity';
-import { MinuteBankEntity } from '../../../entities/minuteBank/minuteBankEntity';
 import { JoinedUserDoc } from '../../../../models/User';
+import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 
 type OptionalCreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
   makePackageEntity: Promise<PackageEntity>;
   makePackageTransactionEntity: Promise<PackageTransactionEntity>;
   makeTeacherBalanceEntity: Promise<TeacherBalanceEntity>;
-  makeMinuteBankEntity: Promise<MinuteBankEntity>;
   makeTeacherEntity: Promise<TeacherEntity>;
   makeUserDbService: Promise<UserDbService>;
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-  makeMinuteBankDbService: Promise<MinuteBankDbService>;
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
+  makeCacheDbService: Promise<CacheDbService>;
   signJwt: any;
   emailHandler: EmailHandler;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
@@ -63,15 +60,14 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _packageTransactionEntity!: PackageTransactionEntity;
   private _teacherBalanceEntity!: TeacherBalanceEntity;
   private _teacherEntity!: TeacherEntity;
-  private _minuteBankEntity!: MinuteBankEntity;
   private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
-  private _minuteBankDbService!: MinuteBankDbService;
   private _teacherBalanceDbService!: TeacherBalanceDbService;
   private _signJwt!: any;
   private _emailHandler!: EmailHandler;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _convertStringToObjectId!: any;
+  private _cacheDbService!: CacheDbService;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -110,21 +106,34 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       modelToInsert: userInstance,
       dbServiceAccessOptions,
     });
+    const createUserNode = this._cacheDbService.graphQuery(
+      `CREATE (user: User { _id: "${savedDbUser._id}" })`
+    );
+    await this._createGraphQueryBrancher(createUserNode);
     return savedDbUser;
+  };
+
+  private _createGraphQueryBrancher = async (graphQuery: Promise<any>): Promise<void> => {
+    const isAsync = process.env.NODE_ENV != 'production';
+    if (isAsync) {
+      await graphQuery;
+    } else {
+      graphQuery;
+    }
   };
 
   public handleTeacherCreation = async (
     savedDbUser: JoinedUserDoc,
     dbServiceAccessOptions: DbServiceAccessOptions
   ): Promise<JoinedUserDoc> => {
-    const joinedUserData = await this._addTeacherData({ savedDbUser, dbServiceAccessOptions });
-    await this._createDbAdminPackageTransaction(savedDbUser, dbServiceAccessOptions);
-    await this._createDbAdminMinuteBank(savedDbUser, dbServiceAccessOptions);
-    await this._createDbTeacherBalance(savedDbUser, dbServiceAccessOptions);
+    const joinedUserData = await this._createTeacherData({ savedDbUser, dbServiceAccessOptions });
+    await this._createDbAdminPackageTransaction({ savedDbUser, dbServiceAccessOptions });
+    await this._createGraphAdminTeacherEdge(savedDbUser);
+    await this._createDbTeacherBalance({ savedDbUser, dbServiceAccessOptions });
     return joinedUserData;
   };
 
-  private _addTeacherData = async (props: {
+  private _createTeacherData = async (props: {
     savedDbUser: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
@@ -140,10 +149,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return savedDbTeacher;
   };
 
-  private _createDbAdminPackageTransaction = async (
-    savedDbUser: JoinedUserDoc,
-    dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<PackageTransactionDoc> => {
+  private _createDbAdminPackageTransaction = async (props: {
+    savedDbUser: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<PackageTransactionDoc> => {
+    const { savedDbUser, dbServiceAccessOptions } = props;
     const modelToInsert = await this._packageTransactionEntity.build({
       hostedById: this._convertStringToObjectId(process.env.MANABU_ADMIN_ID!),
       reservedById: savedDbUser._id,
@@ -166,25 +176,19 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return newPackageTransaction;
   };
 
-  private _createDbAdminMinuteBank = async (
-    savedDbUser: JoinedUserDoc,
-    dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<MinuteBankDoc> => {
-    const modelToInsert = await this._minuteBankEntity.build({
-      hostedById: this._convertStringToObjectId(process.env.MANABU_ADMIN_ID!),
-      reservedById: savedDbUser._id,
-    });
-    const newMinuteBank = await this._minuteBankDbService.insert({
-      modelToInsert,
-      dbServiceAccessOptions,
-    });
-    return newMinuteBank;
+  private _createGraphAdminTeacherEdge = async (savedDbUser: JoinedUserDoc): Promise<void> => {
+    const createAdminTeacherEdge = this._cacheDbService.graphQuery(
+      `MATCH (teacher: User {_id: "${savedDbUser._id}"}), (admin: User {_id:"${process.env
+        .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date()}"}]->(teacher)`
+    );
+    await this._createGraphQueryBrancher(createAdminTeacherEdge);
   };
 
-  private _createDbTeacherBalance = async (
-    savedDbUser: JoinedUserDoc,
-    dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<TeacherBalanceDoc> => {
+  private _createDbTeacherBalance = async (props: {
+    savedDbUser: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<TeacherBalanceDoc> => {
+    const { savedDbUser, dbServiceAccessOptions } = props;
     const modelToInsert = await this._teacherBalanceEntity.build({
       userId: savedDbUser._id,
     });
@@ -281,10 +285,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makeTeacherBalanceEntity,
       makeTeacherEntity,
       makeUserDbService,
-      makeMinuteBankEntity,
       makePackageTransactionDbService,
-      makeMinuteBankDbService,
       makeTeacherBalanceDbService,
+      makeCacheDbService,
       signJwt,
       emailHandler,
       makeRedirectUrlBuilder,
@@ -294,11 +297,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._packageTransactionEntity = await makePackageTransactionEntity;
     this._teacherBalanceEntity = await makeTeacherBalanceEntity;
     this._teacherEntity = await makeTeacherEntity;
-    this._minuteBankEntity = await makeMinuteBankEntity;
     this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
-    this._minuteBankDbService = await makeMinuteBankDbService;
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
+    this._cacheDbService = await makeCacheDbService;
     this._signJwt = signJwt;
     this._emailHandler = emailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
