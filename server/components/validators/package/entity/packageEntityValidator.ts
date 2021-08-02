@@ -12,10 +12,12 @@ class PackageEntityValidator extends AbstractEntityValidator {
       packageType: this._joi.string().valid('default', 'custom'),
       lessonDurations: this._joi.array().items(this._joi.number().valid(30, 60, 90, 120)).unique(),
       tags: this._joi.array().items(this._joi.string().max(100)).unique(),
-      lastUpdated: this._joi.date(),
+      createdDate: this._joi.date(),
+      lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      lastUpdated: this._joi.date().forbidden(),
+      createdDate: this._joi.date().forbidden(),
+      lastModifiedDate: this._joi.date().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };

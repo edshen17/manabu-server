@@ -8,20 +8,21 @@ type AppointmentEntityBuildParams = {
   hostedById: ObjectId;
   reservedById: ObjectId;
   packageTransactionId: ObjectId;
-  startTime: Date;
-  endTime: Date;
+  startDate: Date;
+  endDate: Date;
 };
 
 type AppointmentEntityBuildResponse = {
   hostedById: ObjectId;
   reservedById: ObjectId;
   packageTransactionId: ObjectId;
-  startTime: Date;
-  endTime: Date;
+  startDate: Date;
+  endDate: Date;
   isPast: boolean;
   status: string;
   cancellationReason?: string;
-  lastUpdated: Date;
+  createdDate: Date;
+  lastModifiedDate: Date;
 };
 
 class AppointmentEntity extends AbstractEntity<
@@ -40,16 +41,17 @@ class AppointmentEntity extends AbstractEntity<
   protected _buildTemplate = async (
     buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
-    const { hostedById, reservedById, packageTransactionId, startTime, endTime } = buildParams;
+    const { hostedById, reservedById, packageTransactionId, startDate, endDate } = buildParams;
     const appointmentEntity = Object.freeze({
       hostedById,
       reservedById,
       packageTransactionId,
-      startTime,
-      endTime,
+      startDate,
+      endDate,
       isPast: false,
       status: 'pending',
-      lastUpdated: new Date(),
+      createdDate: new Date(),
+      lastModifiedDate: new Date(),
     });
     return appointmentEntity;
   };

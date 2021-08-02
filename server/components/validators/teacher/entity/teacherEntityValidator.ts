@@ -23,13 +23,15 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       isHidden: this._joi.boolean(),
       lessonCount: this._joi.number(),
       studentCount: this._joi.number(),
-      lastUpdated: this._joi.date(),
+      createdDate: this._joi.date(),
+      lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       approvalDate: this._joi.date().forbidden(),
       lessonCount: this._joi.number().forbidden(),
       studentCount: this._joi.number().forbidden(),
-      lastUpdated: this._joi.date().forbidden(),
+      createdDate: this._joi.date().forbidden(),
+      lastModifiedDate: this._joi.date().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };

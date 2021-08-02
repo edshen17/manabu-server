@@ -14,8 +14,8 @@ beforeEach(() => {
     hostedById: '5d6ede6a0ba62570afcedd3a',
     reservedById: '5d6ede6a0ba62570afcedd3a',
     packageTransactionId: '5d6ede6a0ba62570afcedd3a',
-    startTime: new Date(),
-    endTime: new Date(),
+    startDate: new Date(),
+    endDate: new Date(),
   };
 });
 

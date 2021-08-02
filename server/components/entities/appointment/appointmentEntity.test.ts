@@ -37,8 +37,8 @@ describe('appointmentEntity', () => {
           hostedById: fakeHostedBy._id,
           reservedById: fakeReservedBy._id,
           packageTransactionId: fakePackageTransaction._id,
-          startTime: new Date(),
-          endTime: new Date(),
+          startDate: new Date(),
+          endDate: new Date(),
         });
         expect(fakeAppointment.hostedById).to.equal(fakeHostedBy._id);
         expect(fakeAppointment.reservedById).to.equal(fakeReservedBy._id);

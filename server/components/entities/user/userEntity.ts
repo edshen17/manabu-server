@@ -7,7 +7,7 @@ import { PackageEntityValidator } from '../../validators/package/entity/packageE
 import { TeacherEntityValidator } from '../../validators/teacher/entity/teacherEntityValidator';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { TeacherEntityBuildResponse } from '../teacher/teacherEntity';
-import { NGramHandler } from '../utils/nGramHandler/NGramHandler';
+import { NGramHandler } from '../utils/nGramHandler/nGramHandler';
 
 type OptionalUserEntityInitParams = {
   hashPassword: any;
@@ -35,18 +35,18 @@ type UserEntityBuildResponse = {
   password?: string;
   profileImageUrl: string;
   profileBio: string;
-  registrationDate: Date;
+  createdDate: Date;
   languages?: { level: string; language: string }[];
   region: string;
   timezone: string;
-  lastOnline: Date;
+  lastOnlineDate: Date;
   role: string;
   settings: { currency: string; locale: string };
   memberships: string[];
   contactMethods: UserContactMethod[] | [];
   isEmailVerified: boolean;
   verificationToken: string;
-  lastUpdated: Date;
+  lastModifiedDate: Date;
   nameNGrams: string;
   namePrefixNGrams: string;
 };
@@ -98,18 +98,18 @@ class UserEntity extends AbstractEntity<
       password: encryptedPassword,
       profileImageUrl: profileImageUrl || '',
       profileBio: '',
-      registrationDate: new Date(),
+      createdDate: new Date(),
       languages: [],
       region: '',
       timezone: '',
-      lastOnline: new Date(),
+      lastOnlineDate: new Date(),
       role: 'user',
       settings: { currency: 'SGD', locale: 'en' },
       memberships: [],
       contactMethods: contactMethods || [],
       isEmailVerified: false,
       verificationToken,
-      lastUpdated: new Date(),
+      lastModifiedDate: new Date(),
       teacherData,
       nameNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false }),
       namePrefixNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: true }),

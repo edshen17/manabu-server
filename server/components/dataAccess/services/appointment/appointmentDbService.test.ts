@@ -29,8 +29,8 @@ beforeEach(async () => {
     hostedById: fakeAppointmentTransaction.hostedById,
     reservedById: fakeAppointmentTransaction.reservedById,
     packageTransactionId: fakeAppointmentTransaction._id,
-    startTime: new Date(),
-    endTime: new Date(),
+    startDate: new Date(),
+    endDate: new Date(),
   });
 });
 

@@ -62,8 +62,8 @@ beforeEach(async () => {
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
-    startTime: new Date(),
-    endTime: new Date(),
+    startDate: new Date(),
+    endDate: new Date(),
   });
 });
 

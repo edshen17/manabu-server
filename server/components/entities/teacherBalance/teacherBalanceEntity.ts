@@ -9,6 +9,8 @@ type TeacherBalanceEntityBuildResponse = {
   userId: ObjectId;
   balance: number;
   currency: string;
+  createdDate: Date;
+  lastModifiedDate: Date;
 };
 
 class TeacherBalanceEntity extends AbstractEntity<
@@ -22,6 +24,8 @@ class TeacherBalanceEntity extends AbstractEntity<
       userId,
       balance: 0,
       currency: 'SGD',
+      createdDate: new Date(),
+      lastModifiedDate: new Date(),
     });
     return teacherBalanceEntity;
   };

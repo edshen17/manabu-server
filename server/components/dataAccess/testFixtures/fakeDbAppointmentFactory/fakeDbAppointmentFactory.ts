@@ -24,8 +24,8 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
       hostedById: fakePackageTransaction.hostedById.toString(),
       reservedById: fakePackageTransaction.reservedById.toString(),
       packageTransactionId: fakePackageTransaction._id.toString(),
-      startTime: new Date(),
-      endTime: new Date(),
+      startDate: new Date(),
+      endDate: new Date(),
     };
     return fakeBuildParams;
   };

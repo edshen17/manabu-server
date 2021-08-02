@@ -36,7 +36,8 @@ type PackageTransactionEntityBuildResponse = {
   isTerminated: boolean;
   paymentData: PaymentData;
   status: string;
-  lastUpdated: Date;
+  createdDate: Date;
+  lastModifiedDate: Date;
 };
 
 class PackageTransactionEntity extends AbstractEntity<
@@ -76,7 +77,8 @@ class PackageTransactionEntity extends AbstractEntity<
       isSubscription,
       paymentData,
       status: 'confirmed',
-      lastUpdated: new Date(),
+      createdDate: new Date(),
+      lastModifiedDate: new Date(),
     });
     return packageTransactionEntity;
   };

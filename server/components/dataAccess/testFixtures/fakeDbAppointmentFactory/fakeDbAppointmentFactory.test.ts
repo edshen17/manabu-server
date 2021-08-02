@@ -20,8 +20,8 @@ describe('fakeDbAppointmentFactory', () => {
         hostedById: fakePackageTransaction.hostedById.toString(),
         reservedById: fakePackageTransaction.reservedById.toString(),
         packageTransactionId: fakePackageTransaction._id.toString(),
-        startTime: new Date(),
-        endTime: new Date(),
+        startDate: new Date(),
+        endDate: new Date(),
       });
       expect(fakeAppointment).to.have.property('packageTransactionData');
     });

@@ -1,4 +1,4 @@
-import { NGramHandler } from './NGramHandler';
+import { NGramHandler } from './nGramHandler';
 
 const makeNGramHandler = new NGramHandler();
 

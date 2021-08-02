@@ -10,6 +10,8 @@ class MinuteBankEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       minuteBank: this._joi.number().min(0),
+      createdDate: this._joi.date(),
+      lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi
@@ -21,7 +23,8 @@ class MinuteBankEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
       minuteBank: this._joi.number().forbidden(),
-      lastUpdated: this._joi.date(),
+      createdDate: this._joi.date().forbidden(),
+      lastModifiedDate: this._joi.date().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };

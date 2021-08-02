@@ -15,14 +15,12 @@ const UserSchema = createSchema({
   password: Type.string({ required: false }),
   profileImageUrl: Type.string({ required: false }),
   profileBio: Type.string({ required: false }),
-  registrationDate: Type.date({ default: Date.now }),
   languages: Type.array({ required: true }).of({
     language: Type.string(),
     level: Type.string(),
   }),
   region: Type.string({ required: false }),
   timezone: Type.string({ required: false }),
-  lastOnline: Type.date({ default: Date.now }),
   role: Type.string({ required: true, enum: ['user', 'teacher', 'admin'], index: true }),
   settings: Type.object({
     required: true,
@@ -36,10 +34,12 @@ const UserSchema = createSchema({
   contactMethods: Type.array({ required: true }).of(UserContactMethodEmbed),
   isEmailVerified: Type.boolean({ required: true }),
   verificationToken: Type.string({ required: true }),
-  lastUpdated: Type.date({ required: true }),
   teacherData: Type.schema({ required: false }).of(TeacherSchema),
   nameNGrams: Type.string({ required: true }),
   namePrefixNGrams: Type.string({ required: true }),
+  createdDate: Type.date({ required: true }),
+  lastModifiedDate: Type.date({ required: true }),
+  lastOnlineDate: Type.date({ required: true }),
 });
 
 UserSchema.plugin(mongooseUniqueValidator);

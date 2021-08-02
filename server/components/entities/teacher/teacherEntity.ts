@@ -23,7 +23,7 @@ type TeacherEntityBuildResponse = {
   tags: string[];
   lessonCount: number;
   studentCount: number;
-  lastUpdated: Date;
+  lastModifiedDate: Date;
   packages: PackageEntityBuildResponse[];
 };
 
@@ -49,7 +49,8 @@ class TeacherEntity extends AbstractEntity<
       tags: [],
       lessonCount: 0,
       studentCount: 0,
-      lastUpdated: new Date(),
+      createdDate: new Date(),
+      lastModifiedDate: new Date(),
       packages: this._createDefaultPackages(),
     });
     return teacherEntity;

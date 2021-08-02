@@ -5,7 +5,8 @@ const MinuteBankSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   reservedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   minuteBank: Type.number({ required: true }),
-  lastUpdated: Type.date({ required: true }),
+  createdDate: Type.date({ required: true }),
+  lastModifiedDate: Type.date({ required: true }),
 });
 
 const MinuteBank = typedModel('MinuteBank', MinuteBankSchema);

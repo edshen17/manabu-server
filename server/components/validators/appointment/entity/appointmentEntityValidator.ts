@@ -12,8 +12,10 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
       packageTransactionId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
-      startTime: this._joi.date(),
-      endTime: this._joi.date(),
+      startDate: this._joi.date(),
+      endDate: this._joi.date(),
+      createdDate: this._joi.date(),
+      lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi
@@ -32,7 +34,8 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       cancellationReason: this._joi.string().max(256),
       packageTransactionData: this._joi.object().forbidden(),
-      lastUpdated: this._joi.date(),
+      createdDate: this._joi.date().forbidden(),
+      lastModifiedDate: this._joi.date().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };

@@ -26,6 +26,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
         gatewayName: this._joi.string().max(256),
         gatewayTransactionId: this._joi.string().alphanum().max(256),
       }),
+      createdDate: this._joi.date(),
+      lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi
@@ -51,7 +53,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       terminationDate: this._joi.date().forbidden(),
       transactionDate: this._joi.date().forbidden(),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
-      lastUpdated: this._joi.date(),
+      createdDate: this._joi.date().forbidden(),
+      lastModifiedDate: this._joi.date().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema;
   };

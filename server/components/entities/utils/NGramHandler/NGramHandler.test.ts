@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makeNGramHandler } from '.';
-import { NGramHandler } from './NGramHandler';
+import { NGramHandler } from './nGramHandler';
 
 let nGramHandler: NGramHandler;
 before(() => {

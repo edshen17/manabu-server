@@ -27,8 +27,9 @@ const TeacherSchema = createSchema({
   tags: Type.array({ required: true }).of(Type.string({ required: false })),
   lessonCount: Type.number({ required: true }),
   studentCount: Type.number({ required: true }),
-  lastUpdated: Type.date({ required: true }),
   packages: Type.array({ required: true }).of(PackageSchema),
+  createdDate: Type.date({ required: true }),
+  lastModifiedDate: Type.date({ required: true }),
 });
 
 const Teacher = typedModel('Teacher', TeacherSchema);

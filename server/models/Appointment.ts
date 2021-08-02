@@ -9,15 +9,16 @@ const AppointmentSchema = createSchema({
     'PackageTransaction',
     PackageTransactionSchema
   ),
-  startTime: Type.date({ required: true }),
-  endTime: Type.date({ required: true }),
+  startDate: Type.date({ required: true }),
+  endDate: Type.date({ required: true }),
   isPast: Type.boolean({ required: true }),
   status: Type.string({
     required: true,
     enum: ['pending', 'confirmed', 'cancelled'],
   }),
   cancellationReason: Type.string({ required: false }),
-  lastUpdated: Type.date({ required: true }),
+  createdDate: Type.date({ required: true }),
+  lastModifiedDate: Type.date({ required: true }),
 });
 
 const Appointment = typedModel('Appointment', AppointmentSchema);

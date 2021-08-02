@@ -12,7 +12,8 @@ type MinuteBankEntityBuildResponse = {
   hostedById: ObjectId;
   reservedById: ObjectId;
   minuteBank: number;
-  lastUpdated: Date;
+  createdDate: Date;
+  lastModifiedDate: Date;
 };
 
 class MinuteBankEntity extends AbstractEntity<
@@ -28,7 +29,8 @@ class MinuteBankEntity extends AbstractEntity<
       hostedById,
       reservedById,
       minuteBank: 0,
-      lastUpdated: new Date(),
+      createdDate: new Date(),
+      lastModifiedDate: new Date(),
     });
     return minuteBankEntity;
   };

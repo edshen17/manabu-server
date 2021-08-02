@@ -15,6 +15,9 @@ class UserEntityValidator extends AbstractEntityValidator {
         isPrimaryMethod: this._joi.boolean(),
         methodType: this._joi.string().max(256),
       }),
+      createdDate: this._joi.date(),
+      lastOnlineDate: this._joi.date(),
+      lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       profileBio: this._joi.string().htmlStrip().max(3000),
@@ -25,7 +28,6 @@ class UserEntityValidator extends AbstractEntityValidator {
       }),
       region: this._joi.string().max(256),
       timezone: this._joi.string().max(256),
-      lastOnline: this._joi.date().forbidden(),
       role: this._joi.string().forbidden(),
       settings: this._joi.object({
         currency: this._joi.string().max(5),
@@ -33,9 +35,11 @@ class UserEntityValidator extends AbstractEntityValidator {
       }),
       verificationToken: this._joi.string().forbidden(),
       isEmailVerified: this._joi.boolean().forbidden(),
-      lastUpdated: this._joi.date(),
       nameNGrams: this._joi.string(),
       namePrefixNGrams: this._joi.string(),
+      createdDate: this._joi.date().forbidden(),
+      lastOnlineDate: this._joi.date().forbidden(),
+      lastModifiedDate: this._joi.date().forbidden(),
     });
     this._adminValidationSchema = this._editValidationSchema.keys({
       memberships: this._joi.array().items({

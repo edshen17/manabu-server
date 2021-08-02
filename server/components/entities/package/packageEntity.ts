@@ -15,7 +15,8 @@ type PackageEntityBuildResponse = {
   isOffering: boolean;
   packageType: string;
   lessonDurations: number[];
-  lastUpdated: Date;
+  createdDate: Date;
+  lastModifiedDate: Date;
 };
 
 enum PACKAGE_ENTITY_NAME {
@@ -39,7 +40,8 @@ class PackageEntity extends AbstractEntity<
       packageType,
       packageName,
       lessonDurations,
-      lastUpdated: new Date(),
+      createdDate: new Date(),
+      lastModifiedDate: new Date(),
     });
     return packageEntity;
   };
