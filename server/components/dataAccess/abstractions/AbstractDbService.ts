@@ -291,7 +291,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<DbDoc> => {
     const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
     const insertedModel = await this._dbModel.create(modelToInsert).then((doc: any) => {
-      return doc.toObject();
+      return doc.toObject(); // lean
     });
     // return findById result rather than insertedModel to ensure caller gets correct select modelView
     const dbQueryResult = await this.findById({ _id: insertedModel._id, dbServiceAccessOptions });

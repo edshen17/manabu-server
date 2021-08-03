@@ -25,6 +25,13 @@ class FakeDbTeacherBalanceFactory extends AbstractFakeDbDataFactory<
     };
     return fakeBuildParams;
   };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalFakeDbTeacherBalanceFactoryInitParams
+  ) => {
+    const { makeFakeDbUserFactory } = optionalInitParams || {};
+    this._fakeDbUserFactory = await makeFakeDbUserFactory;
+  };
 }
 
 export { FakeDbTeacherBalanceFactory };

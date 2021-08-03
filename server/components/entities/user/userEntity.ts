@@ -49,6 +49,7 @@ type UserEntityBuildResponse = {
   lastModifiedDate: Date;
   nameNGrams: string;
   namePrefixNGrams: string;
+  teacherData?: TeacherEntityBuildResponse;
 };
 
 class UserEntity extends AbstractEntity<
