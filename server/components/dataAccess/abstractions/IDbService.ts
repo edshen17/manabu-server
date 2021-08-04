@@ -22,7 +22,6 @@ type DbServiceParams = {
 };
 
 type DbServiceAccessOptions = {
-  isProtectedResource: boolean;
   isCurrentAPIUserPermitted: boolean;
   currentAPIUserRole: string;
   isSelf: boolean;

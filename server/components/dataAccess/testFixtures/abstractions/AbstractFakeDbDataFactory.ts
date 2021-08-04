@@ -1,5 +1,5 @@
 import { IEntity } from '../../../entities/abstractions/IEntity';
-import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
+import { IDbService } from '../../abstractions/IDbService';
 import { FakeDbDataFactoryInitParams, IFakeDbDataFactory } from './IFakeDbDataFactory';
 
 abstract class AbstractFakeDbDataFactory<
@@ -17,23 +17,15 @@ abstract class AbstractFakeDbDataFactory<
 {
   protected _entity!: IEntity<any, EntityBuildParams, EntityBuildResponse>;
   protected _dbService!: IDbService<any, DbDoc>;
-  protected _dbServiceAccessOptions: DbServiceAccessOptions;
   protected _cloneDeep!: any;
-  constructor() {
-    this._dbServiceAccessOptions = {
-      isProtectedResource: false,
-      isCurrentAPIUserPermitted: true,
-      currentAPIUserRole: 'user',
-      isSelf: false,
-    };
-  }
 
   public createFakeDbData = async (buildParams?: EntityBuildParams): Promise<DbDoc> => {
     const fakeBuildParams = buildParams || (await this._createFakeBuildParams());
     const fakeEntity = await this._entity.build(fakeBuildParams);
+    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
     let fakeDbData = await this._dbService.insert({
       modelToInsert: fakeEntity,
-      dbServiceAccessOptions: this._dbServiceAccessOptions,
+      dbServiceAccessOptions,
     });
     return fakeDbData;
   };
@@ -68,11 +60,6 @@ abstract class AbstractFakeDbDataFactory<
       'makeEntity' | 'makeDbService' | 'cloneDeep'
     >
   ): Promise<void> => {};
-
-  public getDbServiceAccessOptions = (): DbServiceAccessOptions => {
-    const dbServiceAccessOptionsCopy = this._cloneDeep(this._dbServiceAccessOptions);
-    return dbServiceAccessOptionsCopy;
-  };
 }
 
 export { AbstractFakeDbDataFactory };

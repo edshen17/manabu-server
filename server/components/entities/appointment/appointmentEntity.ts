@@ -30,14 +30,6 @@ class AppointmentEntity extends AbstractEntity<
   AppointmentEntityBuildParams,
   AppointmentEntityBuildResponse
 > {
-  protected _dbServiceAccessOptions: DbServiceAccessOptions = {
-    isProtectedResource: false,
-    isCurrentAPIUserPermitted: true,
-    isSelf: false,
-    currentAPIUserRole: 'user',
-    isOverrideView: true,
-  };
-
   protected _buildTemplate = async (
     buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {

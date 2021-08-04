@@ -10,12 +10,14 @@ before(() => {
 });
 
 beforeEach(() => {
+  const endDate = new Date();
+  endDate.setMinutes(endDate.getMinutes() + 30);
   buildParams = {
     hostedById: '5d6ede6a0ba62570afcedd3a',
     reservedById: '5d6ede6a0ba62570afcedd3a',
     packageTransactionId: '5d6ede6a0ba62570afcedd3a',
     startDate: new Date(),
-    endDate: new Date(),
+    endDate,
   };
 });
 

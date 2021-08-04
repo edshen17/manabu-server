@@ -9,6 +9,7 @@ import {
   CreateUserUsecaseResponse,
 } from '../createUserUsecase/createUserUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 type OptionalLoginUserUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
@@ -34,6 +35,14 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _google!: any;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _CLIENT_DASHBOARD_URL!: string;
+
+  protected _isSelf = (props: {
+    params: any;
+    currentAPIUser: CurrentAPIUser;
+    endpointPath: string;
+  }): boolean => {
+    return true;
+  };
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -105,10 +114,10 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       const isTeacher = savedDbUser.teacherData;
       const shouldCreateNewTeacher = !isTeacher && isTeacherApp;
       if (shouldCreateNewTeacher) {
-        savedDbUser = await this._createUserUsecase.handleTeacherCreation(
+        savedDbUser = await this._createUserUsecase.handleTeacherCreation({
           savedDbUser,
-          dbServiceAccessOptions
-        );
+          dbServiceAccessOptions,
+        });
       }
       const loginUserRes = this._createLoginResponse(savedDbUser);
       return loginUserRes;

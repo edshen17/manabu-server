@@ -7,10 +7,6 @@ abstract class AbstractGetUsecase<
   constructor() {
     super('Resource not found.');
   }
-
-  protected _isProtectedResource = (): boolean => {
-    return false;
-  };
 }
 
 export { AbstractGetUsecase };

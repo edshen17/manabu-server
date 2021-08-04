@@ -106,10 +106,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     dbQueryPromise: Promise<any>;
   }): Promise<any> => {
     const { dbServiceAccessOptions, dbQueryPromise } = props;
-    const { isProtectedResource, isCurrentAPIUserPermitted } = dbServiceAccessOptions;
-    const isAccessPermitted =
-      (isProtectedResource && isCurrentAPIUserPermitted) || !isProtectedResource;
-    if (!isAccessPermitted) {
+    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
+    if (!isCurrentAPIUserPermitted) {
       throw new Error('Access denied.');
     }
     const dbQueryResult = await dbQueryPromise.then((doc) => {

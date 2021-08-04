@@ -31,7 +31,6 @@ interface IFakeDbDataFactory<
       DbDoc
     >
   ) => Promise<this> | this;
-  getDbServiceAccessOptions: () => DbServiceAccessOptions;
   createFakeDbData?: (buildParams: EntityBuildParams) => Promise<DbDoc>;
 }
 

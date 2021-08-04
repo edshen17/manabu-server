@@ -12,25 +12,26 @@ before(async () => {
   availableTimeEntity = await makeAvailableTimeEntity;
 });
 
-describe('minuteBank entity', () => {
+describe('availableTimeEntity', () => {
   describe('build', () => {
     context('given valid inputs', () => {
       it('should return given inputs', async () => {
         const fakeHostedBy = await fakeDbUserFactory.createFakeDbUser();
-        const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
-        const fakeMinuteBank = await availableTimeEntity.build({
+        const endDate = new Date();
+        endDate.setMinutes(endDate.getMinutes() + 30);
+        const fakeAvailableTime = await availableTimeEntity.build({
           hostedById: fakeHostedBy._id,
           startDate: new Date(),
-          endDate: new Date(),
+          endDate,
         });
-        expect(fakeMinuteBank.hostedById).to.deep.equal(fakeHostedBy._id);
+        expect(fakeAvailableTime.hostedById).to.deep.equal(fakeHostedBy._id);
       });
     });
     context('given invalid inputs', () => {
       it('should throw an error', async () => {
         try {
           const entityData: any = {};
-          const fakeMinuteBank = await availableTimeEntity.build(entityData);
+          const fakeAvailableTime = await availableTimeEntity.build(entityData);
         } catch (err) {
           expect(err).to.be.an('error');
         }

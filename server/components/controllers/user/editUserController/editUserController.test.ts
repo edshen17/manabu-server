@@ -36,7 +36,7 @@ describe('editUserController', () => {
         expect(updateUserRes.body.user.name).to.equal('new name');
       }
     });
-    it('should throw an error when access denied (editing as user)', async () => {
+    it('should throw an error when access denied (editing another user)', async () => {
       const fakeUpdater = await fakeDbUserFactory.createFakeDbUser();
       const fakeUpdatee = await fakeDbUserFactory.createFakeDbUser();
       const editUserHttpRequest = iHttpRequestBuilder

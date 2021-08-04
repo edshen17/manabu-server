@@ -26,20 +26,22 @@ before(async () => {
   packageTransactionDbService = await makePackageTransactionDbService;
   appointmentDbService = await makeAppointmentDbService;
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
-  dbServiceAccessOptions = fakeDbPackageTransactionFactory.getDbServiceAccessOptions();
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
 });
 
 beforeEach(async () => {
+  const endDate = new Date();
+  endDate.setMinutes(endDate.getMinutes() + 30);
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
     startDate: new Date(),
-    endDate: new Date(),
+    endDate,
   });
+  dbServiceAccessOptions = packageTransactionDbService.getBaseDbServiceAccessOptions();
 });
 
 describe('packageTransactionDbService', () => {

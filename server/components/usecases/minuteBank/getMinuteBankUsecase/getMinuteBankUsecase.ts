@@ -4,7 +4,6 @@ import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/min
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { ControllerData } from '../../abstractions/IUsecase';
 
 type OptionalGetMinuteBankUsecaseInitParams = {
   makeMinuteBankDbService: Promise<MinuteBankDbService>;

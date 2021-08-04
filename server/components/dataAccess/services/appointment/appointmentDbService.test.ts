@@ -23,14 +23,16 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = fakeDbAppointmentFactory.getDbServiceAccessOptions();
+  const endDate = new Date();
+  endDate.setMinutes(endDate.getMinutes() + 30);
+  dbServiceAccessOptions = appointmentDbService.getBaseDbServiceAccessOptions();
   fakeAppointmentTransaction = await fakeDbAppointmentTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedById: fakeAppointmentTransaction.hostedById,
     reservedById: fakeAppointmentTransaction.reservedById,
     packageTransactionId: fakeAppointmentTransaction._id,
     startDate: new Date(),
-    endDate: new Date(),
+    endDate,
   });
 });
 

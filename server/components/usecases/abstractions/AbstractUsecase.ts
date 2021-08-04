@@ -2,7 +2,7 @@ import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
 import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
 import { CurrentAPIUser } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { ControllerData, IUsecase, RouteData, UsecaseInitParams } from './IUsecase';
+import { ControllerData, IUsecase, UsecaseInitParams } from './IUsecase';
 
 type MakeRequestTemplateParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
@@ -50,12 +50,10 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     });
     const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
     const isValidRequest = this._isValidRequest(controllerData);
-    const isProtectedResource = this._isProtectedResource();
     const dbServiceAccessOptions = this._getDbServiceAccessOptions({
       isCurrentAPIUserPermitted,
       currentAPIUser,
       isSelf,
-      isProtectedResource,
     });
     const makeRequestTemplateParams = {
       dbServiceAccessOptions,
@@ -68,7 +66,6 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
       currentAPIUser,
       controllerData,
       isSelf,
-      isProtectedResource,
     };
     return makeRequestTemplateParams;
   };
@@ -80,9 +77,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   }): boolean => {
     const { params, currentAPIUser, endpointPath } = props;
     const isAdmin = currentAPIUser.role == 'admin';
-    const isProtectedResource = this._isProtectedResource();
+    const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
+    const isLoginProtected = this._isLoginProtected();
+    const isLoggedIn = this._isLoggedIn(currentAPIUser);
     const isCurrentAPIUserPermitted =
-      this._isSelf({ params, currentAPIUser, endpointPath }) || isAdmin || !isProtectedResource;
+      isSelf || isAdmin || !isLoginProtected || (isSelf && isLoginProtected && isLoggedIn);
     return isCurrentAPIUserPermitted;
   };
 
@@ -115,19 +114,13 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return isValidRequest;
   };
 
-  protected _isProtectedResource = (): boolean => {
-    return true;
-  };
-
   private _getDbServiceAccessOptions = (props: {
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     isSelf: boolean;
-    isProtectedResource: boolean;
   }) => {
-    const { currentAPIUser, isCurrentAPIUserPermitted, isSelf, isProtectedResource } = props;
+    const { currentAPIUser, isCurrentAPIUserPermitted, isSelf } = props;
     const dbServiceAccessOptions: DbServiceAccessOptions = {
-      isProtectedResource,
       isCurrentAPIUserPermitted,
       currentAPIUserRole: currentAPIUser.role,
       isSelf,
@@ -155,6 +148,15 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   };
 
   protected _isValidRouteDataTemplate = (controllerData: ControllerData): void => {};
+
+  private _isLoggedIn = (currentAPIUser: CurrentAPIUser): boolean => {
+    const isLoggedIn = currentAPIUser.userId ? true : false;
+    return isLoggedIn;
+  };
+
+  protected _isLoginProtected = (): boolean => {
+    return true;
+  };
 
   public init = async (initParams: UsecaseInitParams<OptionalUsecaseInitParams>): Promise<this> => {
     const { makeQueryValidator, makeParamsValidator, cloneDeep, ...optionalInitParams } =

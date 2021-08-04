@@ -48,7 +48,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = fakeDbUserFactory.getDbServiceAccessOptions();
+  dbServiceAccessOptions = userDbService.getBaseDbServiceAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
@@ -62,12 +62,14 @@ beforeEach(async () => {
     isSubscription: false,
     paymentData: {},
   });
+  const endDate = new Date();
+  endDate.setMinutes(endDate.getMinutes() + 30);
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
     startDate: new Date(),
-    endDate: new Date(),
+    endDate,
   });
   fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
     hostedById: fakeTeacher._id,

@@ -43,7 +43,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = fakeDbPackageFactory.getDbServiceAccessOptions();
+  dbServiceAccessOptions = packageDbService.getBaseDbServiceAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
   fakePackage = fakeTeacher.teacherData!.packages[0];
@@ -58,12 +58,14 @@ beforeEach(async () => {
     isSubscription: false,
     paymentData: {},
   });
+  const endDate = new Date();
+  endDate.setMinutes(endDate.getMinutes() + 30);
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
     startDate: new Date(),
-    endDate: new Date(),
+    endDate,
   });
 });
 

@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('createUserUsecase', () => {
   describe('makeRequest', () => {
-    const getUser = async () => {
+    const createUser = async () => {
       const controllerData = controllerDataBuilder.routeData(routeData).build();
       const createUserRes = await createUserUsecase.makeRequest(controllerData);
       return createUserRes;
@@ -48,14 +48,14 @@ describe('createUserUsecase', () => {
           routeDataBody.verificationToken = 'new token';
 
           try {
-            await getUser();
+            await createUser();
           } catch (err) {
             expect(err).to.be.an('error');
           }
         });
         it('should throw if no inputs are provided', async () => {
           try {
-            await getUser();
+            await createUser();
           } catch (err) {
             expect(err).to.be.an('error');
           }
@@ -71,11 +71,11 @@ describe('createUserUsecase', () => {
           expect(createUserRes.cookies).to.not.equal(null);
         };
         it('should return a new user, auth cookies, and a redirect url', async () => {
-          const createUserRes = await getUser();
+          const createUserRes = await createUser();
           validResOutput(createUserRes);
         });
         it('should return a joined user, auth cookies, and a redirect url', async () => {
-          const createUserRes = await getUser();
+          const createUserRes = await createUser();
           const savedDbUser = createUserRes.user;
           expect(savedDbUser).to.have.property('settings');
           expect(savedDbUser).to.not.have.property('password');

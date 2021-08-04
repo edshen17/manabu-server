@@ -20,10 +20,12 @@ class FakeDbAvailableTimeFactory extends AbstractFakeDbDataFactory<
 
   protected _createFakeBuildParams = async (): Promise<AvailableTimeEntityBuildParams> => {
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const endDate = new Date();
+    endDate.setMinutes(endDate.getMinutes() + 30);
     const fakeBuildParams = {
       hostedById: fakeTeacher._id,
       startDate: new Date(),
-      endDate: new Date(),
+      endDate,
     };
     return fakeBuildParams;
   };

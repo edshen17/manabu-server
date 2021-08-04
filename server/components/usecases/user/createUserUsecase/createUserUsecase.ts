@@ -9,7 +9,7 @@ import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { UserEntity } from '../../../entities/user/userEntity';
+import { UserEntity, UserEntityBuildResponse } from '../../../entities/user/userEntity';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
@@ -17,6 +17,7 @@ import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { PackageEntity } from '../../../entities/package/packageEntity';
 import { JoinedUserDoc } from '../../../../models/User';
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 type OptionalCreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
@@ -69,20 +70,28 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _convertStringToObjectId!: any;
   private _cacheDbService!: CacheDbService;
 
+  protected _isSelf = (props: {
+    params: any;
+    currentAPIUser: CurrentAPIUser;
+    endpointPath: string;
+  }): boolean => {
+    return true;
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateUserUsecaseResponse> => {
     const { body, dbServiceAccessOptions, query } = props;
     const { state } = query || {};
     const { isTeacherApp } = state || {};
-    const userInstance = this._userEntity.build(body);
-    let savedDbUser = await this._createDbUser({ userInstance, dbServiceAccessOptions });
+    const userEntity = await this._userEntity.build(body);
+    let savedDbUser = await this._createDbUser({ userEntity, dbServiceAccessOptions });
     if (isTeacherApp) {
-      savedDbUser = await this.handleTeacherCreation(savedDbUser, dbServiceAccessOptions);
+      savedDbUser = await this.handleTeacherCreation({ savedDbUser, dbServiceAccessOptions });
     }
     if (process.env.NODE_ENV == 'production' && !savedDbUser.isEmailVerified) {
-      this._sendVerificationEmail(userInstance);
-      this._sendInternalEmail(userInstance, isTeacherApp);
+      this._sendVerificationEmail(userEntity);
+      this._sendInternalEmail({ userEntity, isTeacherApp });
     }
     const cookies = this.splitLoginCookies(savedDbUser);
     const redirectUrl = this._redirectUrlBuilder
@@ -99,12 +108,12 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   private _createDbUser = async (props: {
-    userInstance: any;
+    userEntity: UserEntityBuildResponse;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
-    const { userInstance, dbServiceAccessOptions } = props;
+    const { userEntity, dbServiceAccessOptions } = props;
     const savedDbUser = await this._userDbService.insert({
-      modelToInsert: userInstance,
+      modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
     await this._createUserNode(savedDbUser);
@@ -115,10 +124,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     await this._cacheDbService.graphQuery(`CREATE (user: User { _id: "${savedDbUser._id}" })`);
   };
 
-  public handleTeacherCreation = async (
-    savedDbUser: JoinedUserDoc,
-    dbServiceAccessOptions: DbServiceAccessOptions
-  ): Promise<JoinedUserDoc> => {
+  public handleTeacherCreation = async (props: {
+    savedDbUser: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<JoinedUserDoc> => {
+    const { savedDbUser, dbServiceAccessOptions } = props;
     const joinedUserData = await this._createTeacherData({ savedDbUser, dbServiceAccessOptions });
     await this._createDbAdminPackageTransaction({ savedDbUser, dbServiceAccessOptions });
     await this._createGraphAdminTeacherEdge(savedDbUser);
@@ -191,11 +201,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return newTeacherBalance;
   };
 
-  private _sendVerificationEmail = (userInstance: any): void => {
+  private _sendVerificationEmail = (userEntity: any): void => {
     const host = 'https://manabu.sg';
-    const { name, verificationToken } = userInstance;
+    const { name, verificationToken } = userEntity;
     this._emailHandler.sendEmail(
-      userInstance.email,
+      userEntity.email,
       'NOREPLY',
       'Manabu email verification',
       'verificationEmail',
@@ -207,9 +217,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     );
   };
 
-  private _sendInternalEmail = (userInstance: any, isTeacherApp: boolean): void => {
+  private _sendInternalEmail = (props: { userEntity: any; isTeacherApp: boolean }): void => {
+    const { userEntity, isTeacherApp } = props;
     const userType = isTeacherApp ? 'teacher' : 'user';
-    const { name, email } = userInstance;
+    const { name, email } = userEntity;
     this._emailHandler.sendEmail(
       'manabulessons@gmail.com',
       'NOREPLY',

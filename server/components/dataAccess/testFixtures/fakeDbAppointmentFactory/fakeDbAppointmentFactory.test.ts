@@ -15,13 +15,15 @@ before(async () => {
 describe('fakeDbAppointmentFactory', () => {
   describe('createFakeDbData', () => {
     it('should create a fake appointment from the given users and package transaction', async () => {
+      const endDate = new Date();
+      endDate.setMinutes(endDate.getMinutes() + 30);
       const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
       const fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
         hostedById: fakePackageTransaction.hostedById.toString(),
         reservedById: fakePackageTransaction.reservedById.toString(),
         packageTransactionId: fakePackageTransaction._id.toString(),
         startDate: new Date(),
-        endDate: new Date(),
+        endDate,
       });
       expect(fakeAppointment).to.have.property('packageTransactionData');
     });

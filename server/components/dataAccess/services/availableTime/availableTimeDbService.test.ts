@@ -17,7 +17,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = fakeDbAvailableTimeFactory.getDbServiceAccessOptions();
+  dbServiceAccessOptions = availableTimeDbService.getBaseDbServiceAccessOptions();
   fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData();
 });
 

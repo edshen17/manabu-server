@@ -16,6 +16,10 @@ class GetTeachersUsecase extends AbstractGetUsecase<
 > {
   private _userDbService!: UserDbService;
 
+  protected _isLoginProtected = (): boolean => {
+    return false;
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetTeachersUsecaseResponse> => {

@@ -5,9 +5,7 @@ class UserEntityValidator extends AbstractEntityValidator {
     this._createValidationSchema = this._joi.object().keys({
       name: this._joi.string().max(256),
       email: this._joi.string().email().max(256),
-      password: this._joi
-        .string()
-        .pattern(new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)),
+      password: this._joi.string().min(8),
       profileImageUrl: this._joi.string().uri().allow('').max(2048),
       contactMethods: this._joi.array().items({
         methodName: this._joi.string().max(256),

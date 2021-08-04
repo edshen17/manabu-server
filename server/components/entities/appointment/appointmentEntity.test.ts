@@ -33,12 +33,14 @@ describe('appointmentEntity', () => {
           isSubscription: false,
           paymentData: {},
         });
+        const endDate = new Date();
+        endDate.setMinutes(endDate.getMinutes() + 30);
         const fakeAppointment = await appointmentEntity.build({
           hostedById: fakeHostedBy._id,
           reservedById: fakeReservedBy._id,
           packageTransactionId: fakePackageTransaction._id,
           startDate: new Date(),
-          endDate: new Date(),
+          endDate,
         });
         expect(fakeAppointment.hostedById).to.equal(fakeHostedBy._id);
         expect(fakeAppointment.reservedById).to.equal(fakeReservedBy._id);
