@@ -36,6 +36,7 @@ beforeEach(async () => {
   };
   currentAPIUser = {
     userId: fakeTeacher._id,
+    teacherId: fakeTeacher.teacherData!._id,
     role: fakeTeacher.role,
   };
   endpointPath = '';

@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import mongoSanitize from 'express-mongo-sanitize';
 import { v1 } from './routes/api';
+import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
 
 const app = express();
 const corsConfig = {
@@ -31,6 +32,7 @@ app.use(
 );
 app.use(compression());
 app.use(mongoSanitize());
+app.all('*', verifyToken);
 app.use('/api/', v1);
 
 if (process.env.NODE_ENV == 'production') {
@@ -52,5 +54,5 @@ app.use(express.static('public'));
 const port = process.env.PORT || 5000;
 
 http.createServer(app).listen(port, function () {
-  console.log('Express server listening on port ' + app.get('port'));
+  console.log(`Express server listening on port ${port}`);
 });

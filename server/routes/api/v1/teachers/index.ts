@@ -4,14 +4,9 @@ import { makeGetTeachersController } from '../../../../components/controllers/te
 import { makeJSONExpressCallback } from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 
 const teachers = express.Router();
-const VerifyToken = require('../../../../components/VerifyToken'); // TODO: turn into ts + import statement, use app.all(VerifyToken) to use it everywhere
 
-teachers.get('/', VerifyToken, makeJSONExpressCallback.consume(makeGetTeachersController));
+teachers.get('/', makeJSONExpressCallback.consume(makeGetTeachersController));
 
-teachers.patch(
-  '/:teacherId',
-  VerifyToken,
-  makeJSONExpressCallback.consume(makeEditTeacherController)
-);
+teachers.patch('/:teacherId', makeJSONExpressCallback.consume(makeEditTeacherController));
 
 export { teachers };

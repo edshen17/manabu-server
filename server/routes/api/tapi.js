@@ -35,41 +35,6 @@ const exchangeRateScheduler = async () => {
 };
 exchangeRateScheduler();
 
-router.post('/schedule/availableTime', VerifyToken, (req, res, next) => {
-  if (req.userId == req.body.hostedBy) {
-    const newAvailableTime = {
-      hostedBy: req.body.hostedBy,
-      from: req.body.from,
-      to: req.body.to,
-    };
-
-    AvailableTime.findOne(newAvailableTime)
-      .lean()
-      .select({ _id: 1 })
-      // .cache()
-      .then((availableTime) => {
-        if (availableTime) {
-          return res.status(500).send('Available time already exists');
-        } else {
-          new AvailableTime(newAvailableTime)
-            .save()
-            .then((availTime) => {
-              clearKey(AvailableTime.collection.collectionName);
-              return res.status(200).json(availTime);
-            })
-            .catch((err) => {
-              return res.status(500).send(err);
-            });
-        }
-      })
-      .catch((err) => handleErrors(err, req, res, next));
-  } else {
-    return res.status(401).json({
-      error: "You don't have enough permission to perform this action",
-    });
-  }
-});
-
 // get route for avail time
 router.get('/schedule/:uId/availableTime/:startWeekDay/:endWeekDay', (req, res, next) => {
   AvailableTime.find({

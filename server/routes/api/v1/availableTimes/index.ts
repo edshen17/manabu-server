@@ -1,5 +1,4 @@
 import express from 'express';
-import { auth } from './auth/index';
 import { makeCreateUserController } from '../../../../components/controllers/user/createUserController';
 import { makeEditUserController } from '../../../../components/controllers/user/editUserController';
 import { makeGetUserController } from '../../../../components/controllers/user/getUserController';
@@ -14,7 +13,5 @@ users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController))
 
 users.get('/self', makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
-
-users.use('/auth', auth);
 
 export { users };

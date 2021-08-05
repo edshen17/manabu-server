@@ -72,12 +72,12 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
 
   protected _isCurrentAPIUserPermitted = (props: {
     params: any;
-    currentAPIUser: any;
+    currentAPIUser: CurrentAPIUser;
     endpointPath: string;
   }): boolean => {
-    const { params, currentAPIUser, endpointPath } = props;
+    const { currentAPIUser } = props;
     const isAdmin = currentAPIUser.role == 'admin';
-    const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
+    const isSelf = this._isSelf(props);
     const isLoginProtected = this._isLoginProtected();
     const isLoggedIn = this._isLoggedIn(currentAPIUser);
     const isCurrentAPIUserPermitted =

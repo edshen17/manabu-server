@@ -5,12 +5,10 @@ import {
   makeCookieRedirectExpressCallback,
   makeRedirectExpressCallback,
 } from '../../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
-const VerifyToken = require('../../../../../components/VerifyToken');
 const auth = express.Router();
 
 auth.get(
   '/emailToken/:verificationToken/verify',
-  VerifyToken,
   makeRedirectExpressCallback.consume(makeVerifyEmailTokenController)
 );
 
