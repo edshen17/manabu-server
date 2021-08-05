@@ -1,6 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import {
   AbstractEditUsecase,
   AbstractEditUsecaseInitParams,
@@ -13,8 +12,7 @@ type EditTeacherUsecaseResponse = { user: JoinedUserDoc };
 
 class EditTeacherUsecase extends AbstractEditUsecase<
   AbstractEditUsecaseInitParams<OptionalEditTeacherUsecaseInitParams>,
-  EditTeacherUsecaseResponse,
-  TeacherDbService
+  EditTeacherUsecaseResponse
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

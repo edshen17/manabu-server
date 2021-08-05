@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { convertStringToObjectId } from '../../../components/entities/utils/convertStringToObjectId';
 import { JoinedUserDoc } from '../../../models/User';
 
 const verifyToken = (req: any, res: any, next: any) => {
@@ -8,10 +9,10 @@ const verifyToken = (req: any, res: any, next: any) => {
     if (!decoded) {
       throw new Error('Invalid jwt format.');
     }
-    req.userId = decoded._id;
+    req.userId = convertStringToObjectId(decoded._id);
     req.role = decoded.role || 'user';
     if (decoded.teacherData) {
-      req.teacherId = decoded.teacherData._id;
+      req.teacherId = convertStringToObjectId(decoded.teacherData._id);
     }
   }
   next();

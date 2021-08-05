@@ -3,7 +3,6 @@ import {
   DbServiceAccessOptions,
   PaginationOptions,
 } from '../../../dataAccess/abstractions/IDbService';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -12,8 +11,7 @@ type GetTeachersUsecaseResponse = { teachers: JoinedUserDoc[] };
 
 class GetTeachersUsecase extends AbstractGetUsecase<
   OptionalGetTeachersUsecaseInitParams,
-  GetTeachersUsecaseResponse,
-  UserDbService
+  GetTeachersUsecaseResponse
 > {
   protected _isLoginProtected = (): boolean => {
     return false;

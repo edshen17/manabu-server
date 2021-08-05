@@ -1,6 +1,5 @@
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import {
   AvailableTimeEntity,
   AvailableTimeEntityBuildResponse,
@@ -18,8 +17,7 @@ type CreateAvailableTimeUsecaseResponse = {
 
 class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   OptionalCreateAvailableTimeUsecaseInitParams,
-  CreateAvailableTimeUsecaseResponse,
-  AvailableTimeDbService
+  CreateAvailableTimeUsecaseResponse
 > {
   private _availableTimeEntity!: AvailableTimeEntity;
 

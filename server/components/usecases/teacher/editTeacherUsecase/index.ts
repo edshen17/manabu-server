@@ -1,4 +1,5 @@
 import cloneDeep from 'clone-deep';
+import deepEqual from 'deep-equal';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { makeTeacherEntityValidator } from '../../../validators/teacher/entity';
@@ -11,6 +12,7 @@ const makeEditTeacherUsecase = new EditTeacherUsecase().init({
   makeQueryValidator: makeBaseQueryValidator,
   makeEditEntityValidator: makeTeacherEntityValidator,
   cloneDeep,
+  deepEqual,
 });
 
 export { makeEditTeacherUsecase };

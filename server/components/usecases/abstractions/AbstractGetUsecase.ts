@@ -2,9 +2,8 @@ import { AbstractUsecase } from './AbstractUsecase';
 
 abstract class AbstractGetUsecase<
   OptionalUsecaseInitParams,
-  UsecaseResponse,
-  DbService
-> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService> {
+  UsecaseResponse
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
   constructor() {
     super('Resource not found.');
   }

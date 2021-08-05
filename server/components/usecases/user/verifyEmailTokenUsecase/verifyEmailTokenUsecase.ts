@@ -12,16 +12,15 @@ type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectUrl: strin
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   OptionalVerifyEmailTokenUsecaseInitParams,
-  VerifyEmailTokenUsecaseResponse,
-  UserDbService
+  VerifyEmailTokenUsecaseResponse
 > {
   private _redirectUrlBuilder!: RedirectUrlBuilder;
 
-  protected _isSelf = (props: {
+  protected _isSelf = async (props: {
     params: any;
     currentAPIUser: CurrentAPIUser;
     endpointPath: string;
-  }): boolean => {
+  }): Promise<boolean> => {
     return true;
   };
 

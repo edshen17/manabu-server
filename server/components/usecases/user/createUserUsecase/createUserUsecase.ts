@@ -4,7 +4,6 @@ import { PackageDbService } from '../../../dataAccess/services/package/packageDb
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -54,8 +53,7 @@ type CreateUserUsecaseResponse = {
 
 class CreateUserUsecase extends AbstractCreateUsecase<
   OptionalCreateUserUsecaseInitParams,
-  CreateUserUsecaseResponse,
-  UserDbService
+  CreateUserUsecaseResponse
 > {
   private _userEntity!: UserEntity;
   private _packageTransactionEntity!: PackageTransactionEntity;
@@ -69,11 +67,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _convertStringToObjectId!: any;
   private _cacheDbService!: CacheDbService;
 
-  protected _isSelf = (props: {
+  protected _isSelf = async (props: {
     params: any;
     currentAPIUser: CurrentAPIUser;
     endpointPath: string;
-  }): boolean => {
+  }): Promise<boolean> => {
     return true;
   };
 

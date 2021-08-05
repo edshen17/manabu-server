@@ -17,6 +17,7 @@ import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeUserQueryValidator } from '../../../validators/user/query';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
+import deepEqual from 'deep-equal';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserEntity,
@@ -37,6 +38,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeParamsValidator: makeBaseParamsValidator,
   makeQueryValidator: makeUserQueryValidator,
   convertStringToObjectId,
+  deepEqual,
 });
 
 export { makeCreateUserUsecase };

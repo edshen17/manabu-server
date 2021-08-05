@@ -1,7 +1,6 @@
 import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { AbstractDeleteUsecase } from '../../abstractions/AbstractDeleteUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -13,9 +12,13 @@ type DeleteAvailableTimeUsecaseResponse = {
 
 class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
   OptionalDeleteAvailableTimeUsecaseInitParams,
-  DeleteAvailableTimeUsecaseResponse,
-  AvailableTimeDbService
+  DeleteAvailableTimeUsecaseResponse
 > {
+  protected _resourceAccessData: StringKeyObject = {
+    hasResourceAccessCheck: true,
+    resourceIdName: 'availableTimeId',
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<DeleteAvailableTimeUsecaseResponse> => {

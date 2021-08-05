@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { ObjectId } from 'mongoose';
 interface IHttpRequest {
   body: Request['body'];
   path: Request['path'];
@@ -8,8 +9,8 @@ interface IHttpRequest {
 }
 
 type CurrentAPIUser = {
-  userId?: string;
-  teacherId?: string;
+  userId?: ObjectId | string;
+  teacherId?: ObjectId | string;
   role: string;
 };
 

@@ -26,8 +26,7 @@ enum SERVER_LOGIN_ENDPOINTS {
 
 class LoginUserUsecase extends AbstractCreateUsecase<
   OptionalLoginUserUsecaseInitParams,
-  LoginUserUsecaseResponse,
-  UserDbService
+  LoginUserUsecaseResponse
 > {
   private _createUserUsecase!: CreateUserUsecase;
   private _oauth2Client!: any;
@@ -35,11 +34,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _CLIENT_DASHBOARD_URL!: string;
 
-  protected _isSelf = (props: {
+  protected _isSelf = async (props: {
     params: any;
     currentAPIUser: CurrentAPIUser;
     endpointPath: string;
-  }): boolean => {
+  }): Promise<boolean> => {
     return true;
   };
 
@@ -80,7 +79,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { email, password } = body || {};
     const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
     dbServiceAccessOptionsCopy.isOverrideView = true;
-    let savedDbUser = await this._dbService.authenticateUser(
+    const dbService = <UserDbService>this._dbService;
+    let savedDbUser = await dbService.authenticateUser(
       {
         searchQuery: { email },
         dbServiceAccessOptions: dbServiceAccessOptionsCopy,

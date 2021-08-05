@@ -1,6 +1,5 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { MinuteBankDbService } from '../../../dataAccess/services/minuteBank/minuteBankDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -11,8 +10,7 @@ type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] };
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<
   OptionalGetMinuteBankUsecaseInitParams,
-  GetMinuteBankUsecaseResponse,
-  MinuteBankDbService
+  GetMinuteBankUsecaseResponse
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

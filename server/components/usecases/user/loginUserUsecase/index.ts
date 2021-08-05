@@ -1,4 +1,5 @@
 import cloneDeep from 'clone-deep';
+import deepEqual from 'deep-equal';
 import { google } from 'googleapis';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
@@ -27,6 +28,7 @@ const makeLoginUserUsecase = new LoginUserUsecase().init({
   cloneDeep,
   makeQueryValidator: makeUserQueryValidator,
   makeParamsValidator: makeBaseParamsValidator,
+  deepEqual,
 });
 
 export { makeLoginUserUsecase };

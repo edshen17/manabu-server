@@ -3,18 +3,17 @@ import { AbstractUsecase } from './AbstractUsecase';
 
 abstract class AbstractCreateUsecase<
   OptionalUsecaseInitParams,
-  UsecaseResponse,
-  DbService
-> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService> {
+  UsecaseResponse
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
   constructor() {
     super('Access denied.');
   }
 
-  protected _isSelf = (props: {
+  protected _isSelf = async (props: {
     params: any;
     currentAPIUser: CurrentAPIUser;
     endpointPath: string;
-  }): boolean => {
+  }): Promise<boolean> => {
     return true;
   };
 }

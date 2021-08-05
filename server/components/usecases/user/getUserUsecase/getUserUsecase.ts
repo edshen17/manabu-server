@@ -1,6 +1,6 @@
+import { ObjectId } from 'mongoose';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -9,8 +9,7 @@ type GetUserUsecaseResponse = { user: JoinedUserDoc };
 
 class GetUserUsecase extends AbstractGetUsecase<
   OptionalGetUserUsecaseInitParams,
-  GetUserUsecaseResponse,
-  UserDbService
+  GetUserUsecaseResponse
 > {
   protected _isLoginProtected = (): boolean => {
     return false;
@@ -20,8 +19,8 @@ class GetUserUsecase extends AbstractGetUsecase<
     props: MakeRequestTemplateParams
   ): Promise<GetUserUsecaseResponse> => {
     const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
-    const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
-    const _id: string = isSelf ? currentAPIUser.userId : params.userId;
+    const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
+    const _id = isSelf ? currentAPIUser.userId : params.userId;
     const user = await this._getUser({
       _id,
       dbServiceAccessOptions,
@@ -36,7 +35,7 @@ class GetUserUsecase extends AbstractGetUsecase<
   };
 
   private _getUser = async (props: {
-    _id: string;
+    _id: ObjectId;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
     const { _id, dbServiceAccessOptions } = props;

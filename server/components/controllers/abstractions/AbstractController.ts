@@ -6,7 +6,7 @@ import { QueryStringHandler } from '../../usecases/utils/queryStringHandler/quer
 type ControllerParams = { successStatusCode: number; errorStatusCode: number };
 
 abstract class AbstractController<UsecaseResponse> implements IController<UsecaseResponse> {
-  protected _usecase!: IUsecase<any, UsecaseResponse, any>;
+  protected _usecase!: IUsecase<any, UsecaseResponse>;
   protected _queryStringHandler!: QueryStringHandler;
   protected _successStatusCode!: number;
   protected _errorStatusCode!: number;
@@ -52,7 +52,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   };
 
   public init = async (props: {
-    makeUsecase: Promise<IUsecase<any, UsecaseResponse, any>>;
+    makeUsecase: Promise<IUsecase<any, UsecaseResponse>>;
     makeQueryStringHandler: QueryStringHandler;
   }): Promise<this> => {
     const { makeUsecase, makeQueryStringHandler } = props;

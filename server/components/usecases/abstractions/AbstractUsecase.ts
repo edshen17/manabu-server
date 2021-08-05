@@ -16,14 +16,18 @@ type MakeRequestTemplateParams = {
   controllerData: ControllerData;
 };
 
-abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService>
-  implements IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService>
+abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
+  implements IUsecase<OptionalUsecaseInitParams, UsecaseResponse>
 {
   protected _queryValidator!: AbstractQueryValidator;
   protected _paramsValidator!: AbstractParamsValidator;
   protected _cloneDeep!: any;
-  protected _hasResourceOwnerCheck: boolean = false;
-  protected _dbService!: DbService;
+  protected _deepEqual!: any;
+  protected _resourceAccessData: StringKeyObject = {
+    hasResourceAccessCheck: false,
+    resourceIdName: '',
+  };
+  protected _dbService!: IDbService<any, any>;
   private _makeRequestErrorMsg: string;
 
   constructor(makeRequestErrorMsg: string) {
@@ -31,7 +35,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
   }
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
-    const makeRequestTemplateParams = this._getMakeRequestTemplateParams(controllerData);
+    const makeRequestTemplateParams = await this._getMakeRequestTemplateParams(controllerData);
     const { isValidRequest } = makeRequestTemplateParams;
     if (isValidRequest) {
       const usecaseRes = await this._makeRequestTemplate(makeRequestTemplateParams);
@@ -41,12 +45,12 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     }
   };
 
-  protected _getMakeRequestTemplateParams = (
+  protected _getMakeRequestTemplateParams = async (
     controllerData: ControllerData
-  ): MakeRequestTemplateParams => {
+  ): Promise<MakeRequestTemplateParams> => {
     const { routeData, currentAPIUser, endpointPath } = controllerData;
     const { body, params, query } = routeData;
-    const isSelf = this._isSelf({ params, currentAPIUser, endpointPath });
+    const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       isSelf,
       currentAPIUser,
@@ -85,11 +89,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     return isCurrentAPIUserPermitted;
   };
 
-  protected _isSelf = (props: {
+  protected _isSelf = async (props: {
     params: any;
     currentAPIUser: CurrentAPIUser;
     endpointPath: string;
-  }): boolean => {
+  }): Promise<boolean> => {
     const { params, currentAPIUser, endpointPath } = props;
     const isSameUserId: boolean =
       params.userId && currentAPIUser.userId && params.userId == currentAPIUser.userId;
@@ -97,11 +101,33 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
       params.teacherId && currentAPIUser.teacherId && params.teacherId == currentAPIUser.teacherId;
     const isSelfRoute = endpointPath.includes('self');
     const isAdmin = currentAPIUser.role == 'admin';
-    const isSelf = isSameUserId || isSameTeacherId || isSelfRoute || isAdmin;
+    const isResourceOwner = await this._isResourceOwner({ currentAPIUser, params });
+    const isSelf = isSameUserId || isSameTeacherId || isSelfRoute || isAdmin || isResourceOwner;
     return isSelf;
   };
 
-  private _isResourceOwner = () => {};
+  private _isResourceOwner = async (props: {
+    currentAPIUser: CurrentAPIUser;
+    params: any;
+  }): Promise<boolean> => {
+    const { currentAPIUser, params } = props;
+    const { userId } = currentAPIUser;
+    const { hasResourceAccessCheck, resourceIdName } = this._resourceAccessData;
+    let isResourceOwner = false;
+    if (hasResourceAccessCheck) {
+      const resourceId = params[`${resourceIdName}`];
+      const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+      const resourceData = await this._dbService.findById({
+        _id: resourceId,
+        dbServiceAccessOptions,
+      });
+      for (const property in resourceData) {
+        const value = resourceData[property];
+        isResourceOwner = isResourceOwner || this._deepEqual(value, userId);
+      }
+    }
+    return isResourceOwner;
+  };
 
   private _isLoggedIn = (currentAPIUser: CurrentAPIUser): boolean => {
     const isLoggedIn = currentAPIUser.userId ? true : false;
@@ -162,19 +188,19 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
 
   protected _isValidRouteDataTemplate = (controllerData: ControllerData): void => {};
 
-  public init = async (
-    initParams: UsecaseInitParams<OptionalUsecaseInitParams, DbService>
-  ): Promise<this> => {
+  public init = async (initParams: UsecaseInitParams<OptionalUsecaseInitParams>): Promise<this> => {
     const {
       makeQueryValidator,
       makeParamsValidator,
       cloneDeep,
       makeDbService,
+      deepEqual,
       ...optionalInitParams
     } = initParams;
     this._queryValidator = makeQueryValidator;
     this._paramsValidator = makeParamsValidator;
     this._cloneDeep = cloneDeep;
+    this._deepEqual = deepEqual;
     this._dbService = await makeDbService;
     await this._initTemplate(optionalInitParams);
     return this;
@@ -182,8 +208,8 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
 
   protected _initTemplate = (
     optionalInitParams: Omit<
-      UsecaseInitParams<OptionalUsecaseInitParams, DbService>,
-      'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService'
+      UsecaseInitParams<OptionalUsecaseInitParams>,
+      'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
     >
   ): Promise<void> | void => {};
 }
