@@ -5,7 +5,7 @@ import { makeBaseQueryValidator } from '../../../validators/base/query';
 import cloneDeep from 'clone-deep';
 
 const makeGetUserUsecase = new GetUserUsecase().init({
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeParamsValidator: makeUserParamsValidator,
   makeQueryValidator: makeBaseQueryValidator,
   cloneDeep,

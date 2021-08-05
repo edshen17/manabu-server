@@ -7,7 +7,7 @@ import { makeUserParamsValidator } from '../../../validators/user/params';
 import { EditUserUsecase } from './editUserUsecase';
 
 const makeEditUserUsecase = new EditUserUsecase().init({
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeQueryValidator: makeBaseQueryValidator,
   makeParamsValidator: makeUserParamsValidator,
   makeEditEntityValidator: makeUserEntityValidator,

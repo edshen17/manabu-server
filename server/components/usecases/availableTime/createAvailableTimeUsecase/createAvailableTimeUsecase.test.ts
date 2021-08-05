@@ -72,7 +72,7 @@ describe('createAvailableTimeUsecase', () => {
           expect(availableTime).to.have.property('startDate');
           expect(availableTime).to.have.property('endDate');
         };
-        it('should return a new user, auth cookies, and a redirect url', async () => {
+        it('should return a new available time', async () => {
           const createAvailableTimeRes = await createAvailableTime();
           validResOutput(createAvailableTimeRes);
         });

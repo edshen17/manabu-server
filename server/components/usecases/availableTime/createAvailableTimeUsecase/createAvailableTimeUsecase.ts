@@ -10,7 +10,6 @@ import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalCreateAvailableTimeUsecaseInitParams = {
   makeAvailableTimeEntity: Promise<AvailableTimeEntity>;
-  makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
 };
 
 type CreateAvailableTimeUsecaseResponse = {
@@ -19,10 +18,10 @@ type CreateAvailableTimeUsecaseResponse = {
 
 class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   OptionalCreateAvailableTimeUsecaseInitParams,
-  CreateAvailableTimeUsecaseResponse
+  CreateAvailableTimeUsecaseResponse,
+  AvailableTimeDbService
 > {
   private _availableTimeEntity!: AvailableTimeEntity;
-  private _availableTimeDbService!: AvailableTimeDbService;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -44,7 +43,7 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AvailableTimeDoc> => {
     const { availableTimeEntity, dbServiceAccessOptions } = props;
-    const savedDbAvailableTime = await this._availableTimeDbService.insert({
+    const savedDbAvailableTime = await this._dbService.insert({
       modelToInsert: availableTimeEntity,
       dbServiceAccessOptions,
     });
@@ -54,8 +53,7 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateAvailableTimeUsecaseInitParams
   ): Promise<void> => {
-    const { makeAvailableTimeDbService, makeAvailableTimeEntity } = optionalInitParams;
-    this._availableTimeDbService = await makeAvailableTimeDbService;
+    const { makeAvailableTimeEntity } = optionalInitParams;
     this._availableTimeEntity = await makeAvailableTimeEntity;
   };
 }

@@ -1,5 +1,4 @@
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -10,9 +9,9 @@ import {
 } from '../createUserUsecase/createUserUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
 type OptionalLoginUserUsecaseInitParams = {
-  makeUserDbService: Promise<UserDbService>;
   makeCreateUserUsecase: Promise<CreateUserUsecase>;
   oauth2Client: any;
   google: any;
@@ -27,9 +26,9 @@ enum SERVER_LOGIN_ENDPOINTS {
 
 class LoginUserUsecase extends AbstractCreateUsecase<
   OptionalLoginUserUsecaseInitParams,
-  LoginUserUsecaseResponse
+  LoginUserUsecaseResponse,
+  UserDbService
 > {
-  private _userDbService!: UserDbService;
   private _createUserUsecase!: CreateUserUsecase;
   private _oauth2Client!: any;
   private _google!: any;
@@ -81,7 +80,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { email, password } = body || {};
     const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
     dbServiceAccessOptionsCopy.isOverrideView = true;
-    let savedDbUser = await this._userDbService.authenticateUser(
+    let savedDbUser = await this._dbService.authenticateUser(
       {
         searchQuery: { email },
         dbServiceAccessOptions: dbServiceAccessOptionsCopy,
@@ -145,7 +144,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { code } = query;
     const { tokens } = await this._oauth2Client.getToken(code);
     const { email, name, picture } = await this._getGoogleUserData(tokens);
-    let savedDbUser = await this._userDbService.findOne({
+    let savedDbUser = await this._dbService.findOne({
       searchQuery: { email },
       dbServiceAccessOptions,
     });
@@ -183,14 +182,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalLoginUserUsecaseInitParams
   ): Promise<void> => {
-    const {
-      makeUserDbService,
-      makeCreateUserUsecase,
-      oauth2Client,
-      google,
-      makeRedirectUrlBuilder,
-    } = optionalInitParams;
-    this._userDbService = await makeUserDbService;
+    const { makeCreateUserUsecase, oauth2Client, google, makeRedirectUrlBuilder } =
+      optionalInitParams;
     this._createUserUsecase = await makeCreateUserUsecase;
     this._oauth2Client = oauth2Client;
     this._google = google;

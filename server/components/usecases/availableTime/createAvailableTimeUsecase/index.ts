@@ -10,7 +10,7 @@ const makeCreateAvailableTimeUsecase = new CreateAvailableTimeUsecase().init({
   makeParamsValidator: makeBaseParamsValidator,
   makeQueryValidator: makeBaseQueryValidator,
   makeAvailableTimeEntity,
-  makeAvailableTimeDbService,
+  makeDbService: makeAvailableTimeDbService,
 });
 
 export { makeCreateAvailableTimeUsecase };

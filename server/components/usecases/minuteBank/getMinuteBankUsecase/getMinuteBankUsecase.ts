@@ -5,18 +5,15 @@ import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHtt
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
-type OptionalGetMinuteBankUsecaseInitParams = {
-  makeMinuteBankDbService: Promise<MinuteBankDbService>;
-};
+type OptionalGetMinuteBankUsecaseInitParams = {};
 
 type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] };
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<
   OptionalGetMinuteBankUsecaseInitParams,
-  GetMinuteBankUsecaseResponse
+  GetMinuteBankUsecaseResponse,
+  MinuteBankDbService
 > {
-  private _minuteBankDbService!: MinuteBankDbService;
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetMinuteBankUsecaseResponse> => {
@@ -46,17 +43,12 @@ class GetMinuteBankUsecase extends AbstractGetUsecase<
         },
       ],
     };
-    const minuteBanks = await this._minuteBankDbService.find({
+    const minuteBanks = await this._dbService.find({
       searchQuery,
       dbServiceAccessOptions,
     });
     const usecaseResponse = { minuteBanks };
     return usecaseResponse;
-  };
-
-  protected _initTemplate = async (optionalInitParams: OptionalGetMinuteBankUsecaseInitParams) => {
-    const { makeMinuteBankDbService } = optionalInitParams;
-    this._minuteBankDbService = await makeMinuteBankDbService;
   };
 }
 

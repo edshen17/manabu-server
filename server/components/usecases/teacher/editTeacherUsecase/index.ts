@@ -6,7 +6,7 @@ import { makeTeacherParamsValidator } from '../../../validators/teacher/params';
 import { EditTeacherUsecase } from './editTeacherUsecase';
 
 const makeEditTeacherUsecase = new EditTeacherUsecase().init({
-  makeTeacherDbService,
+  makeDbService: makeTeacherDbService,
   makeParamsValidator: makeTeacherParamsValidator,
   makeQueryValidator: makeBaseQueryValidator,
   makeEditEntityValidator: makeTeacherEntityValidator,

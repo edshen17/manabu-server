@@ -25,7 +25,6 @@ type OptionalCreateUserUsecaseInitParams = {
   makePackageTransactionEntity: Promise<PackageTransactionEntity>;
   makeTeacherBalanceEntity: Promise<TeacherBalanceEntity>;
   makeTeacherEntity: Promise<TeacherEntity>;
-  makeUserDbService: Promise<UserDbService>;
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
@@ -55,13 +54,13 @@ type CreateUserUsecaseResponse = {
 
 class CreateUserUsecase extends AbstractCreateUsecase<
   OptionalCreateUserUsecaseInitParams,
-  CreateUserUsecaseResponse
+  CreateUserUsecaseResponse,
+  UserDbService
 > {
   private _userEntity!: UserEntity;
   private _packageTransactionEntity!: PackageTransactionEntity;
   private _teacherBalanceEntity!: TeacherBalanceEntity;
   private _teacherEntity!: TeacherEntity;
-  private _userDbService!: UserDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _teacherBalanceDbService!: TeacherBalanceDbService;
   private _signJwt!: any;
@@ -112,7 +111,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
     const { userEntity, dbServiceAccessOptions } = props;
-    const savedDbUser = await this._userDbService.insert({
+    const savedDbUser = await this._dbService.insert({
       modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
@@ -142,7 +141,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   }): Promise<JoinedUserDoc> => {
     const { savedDbUser, dbServiceAccessOptions } = props;
     const teacherData = await this._teacherEntity.build({});
-    const savedDbTeacher = await this._userDbService.findOneAndUpdate({
+    const savedDbTeacher = await this._dbService.findOneAndUpdate({
       searchQuery: { _id: savedDbUser._id },
       updateQuery: {
         teacherData,
@@ -287,7 +286,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makePackageTransactionEntity,
       makeTeacherBalanceEntity,
       makeTeacherEntity,
-      makeUserDbService,
       makePackageTransactionDbService,
       makeTeacherBalanceDbService,
       makeCacheDbService,
@@ -300,7 +298,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._packageTransactionEntity = await makePackageTransactionEntity;
     this._teacherBalanceEntity = await makeTeacherBalanceEntity;
     this._teacherEntity = await makeTeacherEntity;
-    this._userDbService = await makeUserDbService;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._cacheDbService = await makeCacheDbService;

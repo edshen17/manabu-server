@@ -9,6 +9,9 @@ let props: {
 
 before(() => {
   userParamsValidator = makeUserParamsValidator;
+});
+
+beforeEach(() => {
   props = {
     params: {
       userId: '605bc5ad9db900001528f77c',
@@ -18,14 +21,13 @@ before(() => {
 
 describe('userParamsValidator', () => {
   describe('validate', () => {
-    const testValidInputs = (props: { params: {} }) => {
+    const testValidInputs = () => {
       const { params } = props;
       const validatedObj = userParamsValidator.validate(props);
       expect(validatedObj).to.deep.equal(params);
       expect(validatedObj).to.not.have.property('error');
     };
-    const testInvalidInputs = (props: { params: {} }) => {
-      const { params } = props;
+    const testInvalidInputs = () => {
       try {
         const validatedObj = userParamsValidator.validate(props);
       } catch (err) {
@@ -34,7 +36,7 @@ describe('userParamsValidator', () => {
     };
     context('valid inputs', () => {
       it('should return a valid object', () => {
-        testValidInputs(props);
+        testValidInputs();
       });
     });
     context('invalid inputs', () => {
@@ -42,13 +44,13 @@ describe('userParamsValidator', () => {
         props.params = {
           someField: 'some value',
         };
-        testInvalidInputs(props);
+        testInvalidInputs();
       });
       it('should throw an error', () => {
         props.params = {
           userId: 'some value',
         };
-        testInvalidInputs(props);
+        testInvalidInputs();
       });
     });
   });

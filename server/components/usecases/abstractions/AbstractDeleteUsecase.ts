@@ -1,13 +1,13 @@
 import { AbstractUsecase } from './AbstractUsecase';
 
-abstract class AbstractGetUsecase<
+abstract class AbstractDeleteUsecase<
   OptionalUsecaseInitParams,
   UsecaseResponse,
   DbService
 > extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService> {
   constructor() {
-    super('Resource not found.');
+    super('Resource to delete not found.');
   }
 }
 
-export { AbstractGetUsecase };
+export { AbstractDeleteUsecase };

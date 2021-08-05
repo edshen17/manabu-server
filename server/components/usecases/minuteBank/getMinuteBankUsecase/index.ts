@@ -5,7 +5,7 @@ import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { GetMinuteBankUsecase } from './getMinuteBankUsecase';
 
 const makeGetMinuteBankUsecase = new GetMinuteBankUsecase().init({
-  makeMinuteBankDbService,
+  makeDbService: makeMinuteBankDbService,
   makeQueryValidator: makeBaseQueryValidator,
   makeParamsValidator: makeBaseParamsValidator,
   cloneDeep,

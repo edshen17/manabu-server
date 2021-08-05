@@ -4,15 +4,14 @@ import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
-type OptionalGetUserUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
+type OptionalGetUserUsecaseInitParams = {};
 type GetUserUsecaseResponse = { user: JoinedUserDoc };
 
 class GetUserUsecase extends AbstractGetUsecase<
   OptionalGetUserUsecaseInitParams,
-  GetUserUsecaseResponse
+  GetUserUsecaseResponse,
+  UserDbService
 > {
-  private _userDbService!: UserDbService;
-
   protected _isLoginProtected = (): boolean => {
     return false;
   };
@@ -41,7 +40,7 @@ class GetUserUsecase extends AbstractGetUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
     const { _id, dbServiceAccessOptions } = props;
-    const user = await this._userDbService.findById({
+    const user = await this._dbService.findById({
       _id,
       dbServiceAccessOptions,
     });
@@ -53,7 +52,7 @@ class GetUserUsecase extends AbstractGetUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<void> => {
     const { _id, dbServiceAccessOptions } = props;
-    await this._userDbService.findOneAndUpdate({
+    await this._dbService.findOneAndUpdate({
       searchQuery: {
         _id,
       },
@@ -62,13 +61,6 @@ class GetUserUsecase extends AbstractGetUsecase<
       },
       dbServiceAccessOptions,
     });
-  };
-
-  protected _initTemplate = async (
-    optionalInitParams: OptionalGetUserUsecaseInitParams
-  ): Promise<void> => {
-    const { makeUserDbService } = optionalInitParams;
-    this._userDbService = await makeUserDbService;
   };
 }
 

@@ -19,7 +19,7 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 const makeLoginUserUsecase = new LoginUserUsecase().init({
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeCreateUserUsecase,
   oauth2Client,
   google,

@@ -5,7 +5,7 @@ import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeTeacherQueryValidator } from '../../../validators/teacher/query';
 
 const makeGetTeachersUsecase = new GetTeachersUsecase().init({
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeParamsValidator: makeBaseParamsValidator,
   makeQueryValidator: makeTeacherQueryValidator,
   cloneDeep,

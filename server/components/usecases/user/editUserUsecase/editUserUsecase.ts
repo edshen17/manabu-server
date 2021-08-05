@@ -8,7 +8,6 @@ import { JoinedUserDoc } from '../../../../models/User';
 import { NGramHandler } from '../../../entities/utils/nGramHandler/nGramHandler';
 
 type OptionalEditUserUsecaseInitParams = {
-  makeUserDbService: Promise<UserDbService>;
   makeNGramHandler: NGramHandler;
 };
 
@@ -16,9 +15,9 @@ type EditUserUsecaseResponse = { user: JoinedUserDoc };
 
 class EditUserUsecase extends AbstractEditUsecase<
   AbstractEditUsecaseInitParams<OptionalEditUserUsecaseInitParams>,
-  EditUserUsecaseResponse
+  EditUserUsecaseResponse,
+  UserDbService
 > {
-  private _userDbService!: UserDbService;
   private _nGramHandler!: NGramHandler;
 
   protected _makeRequestTemplate = async (
@@ -33,7 +32,7 @@ class EditUserUsecase extends AbstractEditUsecase<
         isPrefixOnly: true,
       });
     }
-    const savedDbUser = await this._userDbService.findOneAndUpdate({
+    const savedDbUser = await this._dbService.findOneAndUpdate({
       searchQuery: { _id: params.userId },
       updateQuery: body,
       dbServiceAccessOptions,
@@ -45,8 +44,7 @@ class EditUserUsecase extends AbstractEditUsecase<
   protected _initTemplate = async (
     optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditUserUsecaseInitParams>
   ): Promise<void> => {
-    const { makeUserDbService, makeEditEntityValidator, makeNGramHandler } = optionalInitParams;
-    this._userDbService = await makeUserDbService;
+    const { makeEditEntityValidator, makeNGramHandler } = optionalInitParams;
     this._editEntityValidator = makeEditEntityValidator;
     this._nGramHandler = makeNGramHandler;
   };

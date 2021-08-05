@@ -10,18 +10,21 @@ type ControllerData = {
 
 type RouteData = { params: any; body: any; query: any };
 
-type UsecaseInitParams<OptionalUsecaseInitParams> = RequiredUsecaseInitParams &
-  OptionalUsecaseInitParams;
+type UsecaseInitParams<OptionalUsecaseInitParams, DbService> =
+  RequiredUsecaseInitParams<DbService> & OptionalUsecaseInitParams;
 
-type RequiredUsecaseInitParams = {
+type RequiredUsecaseInitParams<DbService> = {
   makeQueryValidator: AbstractQueryValidator;
   makeParamsValidator: AbstractParamsValidator;
   cloneDeep: any;
+  makeDbService: Promise<DbService>;
 };
 
-interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
+interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService> {
   makeRequest: (controllerData: ControllerData) => Promise<UsecaseResponse>;
-  init: (usecaseInitParams: UsecaseInitParams<OptionalUsecaseInitParams>) => Promise<this>;
+  init: (
+    usecaseInitParams: UsecaseInitParams<OptionalUsecaseInitParams, DbService>
+  ) => Promise<this>;
 }
 
 export { ControllerData, IUsecase, RouteData, UsecaseInitParams };

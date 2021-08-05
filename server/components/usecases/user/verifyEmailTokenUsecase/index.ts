@@ -6,7 +6,7 @@ import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { VerifyEmailTokenUsecase } from './verifyEmailTokenUsecase';
 
 const makeVerifyEmailTokenUsecase = new VerifyEmailTokenUsecase().init({
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeRedirectUrlBuilder,
   makeParamsValidator: makeUserParamsValidator,
   makeQueryValidator: makeBaseQueryValidator,

@@ -7,15 +7,14 @@ import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
-type OptionalGetTeachersUsecaseInitParams = { makeUserDbService: Promise<UserDbService> };
+type OptionalGetTeachersUsecaseInitParams = {};
 type GetTeachersUsecaseResponse = { teachers: JoinedUserDoc[] };
 
 class GetTeachersUsecase extends AbstractGetUsecase<
   OptionalGetTeachersUsecaseInitParams,
-  GetTeachersUsecaseResponse
+  GetTeachersUsecaseResponse,
+  UserDbService
 > {
-  private _userDbService!: UserDbService;
-
   protected _isLoginProtected = (): boolean => {
     return false;
   };
@@ -24,7 +23,7 @@ class GetTeachersUsecase extends AbstractGetUsecase<
     props: MakeRequestTemplateParams
   ): Promise<GetTeachersUsecaseResponse> => {
     const { query } = props;
-    const dbServiceAccessOptions = this._userDbService.getBaseDbServiceAccessOptions();
+    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
     const teachers = await this._getTeachers({
       query,
       dbServiceAccessOptions,
@@ -42,7 +41,7 @@ class GetTeachersUsecase extends AbstractGetUsecase<
     const { query, dbServiceAccessOptions } = props;
     const searchQuery = this._processQuery(query);
     const paginationOptions = this._getPaginationOptions(query);
-    const teachers = await this._userDbService.find({
+    const teachers = await this._dbService.find({
       searchQuery,
       dbServiceAccessOptions,
       paginationOptions,
@@ -174,13 +173,6 @@ class GetTeachersUsecase extends AbstractGetUsecase<
     const { page, limit } = query || { page: 0, limit: 20 };
     const paginationOptions = { page, limit, sort: { 'teacherData.approvalDate': 1 } };
     return paginationOptions;
-  };
-
-  protected _initTemplate = async (
-    optionalInitParams: OptionalGetTeachersUsecaseInitParams
-  ): Promise<void> => {
-    const { makeUserDbService } = optionalInitParams;
-    this._userDbService = await makeUserDbService;
   };
 }
 

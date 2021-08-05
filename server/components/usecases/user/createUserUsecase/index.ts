@@ -24,7 +24,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makePackageTransactionEntity,
   makeTeacherEntity,
   makeTeacherBalanceEntity,
-  makeUserDbService,
+  makeDbService: makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,

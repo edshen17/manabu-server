@@ -3,8 +3,9 @@ import { AbstractUsecase } from './AbstractUsecase';
 
 abstract class AbstractCreateUsecase<
   OptionalUsecaseInitParams,
-  UsecaseResponse
-> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
+  UsecaseResponse,
+  DbService
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbService> {
   constructor() {
     super('Access denied.');
   }
