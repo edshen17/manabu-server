@@ -3,7 +3,6 @@ import { ControllerData, RouteData } from '../../abstractions/IUsecase';
 
 class ControllerDataBuilder {
   private _currentAPIUser!: CurrentAPIUser;
-  private _endpointPath!: string;
   private _routeData!: RouteData;
   constructor() {
     this._setDefaultProperties();
@@ -14,21 +13,16 @@ class ControllerDataBuilder {
       userId: undefined,
       role: 'user',
     };
-    this._endpointPath = '';
     this._routeData = {
       params: {},
       body: {},
       query: {},
+      endpointPath: '',
     };
   };
 
   public currentAPIUser = (currentAPIUser: CurrentAPIUser): this => {
     this._currentAPIUser = currentAPIUser;
-    return this;
-  };
-
-  public endpointPath = (endpointPath: string): this => {
-    this._endpointPath = endpointPath;
     return this;
   };
 
@@ -40,7 +34,6 @@ class ControllerDataBuilder {
   public build = (): ControllerData => {
     const controllerData: ControllerData = {
       currentAPIUser: this._currentAPIUser,
-      endpointPath: this._endpointPath,
       routeData: this._routeData,
     };
     this._setDefaultProperties();

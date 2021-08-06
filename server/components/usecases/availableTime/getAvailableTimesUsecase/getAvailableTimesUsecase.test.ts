@@ -16,7 +16,7 @@ let routeData: RouteData;
 let currentAPIUser: CurrentAPIUser;
 let fakeAvailableTime: AvailableTimeDoc;
 let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;
-let endpointPath: string;
+
 before(async () => {
   getAvailableTimesUsecase = await makeGetAvailableTimesUsecase;
   controllerDataBuilder = makeControllerDataBuilder;
@@ -31,12 +31,12 @@ beforeEach(async () => {
     },
     body: {},
     query: {},
+    endpointPath: '',
   };
   currentAPIUser = {
     userId: fakeAvailableTime.hostedById,
     role: 'user',
   };
-  endpointPath = '';
 });
 
 describe('getAvailableTimesUsecase', () => {
@@ -45,7 +45,6 @@ describe('getAvailableTimesUsecase', () => {
       const controllerData = controllerDataBuilder
         .currentAPIUser(currentAPIUser)
         .routeData(routeData)
-        .endpointPath(endpointPath)
         .build();
       const getAvailableTimesRes = await getAvailableTimesUsecase.makeRequest(controllerData);
       const availableTimes = getAvailableTimesRes.availableTimes;
@@ -75,7 +74,7 @@ describe('getAvailableTimesUsecase', () => {
         context('as a non-admin user', () => {
           context('viewing self', () => {
             it("should get the user's available times", async () => {
-              endpointPath = '/self';
+              routeData.endpointPath = '/self';
               routeData.params = {};
               await getAvailableTimes();
             });

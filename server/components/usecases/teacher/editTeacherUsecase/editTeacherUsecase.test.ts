@@ -30,6 +30,7 @@ beforeEach(() => {
       teacherId: fakeTeacher.teacherData!._id,
     },
     query: {},
+    endpointPath: '',
   };
 });
 

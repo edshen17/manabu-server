@@ -38,8 +38,8 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   protected _getMakeRequestTemplateParams = async (
     controllerData: ControllerData
   ): Promise<MakeRequestTemplateParams> => {
-    const { routeData, currentAPIUser, endpointPath } = controllerData;
-    const { body, params, query } = routeData;
+    const { routeData, currentAPIUser } = controllerData;
+    const { body, params, query, endpointPath } = routeData;
     const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       isSelf,

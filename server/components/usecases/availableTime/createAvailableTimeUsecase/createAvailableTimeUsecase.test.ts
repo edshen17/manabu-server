@@ -35,6 +35,7 @@ beforeEach(async () => {
       endDate,
     },
     query: {},
+    endpointPath: '',
   };
 });
 

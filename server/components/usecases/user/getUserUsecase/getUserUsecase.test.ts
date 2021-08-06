@@ -16,7 +16,6 @@ let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
 let routeData: RouteData;
 let currentAPIUser: CurrentAPIUser;
-let endpointPath: string;
 
 before(async () => {
   getUserUsecase = await makeGetUserUsecase;
@@ -33,13 +32,13 @@ beforeEach(async () => {
     },
     body: {},
     query: {},
+    endpointPath: '',
   };
   currentAPIUser = {
     userId: fakeTeacher._id,
     teacherId: fakeTeacher.teacherData!._id,
     role: fakeTeacher.role,
   };
-  endpointPath = '';
 });
 
 describe('getUserUsecase', () => {
@@ -48,7 +47,6 @@ describe('getUserUsecase', () => {
       const controllerData = controllerDataBuilder
         .currentAPIUser(currentAPIUser)
         .routeData(routeData)
-        .endpointPath(endpointPath)
         .build();
       const getUserRes = await getUserUsecase.makeRequest(controllerData);
       const savedDbUser = getUserRes.user;
@@ -101,7 +99,7 @@ describe('getUserUsecase', () => {
             });
             it('should get the user and return a less restricted view on the self endpoint', async () => {
               let { params } = routeData;
-              endpointPath = '/self/me';
+              routeData.endpointPath = '/self/me';
               params = {};
               const savedDbUser = await getUser();
               testUserViews(savedDbUser, 'self');

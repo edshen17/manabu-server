@@ -30,6 +30,7 @@ beforeEach(() => {
     },
     body: {},
     query: {},
+    endpointPath: '',
   };
   currentAPIUser = {
     userId: fakeTeacher._id,

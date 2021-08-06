@@ -38,10 +38,15 @@ describe('getMinuteBankUsecase', () => {
     context('valid inputs', () => {
       it('should return a minuteBank given a valid inputs', async () => {
         const buildControllerData = controllerDataBuilder
-          .endpointPath('/self/minuteBanks')
           .currentAPIUser({
             userId: fakeUser._id,
             role: 'admin',
+          })
+          .routeData({
+            query: {},
+            params: {},
+            body: {},
+            endpointPath: '/self/minuteBanks',
           })
           .build();
         const minuteBankRes = await getMinuteBankUsecase.makeRequest(buildControllerData);
@@ -50,6 +55,5 @@ describe('getMinuteBankUsecase', () => {
         expect(minuteBankRes.minuteBanks.length > 0).to.equal(true);
       });
     });
-    context('invalid inputs', () => {});
   });
 });

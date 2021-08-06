@@ -32,8 +32,8 @@ describe('loginUserUsecase', () => {
             body: fakeUserEntityData,
             params: {},
             query: {},
+            endpointPath: '/base/login',
           })
-          .endpointPath('/base/login')
           .build();
         const loginUserRes = await loginUserUsecase.makeRequest(buildLoginUserControllerData);
         if ('user' in loginUserRes) {

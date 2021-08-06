@@ -28,6 +28,7 @@ beforeEach(() => {
         isTeacherApp: true,
       },
     },
+    endpointPath: '',
   };
 });
 

@@ -19,14 +19,14 @@ describe('controllerDataBuilder', () => {
         userId: fakeUser._id,
         role: fakeUser.role,
       };
-      const controllerData = controllerDataBuilder
-        .endpointPath('some endpoint')
-        .currentAPIUser(testCurrentAPIUser)
-        .build();
-
-      expect(controllerData.endpointPath).to.equal('some endpoint');
+      const controllerData = controllerDataBuilder.currentAPIUser(testCurrentAPIUser).build();
       expect(controllerData.currentAPIUser).to.deep.equal(testCurrentAPIUser);
-      expect(controllerData.routeData).to.deep.equal({ params: {}, body: {}, query: {} });
+      expect(controllerData.routeData).to.deep.equal({
+        params: {},
+        body: {},
+        query: {},
+        endpointPath: '',
+      });
     });
     it('should build a valid ControllerData object with an empty current API user and a non-empty routeData object', async () => {
       const testRouteData = {
@@ -39,9 +39,9 @@ describe('controllerDataBuilder', () => {
         query: {
           query: 'some query',
         },
+        endpointPath: '',
       };
       const controllerData = await controllerDataBuilder.routeData(testRouteData).build();
-      expect(controllerData.endpointPath).to.equal('');
       expect(controllerData.currentAPIUser).to.deep.equal({
         userId: undefined,
         role: 'user',

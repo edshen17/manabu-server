@@ -5,11 +5,10 @@ import { CurrentAPIUser } from '../../webFrameworkCallbacks/abstractions/IHttpRe
 
 type ControllerData = {
   currentAPIUser: CurrentAPIUser;
-  endpointPath: string;
   routeData: RouteData;
 };
 
-type RouteData = { params: any; body: any; query: any };
+type RouteData = { params: any; body: any; query: any; endpointPath: string };
 
 type UsecaseInitParams<OptionalUsecaseInitParams> = RequiredUsecaseInitParams &
   OptionalUsecaseInitParams;

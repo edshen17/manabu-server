@@ -54,6 +54,7 @@ beforeEach(async () => {
       contactMethodName: ['Skype', 'LINE'],
       contactMethodType: ['online', 'offline'],
     },
+    endpointPath: '',
   };
   currentAPIUser = {
     userId: fakeTeacher._id,
