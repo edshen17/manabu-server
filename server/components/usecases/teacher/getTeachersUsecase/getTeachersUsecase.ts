@@ -13,10 +13,6 @@ class GetTeachersUsecase extends AbstractGetUsecase<
   OptionalGetTeachersUsecaseInitParams,
   GetTeachersUsecaseResponse
 > {
-  protected _isLoginProtected = (): boolean => {
-    return false;
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetTeachersUsecaseResponse> => {

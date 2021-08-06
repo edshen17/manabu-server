@@ -44,12 +44,12 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AvailableTimeDoc> => {
     const { availableTimeId, body, dbServiceAccessOptions } = props;
-    const dbAvailableTime = await this._dbService.findOneAndUpdate({
+    const availableTime = await this._dbService.findOneAndUpdate({
       _id: availableTimeId,
       updateQuery: body,
       dbServiceAccessOptions,
     });
-    return dbAvailableTime;
+    return availableTime;
   };
 
   protected _initTemplate = async (

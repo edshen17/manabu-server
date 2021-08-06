@@ -53,13 +53,6 @@ describe('createUserUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
-        it('should throw if no inputs are provided', async () => {
-          try {
-            await createUser();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
-        });
       });
       context('valid inputs', () => {
         const validResOutput = (createUserRes: CreateUserUsecaseResponse) => {

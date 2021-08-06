@@ -71,13 +71,6 @@ describe('editUserUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
-        it('should throw if no inputs are provided', async () => {
-          try {
-            await editUser();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
-        });
       });
       context('valid inputs', () => {
         context('as a non-admin user', () => {

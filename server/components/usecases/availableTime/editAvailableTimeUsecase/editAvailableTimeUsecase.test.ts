@@ -64,8 +64,10 @@ describe('editAvailableTimeUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
-        it('should throw if no inputs are provided', async () => {
-          routeData.body = {};
+        it('should throw if bad inputs are provided', async () => {
+          routeData.body = {
+            hostedById: 'some id',
+          };
           try {
             await editAvailableTime();
           } catch (err) {

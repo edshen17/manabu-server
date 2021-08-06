@@ -11,6 +11,7 @@ const users = express.Router();
 
 users.get('/:userId', makeJSONExpressCallback.consume(makeGetUserController));
 users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController));
+// users.get('/:userId/availableTimes');
 
 users.get('/self', makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));

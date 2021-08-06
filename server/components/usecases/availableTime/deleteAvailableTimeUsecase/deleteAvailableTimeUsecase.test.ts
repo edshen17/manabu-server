@@ -62,13 +62,6 @@ describe('deleteAvailableTimeUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
-        it('should throw if no inputs are provided', async () => {
-          try {
-            await deleteAvailableTime();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
-        });
       });
       context('valid inputs', () => {
         const validResOutput = (deleteAvailableTimeUsecase: DeleteAvailableTimeUsecaseResponse) => {

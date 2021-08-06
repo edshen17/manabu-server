@@ -17,7 +17,6 @@ let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeMinuteBank: MinuteBankDoc;
 let fakeUser: JoinedUserDoc;
-let currentAPIUser: CurrentAPIUser;
 
 before(async () => {
   fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;

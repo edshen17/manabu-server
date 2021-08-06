@@ -57,8 +57,9 @@ describe('createAvailableTimeUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
-        it('should throw if no inputs are provided', async () => {
+        it('should throw an error if there is an availableTime overlap', async () => {
           try {
+            await createAvailableTime();
             await createAvailableTime();
           } catch (err) {
             expect(err).to.be.an('error');

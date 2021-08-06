@@ -26,6 +26,7 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   ): Promise<CreateAvailableTimeUsecaseResponse> => {
     const { body, dbServiceAccessOptions } = props;
     const availableTimeEntity = await this._availableTimeEntity.build(body);
+    await this._testTimeConflicts(availableTimeEntity);
     const availableTime = await this._createDbAvailableTime({
       availableTimeEntity,
       dbServiceAccessOptions,
@@ -34,6 +35,20 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
       availableTime,
     };
     return usecaseRes;
+  };
+
+  private _testTimeConflicts = async (
+    availableTimeEntity: AvailableTimeEntityBuildResponse
+  ): Promise<void> => {
+    const { hostedById, startDate, endDate } = availableTimeEntity;
+    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+    const availableTime = await this._dbService.findOne({
+      searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
+      dbServiceAccessOptions,
+    });
+    if (availableTime) {
+      throw new Error('You cannot have multiple timeslots that overlap.');
+    }
   };
 
   private _createDbAvailableTime = async (props: {

@@ -11,17 +11,13 @@ class GetUserUsecase extends AbstractGetUsecase<
   OptionalGetUserUsecaseInitParams,
   GetUserUsecaseResponse
 > {
-  protected _isLoginProtected = (): boolean => {
-    return false;
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetUserUsecaseResponse> => {
     const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
     const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const _id = isSelf ? currentAPIUser.userId : params.userId;
-    const user = await this._getDbUser({
+    const user = await this._getUser({
       _id,
       dbServiceAccessOptions,
     });
@@ -34,7 +30,7 @@ class GetUserUsecase extends AbstractGetUsecase<
     return { user };
   };
 
-  private _getDbUser = async (props: {
+  private _getUser = async (props: {
     _id: ObjectId;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {

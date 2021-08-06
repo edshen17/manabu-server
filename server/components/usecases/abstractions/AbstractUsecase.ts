@@ -72,10 +72,8 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   }): boolean => {
     const { isSelf, currentAPIUser } = props;
     const isAdmin = currentAPIUser.role == 'admin';
-    const isLoginProtected = this._isLoginProtected();
-    const isLoggedIn = this._isLoggedIn(currentAPIUser);
-    const isCurrentAPIUserPermitted =
-      isSelf || isAdmin || !isLoginProtected || (isSelf && isLoginProtected && isLoggedIn);
+    const isProtectedResource = this._isProtectedResource();
+    const isCurrentAPIUserPermitted = isSelf || isAdmin || !isProtectedResource;
     return isCurrentAPIUserPermitted;
   };
 
@@ -124,7 +122,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return isLoggedIn;
   };
 
-  protected _isLoginProtected = (): boolean => {
+  protected _isProtectedResource = (): boolean => {
     return true;
   };
 
