@@ -3,10 +3,6 @@ import { AbstractUsecase } from './AbstractUsecase';
 abstract class AbstractGetUsecase<
   OptionalUsecaseInitParams,
   UsecaseResponse
-> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
-  constructor() {
-    super('Resource not found.');
-  }
-}
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {}
 
 export { AbstractGetUsecase };

@@ -18,10 +18,6 @@ abstract class AbstractEditUsecase<
 > {
   protected _editEntityValidator!: AbstractEntityValidator;
 
-  constructor() {
-    super('Access denied.');
-  }
-
   protected _isValidRouteDataTemplate = (controllerData: ControllerData): void => {
     const { routeData, currentAPIUser } = controllerData;
     const { role } = currentAPIUser;

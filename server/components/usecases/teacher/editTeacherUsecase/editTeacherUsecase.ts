@@ -18,15 +18,13 @@ class EditTeacherUsecase extends AbstractEditUsecase<
     props: MakeRequestTemplateParams
   ): Promise<EditTeacherUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions } = props;
-    const dbServiceAccessOptionsCopy: DbServiceAccessOptions =
-      this._cloneDeep(dbServiceAccessOptions);
-    dbServiceAccessOptionsCopy.isReturningParent = true;
-    const savedDbTeacher = <JoinedUserDoc>await this._dbService.findOneAndUpdate({
+    dbServiceAccessOptions.isReturningParent = true;
+    const user = <JoinedUserDoc>await this._dbService.findOneAndUpdate({
       searchQuery: { _id: params.teacherId },
       updateQuery: body,
-      dbServiceAccessOptions: dbServiceAccessOptionsCopy,
+      dbServiceAccessOptions,
     });
-    const usecaseRes = { user: savedDbTeacher };
+    const usecaseRes = { user };
     return usecaseRes;
   };
 

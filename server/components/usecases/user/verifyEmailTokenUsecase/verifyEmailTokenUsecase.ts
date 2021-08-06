@@ -27,20 +27,20 @@ class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   protected _makeRequestTemplate = async (props: MakeRequestTemplateParams) => {
     const { dbServiceAccessOptions, params } = props;
     const { verificationToken } = params;
-    const savedDbUser = await this._dbService.findOne({
+    const user = await this._dbService.findOne({
       searchQuery: { verificationToken },
       dbServiceAccessOptions,
     });
-    if (savedDbUser) {
-      const updatedDbUser = await this._dbService.findOneAndUpdate({
-        searchQuery: { _id: savedDbUser._id },
+    if (user) {
+      const updatedUser = await this._dbService.findOneAndUpdate({
+        searchQuery: { _id: user._id },
         updateQuery: { isEmailVerified: true },
         dbServiceAccessOptions,
       });
       const redirectUrl = this._redirectUrlBuilder.host('client').endpoint('/dashboard').build();
       return {
         redirectUrl,
-        user: updatedDbUser,
+        user: updatedUser,
       };
     } else {
       throw new Error('User not found.');

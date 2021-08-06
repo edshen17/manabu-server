@@ -21,7 +21,7 @@ class GetUserUsecase extends AbstractGetUsecase<
     const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
     const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const _id = isSelf ? currentAPIUser.userId : params.userId;
-    const user = await this._getUser({
+    const user = await this._getDbUser({
       _id,
       dbServiceAccessOptions,
     });
@@ -34,7 +34,7 @@ class GetUserUsecase extends AbstractGetUsecase<
     return { user };
   };
 
-  private _getUser = async (props: {
+  private _getDbUser = async (props: {
     _id: ObjectId;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {

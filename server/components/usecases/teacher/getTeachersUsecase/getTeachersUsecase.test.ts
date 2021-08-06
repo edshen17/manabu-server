@@ -91,7 +91,7 @@ describe('getTeachersUsecase', () => {
             routeData.params = '60979db0bb31ed001589a1ea';
             await getTeachers();
           } catch (err) {
-            expect(err.message).to.equal('Resource not found.');
+            expect(err).to.be.an('error');
           }
         });
         it('should throw an error if an invalid id is given', async () => {

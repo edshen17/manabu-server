@@ -25,24 +25,14 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   protected _deepEqual!: any;
   protected _resourceAccessData: StringKeyObject = {
     hasResourceAccessCheck: false,
-    resourceIdName: '',
+    paramIdName: '',
   };
   protected _dbService!: IDbService<any, any>;
-  private _makeRequestErrorMsg: string;
-
-  constructor(makeRequestErrorMsg: string) {
-    this._makeRequestErrorMsg = makeRequestErrorMsg;
-  }
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
     const makeRequestTemplateParams = await this._getMakeRequestTemplateParams(controllerData);
-    const { isValidRequest } = makeRequestTemplateParams;
-    if (isValidRequest) {
-      const usecaseRes = await this._makeRequestTemplate(makeRequestTemplateParams);
-      return usecaseRes;
-    } else {
-      throw new Error(this._makeRequestErrorMsg);
-    }
+    const usecaseRes = await this._makeRequestTemplate(makeRequestTemplateParams);
+    return usecaseRes;
   };
 
   protected _getMakeRequestTemplateParams = async (
@@ -112,10 +102,10 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   }): Promise<boolean> => {
     const { currentAPIUser, params } = props;
     const { userId } = currentAPIUser;
-    const { hasResourceAccessCheck, resourceIdName } = this._resourceAccessData;
+    const { hasResourceAccessCheck, paramIdName } = this._resourceAccessData;
     let isResourceOwner = false;
     if (hasResourceAccessCheck) {
-      const resourceId = params[`${resourceIdName}`];
+      const resourceId = params[`${paramIdName}`];
       const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
       const resourceData = await this._dbService.findById({
         _id: resourceId,
@@ -173,17 +163,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
 
   protected _isValidRouteData = (controllerData: ControllerData): boolean => {
     const { routeData } = controllerData;
-    let isValidRouteData: boolean;
-    try {
-      const { query, params } = routeData;
-      this._queryValidator.validate({ query });
-      this._paramsValidator.validate({ params });
-      this._isValidRouteDataTemplate(controllerData);
-      isValidRouteData = true;
-    } catch (err) {
-      isValidRouteData = false;
-    }
-    return isValidRouteData;
+    const { query, params } = routeData;
+    this._queryValidator.validate({ query });
+    this._paramsValidator.validate({ params });
+    this._isValidRouteDataTemplate(controllerData);
+    return true;
   };
 
   protected _isValidRouteDataTemplate = (controllerData: ControllerData): void => {};

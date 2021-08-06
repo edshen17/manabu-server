@@ -80,56 +80,56 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
     dbServiceAccessOptionsCopy.isOverrideView = true;
     const dbService = <UserDbService>this._dbService;
-    let savedDbUser = await dbService.authenticateUser(
+    let user = await dbService.authenticateUser(
       {
         searchQuery: { email },
         dbServiceAccessOptions: dbServiceAccessOptionsCopy,
       },
       password
     );
-    const handleNoSavedDbUser = () => {
+    const handleNoDbUser = () => {
       throw new Error('Username or password incorrect.');
     };
     const baseLoginResponse = await this._loginUser({
-      savedDbUser,
+      user,
       dbServiceAccessOptions,
       query,
-      handleNoSavedDbUser,
+      handleNoDbUser,
     });
     return baseLoginResponse;
   };
 
   private _loginUser = async (props: {
-    savedDbUser: JoinedUserDoc;
+    user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     query: any;
-    handleNoSavedDbUser: () => any;
+    handleNoDbUser: () => any;
   }): Promise<LoginUserUsecaseResponse> => {
-    const { dbServiceAccessOptions, query, handleNoSavedDbUser } = props || {};
-    let { savedDbUser } = props;
+    const { dbServiceAccessOptions, query, handleNoDbUser } = props || {};
+    let { user } = props;
     const { state } = query || {};
     const { isTeacherApp } = state || {};
-    if (savedDbUser) {
-      const isTeacher = savedDbUser.teacherData;
+    if (user) {
+      const isTeacher = user.teacherData;
       const shouldCreateNewTeacher = !isTeacher && isTeacherApp;
       if (shouldCreateNewTeacher) {
-        savedDbUser = await this._createUserUsecase.handleTeacherCreation({
-          savedDbUser,
+        user = await this._createUserUsecase.handleTeacherCreation({
+          user,
           dbServiceAccessOptions,
         });
       }
-      const loginUserRes = this._createLoginResponse(savedDbUser);
+      const loginUserRes = this._createLoginResponse(user);
       return loginUserRes;
     } else {
-      const noSavedDbUserRes = await handleNoSavedDbUser();
+      const noSavedDbUserRes = await handleNoDbUser();
       return noSavedDbUserRes;
     }
   };
 
-  private _createLoginResponse = (savedDbUser: JoinedUserDoc): LoginUserUsecaseResponse => {
+  private _createLoginResponse = (user: JoinedUserDoc): LoginUserUsecaseResponse => {
     return {
-      user: savedDbUser,
-      cookies: this._createUserUsecase.splitLoginCookies(savedDbUser),
+      user: user,
+      cookies: this._createUserUsecase.splitLoginCookies(user),
       redirectUrl: this._CLIENT_DASHBOARD_URL,
     };
   };
@@ -144,11 +144,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { code } = query;
     const { tokens } = await this._oauth2Client.getToken(code);
     const { email, name, picture } = await this._getGoogleUserData(tokens);
-    let savedDbUser = await this._dbService.findOne({
+    let user = await this._dbService.findOne({
       searchQuery: { email },
       dbServiceAccessOptions,
     });
-    const handleNoSavedDbUser = async () => {
+    const handleNoDbUser = async () => {
       body.name = name;
       body.email = email;
       body.profilePicture = picture;
@@ -159,10 +159,10 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       return userRes;
     };
     const googleLoginRes = await this._loginUser({
-      savedDbUser,
+      user,
       dbServiceAccessOptions,
       query,
-      handleNoSavedDbUser,
+      handleNoDbUser,
     });
     return googleLoginRes;
   };

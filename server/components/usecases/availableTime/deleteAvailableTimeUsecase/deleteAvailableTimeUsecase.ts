@@ -16,7 +16,7 @@ class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
 > {
   protected _resourceAccessData: StringKeyObject = {
     hasResourceAccessCheck: true,
-    resourceIdName: 'availableTimeId',
+    paramIdName: 'availableTimeId',
   };
 
   protected _makeRequestTemplate = async (
@@ -24,12 +24,12 @@ class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
   ): Promise<DeleteAvailableTimeUsecaseResponse> => {
     const { params, dbServiceAccessOptions } = props;
     const { availableTimeId } = params;
-    let deletedDbAvailableTime = await this._deleteDbAvailableTime({
+    const availableTime = await this._deleteDbAvailableTime({
       availableTimeId,
       dbServiceAccessOptions,
     });
     const usecaseRes = {
-      availableTime: deletedDbAvailableTime,
+      availableTime,
     };
     return usecaseRes;
   };
@@ -39,11 +39,11 @@ class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AvailableTimeDoc> => {
     const { availableTimeId, dbServiceAccessOptions } = props;
-    const deletedDbAvailableTime = await this._dbService.findByIdAndDelete({
+    const availableTime = await this._dbService.findByIdAndDelete({
       _id: availableTimeId,
       dbServiceAccessOptions,
     });
-    return deletedDbAvailableTime;
+    return availableTime;
   };
 }
 

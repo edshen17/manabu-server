@@ -31,13 +31,13 @@ class EditUserUsecase extends AbstractEditUsecase<
         isPrefixOnly: true,
       });
     }
-    const savedDbUser = await this._dbService.findOneAndUpdate({
+    const user = await this._dbService.findOneAndUpdate({
       searchQuery: { _id: params.userId },
       updateQuery: body,
       dbServiceAccessOptions,
     });
 
-    return { user: savedDbUser };
+    return { user };
   };
 
   protected _initTemplate = async (

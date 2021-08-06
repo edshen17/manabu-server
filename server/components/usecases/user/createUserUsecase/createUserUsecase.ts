@@ -82,22 +82,22 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { state } = query || {};
     const { isTeacherApp } = state || {};
     const userEntity = await this._userEntity.build(body);
-    let savedDbUser = await this._createDbUser({ userEntity, dbServiceAccessOptions });
+    let user = await this._createDbUser({ userEntity, dbServiceAccessOptions });
     if (isTeacherApp) {
-      savedDbUser = await this.handleTeacherCreation({ savedDbUser, dbServiceAccessOptions });
+      user = await this.handleTeacherCreation({ user, dbServiceAccessOptions });
     }
-    if (process.env.NODE_ENV == 'production' && !savedDbUser.isEmailVerified) {
+    if (process.env.NODE_ENV == 'production' && !user.isEmailVerified) {
       this._sendVerificationEmail(userEntity);
       this._sendInternalEmail({ userEntity, isTeacherApp });
     }
-    const cookies = this.splitLoginCookies(savedDbUser);
+    const cookies = this.splitLoginCookies(user);
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
       .endpoint('/dashboard')
       .stringifyQueryStringObj(query)
       .build();
     const usecaseRes = {
-      user: savedDbUser,
+      user,
       cookies,
       redirectUrl,
     };
@@ -109,38 +109,38 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
     const { userEntity, dbServiceAccessOptions } = props;
-    const savedDbUser = await this._dbService.insert({
+    const user = await this._dbService.insert({
       modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
-    await this._createUserNode(savedDbUser);
-    return savedDbUser;
+    await this._createUserNode(user);
+    return user;
   };
 
-  private _createUserNode = async (savedDbUser: JoinedUserDoc): Promise<void> => {
-    await this._cacheDbService.graphQuery(`CREATE (user: User { _id: "${savedDbUser._id}" })`);
+  private _createUserNode = async (user: JoinedUserDoc): Promise<void> => {
+    await this._cacheDbService.graphQuery(`CREATE (user: User { _id: "${user._id}" })`);
   };
 
   public handleTeacherCreation = async (props: {
-    savedDbUser: JoinedUserDoc;
+    user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
-    const { savedDbUser, dbServiceAccessOptions } = props;
-    const joinedUserData = await this._createTeacherData({ savedDbUser, dbServiceAccessOptions });
-    await this._createDbAdminPackageTransaction({ savedDbUser, dbServiceAccessOptions });
-    await this._createGraphAdminTeacherEdge(savedDbUser);
-    await this._createDbTeacherBalance({ savedDbUser, dbServiceAccessOptions });
+    const { user, dbServiceAccessOptions } = props;
+    const joinedUserData = await this._createTeacherData({ user, dbServiceAccessOptions });
+    await this._createDbAdminPackageTransaction({ user, dbServiceAccessOptions });
+    await this._createGraphAdminTeacherEdge(user);
+    await this._createDbTeacherBalance({ user, dbServiceAccessOptions });
     return joinedUserData;
   };
 
   private _createTeacherData = async (props: {
-    savedDbUser: JoinedUserDoc;
+    user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
-    const { savedDbUser, dbServiceAccessOptions } = props;
+    const { user, dbServiceAccessOptions } = props;
     const teacherData = await this._teacherEntity.build({});
     const savedDbTeacher = await this._dbService.findOneAndUpdate({
-      searchQuery: { _id: savedDbUser._id },
+      searchQuery: { _id: user._id },
       updateQuery: {
         teacherData,
       },
@@ -150,13 +150,13 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   private _createDbAdminPackageTransaction = async (props: {
-    savedDbUser: JoinedUserDoc;
+    user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<PackageTransactionDoc> => {
-    const { savedDbUser, dbServiceAccessOptions } = props;
+    const { user, dbServiceAccessOptions } = props;
     const modelToInsert = await this._packageTransactionEntity.build({
       hostedById: this._convertStringToObjectId(process.env.MANABU_ADMIN_ID!),
-      reservedById: savedDbUser._id,
+      reservedById: user._id,
       packageId: this._convertStringToObjectId(process.env.MANABU_ADMIN_PKG_ID!),
       lessonDuration: 60,
       remainingAppointments: 1,
@@ -176,20 +176,20 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return newPackageTransaction;
   };
 
-  private _createGraphAdminTeacherEdge = async (savedDbUser: JoinedUserDoc): Promise<void> => {
+  private _createGraphAdminTeacherEdge = async (user: JoinedUserDoc): Promise<void> => {
     await this._cacheDbService.graphQuery(
-      `MATCH (teacher: User {_id: "${savedDbUser._id}"}), (admin: User {_id:"${process.env
+      `MATCH (teacher: User {_id: "${user._id}"}), (admin: User {_id:"${process.env
         .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date()}"}]->(teacher)`
     );
   };
 
   private _createDbTeacherBalance = async (props: {
-    savedDbUser: JoinedUserDoc;
+    user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<TeacherBalanceDoc> => {
-    const { savedDbUser, dbServiceAccessOptions } = props;
+    const { user, dbServiceAccessOptions } = props;
     const modelToInsert = await this._teacherBalanceEntity.build({
-      userId: savedDbUser._id,
+      userId: user._id,
     });
     const newTeacherBalance = await this._teacherBalanceDbService.insert({
       modelToInsert,
@@ -231,8 +231,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     );
   };
 
-  public splitLoginCookies = (savedDbUser: JoinedUserDoc): CookieData[] => {
-    const token = this._signClientJwt(savedDbUser);
+  public splitLoginCookies = (user: JoinedUserDoc): CookieData[] => {
+    const token = this._signClientJwt(user);
     const tokenArr: string[] = token.split('.');
     const options = this._setCookieOptions();
     const hpCookie = {
@@ -249,10 +249,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return loginCookies;
   };
 
-  private _signClientJwt = (savedDbUser: any): string => {
+  private _signClientJwt = (user: any): string => {
     const token = this._signJwt(
       {
-        ...savedDbUser,
+        ...user,
       },
       process.env.JWT_SECRET,
       {

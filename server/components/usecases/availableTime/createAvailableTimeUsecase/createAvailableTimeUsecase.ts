@@ -26,12 +26,12 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   ): Promise<CreateAvailableTimeUsecaseResponse> => {
     const { body, dbServiceAccessOptions } = props;
     const availableTimeEntity = await this._availableTimeEntity.build(body);
-    let savedDbAvailableTime = await this._createDbAvailableTime({
+    const availableTime = await this._createDbAvailableTime({
       availableTimeEntity,
       dbServiceAccessOptions,
     });
     const usecaseRes = {
-      availableTime: savedDbAvailableTime,
+      availableTime,
     };
     return usecaseRes;
   };
