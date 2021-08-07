@@ -9,6 +9,7 @@ enum ENTITY_VALIDATOR_VALIDATE_USER_ROLES {
 enum ENTITY_VALIDATOR_VALIDATE_MODES {
   CREATE = 'create',
   EDIT = 'edit',
+  DELETE = 'delete',
   QUERY = 'query',
   PARAMS = 'params',
 }
@@ -27,6 +28,7 @@ abstract class AbstractEntityValidator extends AbstractValidator<
 > {
   protected _createValidationSchema: any;
   protected _editValidationSchema: any;
+  protected _deleteValidationSchema: any;
   protected _adminValidationSchema: any;
 
   protected _validateProps = (props: EntityValidatorValidateParams): JoiValidationObject => {
@@ -38,6 +40,8 @@ abstract class AbstractEntityValidator extends AbstractValidator<
       validatedProps = this._createValidationSchema.validate(buildParams);
     } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.EDIT) {
       validatedProps = this._editValidationSchema.validate(buildParams);
+    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.DELETE) {
+      validatedProps = this._deleteValidationSchema.validate(buildParams);
     } else {
       validatedProps = {
         error: 'Unsupported function argument.',

@@ -4,11 +4,11 @@ import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fa
 import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
 import { makeGetMinuteBankController } from '.';
 import { GetMinuteBankController } from './getMinuteBankController';
-import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
 import { JoinedUserDoc } from '../../../../models/User';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
 
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
 let fakeDbUserFactory: FakeDbUserFactory;

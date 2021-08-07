@@ -1,11 +1,11 @@
 import faker from 'faker';
 import { expect } from 'chai';
 import { makeCreateUserController } from '.';
-import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
 import { CreateUserController } from './createUserController';
 import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let createUserController: CreateUserController;

@@ -10,12 +10,14 @@ import {
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { JoinedUserDoc } from '../../../../models/User';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbUserFactory: FakeDbUserFactory;
 let createAvailableTimeUsecase: CreateAvailableTimeUsecase;
 let routeData: RouteData;
 let fakeUser: JoinedUserDoc;
+let currentAPIUser: CurrentAPIUser;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
@@ -25,14 +27,16 @@ before(async () => {
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  const endDate = new Date();
-  endDate.setMinutes(endDate.getMinutes() + 30);
+  currentAPIUser = {
+    userId: fakeUser._id,
+    role: fakeUser.role,
+  };
   routeData = {
     params: {},
     body: {
       hostedById: fakeUser._id,
       startDate: new Date(),
-      endDate,
+      endDate: new Date(),
     },
     query: {},
     endpointPath: '',
@@ -42,7 +46,10 @@ beforeEach(async () => {
 describe('createAvailableTimeUsecase', () => {
   describe('makeRequest', () => {
     const createAvailableTime = async () => {
-      const controllerData = controllerDataBuilder.routeData(routeData).build();
+      const controllerData = controllerDataBuilder
+        .routeData(routeData)
+        .currentAPIUser(currentAPIUser)
+        .build();
       const createAvailableTimeRes = await createAvailableTimeUsecase.makeRequest(controllerData);
       return createAvailableTimeRes;
     };
@@ -61,6 +68,14 @@ describe('createAvailableTimeUsecase', () => {
         it('should throw an error if there is an availableTime overlap', async () => {
           try {
             await createAvailableTime();
+            await createAvailableTime();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
+        it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
+          try {
+            routeData.body.hostedById = '507f1f77bcf86cd799439011';
             await createAvailableTime();
           } catch (err) {
             expect(err).to.be.an('error');

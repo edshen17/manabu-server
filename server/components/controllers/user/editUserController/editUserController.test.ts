@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import { makeEditUserController } from '.';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { EditUserController } from './editUserController';
 
 let fakeDbUserFactory: FakeDbUserFactory;

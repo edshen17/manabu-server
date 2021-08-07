@@ -1,11 +1,11 @@
 import { expect } from 'chai';
-import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
 import { CreateAvailableTimeController } from './createAvailableTimeController';
 import { makeCreateAvailableTimeController } from '.';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { JoinedUserDoc } from '../../../../models/User';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let createAvailableTimeController: CreateAvailableTimeController;

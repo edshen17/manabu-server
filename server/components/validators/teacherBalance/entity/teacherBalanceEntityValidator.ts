@@ -21,6 +21,11 @@ class TeacherBalanceEntityValidator extends AbstractEntityValidator {
       balance: this._joi.object().forbidden(),
       currency: this._joi.object().forbidden(),
     });
+    this._deleteValidationSchema = this._createValidationSchema.keys({
+      _id: this._joi
+        .alternatives()
+        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
+    });
     this._adminValidationSchema = this._editValidationSchema;
   };
 }

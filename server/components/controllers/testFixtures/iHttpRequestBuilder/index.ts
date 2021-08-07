@@ -1,4 +1,4 @@
-import { IHttpRequestBuilder } from './IHttpRequestBuilder';
+import { IHttpRequestBuilder } from './iHttpRequestBuilder';
 
 const makeIHttpRequestBuilder = new IHttpRequestBuilder();
 

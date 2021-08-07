@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makeIHttpRequestBuilder } from '.';
-import { IHttpRequestBuilder } from './IHttpRequestBuilder';
+import { IHttpRequestBuilder } from './iHttpRequestBuilder';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 

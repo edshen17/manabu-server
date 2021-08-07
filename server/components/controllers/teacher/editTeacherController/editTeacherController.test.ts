@@ -3,8 +3,8 @@ import { makeEditTeacherController } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeIHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/IHttpRequestBuilder/IHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { EditTeacherController } from './editTeacherController';
 
 let fakeDbUserFactory: FakeDbUserFactory;
