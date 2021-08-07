@@ -7,11 +7,15 @@ import {
   makeJSONCookieExpressCallback,
   makeJSONExpressCallback,
 } from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
+import { makeGetAvailableTimesController } from '../../../../components/controllers/availableTime/getAvailableTimesController';
 const users = express.Router();
 
 users.get('/:userId', makeJSONExpressCallback.consume(makeGetUserController));
 users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController));
-// users.get('/:userId/availableTimes');
+users.get(
+  '/:userId/availableTimes',
+  makeJSONExpressCallback.consume(makeGetAvailableTimesController)
+);
 
 users.get('/self', makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));

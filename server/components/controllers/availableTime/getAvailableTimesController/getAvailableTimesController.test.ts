@@ -9,6 +9,9 @@ import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder'
 import { makeGetAvailableTimesController } from '.';
 import { GetAvailableTimesController } from './getAvailableTimesController';
 import { GetAvailableTimesUsecaseResponse } from '../../../usecases/availableTime/getAvailableTimesUsecase/getAvailableTimesUsecase';
+import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
+import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
+import dayjs from 'dayjs';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let getAvailableTimesController: GetAvailableTimesController;
@@ -18,12 +21,15 @@ let body: StringKeyObject;
 let currentAPIUser: CurrentAPIUser;
 let params: StringKeyObject;
 let path: string;
+let query: string;
+let queryStringHandler: QueryStringHandler;
 
 before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
   getAvailableTimesController = await makeGetAvailableTimesController;
   fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
   fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData();
+  queryStringHandler = makeQueryStringHandler;
 });
 
 beforeEach(async () => {
@@ -34,6 +40,10 @@ beforeEach(async () => {
     userId: fakeAvailableTime.hostedById,
   };
   path = '';
+  const filter = queryStringHandler.encodeQueryStringObj({
+    endDate: dayjs().add(1, 'hour').toDate(),
+  });
+  query = queryStringHandler.parseQueryString(filter);
 });
 
 describe('getAvailableTimesController', () => {
@@ -46,6 +56,7 @@ describe('getAvailableTimesController', () => {
         .body(body)
         .currentAPIUser(currentAPIUser)
         .path(path)
+        .query(query)
         .build();
       const getAvailableTimesRes = await getAvailableTimesController.makeRequest(
         getAvailableTimesHttpRequest
@@ -54,7 +65,6 @@ describe('getAvailableTimesController', () => {
     };
     const testValidGetAvailableTimes = async (): Promise<void> => {
       const getAvailableTimesRes = await getAvailableTimes();
-      console.log(getAvailableTimesRes, 'here');
       expect(getAvailableTimesRes.statusCode).to.equal(200);
       if ('availableTimes' in getAvailableTimesRes.body) {
         expect(getAvailableTimesRes.body.availableTimes).to.deep.equal([fakeAvailableTime]);
