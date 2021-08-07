@@ -2,10 +2,7 @@ import { GetMinuteBankUsecaseResponse } from '../../../usecases/minuteBank/getMi
 import { AbstractController, ControllerParams } from '../../abstractions/AbstractController';
 import { IController } from '../../abstractions/IController';
 
-class GetMinuteBankController
-  extends AbstractController<GetMinuteBankUsecaseResponse>
-  implements IController<GetMinuteBankUsecaseResponse>
-{
+class GetMinuteBankController extends AbstractController<GetMinuteBankUsecaseResponse> {
   constructor(props: ControllerParams) {
     super(props);
   }

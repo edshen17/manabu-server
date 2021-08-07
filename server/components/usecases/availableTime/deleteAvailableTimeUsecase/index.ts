@@ -4,6 +4,7 @@ import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
 import { makeAvailableTimeParamsValidator } from '../../../validators/availableTime/params';
 import deepEqual from 'deep-equal';
+import { makeAvailableTimeEntityValidator } from '../../../validators/availableTime/entity';
 
 const makeDeleteAvailableTimeUsecase = new DeleteAvailableTimeUsecase().init({
   cloneDeep,
@@ -11,6 +12,7 @@ const makeDeleteAvailableTimeUsecase = new DeleteAvailableTimeUsecase().init({
   makeQueryValidator: makeBaseQueryValidator,
   makeDbService: makeAvailableTimeDbService,
   deepEqual,
+  makeDeleteEntityValidator: makeAvailableTimeEntityValidator,
 });
 
 export { makeDeleteAvailableTimeUsecase };

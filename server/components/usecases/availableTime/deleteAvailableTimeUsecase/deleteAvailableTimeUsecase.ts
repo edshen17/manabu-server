@@ -1,7 +1,10 @@
 import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { AbstractDeleteUsecase } from '../../abstractions/AbstractDeleteUsecase';
+import {
+  AbstractDeleteUsecase,
+  AbstractDeleteUsecaseInitParams,
+} from '../../abstractions/AbstractDeleteUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalDeleteAvailableTimeUsecaseInitParams = {};
@@ -46,6 +49,13 @@ class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
       dbServiceAccessOptions,
     });
     return availableTime;
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: AbstractDeleteUsecaseInitParams<OptionalDeleteAvailableTimeUsecaseInitParams>
+  ) => {
+    const { makeDeleteEntityValidator } = optionalInitParams;
+    this._deleteEntityValidator = makeDeleteEntityValidator;
   };
 }
 
