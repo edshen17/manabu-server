@@ -53,14 +53,6 @@ describe('getAvailableTimesUsecase', () => {
 
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should throw an error if no user is found', async () => {
-          try {
-            routeData.params = '60979db0bb31ed001589a1ea';
-            await getAvailableTimes();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
-        });
         it('should throw an error if an invalid id is given', async () => {
           try {
             routeData.params = 'undefined';
