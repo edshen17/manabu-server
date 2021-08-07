@@ -14,9 +14,11 @@ class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
   OptionalDeleteAvailableTimeUsecaseInitParams,
   DeleteAvailableTimeUsecaseResponse
 > {
-  protected _resourceAccessData: StringKeyObject = {
-    hasResourceAccessCheck: true,
-    paramIdName: 'availableTimeId',
+  protected _getResourceAccessData = (): StringKeyObject => {
+    return {
+      hasResourceAccessCheck: true,
+      paramIdName: 'availableTimeId',
+    };
   };
 
   protected _makeRequestTemplate = async (

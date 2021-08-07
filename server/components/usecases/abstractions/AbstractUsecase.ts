@@ -23,10 +23,6 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   protected _paramsValidator!: AbstractParamsValidator;
   protected _cloneDeep!: any;
   protected _deepEqual!: any;
-  protected _resourceAccessData: StringKeyObject = {
-    hasResourceAccessCheck: false,
-    paramIdName: '',
-  };
   protected _dbService!: IDbService<any, any>;
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
@@ -100,7 +96,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
   }): Promise<boolean> => {
     const { currentAPIUser, params } = props;
     const { userId } = currentAPIUser;
-    const { hasResourceAccessCheck, paramIdName } = this._resourceAccessData;
+    const { hasResourceAccessCheck, paramIdName } = this._getResourceAccessData();
     let isResourceOwner = false;
     if (hasResourceAccessCheck) {
       const resourceId = params[`${paramIdName}`];
@@ -117,9 +113,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return isResourceOwner;
   };
 
-  private _isLoggedIn = (currentAPIUser: CurrentAPIUser): boolean => {
-    const isLoggedIn = currentAPIUser.userId ? true : false;
-    return isLoggedIn;
+  protected _getResourceAccessData = (): StringKeyObject => {
+    return {
+      hasResourceAccessCheck: false,
+      paramIdName: '',
+    };
   };
 
   protected _isProtectedResource = (): boolean => {

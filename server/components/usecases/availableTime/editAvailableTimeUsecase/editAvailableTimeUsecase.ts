@@ -17,9 +17,11 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   OptionalEditAvailableTimeUsecaseInitParams,
   EditAvailableTimeUsecaseResponse
 > {
-  protected _resourceAccessData: StringKeyObject = {
-    hasResourceAccessCheck: true,
-    paramIdName: 'availableTimeId',
+  protected _getResourceAccessData = (): StringKeyObject => {
+    return {
+      hasResourceAccessCheck: true,
+      paramIdName: 'availableTimeId',
+    };
   };
 
   protected _makeRequestTemplate = async (
