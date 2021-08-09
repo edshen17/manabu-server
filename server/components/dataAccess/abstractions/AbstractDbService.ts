@@ -401,8 +401,11 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     if ('dbURI' in this._makeDbResponse!) {
       const { dbURI, mongoDbOptions, mongoose } = this._makeDbResponse;
       const mongoDbOptionsCopy = this._cloneDeep(mongoDbOptions);
-      mongoDbOptionsCopy.readPreference = 'primary';
-      const db = await mongoose.createConnection(dbURI, mongoDbOptionsCopy);
+      mongoDbOptionsCopy.readPreference = 'nearest';
+      const db = await mongoose.createConnection(dbURI, {
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+      });
       const session = await db.startSession();
       return session;
     }

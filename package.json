@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "server": "nodemon server/index.ts",
     "start": "node server/dist/index.js",
-    "test": "mocha --timeout 50000 --require fixtures.cjs --parallel -r ts-node/register server/**/splitAvailableTimeHandler.test.ts",
+    "test": "mocha --timeout 5000 --require fixtures.cjs --parallel -r ts-node/register server/**/*.test.ts",
     "madge": "madge --circular --extensions ts ./"
   },
   "main": "index.js",
@@ -83,7 +83,7 @@
     "faker": "^5.5.3",
     "madge": "^5.0.1",
     "mocha": "^8.4.0",
-    "mongodb-memory-server": "^6.9.6",
+    "mongodb-memory-server": "^7.3.6",
     "nodemon": "^2.0.6",
     "nyc": "^15.1.0",
     "prettier": "^2.3.0",

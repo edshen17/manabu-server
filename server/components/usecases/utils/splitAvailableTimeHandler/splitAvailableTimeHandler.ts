@@ -40,21 +40,18 @@ class SplitAvailableTimeHandler {
       overlapAvailableTime.startDate.getTime() == appointment.startDate.getTime();
     const isSameEndDate = overlapAvailableTime.endDate.getTime() == appointment.endDate.getTime();
     if (isSameStartDate) {
-      console.log(1);
       await this._updateAvailableTime({
         updateQuery: { startDate: appointment.endDate },
         overlapAvailableTime,
         dbServiceAccessOptions,
       });
     } else if (isSameEndDate) {
-      console.log(2);
       await this._updateAvailableTime({
         updateQuery: { endDate: appointment.startDate },
         overlapAvailableTime,
         dbServiceAccessOptions,
       });
     } else {
-      console.log(3);
       await this._updateAvailableTime({
         updateQuery: { endDate: appointment.startDate },
         overlapAvailableTime,
