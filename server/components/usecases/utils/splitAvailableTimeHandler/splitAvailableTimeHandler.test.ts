@@ -4,6 +4,7 @@ import { makeSplitAvailableTimeHandler } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { makeFakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/fakeDbAppointmentFactory';
@@ -22,6 +23,7 @@ let fakeAppointment: AppointmentDoc;
 let fakeAvailableTime: AvailableTimeDoc;
 let fakePackageTransaction: PackageTransactionDoc;
 let availableTimeDbService: AvailableTimeDbService;
+let dbServiceAccessOptions: DbServiceAccessOptions;
 
 before(async () => {
   splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
@@ -33,50 +35,103 @@ before(async () => {
 
 beforeEach(async () => {
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
-  fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData({
-    hostedById: fakePackageTransaction.hostedById,
-    startDate: dayjs().toDate(),
-    endDate: dayjs().add(3, 'hour').toDate(),
-  });
-  fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-    hostedById: fakePackageTransaction.hostedById,
-    reservedById: fakePackageTransaction.reservedById,
-    packageTransactionId: fakePackageTransaction._id,
-    startDate: fakeAvailableTime.startDate,
-    endDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
-  });
+  dbServiceAccessOptions = availableTimeDbService.getBaseDbServiceAccessOptions();
 });
 
 describe('splitAvailableTimeHandler', () => {
   context('valid input', () => {
-    const splitAvailableTime = async (): Promise<AvailableTimeDoc> => {
+    const splitAvailableTime = async (props: {
+      availableTimeStartDate: Date;
+      availableTimeEndDate: Date;
+      appointmentStartDate: Date;
+      appointmentEndDate: Date;
+    }): Promise<AvailableTimeDoc> => {
+      const {
+        availableTimeStartDate,
+        availableTimeEndDate,
+        appointmentStartDate,
+        appointmentEndDate,
+      } = props;
+      fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData({
+        hostedById: fakePackageTransaction.hostedById,
+        startDate: availableTimeStartDate,
+        endDate: availableTimeEndDate,
+      });
+      fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
+        hostedById: fakePackageTransaction.hostedById,
+        reservedById: fakePackageTransaction.reservedById,
+        packageTransactionId: fakePackageTransaction._id,
+        startDate: appointmentStartDate,
+        endDate: appointmentEndDate,
+      });
       await splitAvailableTimeHandler.split([fakeAppointment]);
       const updatedAvailableTime = await availableTimeDbService.findOne({
         searchQuery: {
           hostedById: fakeAppointment.hostedById,
         },
-        dbServiceAccessOptions: availableTimeDbService.getBaseDbServiceAccessOptions(),
+        dbServiceAccessOptions,
       });
       return updatedAvailableTime;
     };
     context("appointment startTime is the same as availableTime's startTime", () => {
       it('should split the availableTime so that starts at the end of the appointment', async () => {
-        const updatedAvailableTime = await splitAvailableTime();
+        const splitAvailableTimeParams = {
+          availableTimeStartDate: dayjs().toDate(),
+          availableTimeEndDate: dayjs().add(3, 'hour').toDate(),
+          appointmentStartDate: dayjs().toDate(),
+          appointmentEndDate: dayjs().add(1, 'hour').toDate(),
+        };
+        const updatedAvailableTime = await splitAvailableTime(splitAvailableTimeParams);
         expect(updatedAvailableTime.startDate).to.not.deep.equal(fakeAvailableTime.startDate);
         expect(updatedAvailableTime.endDate).to.deep.equal(fakeAvailableTime.endDate);
         expect(updatedAvailableTime.startDate).to.deep.equal(
-          dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate()
+          splitAvailableTimeParams.appointmentEndDate
         );
       });
     });
     context(
       "appointment startTime and endTime is not the same as availableTime's startTime and endTime",
       () => {
-        it('should split the availableTime so that there is one before the appointment and one after', async () => {});
+        it('should split the availableTime so that there is one before the appointment and one after', async () => {
+          const splitAvailableTimeParams = {
+            availableTimeStartDate: dayjs().toDate(),
+            availableTimeEndDate: dayjs().add(3, 'hour').toDate(),
+            appointmentStartDate: dayjs().add(1, 'hour').toDate(),
+            appointmentEndDate: dayjs().add(2, 'hour').toDate(),
+          };
+          const updatedAvailableTime = await splitAvailableTime(splitAvailableTimeParams);
+          const newAvailableTime = await availableTimeDbService.findOne({
+            searchQuery: {
+              hostedById: fakePackageTransaction.hostedById,
+              startDate: splitAvailableTimeParams.appointmentEndDate,
+            },
+            dbServiceAccessOptions,
+          });
+          expect(updatedAvailableTime.startDate).to.deep.equal(fakeAvailableTime.startDate);
+          expect(updatedAvailableTime.endDate).to.deep.equal(
+            dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate()
+          );
+          expect(newAvailableTime.endDate).to.deep.equal(
+            splitAvailableTimeParams.availableTimeEndDate
+          );
+        });
       }
     );
     context("appointment endTime is the same as availableTime's endTime", () => {
-      it('should split the availableTime so that it ends at the start of the appointment', async () => {});
+      it('should split the availableTime so that it ends at the start of the appointment', async () => {
+        const splitAvailableTimeParams = {
+          availableTimeStartDate: dayjs().toDate(),
+          availableTimeEndDate: dayjs().add(3, 'hour').toDate(),
+          appointmentStartDate: dayjs().add(2, 'hour').toDate(),
+          appointmentEndDate: dayjs().add(3, 'hour').toDate(),
+        };
+        const updatedAvailableTime = await splitAvailableTime(splitAvailableTimeParams);
+        expect(updatedAvailableTime.endDate).to.not.deep.equal(fakeAvailableTime.endDate);
+        expect(updatedAvailableTime.startDate).to.deep.equal(fakeAvailableTime.startDate);
+        expect(updatedAvailableTime.endDate).to.deep.equal(
+          splitAvailableTimeParams.appointmentStartDate
+        );
+      });
     });
   });
 });

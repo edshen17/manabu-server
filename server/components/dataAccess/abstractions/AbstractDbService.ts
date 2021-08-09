@@ -398,17 +398,12 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public startSession = async (): Promise<any> => {
-    if ('dbURI' in this._makeDbResponse!) {
-      const { dbURI, mongoDbOptions, mongoose } = this._makeDbResponse;
-      const mongoDbOptionsCopy = this._cloneDeep(mongoDbOptions);
-      mongoDbOptionsCopy.readPreference = 'nearest';
-      const db = await mongoose.createConnection(dbURI, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-      });
-      const session = await db.startSession();
-      return session;
-    }
+    const { dbURI, mongoDbOptions, mongoose } = this._makeDbResponse;
+    const mongoDbOptionsCopy = this._cloneDeep(mongoDbOptions);
+    mongoDbOptionsCopy.readPreference = 'primary';
+    const db = await mongoose.createConnection(dbURI, mongoDbOptionsCopy);
+    const session = await db.startSession();
+    return session;
   };
 
   public init = async (
