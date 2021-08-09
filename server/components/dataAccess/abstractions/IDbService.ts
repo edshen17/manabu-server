@@ -19,6 +19,7 @@ type DbServiceParams = {
   modelsToInsert?: StringKeyObject[];
   updateQuery?: StringKeyObject;
   paginationOptions?: PaginationOptions;
+  session?: StringKeyObject;
 };
 
 type DbServiceAccessOptions = {
@@ -75,7 +76,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   findOne: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   find: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   insert: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  insertMany: (dbServiceParams: DbServiceParams) => Promise<StringKeyObject>;
+  insertMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   findOneAndUpdate: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
   updateMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
   findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
@@ -83,6 +84,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
   getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;
+  startSession: () => Promise<any>;
 }
 
 export {

@@ -8,6 +8,7 @@ import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
 
 type OptionalFakeDbAvailableTimeFactoryInitParams = {
   makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
+  dayjs: any;
 };
 
 class FakeDbAvailableTimeFactory extends AbstractFakeDbDataFactory<
@@ -17,15 +18,14 @@ class FakeDbAvailableTimeFactory extends AbstractFakeDbDataFactory<
   AvailableTimeDoc
 > {
   private _fakeDbUserFactory!: FakeDbUserFactory;
+  private _dayjs!: any;
 
   protected _createFakeBuildParams = async (): Promise<AvailableTimeEntityBuildParams> => {
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
-    const endDate = new Date();
-    endDate.setMinutes(endDate.getMinutes() + 30);
     const fakeBuildParams = {
       hostedById: fakeTeacher._id,
-      startDate: new Date(),
-      endDate,
+      startDate: this._dayjs().toDate(),
+      endDate: this._dayjs().add(1, 'hour').toDate(),
     };
     return fakeBuildParams;
   };
@@ -33,8 +33,9 @@ class FakeDbAvailableTimeFactory extends AbstractFakeDbDataFactory<
   protected _initTemplate = async (
     optionalInitParams: OptionalFakeDbAvailableTimeFactoryInitParams
   ) => {
-    const { makeFakeDbUserFactory } = optionalInitParams || {};
+    const { makeFakeDbUserFactory, dayjs } = optionalInitParams;
     this._fakeDbUserFactory = await makeFakeDbUserFactory;
+    this._dayjs = dayjs;
   };
 }
 

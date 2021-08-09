@@ -2,6 +2,7 @@ import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   AvailableTimeEntity,
+  AvailableTimeEntityBuildParams,
   AvailableTimeEntityBuildResponse,
 } from '../../../entities/availableTime/availableTimeEntity';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -29,9 +30,9 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   ): Promise<CreateAvailableTimeUsecaseResponse> => {
     const { body, dbServiceAccessOptions, currentAPIUser } = props;
     this._testResourceOwnership({ body, currentAPIUser });
+    await this._testTimeConflict({ body, dbServiceAccessOptions });
     const availableTimeEntity = await this._availableTimeEntity.build(body);
-    await this._testTimeConflict(availableTimeEntity);
-    const availableTime = await this._createDbAvailableTime({
+    const availableTime = await this._createAvailableTime({
       availableTimeEntity,
       dbServiceAccessOptions,
     });
@@ -55,21 +56,22 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _testTimeConflict = async (
-    availableTimeEntity: AvailableTimeEntityBuildResponse
-  ): Promise<void> => {
-    const { hostedById, startDate, endDate } = availableTimeEntity;
-    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+  private _testTimeConflict = async (props: {
+    body: AvailableTimeEntityBuildParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<void> => {
+    const { body, dbServiceAccessOptions } = props;
+    const { hostedById, startDate, endDate } = body;
     const availableTime = await this._dbService.findOne({
       searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
       dbServiceAccessOptions,
     });
     if (availableTime) {
-      throw new Error('You cannot have multiple timeslots that overlap.');
+      throw new Error('You cannot have timeslots that overlap.');
     }
   };
 
-  private _createDbAvailableTime = async (props: {
+  private _createAvailableTime = async (props: {
     availableTimeEntity: AvailableTimeEntityBuildResponse;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AvailableTimeDoc> => {
