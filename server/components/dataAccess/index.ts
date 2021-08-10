@@ -8,6 +8,7 @@ type MakeDbResponse = {
   mongoDbOptions: any;
 };
 const mongod = MongoMemoryReplSet.create({ replSet: { count: 1, storageEngine: 'wiredTiger' } });
+
 const makeDb = async (): Promise<MakeDbResponse> => {
   let dbHost = 'staging'; // change to users
   let URIOptions = 'retryWrites=false&w=majority';
@@ -29,4 +30,4 @@ const makeDb = async (): Promise<MakeDbResponse> => {
   return { mongoose, dbURI, mongoDbOptions };
 };
 
-export { makeDb, MakeDbResponse };
+export { makeDb, MakeDbResponse, mongod };

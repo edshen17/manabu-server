@@ -13,7 +13,14 @@ const TeacherSchema = createSchema({
   }),
   introductionVideoUrl: Type.string({ required: false }),
   applicationStatus: Type.string({ required: true, enum: ['pending', 'approved', 'rejected'] }),
-  isHidden: Type.boolean({ required: true }),
+  settings: Type.object({
+    required: true,
+  }).of({
+    isHidden: Type.boolean({ required: true }),
+    emailAlerts: Type.object({
+      packageTransactionCreation: Type.boolean(),
+    }),
+  }),
   teacherType: Type.string({
     required: true,
     enum: ['licensed', 'unlicensed'],

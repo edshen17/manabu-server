@@ -26,6 +26,12 @@ const UserSchema = createSchema({
     required: true,
   }).of({
     currency: Type.string(),
+    locale: Type.string(),
+    emailAlerts: Type.object({
+      appointmentCreation: Type.boolean(),
+      appointmentUpdate: Type.boolean(),
+      appointmentStartReminder: Type.boolean(),
+    }),
   }),
   memberships: Type.array({ required: true }).of({
     name: Type.string(),
@@ -40,6 +46,10 @@ const UserSchema = createSchema({
   createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
   lastOnlineDate: Type.date({ required: true }),
+  balance: Type.object({ required: true }).of({
+    amount: Type.number(),
+    currency: Type.string(),
+  }),
 });
 
 UserSchema.plugin(mongooseUniqueValidator);

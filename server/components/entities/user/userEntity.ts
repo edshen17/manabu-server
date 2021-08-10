@@ -41,7 +41,15 @@ type UserEntityBuildResponse = {
   timezone: string;
   lastOnlineDate: Date;
   role: string;
-  settings: { currency: string; locale: string };
+  settings: {
+    currency: string;
+    locale: string;
+    emailAlerts: {
+      appointmentCreation: boolean;
+      appointmentUpdate: boolean;
+      appointmentStartReminder: boolean;
+    };
+  };
   memberships: string[];
   contactMethods: UserContactMethod[] | [];
   isEmailVerified: boolean;
@@ -49,6 +57,10 @@ type UserEntityBuildResponse = {
   lastModifiedDate: Date;
   nameNGrams: string;
   namePrefixNGrams: string;
+  balance: {
+    amount: number;
+    currency: string;
+  };
   teacherData?: TeacherEntityBuildResponse;
 };
 
@@ -105,7 +117,15 @@ class UserEntity extends AbstractEntity<
       timezone: '',
       lastOnlineDate: new Date(),
       role: 'user',
-      settings: { currency: 'SGD', locale: 'en' },
+      settings: {
+        currency: 'SGD',
+        locale: 'en',
+        emailAlerts: {
+          appointmentCreation: true,
+          appointmentUpdate: true,
+          appointmentStartReminder: true,
+        },
+      },
       memberships: [],
       contactMethods: contactMethods || [],
       isEmailVerified: false,
@@ -114,6 +134,10 @@ class UserEntity extends AbstractEntity<
       teacherData,
       nameNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false }),
       namePrefixNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: true }),
+      balance: {
+        amount: 0,
+        currency: 'SGD',
+      },
     });
     return userEntity;
   };

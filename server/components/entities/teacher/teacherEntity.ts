@@ -16,10 +16,10 @@ type TeacherEntityBuildResponse = {
   alsoSpeaks: { language: string; level: string }[];
   introductionVideoUrl: string;
   applicationStatus: string;
-  isHidden: boolean;
   teacherType: string;
   licensePathUrl: string;
   priceData: { hourlyRate: number; currency: string };
+  settings: { isHidden: boolean; emailAlerts: { packageTransactionCreation: boolean } };
   tags: string[];
   lessonCount: number;
   studentCount: number;
@@ -42,7 +42,7 @@ class TeacherEntity extends AbstractEntity<
       alsoSpeaks: [],
       introductionVideoUrl: '',
       applicationStatus: 'pending',
-      isHidden: false,
+      settings: { isHidden: false, emailAlerts: { packageTransactionCreation: true } },
       teacherType: 'unlicensed',
       licensePathUrl: '',
       priceData: { hourlyRate: 35, currency: 'SGD' },

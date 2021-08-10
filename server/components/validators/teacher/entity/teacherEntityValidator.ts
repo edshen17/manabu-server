@@ -3,7 +3,7 @@ import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValida
 class TeacherEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
-      teacherType: this._joi.string().valid('unlicensed', 'licensed').allow(''),
+      approvalDate: this._joi.date(),
       teachingLanguages: this._joi.array().items({
         language: this._joi.string().max(5),
         level: this._joi.string().max(5),
@@ -12,15 +12,21 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         language: this._joi.string().max(5),
         level: this._joi.string().max(5),
       }),
+      introductionVideoUrl: this._joi.string().uri().allow('').max(2048),
+      applicationStatus: this._joi.string().valid('pending', 'approved', 'rejected'),
+      settings: this._joi.object({
+        isHidden: this._joi.boolean(),
+        emailAlerts: {
+          packageTransactionCreation: this._joi.boolean(),
+        },
+      }),
+      teacherType: this._joi.string().valid('unlicensed', 'licensed').allow(''),
+      licensePathUrl: this._joi.string().uri().allow('').max(2048),
       priceData: this._joi.object({
         hourlyRate: this._joi.number().min(0),
         currency: this._joi.string().max(5),
       }),
-      introductionVideoUrl: this._joi.string().uri().allow('').max(2048),
-      applicationStatus: this._joi.string().valid('pending', 'approved', 'rejected'),
-      licensePathUrl: this._joi.string().uri().allow('').max(2048),
       tags: this._joi.array().items(this._joi.string().max(100)).unique(),
-      isHidden: this._joi.boolean(),
       lessonCount: this._joi.number(),
       studentCount: this._joi.number(),
       createdDate: this._joi.date(),

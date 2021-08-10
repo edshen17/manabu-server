@@ -61,7 +61,6 @@ describe('teacherEntityValidator', () => {
           it('should return a valid object', () => {
             buildParams = {
               applicationStatus: 'approved',
-              isHidden: false,
             };
             testValidInputs({ validationMode: 'edit', userRole: 'admin' });
           });

@@ -17,7 +17,6 @@ import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import dayjs from 'dayjs';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
-import { AppointmentEntityBuildParams } from '../../../entities/appointment/appointmentEntity';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;

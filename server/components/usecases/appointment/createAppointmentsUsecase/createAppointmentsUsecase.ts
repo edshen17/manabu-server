@@ -89,7 +89,6 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     if (!hasResourceOwnership) {
       throw new Error('Appointment foreign key mismatch.');
     } else if (!isCorrectDuration) {
-      console.log(timeDifference, 'here');
       throw new Error('Appointment duration mismatch.');
     }
   };
