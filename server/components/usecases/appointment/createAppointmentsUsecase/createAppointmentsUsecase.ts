@@ -14,6 +14,7 @@ type OptionalCreateAppointmentsUsecaseInitParams = {
   makeAppointmentEntity: Promise<AppointmentEntity>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeSplitAvailableTimeHandler: Promise<SplitAvailableTimeHandler>;
+  dayjs: any;
 };
 
 type CreateAppointmentsUsecaseResponse = {
@@ -27,6 +28,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   private _appointmentEntity!: AppointmentEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _splitAvailableTimeHandler!: SplitAvailableTimeHandler;
+  private _dayjs!: any;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -81,9 +83,14 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       packageTransaction.reservedById,
       appointment.reservedById
     );
+    const timeDifference = this._dayjs(appointment.endDate).diff(appointment.startDate, 'minute');
+    const isCorrectDuration = timeDifference == packageTransaction.lessonDuration;
     const hasResourceOwnership = isHostedByIdEqual && isReservedByIdEqual;
     if (!hasResourceOwnership) {
       throw new Error('Appointment foreign key mismatch.');
+    } else if (!isCorrectDuration) {
+      console.log(timeDifference, 'here');
+      throw new Error('Appointment duration mismatch.');
     }
   };
 
@@ -118,10 +125,12 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       makeAppointmentEntity,
       makePackageTransactionDbService,
       makeSplitAvailableTimeHandler,
+      dayjs,
     } = optionalInitParams;
     this._appointmentEntity = await makeAppointmentEntity;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
+    this._dayjs = dayjs;
   };
 }
 

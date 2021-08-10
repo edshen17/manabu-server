@@ -309,11 +309,10 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   }): Promise<DbDoc[]> => {
     const { modelToInsert, dbServiceAccessOptions, session } = dbServiceParams;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
-    const dbQueryPromise = this._dbModel
-      .insertMany(modelToInsert, modelView, {
-        lean: true,
-      })
-      .session(session);
+    const dbQueryPromise = this._dbModel.insertMany(modelToInsert, modelView, {
+      lean: true,
+      session,
+    });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,

@@ -8,6 +8,7 @@ import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFact
 
 type OptionalFakeDbAppointmentFactoryInitParams = {
   makeFakeDbPackageTransactionFactory: Promise<FakeDbPackageTransactionFactory>;
+  dayjs: any;
 };
 
 class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
@@ -17,17 +18,16 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
   AppointmentDoc
 > {
   private _fakeDbPackageTransactionFactory!: FakeDbPackageTransactionFactory;
+  private _dayjs!: any;
 
   protected _createFakeBuildParams = async (): Promise<AppointmentEntityBuildParams> => {
-    const endDate = new Date();
-    endDate.setMinutes(endDate.getMinutes() + 30);
     const fakePackageTransaction = await this._fakeDbPackageTransactionFactory.createFakeDbData();
     const fakeBuildParams = {
       hostedById: fakePackageTransaction.hostedById.toString(),
       reservedById: fakePackageTransaction.reservedById.toString(),
       packageTransactionId: fakePackageTransaction._id.toString(),
-      startDate: new Date(),
-      endDate,
+      startDate: this._dayjs().toDate(),
+      endDate: this._dayjs().add(1, 'hour').toDate(),
     };
     return fakeBuildParams;
   };
@@ -35,8 +35,9 @@ class FakeDbAppointmentFactory extends AbstractFakeDbDataFactory<
   protected _initTemplate = async (
     optionalInitParams: OptionalFakeDbAppointmentFactoryInitParams
   ) => {
-    const { makeFakeDbPackageTransactionFactory } = optionalInitParams;
+    const { makeFakeDbPackageTransactionFactory, dayjs } = optionalInitParams;
     this._fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
+    this._dayjs = dayjs;
   };
 }
 

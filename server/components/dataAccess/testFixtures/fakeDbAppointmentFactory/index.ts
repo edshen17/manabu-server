@@ -1,4 +1,5 @@
 import cloneDeep from 'clone-deep';
+import dayjs from 'dayjs';
 import { makeAppointmentEntity } from '../../../entities/appointment';
 import { makeAppointmentDbService } from '../../services/appointment';
 import { makeFakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory';
@@ -9,6 +10,7 @@ const makeFakeDbAppointmentFactory = new FakeDbAppointmentFactory().init({
   makeEntity: makeAppointmentEntity,
   makeDbService: makeAppointmentDbService,
   makeFakeDbPackageTransactionFactory,
+  dayjs,
 });
 
 export { makeFakeDbAppointmentFactory };
