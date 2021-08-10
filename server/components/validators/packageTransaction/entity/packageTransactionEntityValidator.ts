@@ -18,6 +18,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
         subTotal: this._joi.number().min(0),
         total: this._joi.number().min(0),
       }),
+      terminationDate: this._joi.date(),
+      isTerminated: this._joi.boolean(),
       remainingAppointments: this._joi.number().min(0).max(30),
       remainingReschedules: this._joi.number().min(0).max(5),
       lessonLanguage: this._joi.string().max(5),
@@ -26,8 +28,9 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
         gatewayName: this._joi.string().max(256),
         gatewayTransactionId: this._joi.string().alphanum().max(256),
       }),
-      createdDate: this._joi.date(),
+      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       lastModifiedDate: this._joi.date(),
+      createdDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi
@@ -42,19 +45,27 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
-      lessonDuration: this._joi.number().forbidden(),
-      priceData: this._joi.object().forbidden(),
-      remainingAppointments: this._joi.number().forbidden(),
-      remainingReschedules: this._joi.number().forbidden(),
-      lessonLanguage: this._joi.string().forbidden(),
-      isSubscription: this._joi.boolean().forbidden(),
-      paymentData: this._joi.object().forbidden(),
-      isTerminated: this._joi.boolean().forbidden(),
+      priceData: this._joi
+        .object({
+          currency: this._joi.string().max(5),
+          subTotal: this._joi.number().min(0),
+          total: this._joi.number().min(0),
+        })
+        .forbidden(),
       terminationDate: this._joi.date().forbidden(),
-      transactionDate: this._joi.date().forbidden(),
-      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
-      createdDate: this._joi.date().forbidden(),
+      isTerminated: this._joi.boolean().forbidden(),
+      remainingAppointments: this._joi.number().min(0).max(30).forbidden(),
+      remainingReschedules: this._joi.number().min(0).max(5).forbidden(),
+      lessonLanguage: this._joi.string().max(5).forbidden(),
+      isSubscription: this._joi.boolean().forbidden(),
+      paymentData: this._joi
+        .object({
+          gatewayName: this._joi.string().max(256),
+          gatewayTransactionId: this._joi.string().alphanum().max(256),
+        })
+        .forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
+      createdDate: this._joi.date().forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

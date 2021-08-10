@@ -14,6 +14,9 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       startDate: this._joi.date(),
       endDate: this._joi.date(),
+      isPast: this._joi.boolean(),
+      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
+      cancellationReason: this._joi.string().max(256),
       createdDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
     });
@@ -30,10 +33,9 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
+      startDate: this._joi.date().forbidden(),
+      endDate: this._joi.date().forbidden(),
       isPast: this._joi.boolean().forbidden(),
-      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
-      cancellationReason: this._joi.string().max(256),
-      packageTransactionData: this._joi.object().forbidden(),
       createdDate: this._joi.date().forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
     });
