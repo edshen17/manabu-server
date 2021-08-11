@@ -115,6 +115,12 @@ describe('createAppointmentsTimeController', () => {
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
+      it('should throw an error if appointment goes over available time', async () => {
+        bodyAppointment.startDate = dayjs(bodyAppointment.startDate).add(3, 'hour').toDate();
+        bodyAppointment.endDate = dayjs(bodyAppointment.startDate).add(4, 'hour').toDate();
+        const createAppointmentsRes = await createAppointments();
+        expect(createAppointmentsRes.statusCode).to.equal(500);
+      });
       it('should throw an error if the user is not logged in', async () => {
         currentAPIUser.userId = undefined;
         const createAppointmentsRes = await createAppointments();

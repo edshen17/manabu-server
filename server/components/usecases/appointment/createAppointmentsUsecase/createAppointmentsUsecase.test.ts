@@ -133,6 +133,19 @@ describe('createAppointmentUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
+        it('should throw an error if appointment goes over available time', async () => {
+          try {
+            routeDataAppointment.startDate = dayjs(routeDataAppointment.startDate)
+              .add(3, 'hour')
+              .toDate();
+            routeDataAppointment.endDate = dayjs(routeDataAppointment.startDate)
+              .add(1, 'hour')
+              .toDate();
+            await createAppointments();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
         it('should throw an error if user is not logged in', async () => {
           try {
             currentAPIUser.userId = undefined;
