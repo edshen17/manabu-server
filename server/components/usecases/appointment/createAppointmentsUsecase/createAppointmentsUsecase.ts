@@ -7,6 +7,7 @@ import {
   AppointmentEntityBuildParams,
   AppointmentEntityBuildResponse,
 } from '../../../entities/appointment/appointmentEntity';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
@@ -36,11 +37,12 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateAppointmentsUsecaseResponse> => {
-    const { body, dbServiceAccessOptions } = props;
+    const { body, dbServiceAccessOptions, currentAPIUser } = props;
     const { appointments } = body;
     const savedDbAppointments = await this._createAppointments({
       appointments,
       dbServiceAccessOptions,
+      currentAPIUser,
     });
     const usecaseRes = {
       appointments: savedDbAppointments,
@@ -51,13 +53,18 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   private _createAppointments = async (props: {
     appointments: AppointmentEntityBuildParams[];
     dbServiceAccessOptions: DbServiceAccessOptions;
+    currentAPIUser: CurrentAPIUser;
   }): Promise<AppointmentDoc[]> => {
-    const { appointments, dbServiceAccessOptions } = props;
+    const { appointments, dbServiceAccessOptions, currentAPIUser } = props;
     const modelToInsert: AppointmentEntityBuildResponse[] = [];
     for (const appointment of appointments) {
-      await this._testResourceOwnership({ appointment, dbServiceAccessOptions });
+      await this._testResourceOwnership({ appointment, dbServiceAccessOptions, currentAPIUser });
       await this._testAvailableTimeExistence({ appointment, dbServiceAccessOptions });
-      await this._testAppointmentTimeConflict({ appointment, dbServiceAccessOptions });
+      await this._testAppointmentTimeConflict({
+        appointment,
+        dbServiceAccessOptions,
+        currentAPIUser,
+      });
       const appointmentEntity = await this._appointmentEntity.build(appointment);
       modelToInsert.push(appointmentEntity);
     }
@@ -72,8 +79,9 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   private _testResourceOwnership = async (props: {
     appointment: AppointmentEntityBuildParams;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    currentAPIUser: CurrentAPIUser;
   }): Promise<void> => {
-    const { appointment, dbServiceAccessOptions } = props;
+    const { appointment, dbServiceAccessOptions, currentAPIUser } = props;
     const packageTransaction = await this._packageTransactionDbService.findById({
       _id: appointment.packageTransactionId,
       dbServiceAccessOptions,
@@ -82,10 +90,9 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       packageTransaction.hostedById,
       appointment.hostedById
     );
-    const isReservedByIdEqual = this._deepEqual(
-      packageTransaction.reservedById,
-      appointment.reservedById
-    );
+    const isReservedByIdEqual =
+      this._deepEqual(packageTransaction.reservedById, appointment.reservedById) &&
+      this._deepEqual(packageTransaction.reservedById, currentAPIUser.userId);
     const timeDifference = this._dayjs(appointment.endDate).diff(appointment.startDate, 'minute');
     const isCorrectDuration = timeDifference == packageTransaction.lessonDuration;
     const hasResourceOwnership = isHostedByIdEqual && isReservedByIdEqual;
@@ -114,14 +121,23 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   private _testAppointmentTimeConflict = async (props: {
     appointment: AppointmentEntityBuildParams;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    currentAPIUser: CurrentAPIUser;
   }): Promise<void> => {
-    const { appointment, dbServiceAccessOptions } = props;
+    const { appointment, dbServiceAccessOptions, currentAPIUser } = props;
     const { hostedById, startDate, endDate } = appointment;
-    const duplicateAppointment = await this._dbService.findOne({
+    const overlappingHostedByAppointment = await this._dbService.findOne({
       searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
       dbServiceAccessOptions,
     });
-    if (duplicateAppointment) {
+    const overlappingReservedByAppointment = await this._dbService.findOne({
+      searchQuery: {
+        reservedById: currentAPIUser.userId,
+        startDate: { $lt: endDate },
+        endDate: { $gt: startDate },
+      },
+      dbServiceAccessOptions,
+    });
+    if (overlappingHostedByAppointment || overlappingReservedByAppointment) {
       throw new Error('You cannot have appointments that overlap.');
     }
   };

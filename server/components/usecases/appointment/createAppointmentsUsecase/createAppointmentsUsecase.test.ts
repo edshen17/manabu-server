@@ -69,7 +69,7 @@ beforeEach(async () => {
 
 describe('createAppointmentUsecase', () => {
   describe('makeRequest', () => {
-    const createAppointment = async () => {
+    const createAppointments = async () => {
       const controllerData = controllerDataBuilder
         .routeData(routeData)
         .currentAPIUser(currentAPIUser)
@@ -79,19 +79,19 @@ describe('createAppointmentUsecase', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should throw an error if restricted fields found in body', async () => {
+        it('should throw an error if body is invalid', async () => {
           routeDataAppointment.hostedById = 'some id';
           routeDataAppointment.createdDate = new Date();
           try {
-            await createAppointment();
+            await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
           }
         });
         it('should throw an error if there is an appointment overlap', async () => {
           try {
-            await createAppointment();
-            await createAppointment();
+            await createAppointments();
+            await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
           }
@@ -99,7 +99,7 @@ describe('createAppointmentUsecase', () => {
         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
           try {
             routeDataAppointment.hostedById = '507f1f77bcf86cd799439011';
-            await createAppointment();
+            await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
           }
@@ -109,7 +109,7 @@ describe('createAppointmentUsecase', () => {
             routeDataAppointment.hostedById = '507f1f77bcf86cd799439011';
             routeDataAppointment.reservedById = '507f1f77bcf86cd799439011';
             routeDataAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
-            await createAppointment();
+            await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
           }
@@ -119,16 +119,24 @@ describe('createAppointmentUsecase', () => {
             routeDataAppointment.endDate = dayjs(routeDataAppointment.endDate)
               .add(1, 'hour')
               .toDate();
-            await createAppointment();
+            await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
           }
         });
         it('should throw an error if no corresponding available time exists', async () => {
           try {
-            routeDataAppointment.startDate = dayjs().toDate();
-            routeDataAppointment.endDate = dayjs().add(1, 'hour').toDate();
-            await createAppointment();
+            routeDataAppointment.startDate = dayjs().add(5, 'hour').toDate();
+            routeDataAppointment.endDate = dayjs().add(6, 'hour').toDate();
+            await createAppointments();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
+        it('should throw an error if user is not logged in', async () => {
+          try {
+            currentAPIUser.userId = undefined;
+            await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
           }
@@ -145,7 +153,7 @@ describe('createAppointmentUsecase', () => {
           expect(appointment).to.have.property('packageTransactionData');
         };
         it('should return a new appointment', async () => {
-          const createAppointmentRes = await createAppointment();
+          const createAppointmentRes = await createAppointments();
           validResOutput(createAppointmentRes);
         });
       });
