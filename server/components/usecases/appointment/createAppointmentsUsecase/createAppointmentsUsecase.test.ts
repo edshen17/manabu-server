@@ -23,11 +23,13 @@ let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;
 let createAppointmentsUsecase: CreateAppointmentsUsecase;
 let routeData: RouteData;
-let fakePackageTransaction: PackageTransactionDoc;
+let firstFakePackageTransaction: PackageTransactionDoc;
+let secondFakePackageTransaction: PackageTransactionDoc;
 let fakeAvailableTime: AvailableTimeDoc;
 let currentAPIUser: CurrentAPIUser;
 let availableTimeDbService: AvailableTimeDbService;
-let routeDataAppointment: any;
+let firstAppointment: any;
+let secondAppointment: any;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
@@ -38,14 +40,15 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  firstFakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  secondFakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData({
-    hostedById: fakePackageTransaction.hostedById,
+    hostedById: firstFakePackageTransaction.hostedById,
     startDate: dayjs().toDate(),
     endDate: dayjs().add(3, 'hour').toDate(),
   });
   currentAPIUser = {
-    userId: fakePackageTransaction.reservedById,
+    userId: firstFakePackageTransaction.reservedById,
     role: 'user',
   };
   routeData = {
@@ -53,18 +56,26 @@ beforeEach(async () => {
     body: {
       appointments: [
         {
-          hostedById: fakePackageTransaction.hostedById,
-          reservedById: fakePackageTransaction.reservedById,
-          packageTransactionId: fakePackageTransaction._id,
+          hostedById: firstFakePackageTransaction.hostedById,
+          reservedById: firstFakePackageTransaction.reservedById,
+          packageTransactionId: firstFakePackageTransaction._id,
           startDate: fakeAvailableTime.startDate,
           endDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
+        },
+        {
+          hostedById: firstFakePackageTransaction.hostedById,
+          reservedById: firstFakePackageTransaction.reservedById,
+          packageTransactionId: firstFakePackageTransaction._id,
+          startDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
+          endDate: dayjs(fakeAvailableTime.startDate).add(2, 'hour').toDate(),
         },
       ],
     },
     query: {},
     endpointPath: '',
   };
-  routeDataAppointment = routeData.body.appointments[0];
+  firstAppointment = routeData.body.appointments[0];
+  secondAppointment = routeData.body.appointments[1];
 });
 
 describe('createAppointmentUsecase', () => {
@@ -80,8 +91,8 @@ describe('createAppointmentUsecase', () => {
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if body is invalid', async () => {
-          routeDataAppointment.hostedById = 'some id';
-          routeDataAppointment.createdDate = new Date();
+          firstAppointment.hostedById = 'some id';
+          firstAppointment.createdDate = new Date();
           try {
             await createAppointments();
           } catch (err) {
@@ -98,7 +109,7 @@ describe('createAppointmentUsecase', () => {
         });
         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
           try {
-            routeDataAppointment.hostedById = '507f1f77bcf86cd799439011';
+            firstAppointment.hostedById = '507f1f77bcf86cd799439011';
             await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -106,9 +117,9 @@ describe('createAppointmentUsecase', () => {
         });
         it('should throw an error if body contains an foreign keys that do not exist', async () => {
           try {
-            routeDataAppointment.hostedById = '507f1f77bcf86cd799439011';
-            routeDataAppointment.reservedById = '507f1f77bcf86cd799439011';
-            routeDataAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
+            firstAppointment.hostedById = '507f1f77bcf86cd799439011';
+            firstAppointment.reservedById = '507f1f77bcf86cd799439011';
+            firstAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
             await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -116,9 +127,7 @@ describe('createAppointmentUsecase', () => {
         });
         it('should throw an error if the lesson duration is wrong', async () => {
           try {
-            routeDataAppointment.endDate = dayjs(routeDataAppointment.endDate)
-              .add(1, 'hour')
-              .toDate();
+            firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
             await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -126,8 +135,8 @@ describe('createAppointmentUsecase', () => {
         });
         it('should throw an error if no corresponding available time exists', async () => {
           try {
-            routeDataAppointment.startDate = dayjs().add(5, 'hour').toDate();
-            routeDataAppointment.endDate = dayjs().add(6, 'hour').toDate();
+            firstAppointment.startDate = dayjs().add(5, 'hour').toDate();
+            firstAppointment.endDate = dayjs().add(6, 'hour').toDate();
             await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -135,12 +144,8 @@ describe('createAppointmentUsecase', () => {
         });
         it('should throw an error if appointment goes over available time', async () => {
           try {
-            routeDataAppointment.startDate = dayjs(routeDataAppointment.startDate)
-              .add(3, 'hour')
-              .toDate();
-            routeDataAppointment.endDate = dayjs(routeDataAppointment.startDate)
-              .add(1, 'hour')
-              .toDate();
+            firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
+            firstAppointment.endDate = dayjs(firstAppointment.startDate).add(1, 'hour').toDate();
             await createAppointments();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -154,16 +159,24 @@ describe('createAppointmentUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
+        it('should throw an error if one of the appointments is not of the same type', async () => {
+          try {
+            secondAppointment.packageTransactionId = secondFakePackageTransaction._id;
+            await createAppointments();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
       });
       context('valid inputs', () => {
         const validResOutput = (createAppointmentRes: CreateAppointmentsUsecaseResponse) => {
           const appointments = createAppointmentRes.appointments;
-          const appointment = createAppointmentRes.appointments[0];
-          expect(appointments.length).to.equal(1);
-          expect(appointment).to.have.property('hostedById');
-          expect(appointment).to.have.property('startDate');
-          expect(appointment).to.have.property('endDate');
-          expect(appointment).to.have.property('packageTransactionData');
+          const firstAppointment = createAppointmentRes.appointments[0];
+          expect(appointments.length).to.equal(2);
+          expect(firstAppointment).to.have.property('hostedById');
+          expect(firstAppointment).to.have.property('startDate');
+          expect(firstAppointment).to.have.property('endDate');
+          expect(firstAppointment).to.have.property('packageTransactionData');
         };
         it('should return a new appointment', async () => {
           const createAppointmentRes = await createAppointments();

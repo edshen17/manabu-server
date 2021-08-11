@@ -18,12 +18,14 @@ let iHttpRequestBuilder: IHttpRequestBuilder;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;
 let availableTimeDbService: AvailableTimeDbService;
-let fakePackageTransaction: PackageTransactionDoc;
+let firstFakePackageTransaction: PackageTransactionDoc;
+let secondFakePackageTransaction: PackageTransactionDoc;
 let fakeAvailableTime: AvailableTimeDoc;
 let currentAPIUser: CurrentAPIUser;
 let body: StringKeyObject;
 let createAppointmentsController: CreateAppointmentsController;
-let bodyAppointment: any;
+let firstAppointment: any;
+let secondAppointment: any;
 
 before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
@@ -34,28 +36,37 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  firstFakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  secondFakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData({
-    hostedById: fakePackageTransaction.hostedById,
+    hostedById: firstFakePackageTransaction.hostedById,
     startDate: dayjs().toDate(),
     endDate: dayjs().add(3, 'hour').toDate(),
   });
   body = {
     appointments: [
       {
-        hostedById: fakePackageTransaction.hostedById,
-        reservedById: fakePackageTransaction.reservedById,
-        packageTransactionId: fakePackageTransaction._id,
+        hostedById: firstFakePackageTransaction.hostedById,
+        reservedById: firstFakePackageTransaction.reservedById,
+        packageTransactionId: firstFakePackageTransaction._id,
         startDate: fakeAvailableTime.startDate,
         endDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
+      },
+      {
+        hostedById: firstFakePackageTransaction.hostedById,
+        reservedById: firstFakePackageTransaction.reservedById,
+        packageTransactionId: firstFakePackageTransaction._id,
+        startDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
+        endDate: dayjs(fakeAvailableTime.startDate).add(2, 'hour').toDate(),
       },
     ],
   };
   currentAPIUser = {
-    userId: fakePackageTransaction.reservedById,
+    userId: firstFakePackageTransaction.reservedById,
     role: 'user',
   };
-  bodyAppointment = body.appointments[0];
+  firstAppointment = body.appointments[0];
+  secondAppointment = body.appointments[1];
 });
 
 describe('createAppointmentsTimeController', () => {
@@ -76,14 +87,14 @@ describe('createAppointmentsTimeController', () => {
         expect(createAppointmentsRes.statusCode).to.equal(201);
         if ('appointments' in createAppointmentsRes.body) {
           expect(createAppointmentsRes.body.appointments[0].hostedById).to.deep.equal(
-            fakePackageTransaction.hostedById
+            firstFakePackageTransaction.hostedById
           );
         }
       });
     });
     context('invalid inputs', () => {
       it('should throw an error if user input is invalid', async () => {
-        bodyAppointment.startDate = 'some id';
+        firstAppointment.startDate = 'some id';
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
@@ -93,31 +104,36 @@ describe('createAppointmentsTimeController', () => {
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
       it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
-        bodyAppointment.hostedById = '507f1f77bcf86cd799439011';
+        firstAppointment.hostedById = '507f1f77bcf86cd799439011';
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
       it('should throw an error if body contains an foreign keys that do not exist', async () => {
-        bodyAppointment.hostedById = '507f1f77bcf86cd799439011';
-        bodyAppointment.reservedById = '507f1f77bcf86cd799439011';
-        bodyAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
+        firstAppointment.hostedById = '507f1f77bcf86cd799439011';
+        firstAppointment.reservedById = '507f1f77bcf86cd799439011';
+        firstAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
       it('should throw an error if the lesson duration is wrong', async () => {
-        bodyAppointment.endDate = dayjs(bodyAppointment.endDate).add(1, 'hour').toDate();
+        firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
       it('should throw an error if no corresponding available time exists', async () => {
-        bodyAppointment.startDate = dayjs().add(5, 'hour').toDate();
-        bodyAppointment.endDate = dayjs().add(6, 'hour').toDate();
+        firstAppointment.startDate = dayjs().add(5, 'hour').toDate();
+        firstAppointment.endDate = dayjs().add(6, 'hour').toDate();
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
       it('should throw an error if appointment goes over available time', async () => {
-        bodyAppointment.startDate = dayjs(bodyAppointment.startDate).add(3, 'hour').toDate();
-        bodyAppointment.endDate = dayjs(bodyAppointment.startDate).add(4, 'hour').toDate();
+        firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
+        firstAppointment.endDate = dayjs(firstAppointment.startDate).add(4, 'hour').toDate();
+        const createAppointmentsRes = await createAppointments();
+        expect(createAppointmentsRes.statusCode).to.equal(500);
+      });
+      it('should throw an error if one of the appointments is not of the same type', async () => {
+        secondAppointment.packageTransactionId = secondFakePackageTransaction._id;
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });

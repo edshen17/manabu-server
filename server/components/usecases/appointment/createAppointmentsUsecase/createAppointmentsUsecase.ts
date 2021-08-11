@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
@@ -10,6 +11,7 @@ import {
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
 
 type OptionalCreateAppointmentsUsecaseInitParams = {
@@ -17,6 +19,7 @@ type OptionalCreateAppointmentsUsecaseInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
   makeSplitAvailableTimeHandler: Promise<SplitAvailableTimeHandler>;
+  makeEmailHandler: Promise<EmailHandler>;
   dayjs: any;
 };
 
@@ -33,6 +36,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   private _availableTimeDbService!: AvailableTimeDbService;
   private _splitAvailableTimeHandler!: SplitAvailableTimeHandler;
   private _dayjs!: any;
+  private _emailHandler!: EmailHandler;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -44,6 +48,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       currentAPIUser,
     });
+    // this._sendAppointmentAlertEmail({ templateStrings: { appointmentLength: appointment } });
     const usecaseRes = {
       appointments: savedDbAppointments,
     };
@@ -68,6 +73,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       const appointmentEntity = await this._appointmentEntity.build(appointment);
       modelToInsert.push(appointmentEntity);
     }
+    this._testSameAppointmentType(modelToInsert);
     const savedDbAppointments = await this._dbService.insertMany({
       modelToInsert,
       dbServiceAccessOptions,
@@ -142,6 +148,24 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
+  private _testSameAppointmentType = (appointments: AppointmentEntityBuildResponse[]) => {
+    const hostedById = appointments[0].hostedById;
+    const reservedById = appointments[0].reservedById;
+    const packageTransactionId = appointments[0].packageTransactionId;
+    const sameAppointmentTypeCount = appointments.filter((appointment) => {
+      const isHostedByIdEqual = this._deepEqual(appointment.hostedById, hostedById);
+      const isReservedByIdEqual = this._deepEqual(appointment.reservedById, reservedById);
+      const isPackageTransactionIdEqual = this._deepEqual(
+        appointment.packageTransactionId,
+        packageTransactionId
+      );
+      return isHostedByIdEqual && isReservedByIdEqual && isPackageTransactionIdEqual;
+    }).length;
+    if (sameAppointmentTypeCount != appointments.length) {
+      throw new Error('All appointments must be of the same type.');
+    }
+  };
+
   private _splitAvailableTimeBrancher = async (appointments: AppointmentDoc[]): Promise<void> => {
     const isAsync = process.env.NODE_ENV != 'production';
     if (isAsync) {
@@ -151,6 +175,8 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
+  private _sendAppointmentAlertEmail = () => {};
+
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateAppointmentsUsecaseInitParams
   ): Promise<void> => {
@@ -159,6 +185,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       makePackageTransactionDbService,
       makeSplitAvailableTimeHandler,
       makeAvailableTimeDbService,
+      makeEmailHandler,
       dayjs,
     } = optionalInitParams;
     this._appointmentEntity = await makeAppointmentEntity;
@@ -166,6 +193,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     this._splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
     this._availableTimeDbService = await makeAvailableTimeDbService;
     this._dayjs = dayjs;
+    this._emailHandler = await makeEmailHandler;
   };
 }
 

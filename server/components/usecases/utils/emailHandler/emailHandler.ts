@@ -1,8 +1,12 @@
 import { ObjectId } from 'mongoose';
-import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
-type RequiredSendEmailParams = { sendFrom: string; subjectLine: string; htmlFileName: string };
+type RequiredSendEmailParams = {
+  sendFrom: string;
+  subjectLine: string;
+  htmlFileName: string;
+  templateStrings: StringKeyObject;
+};
 
 class EmailHandler {
   private _NODE_MAILER_OPTIONS = Object.freeze({
@@ -30,16 +34,30 @@ class EmailHandler {
   public sendAlertEmailFromUserId = async (
     props: { userId: ObjectId; alertSettingName: string } & RequiredSendEmailParams
   ): Promise<void> => {
-    const { userId, alertSettingName, sendFrom, subjectLine, htmlFileName } = props;
+    const { userId, alertSettingName, sendFrom, subjectLine, htmlFileName, templateStrings } =
+      props;
     const dbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
     const user = await this._userDbService.findById({
       _id: userId,
       dbServiceAccessOptions,
     });
+    const userEmailAlertSettings: StringKeyObject = user.settings.emailAlerts;
+    const teacherEmailAlertSettings: StringKeyObject = user.teacherData
+      ? user.teacherData.settings.emailAlerts
+      : {};
+    if (userEmailAlertSettings[alertSettingName] || teacherEmailAlertSettings[alertSettingName]) {
+      this.sendEmail({
+        recipientEmails: user.email,
+        templateStrings: { name: user.name, ...templateStrings },
+        sendFrom,
+        subjectLine,
+        htmlFileName,
+      });
+    }
   };
 
   public sendEmail = (
-    props: { recipientEmails: string | string[]; templateStrings: any } & RequiredSendEmailParams
+    props: { recipientEmails: string | string[] } & RequiredSendEmailParams
   ): void => {
     const { recipientEmails, sendFrom, subjectLine, htmlFileName, templateStrings } = props;
     const isProduction = process.env.NODE_ENV == 'production';

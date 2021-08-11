@@ -18,8 +18,8 @@ const TeacherSchema = createSchema({
   }).of({
     isHidden: Type.boolean({ required: true }),
     emailAlerts: Type.object({
-      packageTransactionCreation: Type.boolean(),
-    }),
+      required: true,
+    }).of({ packageTransactionCreation: Type.boolean() }),
   }),
   teacherType: Type.string({
     required: true,

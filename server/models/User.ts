@@ -28,6 +28,8 @@ const UserSchema = createSchema({
     currency: Type.string(),
     locale: Type.string(),
     emailAlerts: Type.object({
+      required: true,
+    }).of({
       appointmentCreation: Type.boolean(),
       appointmentUpdate: Type.boolean(),
       appointmentStartReminder: Type.boolean(),
