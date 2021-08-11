@@ -25,8 +25,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  dbServiceAccessOptions = userDbService.getBaseDbServiceAccessOptions();
-  dbServiceAccessOptions.isOverrideView = true;
+  dbServiceAccessOptions = userDbService.getOverrideDbServiceAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   overrideFakeUser = await userDbService.findById({
     _id: fakeUser._id,

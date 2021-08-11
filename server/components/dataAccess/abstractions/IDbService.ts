@@ -84,6 +84,7 @@ interface IDbService<OptionalDbServiceInitParams, DbDoc> {
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
   getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;
+  getOverrideDbServiceAccessOptions: () => DbServiceAccessOptions;
   startSession: () => Promise<any>;
 }
 

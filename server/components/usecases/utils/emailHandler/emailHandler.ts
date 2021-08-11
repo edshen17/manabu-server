@@ -1,3 +1,9 @@
+import { ObjectId } from 'mongoose';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+
+type RequiredSendEmailParams = { sendFrom: string; subjectLine: string; htmlFileName: string };
+
 class EmailHandler {
   private _NODE_MAILER_OPTIONS = Object.freeze({
     host: 'mail.privateemail.com',
@@ -19,23 +25,29 @@ class EmailHandler {
   private _nodemailer!: any;
   private _handlebars!: any;
   private _fs!: any;
+  private _userDbService!: UserDbService;
 
-  public sendEmail = (props: {
-    recipientEmails: string | string[];
-    sendFrom: string;
-    subjectLine: string;
-    htmlFileName: string;
-    templateStrings: any;
-  }) => {
+  public sendAlertEmailFromUserId = async (
+    props: { userId: ObjectId; alertSettingName: string } & RequiredSendEmailParams
+  ): Promise<void> => {
+    const { userId, alertSettingName, sendFrom, subjectLine, htmlFileName } = props;
+    const dbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
+    const user = await this._userDbService.findById({
+      _id: userId,
+      dbServiceAccessOptions,
+    });
+  };
+
+  public sendEmail = (
+    props: { recipientEmails: string | string[]; templateStrings: any } & RequiredSendEmailParams
+  ): void => {
     const { recipientEmails, sendFrom, subjectLine, htmlFileName, templateStrings } = props;
     const isProduction = process.env.NODE_ENV == 'production';
     if (isProduction) {
       const nodeMailerOptions: any = {
         ...this._NODE_MAILER_OPTIONS,
       };
-
       nodeMailerOptions.auth = this._MAIL_SEND_FROM_OPTIONS[sendFrom];
-
       const transporter = this._nodemailer.createTransport(nodeMailerOptions);
       const self = this;
 
@@ -51,7 +63,6 @@ class EmailHandler {
           subject: subjectLine,
           html: htmlToSend,
         };
-
         transporter.sendMail(mailOptions);
       });
     }
@@ -67,11 +78,17 @@ class EmailHandler {
     });
   };
 
-  public init = (props: { handlebars: any; nodemailer: any; fs: any }): this => {
-    const { handlebars, nodemailer, fs } = props;
+  public init = async (props: {
+    handlebars: any;
+    nodemailer: any;
+    fs: any;
+    makeUserDbService: Promise<UserDbService>;
+  }): Promise<this> => {
+    const { handlebars, nodemailer, fs, makeUserDbService } = props;
     this._handlebars = handlebars;
     this._nodemailer = nodemailer;
     this._fs = fs;
+    this._userDbService = await makeUserDbService;
     return this;
   };
 }

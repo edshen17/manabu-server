@@ -30,7 +30,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   makeCacheDbService: Promise<CacheDbService>;
   signJwt: any;
-  makeEmailHandler: EmailHandler;
+  makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: any;
 };
@@ -301,7 +301,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._cacheDbService = await makeCacheDbService;
     this._signJwt = signJwt;
-    this._emailHandler = makeEmailHandler;
+    this._emailHandler = await makeEmailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;
   };

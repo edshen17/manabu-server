@@ -153,14 +153,22 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public getBaseDbServiceAccessOptions = (): DbServiceAccessOptions => {
-    const dbServiceAccessOptions = {
-      isProtectedResource: false,
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
       isCurrentAPIUserPermitted: true,
       currentAPIUserRole: 'user',
       isSelf: false,
     };
-    const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
-    return dbServiceAccessOptionsCopy;
+    return dbServiceAccessOptions;
+  };
+
+  public getOverrideDbServiceAccessOptions = (): DbServiceAccessOptions => {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: 'user',
+      isSelf: false,
+      isOverrideView: true,
+    };
+    return dbServiceAccessOptions;
   };
 
   protected _getCacheKey = (props: {

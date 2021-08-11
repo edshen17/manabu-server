@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeAppointmentDbService } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -23,16 +24,14 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  const endDate = new Date();
-  endDate.setMinutes(endDate.getMinutes() + 30);
   dbServiceAccessOptions = appointmentDbService.getBaseDbServiceAccessOptions();
   fakeAppointmentTransaction = await fakeDbAppointmentTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
     hostedById: fakeAppointmentTransaction.hostedById,
     reservedById: fakeAppointmentTransaction.reservedById,
     packageTransactionId: fakeAppointmentTransaction._id,
-    startDate: new Date(),
-    endDate,
+    startDate: dayjs().toDate(),
+    endDate: dayjs().add(30, 'minute').toDate(),
   });
 });
 
