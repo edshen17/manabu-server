@@ -4,7 +4,6 @@ import { PackageDbService } from '../../../dataAccess/services/package/packageDb
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
-import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -17,6 +16,7 @@ import { PackageEntity } from '../../../entities/package/packageEntity';
 import { JoinedUserDoc } from '../../../../models/User';
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 
 type OptionalCreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
@@ -30,7 +30,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   makeCacheDbService: Promise<CacheDbService>;
   signJwt: any;
-  emailHandler: EmailHandler;
+  makeEmailHandler: EmailHandler;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: any;
 };
@@ -86,10 +86,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     if (isTeacherApp) {
       user = await this.handleTeacherCreation({ user, dbServiceAccessOptions });
     }
-    if (process.env.NODE_ENV == 'production' && !user.isEmailVerified) {
+    if (!user.isEmailVerified) {
       this._sendVerificationEmail(userEntity);
-      this._sendInternalEmail({ userEntity, isTeacherApp });
+      // this._sendInternalEmail({ userEntity, isTeacherApp });
     }
+    this._sendVerificationEmail(userEntity);
     const cookies = this.splitLoginCookies(user);
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
@@ -201,34 +202,34 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _sendVerificationEmail = (userEntity: any): void => {
     const host = 'https://manabu.sg';
     const { name, verificationToken } = userEntity;
-    this._emailHandler.sendEmail(
-      userEntity.email,
-      'NOREPLY',
-      'Manabu email verification',
-      'verificationEmail',
-      {
+    this._emailHandler.sendEmail({
+      recipientEmails: userEntity.email,
+      sendFrom: 'NOREPLY',
+      subjectLine: 'Manabu email verification',
+      htmlFileName: 'verificationEmail',
+      templateStrings: {
         name,
         host,
-        verificationToken: verificationToken,
-      }
-    );
+        verificationToken,
+      },
+    });
   };
 
   private _sendInternalEmail = (props: { userEntity: any; isTeacherApp: boolean }): void => {
     const { userEntity, isTeacherApp } = props;
     const userType = isTeacherApp ? 'teacher' : 'user';
     const { name, email } = userEntity;
-    this._emailHandler.sendEmail(
-      'manabulessons@gmail.com',
-      'NOREPLY',
-      `A new ${userType} signed up`,
-      'internalNewSignUpEmail',
-      {
+    this._emailHandler.sendEmail({
+      recipientEmails: 'manabulessons@gmail.com',
+      sendFrom: 'NOREPLY',
+      subjectLine: `A new ${userType} signed up`,
+      htmlFileName: 'internalNewSignUpEmail',
+      templateStrings: {
         name,
         email,
         userType,
-      }
-    );
+      },
+    });
   };
 
   public splitLoginCookies = (user: JoinedUserDoc): CookieData[] => {
@@ -288,7 +289,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makeTeacherBalanceDbService,
       makeCacheDbService,
       signJwt,
-      emailHandler,
+      makeEmailHandler,
       makeRedirectUrlBuilder,
       convertStringToObjectId,
     } = optionalInitParams;
@@ -300,7 +301,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._cacheDbService = await makeCacheDbService;
     this._signJwt = signJwt;
-    this._emailHandler = emailHandler;
+    this._emailHandler = makeEmailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;
   };

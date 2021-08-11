@@ -6,7 +6,6 @@ import { makeTeacherBalanceDbService } from '../../../dataAccess/services/teache
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makePackageDbService } from '../../../dataAccess/services/package';
 import { makeUserDbService } from '../../../dataAccess/services/user';
-import { emailHandler } from '../../utils/emailHandler/emailHandler';
 import { CreateUserUsecase } from './createUserUsecase';
 import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
@@ -18,6 +17,7 @@ import { makeUserQueryValidator } from '../../../validators/user/query';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
 import deepEqual from 'deep-equal';
+import { makeEmailHandler } from '../../utils/emailHandler';
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserEntity,
@@ -32,7 +32,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeTeacherBalanceDbService,
   makeCacheDbService,
   signJwt,
-  emailHandler,
+  makeEmailHandler,
   makeRedirectUrlBuilder,
   cloneDeep,
   makeParamsValidator: makeBaseParamsValidator,

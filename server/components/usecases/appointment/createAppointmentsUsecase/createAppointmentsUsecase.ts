@@ -61,7 +61,6 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       modelToInsert,
       dbServiceAccessOptions,
     });
-    // email teacher
     await this._splitAvailableTimeBrancher(savedDbAppointments);
     return savedDbAppointments;
   };
