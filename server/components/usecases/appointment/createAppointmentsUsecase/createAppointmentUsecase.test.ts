@@ -114,9 +114,20 @@ describe('createAppointmentUsecase', () => {
             expect(err).to.be.an('error');
           }
         });
-        it('should throw an error if lesson duration is wrong', async () => {
+        it('should throw an error if the lesson duration is wrong', async () => {
           try {
-            routeDataAppointment.hostedById = '507f1f77bcf86cd799439011';
+            routeDataAppointment.endDate = dayjs(routeDataAppointment.endDate)
+              .add(1, 'hour')
+              .toDate();
+            await createAppointment();
+          } catch (err) {
+            expect(err).to.be.an('error');
+          }
+        });
+        it('should throw an error if no corresponding available time exists', async () => {
+          try {
+            routeDataAppointment.startDate = dayjs().toDate();
+            routeDataAppointment.endDate = dayjs().add(1, 'hour').toDate();
             await createAppointment();
           } catch (err) {
             expect(err).to.be.an('error');

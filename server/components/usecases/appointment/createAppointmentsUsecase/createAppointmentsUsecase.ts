@@ -1,5 +1,6 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import {
   AppointmentEntity,
@@ -13,6 +14,7 @@ import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler
 type OptionalCreateAppointmentsUsecaseInitParams = {
   makeAppointmentEntity: Promise<AppointmentEntity>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
+  makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
   makeSplitAvailableTimeHandler: Promise<SplitAvailableTimeHandler>;
   dayjs: any;
 };
@@ -27,6 +29,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
 > {
   private _appointmentEntity!: AppointmentEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;
+  private _availableTimeDbService!: AvailableTimeDbService;
   private _splitAvailableTimeHandler!: SplitAvailableTimeHandler;
   private _dayjs!: any;
 
@@ -53,7 +56,8 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     const modelToInsert: AppointmentEntityBuildResponse[] = [];
     for (const appointment of appointments) {
       await this._testResourceOwnership({ appointment, dbServiceAccessOptions });
-      await this._testTimeConflict({ appointment, dbServiceAccessOptions });
+      await this._testAvailableTimeExistence({ appointment, dbServiceAccessOptions });
+      await this._testAppointmentTimeConflict({ appointment, dbServiceAccessOptions });
       const appointmentEntity = await this._appointmentEntity.build(appointment);
       modelToInsert.push(appointmentEntity);
     }
@@ -92,7 +96,22 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _testTimeConflict = async (props: {
+  private _testAvailableTimeExistence = async (props: {
+    appointment: AppointmentEntityBuildParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }) => {
+    const { appointment, dbServiceAccessOptions } = props;
+    const { hostedById, startDate, endDate } = appointment;
+    const availableTime = await this._availableTimeDbService.findOne({
+      searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
+      dbServiceAccessOptions,
+    });
+    if (!availableTime) {
+      throw new Error('You cannot have an appointment with no corresponding available time slot.');
+    }
+  };
+
+  private _testAppointmentTimeConflict = async (props: {
     appointment: AppointmentEntityBuildParams;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<void> => {
@@ -123,11 +142,13 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       makeAppointmentEntity,
       makePackageTransactionDbService,
       makeSplitAvailableTimeHandler,
+      makeAvailableTimeDbService,
       dayjs,
     } = optionalInitParams;
     this._appointmentEntity = await makeAppointmentEntity;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
+    this._availableTimeDbService = await makeAvailableTimeDbService;
     this._dayjs = dayjs;
   };
 }

@@ -6,6 +6,7 @@ import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUs
 import { JoinedUserDoc } from '../../../../models/User';
 import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
+import dayjs from 'dayjs';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let createAvailableTimeController: CreateAvailableTimeController;
@@ -26,12 +27,10 @@ describe('createAvailableTimeController', () => {
   describe('makeRequest', () => {
     context('valid inputs', () => {
       it('should create a new available time document', async () => {
-        const endDate = new Date();
-        endDate.setMinutes(endDate.getMinutes() + 30);
         const body = {
           hostedById: fakeTeacher._id,
-          startDate: new Date(),
-          endDate,
+          startDate: dayjs().toDate(),
+          endDate: dayjs().add(30, 'minute').toDate(),
         };
         const createAvailableTimeHttpRequest = iHttpRequestBuilder
           .body(body)

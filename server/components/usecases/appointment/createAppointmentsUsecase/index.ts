@@ -8,6 +8,7 @@ import { makeAppointmentDbService } from '../../../dataAccess/services/appointme
 import { makeAppointmentEntity } from '../../../entities/appointment';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makeSplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler';
+import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
 
 const makeCreateAppointmentsUsecase = new CreateAppointmentsUsecase().init({
   cloneDeep,
@@ -19,6 +20,7 @@ const makeCreateAppointmentsUsecase = new CreateAppointmentsUsecase().init({
   makePackageTransactionDbService,
   makeSplitAvailableTimeHandler,
   dayjs,
+  makeAvailableTimeDbService,
 });
 
 export { makeCreateAppointmentsUsecase };
