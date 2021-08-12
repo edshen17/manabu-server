@@ -1,6 +1,11 @@
 import { ObjectId } from 'mongoose';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
+enum MAIL_SENDER_NAME {
+  SUPPORT = 'SUPPORT',
+  NOREPLY = 'NOREPLY',
+}
+
 type RequiredSendEmailParams = {
   sendFrom: string;
   subjectLine: string;
@@ -14,7 +19,7 @@ class EmailHandler {
     port: 587,
     secure: false,
   });
-  private _MAIL_SEND_FROM_OPTIONS: { [key: string]: any } = {
+  private _MAIL_AUTH: { [key: string]: any } = {
     SUPPORT: {
       emailName: 'manabu.sg <support@manabu.sg>',
       user: 'support@manabu.sg',
@@ -70,11 +75,11 @@ class EmailHandler {
       const nodeMailerOptions: any = {
         ...this._NODE_MAILER_OPTIONS,
       };
-      nodeMailerOptions.auth = this._MAIL_SEND_FROM_OPTIONS[sendFrom];
+      nodeMailerOptions.auth = this._MAIL_AUTH[sendFrom];
       const transporter = this._nodemailer.createTransport(nodeMailerOptions);
       const html = await this._createHtmlToRender({ mjmlFileName, data });
       const mailOptions = {
-        from: this._MAIL_SEND_FROM_OPTIONS[sendFrom]['emailName'],
+        from: this._MAIL_AUTH[sendFrom]['emailName'],
         to: recipientEmails,
         subject: subjectLine,
         html,
@@ -122,4 +127,4 @@ class EmailHandler {
   };
 }
 
-export { EmailHandler };
+export { EmailHandler, MAIL_SENDER_NAME };
