@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongoose';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
-enum MAIL_SENDER_NAME {
+enum EMAIL_SENDER_NAME {
   SUPPORT = 'SUPPORT',
   NOREPLY = 'NOREPLY',
 }
@@ -39,9 +39,9 @@ class EmailHandler {
   private _mjml!: any;
 
   public sendAlertEmailFromUserId = async (
-    props: { userId: ObjectId; alertSettingName: string } & RequiredSendEmailParams
+    props: { userId: ObjectId; emailAlertName: string } & RequiredSendEmailParams
   ): Promise<void> => {
-    const { userId, alertSettingName, sendFrom, subjectLine, mjmlFileName, data } = props;
+    const { userId, emailAlertName, sendFrom, subjectLine, mjmlFileName, data } = props;
     const dbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
     const user = await this._userDbService.findById({
       _id: userId,
@@ -51,7 +51,7 @@ class EmailHandler {
     const teacherEmailAlertSettings: StringKeyObject = user.teacherData
       ? user.teacherData.settings.emailAlerts
       : {};
-    if (userEmailAlertSettings[alertSettingName] || teacherEmailAlertSettings[alertSettingName]) {
+    if (userEmailAlertSettings[emailAlertName] || teacherEmailAlertSettings[emailAlertName]) {
       this.sendEmail({
         recipientEmails: user.email,
         data: { name: user.name, ...data },
@@ -127,4 +127,4 @@ class EmailHandler {
   };
 }
 
-export { EmailHandler, MAIL_SENDER_NAME };
+export { EmailHandler, EMAIL_SENDER_NAME };

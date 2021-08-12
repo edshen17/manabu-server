@@ -1,5 +1,8 @@
 import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
+import { PackageDoc } from '../../../../models/Package';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { JoinedUserDoc, USER_EMAIL_ALERT_NAME } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
@@ -11,7 +14,8 @@ import {
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { EmailHandler } from '../../utils/emailHandler/emailHandler';
+import { EmailHandler, EMAIL_SENDER_NAME } from '../../utils/emailHandler/emailHandler';
+import { EMAIL_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
 import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
 
 type OptionalCreateAppointmentsUsecaseInitParams = {
@@ -48,7 +52,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       currentAPIUser,
     });
-    this._sendAppointmentAlertEmail({ savedDbAppointments, currentAPIUser });
+    this._sendAppointmentAlertEmail(savedDbAppointments);
     const usecaseRes = {
       appointments: savedDbAppointments,
     };
@@ -175,11 +179,54 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _sendAppointmentAlertEmail = async (props: {
-    savedDbAppointments: AppointmentDoc[];
-    currentAPIUser: CurrentAPIUser;
-  }): Promise<void> => {
-    const { savedDbAppointments, currentAPIUser } = props;
+  private _sendAppointmentAlertEmail = async (
+    savedDbAppointments: AppointmentDoc[]
+  ): Promise<void> => {
+    const packageTransactionData = savedDbAppointments[0].packageTransactionData;
+    const hostedByData = packageTransactionData.hostedByData;
+    const reservedByData = packageTransactionData.reservedByData;
+    const packageData = packageTransactionData.packageData;
+    const appointmentAmount = savedDbAppointments.length;
+    const isMultipleReservations = appointmentAmount > 1;
+    const alertEmailParams = this._getAlertEmailParams({
+      hostedByData,
+      reservedByData,
+      appointmentAmount,
+      isMultipleReservations,
+      packageData,
+      packageTransactionData,
+    });
+    this._emailHandler.sendAlertEmailFromUserId(alertEmailParams);
+  };
+
+  private _getAlertEmailParams = (props: {
+    hostedByData: JoinedUserDoc;
+    reservedByData: JoinedUserDoc;
+    appointmentAmount: number;
+    isMultipleReservations: boolean;
+    packageData: PackageDoc;
+    packageTransactionData: PackageTransactionDoc;
+  }) => {
+    const { hostedByData, reservedByData, appointmentAmount, isMultipleReservations } = props;
+    const subjectLine = `You have ${appointmentAmount} new ${
+      isMultipleReservations ? 'appointments' : 'appointment'
+    } from ${reservedByData.name} that ${
+      isMultipleReservations ? 'need' : 'needs'
+    } to be confirmed.`;
+    const alertEmailParams = {
+      userId: hostedByData._id,
+      emailAlertName: USER_EMAIL_ALERT_NAME.APPOINTMENT_CREATION,
+      sendFrom: EMAIL_SENDER_NAME.NOREPLY,
+      subjectLine,
+      mjmlFileName: EMAIL_TEMPLATE_NAME.APPOINTMENT_CREATION,
+      data: {
+        bodyText: `Please confirm the ${
+          isMultipleReservations ? 'appointments' : 'appointment'
+        } made by ${reservedByData.name}`,
+        ...props,
+      },
+    };
+    return alertEmailParams;
   };
 
   protected _initTemplate = async (

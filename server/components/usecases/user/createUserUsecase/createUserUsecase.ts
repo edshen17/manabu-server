@@ -16,7 +16,7 @@ import { PackageEntity } from '../../../entities/package/packageEntity';
 import { JoinedUserDoc } from '../../../../models/User';
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { EmailHandler, MAIL_SENDER_NAME } from '../../utils/emailHandler/emailHandler';
+import { EmailHandler, EMAIL_SENDER_NAME } from '../../utils/emailHandler/emailHandler';
 import { EMAIL_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
 
 type OptionalCreateUserUsecaseInitParams = {
@@ -203,7 +203,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { name, verificationToken } = userEntity;
     this._emailHandler.sendEmail({
       recipientEmails: userEntity.email,
-      sendFrom: MAIL_SENDER_NAME.NOREPLY,
+      sendFrom: EMAIL_SENDER_NAME.NOREPLY,
       subjectLine: 'Manabu email verification',
       mjmlFileName: EMAIL_TEMPLATE_NAME.EMAIL_VERIFICATION,
       data: { name, verificationToken },
@@ -216,7 +216,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { name, email } = userEntity;
     this._emailHandler.sendEmail({
       recipientEmails: 'manabulessons@gmail.com',
-      sendFrom: MAIL_SENDER_NAME.NOREPLY,
+      sendFrom: EMAIL_SENDER_NAME.NOREPLY,
       subjectLine: `A new ${userType} signed up`,
       mjmlFileName: EMAIL_TEMPLATE_NAME.INTERNAL,
       data: {
