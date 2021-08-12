@@ -48,7 +48,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       currentAPIUser,
     });
-    // this._sendAppointmentAlertEmail({ templateStrings: { appointmentLength: appointment } });
+    this._sendAppointmentAlertEmail({ savedDbAppointments, currentAPIUser });
     const usecaseRes = {
       appointments: savedDbAppointments,
     };
@@ -175,7 +175,12 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _sendAppointmentAlertEmail = () => {};
+  private _sendAppointmentAlertEmail = async (props: {
+    savedDbAppointments: AppointmentDoc[];
+    currentAPIUser: CurrentAPIUser;
+  }): Promise<void> => {
+    const { savedDbAppointments, currentAPIUser } = props;
+  };
 
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateAppointmentsUsecaseInitParams

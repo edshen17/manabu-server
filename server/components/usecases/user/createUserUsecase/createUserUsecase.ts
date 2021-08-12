@@ -90,7 +90,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       this._sendVerificationEmail(userEntity);
       // this._sendInternalEmail({ userEntity, isTeacherApp });
     }
-    this._sendVerificationEmail(userEntity);
     const cookies = this.splitLoginCookies(user);
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
@@ -200,18 +199,13 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   private _sendVerificationEmail = (userEntity: any): void => {
-    const host = 'https://manabu.sg';
     const { name, verificationToken } = userEntity;
     this._emailHandler.sendEmail({
       recipientEmails: userEntity.email,
       sendFrom: 'NOREPLY',
       subjectLine: 'Manabu email verification',
-      htmlFileName: 'verificationEmail',
-      templateStrings: {
-        name,
-        host,
-        verificationToken,
-      },
+      mjmlFileName: 'verificationEmail',
+      data: { name, verificationToken },
     });
   };
 
@@ -223,8 +217,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       recipientEmails: 'manabulessons@gmail.com',
       sendFrom: 'NOREPLY',
       subjectLine: `A new ${userType} signed up`,
-      htmlFileName: 'internalNewSignUpEmail',
-      templateStrings: {
+      mjmlFileName: 'internalNewSignUpEmail',
+      data: {
         name,
         email,
         userType,

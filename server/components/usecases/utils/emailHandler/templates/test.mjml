@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body>
+    <mj-section v-if="list">
+      <mj-column>
+        <mj-text>
+          MJML + Vue is:
+        </mj-text>
+        <mj-text v-for="(item, index) in list">
+          {{index}}. {{item}}
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

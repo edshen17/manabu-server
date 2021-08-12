@@ -4,8 +4,8 @@ import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 type RequiredSendEmailParams = {
   sendFrom: string;
   subjectLine: string;
-  htmlFileName: string;
-  templateStrings: StringKeyObject;
+  mjmlFileName: string;
+  data: StringKeyObject;
 };
 
 class EmailHandler {
@@ -27,15 +27,16 @@ class EmailHandler {
     },
   };
   private _nodemailer!: any;
-  private _handlebars!: any;
   private _fs!: any;
   private _userDbService!: UserDbService;
+  private _vue!: any;
+  private _createRenderer!: any;
+  private _mjml!: any;
 
   public sendAlertEmailFromUserId = async (
     props: { userId: ObjectId; alertSettingName: string } & RequiredSendEmailParams
   ): Promise<void> => {
-    const { userId, alertSettingName, sendFrom, subjectLine, htmlFileName, templateStrings } =
-      props;
+    const { userId, alertSettingName, sendFrom, subjectLine, mjmlFileName, data } = props;
     const dbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
     const user = await this._userDbService.findById({
       _id: userId,
@@ -48,18 +49,22 @@ class EmailHandler {
     if (userEmailAlertSettings[alertSettingName] || teacherEmailAlertSettings[alertSettingName]) {
       this.sendEmail({
         recipientEmails: user.email,
-        templateStrings: { name: user.name, ...templateStrings },
+        data: { name: user.name, ...data },
         sendFrom,
         subjectLine,
-        htmlFileName,
+        mjmlFileName,
       });
     }
   };
 
-  public sendEmail = (
-    props: { recipientEmails: string | string[] } & RequiredSendEmailParams
-  ): void => {
-    const { recipientEmails, sendFrom, subjectLine, htmlFileName, templateStrings } = props;
+  public sendEmail = async (props: {
+    recipientEmails: string | string[];
+    sendFrom: string;
+    subjectLine: string;
+    mjmlFileName: string;
+    data: StringKeyObject;
+  }) => {
+    const { recipientEmails, sendFrom, subjectLine, mjmlFileName, data } = props;
     const isProduction = process.env.NODE_ENV == 'production';
     if (isProduction) {
       const nodeMailerOptions: any = {
@@ -67,46 +72,51 @@ class EmailHandler {
       };
       nodeMailerOptions.auth = this._MAIL_SEND_FROM_OPTIONS[sendFrom];
       const transporter = this._nodemailer.createTransport(nodeMailerOptions);
-      const self = this;
-
-      this._readHTMLFile(`${__dirname}/templates/${htmlFileName}.html`, (err, html) => {
-        if (err) {
-          throw err;
-        }
-        const template = self._handlebars.compile(html);
-        const htmlToSend = template(templateStrings);
-        const mailOptions = {
-          from: self._MAIL_SEND_FROM_OPTIONS[sendFrom]['emailName'],
-          to: recipientEmails,
-          subject: subjectLine,
-          html: htmlToSend,
-        };
-        transporter.sendMail(mailOptions);
-      });
+      const html = await this._createHtmlToRender({ mjmlFileName, data });
+      const mailOptions = {
+        from: this._MAIL_SEND_FROM_OPTIONS[sendFrom]['emailName'],
+        to: recipientEmails,
+        subject: subjectLine,
+        html,
+      };
+      transporter.sendMail(mailOptions);
     }
   };
 
-  private _readHTMLFile = (path: string, callback: (...args: any[]) => any) => {
-    this._fs.readFile(path, { encoding: 'utf-8' }, function (err: Error, html: string) {
-      if (err) {
-        throw err;
-      } else {
-        callback(null, html);
-      }
+  private _createHtmlToRender = async (props: {
+    mjmlFileName: string;
+    data: StringKeyObject;
+  }): Promise<string> => {
+    const { mjmlFileName, data } = props;
+    const template = this._readMJMLFile(`${__dirname}/templates/${mjmlFileName}`);
+    const app = new this._vue({
+      data,
+      template,
     });
+    const html = this._mjml(await this._createRenderer().renderToString(app)).html;
+    return html;
+  };
+
+  private _readMJMLFile = (fileName: string) => {
+    const data = this._fs.readFileSync(`${fileName}.mjml`, 'utf8');
+    return data;
   };
 
   public init = async (props: {
-    handlebars: any;
     nodemailer: any;
     fs: any;
     makeUserDbService: Promise<UserDbService>;
+    vue: any;
+    createRenderer: any;
+    mjml: any;
   }): Promise<this> => {
-    const { handlebars, nodemailer, fs, makeUserDbService } = props;
-    this._handlebars = handlebars;
+    const { nodemailer, fs, makeUserDbService, vue, createRenderer, mjml } = props;
     this._nodemailer = nodemailer;
     this._fs = fs;
     this._userDbService = await makeUserDbService;
+    this._vue = vue;
+    this._createRenderer = await createRenderer;
+    this._mjml = mjml;
     return this;
   };
 }
