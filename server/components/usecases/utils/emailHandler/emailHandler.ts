@@ -88,9 +88,10 @@ class EmailHandler {
     data: StringKeyObject;
   }): Promise<string> => {
     const { mjmlFileName, data } = props;
-    const template = this._readMJMLFile(`${__dirname}/templates/${mjmlFileName}`);
+    const dirname = __dirname.replace(/\\/g, '/');
+    const template = this._readMJMLFile(`${dirname}/templates/${mjmlFileName}`);
     const app = new this._vue({
-      data,
+      data: { ...data, dirname },
       template,
     });
     const html = this._mjml(await this._createRenderer().renderToString(app)).html;
