@@ -64,26 +64,37 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
     currentAPIUser: CurrentAPIUser;
   }): Promise<AppointmentDoc[]> => {
-    const { appointments, dbServiceAccessOptions, currentAPIUser } = props;
+    const { appointments, dbServiceAccessOptions } = props;
     const modelToInsert: AppointmentEntityBuildResponse[] = [];
     for (const appointment of appointments) {
-      await this._testResourceOwnership({ appointment, dbServiceAccessOptions, currentAPIUser });
-      await this._testAvailableTimeExistence({ appointment, dbServiceAccessOptions });
-      await this._testAppointmentTimeConflict({
-        appointment,
-        dbServiceAccessOptions,
-        currentAPIUser,
-      });
-      const appointmentEntity = await this._appointmentEntity.build(appointment);
-      modelToInsert.push(appointmentEntity);
+      await this._createAppointment({ ...props, appointment, modelToInsert });
     }
     this._testSameAppointmentType(modelToInsert);
     const savedDbAppointments = await this._dbService.insertMany({
       modelToInsert,
       dbServiceAccessOptions,
     });
+    await this._reduceAppointments(savedDbAppointments);
     await this._splitAvailableTimeBrancher(savedDbAppointments);
     return savedDbAppointments;
+  };
+
+  private _createAppointment = async (props: {
+    appointment: AppointmentEntityBuildParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    currentAPIUser: CurrentAPIUser;
+    modelToInsert: AppointmentEntityBuildResponse[];
+  }): Promise<void> => {
+    const { appointment, dbServiceAccessOptions, currentAPIUser, modelToInsert } = props;
+    await this._testResourceOwnership({ appointment, dbServiceAccessOptions, currentAPIUser });
+    await this._testAvailableTimeExistence({ appointment, dbServiceAccessOptions });
+    await this._testAppointmentTimeConflict({
+      appointment,
+      dbServiceAccessOptions,
+      currentAPIUser,
+    });
+    const appointmentEntity = await this._appointmentEntity.build(appointment);
+    modelToInsert.push(appointmentEntity);
   };
 
   private _testResourceOwnership = async (props: {
@@ -168,6 +179,20 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     if (sameAppointmentTypeCount != appointments.length) {
       throw new Error('All appointments must be of the same type.');
     }
+  };
+
+  private _reduceAppointments = async (appointments: AppointmentDoc[]): Promise<void> => {
+    const packageTransactionId = appointments[0].packageTransactionId;
+    const dbServiceAccessOptions =
+      this._packageTransactionDbService.getBaseDbServiceAccessOptions();
+    const appointmentsToSubtract = appointments.length * -1;
+    await this._packageTransactionDbService.findOneAndUpdate({
+      searchQuery: { _id: packageTransactionId },
+      updateQuery: {
+        $inc: { remainingAppointments: appointmentsToSubtract },
+      },
+      dbServiceAccessOptions,
+    });
   };
 
   private _splitAvailableTimeBrancher = async (appointments: AppointmentDoc[]): Promise<void> => {

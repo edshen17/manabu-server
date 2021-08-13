@@ -227,6 +227,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     });
   };
 
+  // can be refactored to a cookie handler
   public splitLoginCookies = (user: JoinedUserDoc): CookieData[] => {
     const token = this._signClientJwt(user);
     const tokenArr: string[] = token.split('.');

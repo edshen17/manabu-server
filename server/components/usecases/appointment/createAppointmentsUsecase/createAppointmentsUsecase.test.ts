@@ -17,6 +17,8 @@ import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import dayjs from 'dayjs';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
+import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
+import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
@@ -28,6 +30,7 @@ let secondFakePackageTransaction: PackageTransactionDoc;
 let fakeAvailableTime: AvailableTimeDoc;
 let currentAPIUser: CurrentAPIUser;
 let availableTimeDbService: AvailableTimeDbService;
+let packageTransactionDbService: PackageTransactionDbService;
 let firstAppointment: any;
 let secondAppointment: any;
 
@@ -37,6 +40,7 @@ before(async () => {
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
   availableTimeDbService = await makeAvailableTimeDbService;
+  packageTransactionDbService = await makePackageTransactionDbService;
 });
 
 beforeEach(async () => {
@@ -169,18 +173,30 @@ describe('createAppointmentUsecase', () => {
         });
       });
       context('valid inputs', () => {
-        const validResOutput = (createAppointmentRes: CreateAppointmentsUsecaseResponse) => {
+        const validResOutput = async (
+          createAppointmentRes: CreateAppointmentsUsecaseResponse
+        ): Promise<void> => {
           const appointments = createAppointmentRes.appointments;
           const firstAppointment = createAppointmentRes.appointments[0];
+          const dbServiceAccessOptions =
+            packageTransactionDbService.getBaseDbServiceAccessOptions();
+          const updatedPackageTransaction = await packageTransactionDbService.findById({
+            _id: firstAppointment.packageTransactionId,
+            dbServiceAccessOptions,
+          });
           expect(appointments.length).to.equal(2);
           expect(firstAppointment).to.have.property('hostedById');
           expect(firstAppointment).to.have.property('startDate');
           expect(firstAppointment).to.have.property('endDate');
           expect(firstAppointment).to.have.property('packageTransactionData');
+          expect(
+            updatedPackageTransaction.remainingAppointments <
+              firstFakePackageTransaction.remainingAppointments
+          ).to.equal(true);
         };
         it('should return a new appointment', async () => {
           const createAppointmentRes = await createAppointments();
-          validResOutput(createAppointmentRes);
+          await validResOutput(createAppointmentRes);
         });
       });
     });

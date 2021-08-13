@@ -4,7 +4,7 @@ import { makeJSONExpressCallback } from '../../../../components/webFrameworkCall
 
 const appointments = express.Router();
 
-// /self
+// create /self route?
 appointments.post('/create', makeJSONExpressCallback.consume(makeCreateAppointmentsController));
 
 export { appointments };
