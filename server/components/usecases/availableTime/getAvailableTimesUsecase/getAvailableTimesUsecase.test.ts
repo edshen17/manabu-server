@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import dayjs from 'dayjs';
 import { makeGetAvailableTimesUsecase } from '.';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';

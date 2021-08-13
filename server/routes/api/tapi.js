@@ -35,35 +35,6 @@ const exchangeRateScheduler = async () => {
 };
 exchangeRateScheduler();
 
-// create appointment
-router.post('/schedule/appointment', VerifyToken, (req, res, next) => {
-  const newAppointment = req.body;
-
-  Appointment.findOne(newAppointment)
-    .lean()
-    .select({ _id: 1 })
-    // .cache()
-    .then((appointment) => {
-      if (appointment) {
-        return res.status(500).send('Appointment already exists');
-      } else {
-        newAppointment.reservedBy = req.body.reservedBy;
-        if (req.userId == req.body.reservedBy) {
-          new Appointment(newAppointment)
-            .save()
-            .then((appointment) => {
-              clearKey(Appointment.collection.collectionName);
-              return res.status(200).json(appointment);
-            })
-            .catch((err) => {
-              return res.status(500).send(err);
-            });
-        }
-      }
-    })
-    .catch((err) => handleErrors(err, req, res, next));
-});
-
 // get appointment details for the user
 // startWeekDay/endWeekDay are ISO strings
 // to do figure out way to restrict auth
