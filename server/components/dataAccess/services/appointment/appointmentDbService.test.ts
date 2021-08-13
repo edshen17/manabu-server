@@ -58,7 +58,7 @@ describe('appointmentDbService', () => {
         });
       });
       context('valid inputs', () => {
-        const getAppointment = async () => {
+        const getAppointment = async (dbServiceAccessOptions: DbServiceAccessOptions) => {
           const findParams = {
             searchQuery: {
               hostedById: fakeAppointment.hostedById,
@@ -71,39 +71,48 @@ describe('appointmentDbService', () => {
           });
           const findOneAppointment = await appointmentDbService.findOne(findParams);
           const findAppointments = await appointmentDbService.find(findParams);
-          const appointmentPackageTransactionData: any = findByIdAppointment.packageTransactionData;
           expect(findByIdAppointment).to.deep.equal(findOneAppointment);
           expect(findByIdAppointment).to.deep.equal(findAppointments[0]);
-          expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('password');
-          expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('email');
-          expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('settings');
-          expect(appointmentPackageTransactionData.hostedByData).to.not.have.property(
-            'commMethods'
-          );
-          expect(appointmentPackageTransactionData.reservedByData).to.not.have.property('password');
-          expect(appointmentPackageTransactionData.reservedByData).to.not.have.property('email');
-          expect(appointmentPackageTransactionData.reservedByData).to.not.have.property('settings');
-          expect(appointmentPackageTransactionData.reservedByData).to.not.have.property(
-            'commMethods'
-          );
+          if (
+            dbServiceAccessOptions.isSelf ||
+            dbServiceAccessOptions.isOverrideView ||
+            dbServiceAccessOptions.currentAPIUserRole == 'admin'
+          ) {
+            const appointmentPackageTransactionData: any =
+              findByIdAppointment.packageTransactionData;
+
+            expect(findByIdAppointment).to.deep.equal(findOneAppointment);
+            expect(findByIdAppointment).to.deep.equal(findAppointments[0]);
+            expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('password');
+            expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('email');
+            expect(appointmentPackageTransactionData.hostedByData).to.not.have.property('settings');
+            expect(appointmentPackageTransactionData.hostedByData).to.not.have.property(
+              'commMethods'
+            );
+          } else {
+            expect(findByIdAppointment).to.not.have.property('reservedById');
+            expect(findByIdAppointment).to.not.have.property('packageTransactionId');
+            expect(findByIdAppointment).to.not.have.property('packageTransactionData');
+          }
         };
         context('as a non-admin user', () => {
           context('viewing self', () => {
             it('should find the appointment and return an unrestricted view on some data', async () => {
               dbServiceAccessOptions.isSelf = true;
-              await getAppointment();
+              await getAppointment(dbServiceAccessOptions);
             });
           });
           context('viewing other', () => {
-            it('should find the appointment and return an unrestricted view on some data', async () => {
-              await getAppointment();
+            it('should find the appointment and return a restricted view on some data', async () => {
+              console.log('here start');
+              await getAppointment(dbServiceAccessOptions);
             });
           });
         });
         context('as an admin', () => {
           it('should find the appointment and return an restricted view on some data', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
-            await getAppointment();
+            await getAppointment(dbServiceAccessOptions);
           });
         });
       });
@@ -157,7 +166,7 @@ describe('appointmentDbService', () => {
             dbServiceAccessOptions,
           });
         } catch (err) {
-          expect(err.message).to.equal('Access denied.');
+          expect(err).to.be.an('error');
         }
       });
     });

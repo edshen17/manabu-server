@@ -167,6 +167,8 @@ describe('packageTransactionDbService', () => {
   });
   describe('update', () => {
     const updatePackageTransaction = async () => {
+      const overrideDbServiceAccessOptions =
+        appointmentDbService.getOverrideDbServiceAccessOptions();
       const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackageTransaction._id },
         updateQuery: { lessonLanguage: 'en' },
@@ -174,7 +176,7 @@ describe('packageTransactionDbService', () => {
       });
       const updatedAppointment = await appointmentDbService.findOne({
         searchQuery: { packageTransactionId: updatedPackageTransaction._id },
-        dbServiceAccessOptions,
+        dbServiceAccessOptions: overrideDbServiceAccessOptions,
       });
       expect(updatedPackageTransaction).to.not.deep.equal(fakePackageTransaction);
       expect(updatedPackageTransaction.lessonLanguage).to.equal('en');

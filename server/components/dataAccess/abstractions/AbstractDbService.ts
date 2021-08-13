@@ -93,13 +93,14 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     let dbQueryResult = await this._executeQuery({ dbServiceAccessOptions, dbQueryPromise });
     const hasJoin = this._joinType != DB_SERVICE_JOIN_TYPE.NONE;
     const isResultArray = Array.isArray(dbQueryResult);
+    const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     if (hasJoin && isResultArray) {
       const mappedQueryResult = dbQueryResult.map(async (dbDoc: any) => {
-        return await this._processDbDoc(dbDoc);
+        return await this._joinDbDoc({ dbDoc, modelView });
       });
       dbQueryResult = await Promise.all(mappedQueryResult);
     } else if (hasJoin && !isResultArray) {
-      dbQueryResult = await this._processDbDoc(dbQueryResult);
+      dbQueryResult = await this._joinDbDoc({ dbDoc: dbQueryResult, modelView });
     }
     return dbQueryResult;
   };
@@ -126,7 +127,11 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return {};
   };
 
-  private _processDbDoc = async (dbDoc: any): Promise<StringKeyObject> => {
+  private _joinDbDoc = async (props: {
+    dbDoc: any;
+    modelView: StringKeyObject;
+  }): Promise<StringKeyObject> => {
+    const { dbDoc, modelView } = props;
     const dbDocCopy: StringKeyObject = this._cloneDeep(dbDoc);
     if (dbDocCopy) {
       const dbServiceAccessOptions = this.getBaseDbServiceAccessOptions();
@@ -135,8 +140,12 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
         dbServiceAccessOptions,
       });
       for (const computedProp in computedProps) {
-        const computedData = computedProps[computedProp];
-        dbDocCopy[computedProp] = computedData;
+        const foreignKeyIdName = computedProp.replace(/Data/i, 'Id');
+        const isRestrictedProp = modelView[foreignKeyIdName] == 0;
+        if (!isRestrictedProp) {
+          const computedData = computedProps[computedProp];
+          dbDocCopy[computedProp] = computedData;
+        }
       }
     }
     return dbDocCopy;

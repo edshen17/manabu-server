@@ -1,6 +1,10 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
+import {
+  DbServiceAccessOptions,
+  DbServiceModelViews,
+  DB_SERVICE_JOIN_TYPE,
+} from '../../abstractions/IDbService';
 import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 
 type OptionalAppointmentDbServiceInitParams = {
@@ -12,6 +16,19 @@ class AppointmentDbService extends AbstractDbService<
   AppointmentDoc
 > {
   private _packageTransactionDbService!: PackageTransactionDbService;
+
+  protected _getDbServiceModelViews = (): DbServiceModelViews => {
+    return {
+      defaultView: {
+        reservedById: 0,
+        packageTransactionId: 0,
+        cancellationReason: 0,
+      },
+      adminView: {},
+      selfView: {},
+      overrideView: {},
+    };
+  };
 
   protected _getComputedProps = async (props: {
     dbDoc: any;

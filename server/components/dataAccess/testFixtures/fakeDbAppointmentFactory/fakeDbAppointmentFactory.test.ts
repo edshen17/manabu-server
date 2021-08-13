@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeFakeDbAppointmentFactory } from '.';
 import { makeFakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
@@ -15,21 +16,19 @@ before(async () => {
 describe('fakeDbAppointmentFactory', () => {
   describe('createFakeDbData', () => {
     it('should create a fake appointment from the given users and package transaction', async () => {
-      const endDate = new Date();
-      endDate.setMinutes(endDate.getMinutes() + 30);
       const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
       const fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-        hostedById: fakePackageTransaction.hostedById.toString(),
-        reservedById: fakePackageTransaction.reservedById.toString(),
-        packageTransactionId: fakePackageTransaction._id.toString(),
-        startDate: new Date(),
-        endDate,
+        hostedById: fakePackageTransaction.hostedById,
+        reservedById: fakePackageTransaction.reservedById,
+        packageTransactionId: fakePackageTransaction._id,
+        startDate: dayjs().toDate(),
+        endDate: dayjs().add(30, 'minute').toDate(),
       });
-      expect(fakeAppointment).to.have.property('packageTransactionData');
+      expect(fakeAppointment).to.have.property('hostedById');
     });
     it('should create a fake appointment from without any input', async () => {
       const fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData();
-      expect(fakeAppointment).to.have.property('packageTransactionData');
+      expect(fakeAppointment).to.have.property('hostedById');
     });
   });
 });

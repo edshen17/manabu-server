@@ -172,6 +172,8 @@ describe('packageDbService', () => {
 
   describe('update', () => {
     const updatePackage = async () => {
+      const overrideDbServiceAccessOptions =
+        appointmentDbService.getOverrideDbServiceAccessOptions();
       const updatedPackage = await packageDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackage._id },
         updateQuery: { packageType: 'custom' },
@@ -185,7 +187,7 @@ describe('packageDbService', () => {
         searchQuery: {
           packageTransactionId: updatedPackageTransaction._id,
         },
-        dbServiceAccessOptions,
+        dbServiceAccessOptions: overrideDbServiceAccessOptions,
       });
       expect(updatedPackage).to.not.deep.equal(fakePackage);
       expect(updatedPackage.packageType).to.equal('custom');

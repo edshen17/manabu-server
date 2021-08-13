@@ -181,6 +181,8 @@ describe('teacherDbService', () => {
   });
   describe('update', () => {
     const updateTeacher = async () => {
+      const overrideDbServiceAccessOptions =
+        appointmentDbService.getOverrideDbServiceAccessOptions();
       const updatedTeacher = <TeacherDoc>await teacherDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacher.teacherData!._id },
         updateQuery: { studentCount: 5 },
@@ -190,7 +192,7 @@ describe('teacherDbService', () => {
         searchQuery: {
           hostedById: fakeTeacher._id,
         },
-        dbServiceAccessOptions,
+        dbServiceAccessOptions: overrideDbServiceAccessOptions,
       });
       const findPackageTransaction = await packageTransactionDbService.findOne({
         searchQuery: {
