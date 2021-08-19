@@ -104,7 +104,6 @@ describe('appointmentDbService', () => {
           });
           context('viewing other', () => {
             it('should find the appointment and return a restricted view on some data', async () => {
-              console.log('here start');
               await getAppointment(dbServiceAccessOptions);
             });
           });

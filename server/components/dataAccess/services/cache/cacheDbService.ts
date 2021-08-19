@@ -82,7 +82,7 @@ class CacheDbService {
   };
 
   public clearHashKey = async (hashKey: string): Promise<void> => {
-    this._redisClient.del(hashKey);
+    await this._redisClient.del(hashKey);
   };
 
   public clearAll = async (): Promise<void> => {
