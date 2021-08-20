@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { makeTeacherQueryValidator } from '.';
+import { StringKeyObject } from '../../../../types/custom';
 import { TeacherQueryValidator } from './teacherQueryValidator';
 
 let teacherQueryValidator: TeacherQueryValidator;

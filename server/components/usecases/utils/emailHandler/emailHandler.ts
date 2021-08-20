@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongoose';
+import { StringKeyObject } from '../../../../types/custom';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
 enum EMAIL_SENDER_NAME {

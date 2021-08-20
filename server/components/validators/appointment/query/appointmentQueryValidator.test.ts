@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { makeAppointmentQueryValidator } from '.';
+import { StringKeyObject } from '../../../../types/custom';
 import { AppointmentQueryValidator } from './appointmentQueryValidator';
 
 let appointmentQueryValidator: AppointmentQueryValidator;

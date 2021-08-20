@@ -1,5 +1,6 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { AvailableTimeEntity } from '../../../entities/availableTime/availableTimeEntity';

@@ -1,3 +1,5 @@
+import { StringKeyObject } from '../../../../types/custom';
+
 class QueryStringHandler {
   private _queryStringLib: any;
 

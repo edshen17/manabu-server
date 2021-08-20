@@ -12,6 +12,7 @@ import { GetAvailableTimesUsecaseResponse } from '../../../usecases/availableTim
 import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
 import dayjs from 'dayjs';
+import { StringKeyObject } from '../../../../types/custom';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let getAvailableTimesController: GetAvailableTimesController;

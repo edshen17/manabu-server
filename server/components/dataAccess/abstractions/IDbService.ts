@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongoose';
+import { StringKeyObject } from '../../../types/custom';
 import { CacheDbService } from '../services/cache/cacheDbService';
 
 type DbServiceInitParams<OptionalDbServiceInitParams> = RequiredDbServiceInitParams &

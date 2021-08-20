@@ -1,4 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
+import { StringKeyObject } from '../../../../types/custom';
 import {
   DbServiceAccessOptions,
   PaginationOptions,

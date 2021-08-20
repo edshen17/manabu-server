@@ -1,4 +1,5 @@
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   AvailableTimeEntity,

@@ -1,3 +1,5 @@
+import { StringKeyObject } from '../../../../types/custom';
+
 type CacheDbServiceInitParams = {
   redisClient: any;
   convertStringToObjectId: any;

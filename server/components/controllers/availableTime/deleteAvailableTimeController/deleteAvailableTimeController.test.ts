@@ -9,6 +9,7 @@ import { ControllerResponse } from '../../abstractions/IController';
 import { DeleteAvailableTimeUsecaseResponse } from '../../../usecases/availableTime/deleteAvailableTimeUsecase/deleteAvailableTimeUsecase';
 import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
+import { StringKeyObject } from '../../../../types/custom';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let deleteAvailableTimeController: DeleteAvailableTimeController;

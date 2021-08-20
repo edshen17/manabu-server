@@ -1,3 +1,4 @@
+import { StringKeyObject } from '../../../types/custom';
 import { AbstractDbService } from './AbstractDbService';
 import { DbServiceAccessOptions, IDbService } from './IDbService';
 

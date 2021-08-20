@@ -1,4 +1,5 @@
 import { AppointmentDoc } from '../../../../models/Appointment';
+import { StringKeyObject } from '../../../../types/custom';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import {
   DbServiceAccessOptions,

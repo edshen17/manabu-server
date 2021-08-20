@@ -1,4 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
+import { StringKeyObject } from '../../../../types/custom';
 import { UserContactMethod } from '../../user/userEntity';
 
 type LocationData =

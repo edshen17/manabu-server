@@ -12,6 +12,7 @@ import {
   LocationDataHandler,
 } from '../../../entities/utils/locationDataHandler/locationDataHandler';
 import { ObjectId } from 'mongoose';
+import { StringKeyObject } from '../../../../types/custom';
 
 type OptionalPackageTransactionDbServiceInitParams = {
   makeUserDbService: Promise<UserDbService>;

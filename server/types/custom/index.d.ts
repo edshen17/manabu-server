@@ -1,1 +1,3 @@
-declare type StringKeyObject = { [index: string]: any };
+type StringKeyObject = { [index: string]: any };
+
+export { StringKeyObject };

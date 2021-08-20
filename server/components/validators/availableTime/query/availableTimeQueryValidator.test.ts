@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { makeAvailableTimeQueryValidator } from '.';
+import { StringKeyObject } from '../../../../types/custom';
 import { AvailableTimeQueryValidator } from './availableTimeQueryValidator';
 
 let availableTimeQueryValidator: AvailableTimeQueryValidator;

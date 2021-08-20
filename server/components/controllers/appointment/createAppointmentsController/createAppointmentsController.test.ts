@@ -13,6 +13,7 @@ import { makeCreateAppointmentsController } from '.';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
+import { StringKeyObject } from '../../../../types/custom';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;

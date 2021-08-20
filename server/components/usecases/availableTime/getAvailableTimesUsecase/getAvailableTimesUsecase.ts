@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { StringKeyObject } from '../../../../types/custom';
 import {
   DbServiceAccessOptions,
   PaginationOptions,

@@ -9,6 +9,7 @@ import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHtt
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
 import { EditAvailableTimeController } from './editAvailableTimeController';
 import { makeEditAvailableTimeController } from '.';
+import { StringKeyObject } from '../../../../types/custom';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let editAvailableTimeController: EditAvailableTimeController;
