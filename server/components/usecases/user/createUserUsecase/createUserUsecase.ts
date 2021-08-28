@@ -253,15 +253,16 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: 24 * 60 * 60 * 7,
+        expiresIn: '7d',
       }
     );
     return token;
   };
 
   private _setCookieOptions = (): CookieData['options'] => {
+    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
     const cookieOptions = {
-      maxAge: 2 * 24 * 60 * 60 * 1000,
+      maxAge: ONE_WEEK_MS,
       httpOnly: true,
       secure: true,
     };

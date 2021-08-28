@@ -8,7 +8,7 @@ class JSONCallbackDecorator extends AbstractExpressCallback {
   }
   public consumeTemplate = (res: any, body: any) => {
     this.abstractExpressCallback.consumeTemplate(res, body);
-    const { cookies, redirectUrl, ...filteredBody } = body;
+    const { cookies, ...filteredBody } = body;
     res.json(filteredBody);
   };
 }

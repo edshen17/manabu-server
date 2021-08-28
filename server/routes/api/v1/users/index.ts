@@ -16,10 +16,7 @@ users.get(
   '/:userId/availableTimes',
   makeJSONExpressCallback.consume(makeGetAvailableTimesController)
 );
-
-users.get('/self', makeJSONExpressCallback.consume(makeGetUserController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
-
 users.use('/auth', auth);
 
 export { users };
