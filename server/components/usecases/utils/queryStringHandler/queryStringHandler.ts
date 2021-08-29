@@ -4,13 +4,13 @@ class QueryStringHandler {
   private _queryStringLib: any;
 
   public encodeQueryStringObj = (toEncodeObj: StringKeyObject): string => {
-    const encodedQueryStringObj = this._encodeQueryStringObj(toEncodeObj);
-    const encodedQueryString = this.stringifyQueryStringObj(encodedQueryStringObj);
-    return encodedQueryString;
+    const queryStringObj = this._encodeQueryStringObj(toEncodeObj);
+    const queryStringValue = this.stringifyQueryStringObj(queryStringObj);
+    return queryStringValue;
   };
 
   private _encodeQueryStringObj = (toEncodeObj: StringKeyObject): StringKeyObject => {
-    const encodedQueryStringObj: StringKeyObject = {};
+    const queryStringObj: StringKeyObject = {};
     for (const queryString in toEncodeObj) {
       const itemToEncode = toEncodeObj[queryString];
       let stringifiedQueryString: string;
@@ -19,10 +19,10 @@ class QueryStringHandler {
       } else {
         stringifiedQueryString = itemToEncode;
       }
-      const encodedQueryString = Buffer.from(stringifiedQueryString).toString('base64');
-      encodedQueryStringObj[queryString] = encodedQueryString;
+      const queryStringValue = Buffer.from(stringifiedQueryString).toString('base64');
+      queryStringObj[queryString] = queryStringValue;
     }
-    return encodedQueryStringObj;
+    return queryStringObj;
   };
 
   public stringifyQueryStringObj = (toStringifyObj: StringKeyObject): string => {
@@ -30,12 +30,29 @@ class QueryStringHandler {
     return stringifiedQueryStrings;
   };
 
-  public decodeQueryStringObj = (encodedQueryStringObj: StringKeyObject): any => {
+  public decodeQueryString = (queryStringValue: string): any => {
+    const queryStringObj: StringKeyObject = this.parseQueryString(queryStringValue);
+    const decodedQueryStringObj: StringKeyObject = this.decodeQueryStringObj(queryStringObj);
+    return decodedQueryStringObj;
+  };
+
+  public parseQueryString = (queryString: string): any => {
+    const parsedQueryStrings = this._queryStringLib.parse(queryString);
+    return parsedQueryStrings;
+  };
+
+  public decodeQueryStringObj = (queryStringObj: StringKeyObject): any => {
     const decodedQueryStringObj: StringKeyObject = {};
-    for (const queryString in encodedQueryStringObj) {
-      const encodedQueryString = encodedQueryStringObj[queryString];
-      const decodedQueryString = Buffer.from(encodedQueryString, 'base64').toString();
-      decodedQueryStringObj[queryString] = this._parseStringifiedItem(decodedQueryString);
+    for (const queryString in queryStringObj) {
+      const queryStringValue = queryStringObj[queryString];
+      const isBase64Encoded =
+        Buffer.from(queryStringValue, 'base64').toString('base64') === queryStringValue;
+      if (isBase64Encoded) {
+        const decodedQueryString = Buffer.from(queryStringValue, 'base64').toString();
+        decodedQueryStringObj[queryString] = this._parseStringifiedItem(decodedQueryString);
+      } else {
+        decodedQueryStringObj[queryString] = queryStringValue;
+      }
     }
     return decodedQueryStringObj;
   };
@@ -48,22 +65,6 @@ class QueryStringHandler {
       parsedObj = stringifiedItem;
     }
     return parsedObj;
-  };
-
-  public decodeQueryString = (encodedQueryString: string): any => {
-    const encodedQueryStringObj: StringKeyObject = this.parseQueryString(encodedQueryString);
-    const decodedQueryStringObj: StringKeyObject = {};
-    for (const queryString in encodedQueryStringObj) {
-      const encodedQueryString = encodedQueryStringObj[queryString];
-      const decodedQueryString = Buffer.from(encodedQueryString, 'base64').toString();
-      decodedQueryStringObj[queryString] = this._parseStringifiedItem(decodedQueryString);
-    }
-    return decodedQueryStringObj;
-  };
-
-  public parseQueryString = (queryString: string): any => {
-    const parsedQueryStrings = this._queryStringLib.parse(queryString);
-    return parsedQueryStrings;
   };
 
   public init = (initParams: { queryStringLib: any }): this => {

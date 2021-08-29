@@ -31,8 +31,8 @@ class RedirectUrlBuilder {
         development: 'http://localhost:8080',
       },
       server: {
-        production: 'https://manabu.sg/api',
-        development: 'http://localhost:5000/api',
+        production: 'https://manabu.sg/api/v1',
+        development: 'http://localhost:5000/api/v1',
       },
     };
     return hostOptions[host][process.env.NODE_ENV!];

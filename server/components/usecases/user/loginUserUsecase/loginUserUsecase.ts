@@ -151,7 +151,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const handleNoDbUser = async () => {
       body.name = name;
       body.email = email;
-      body.profilePicture = picture;
+      body.profileImageUrl = picture;
       const userRes = await this._createUserUsecase.makeRequest(controllerData);
       if ('user' in userRes) {
         userRes.redirectUrl = this._CLIENT_DASHBOARD_URL;
