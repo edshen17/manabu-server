@@ -144,7 +144,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { code } = query;
     const { tokens } = await this._oauth2Client.getToken(code);
     const { email, name, picture } = await this._getGoogleUserData(tokens);
-    let user = await this._dbService.findOne({
+    const user = await this._dbService.findOne({
       searchQuery: { email },
       dbServiceAccessOptions,
     });
