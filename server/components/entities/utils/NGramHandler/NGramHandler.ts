@@ -1,7 +1,7 @@
 class NGramHandler {
   public createEdgeNGrams = (props: { str: string; isPrefixOnly: boolean }) => {
     const { str, isPrefixOnly } = props;
-    if (str && str.length > 1) {
+    if (str && str.length >= 1) {
       const splitOnSpace = str.split(' ');
       if (isPrefixOnly) {
         const hasSpace = splitOnSpace.length > 1;

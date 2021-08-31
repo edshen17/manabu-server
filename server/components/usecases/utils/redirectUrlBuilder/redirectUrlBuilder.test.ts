@@ -29,7 +29,7 @@ describe('redirectUrlBuilder', () => {
               .host('server')
               .endpoint('/users/register')
               .build();
-            expect(redirectUrl).to.equal('http://localhost:5000/api/users/register');
+            expect(redirectUrl).to.equal('http://localhost:5000/api/v1/users/register');
           });
         });
         context('with query strings', () => {
@@ -40,7 +40,7 @@ describe('redirectUrlBuilder', () => {
               .encodeQueryStringObj(defaultQueryStrings)
               .build();
             expect(redirectUrl).to.equal(
-              'http://localhost:5000/api/users/register?id=c29tZSBpZA%3D%3D&state=c29tZSBzdGF0ZQ%3D%3D'
+              'http://localhost:5000/api/v1/users/register?id=c29tZSBpZA%3D%3D&state=c29tZSBzdGF0ZQ%3D%3D'
             );
           });
         });
