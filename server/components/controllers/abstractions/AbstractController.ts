@@ -1,7 +1,7 @@
-import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { IUsecase } from '../../usecases/abstractions/IUsecase';
-import { ControllerResponse, IController } from './IController';
 import { QueryStringHandler } from '../../usecases/utils/queryStringHandler/queryStringHandler';
+import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { ControllerResponse, IController } from './IController';
 
 type ControllerParams = { successStatusCode: number; errorStatusCode: number };
 
@@ -12,7 +12,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   protected _errorStatusCode!: number;
 
   constructor(props: ControllerParams) {
-    const { successStatusCode, errorStatusCode } = props;
+    const { successStatusCode, errorStatusCode } = props
     this._successStatusCode = successStatusCode;
     this._errorStatusCode = errorStatusCode;
   }
@@ -62,3 +62,4 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
 }
 
 export { AbstractController, ControllerParams };
+

@@ -11,7 +11,18 @@
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+    "editor.codeActionsOnSave": [
+        "source.organizeImports",
+        "source.fixAll"
+    ],
+    "editor.formatOnSave": false,
+    "javascript.format.enable": false,
+    "eslint.alwaysShowStatus": true,
+    "eslint.options": {
+    "extensions": [ ".html", ".js", ".vue", ".jsx", ".ts" ]
     },
+    "eslint.validate": [ "javascript", "vue", "html", "typescriptvue", "typescript" ],
+    "eslint.workingDirectories": [
+        "./client"
+    ]
 }
