@@ -10,5 +10,9 @@ module.exports = {
   ],
   env: {
     node: true
+  },
+  rules: {
+    "no-non-null-assertion": "off",
+    "@typescript-eslint/no-this-alias": "off"
   }
 };
