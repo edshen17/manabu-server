@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { EditTeacherUsecase } from './editTeacherUsecase';
 import { makeEditTeacherUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { RouteData } from '../../abstractions/IUsecase';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { EditTeacherUsecase } from './editTeacherUsecase';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;
@@ -67,7 +67,7 @@ describe('editTeacherUsecase', () => {
           const editTeacherRes = await editTeacherUsecase.makeRequest(
             buildEditTeacherControllerData
           );
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -79,7 +79,7 @@ describe('editTeacherUsecase', () => {
           const editTeacherRes = await editTeacherUsecase.makeRequest(
             buildEditTeacherControllerData
           );
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -95,7 +95,7 @@ describe('editTeacherUsecase', () => {
           const editTeacherRes = await editTeacherUsecase.makeRequest(
             buildEditTeacherControllerData
           );
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

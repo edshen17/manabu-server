@@ -1,7 +1,7 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import {
   MinuteBankEntityBuildParams,
-  MinuteBankEntityBuildResponse,
+  MinuteBankEntityBuildResponse
 } from '../../../entities/minuteBank/minuteBankEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
@@ -37,3 +37,4 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
 }
 
 export { FakeDbMinuteBankFactory };
+

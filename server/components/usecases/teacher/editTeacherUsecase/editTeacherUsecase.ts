@@ -1,5 +1,4 @@
 import { JoinedUserDoc } from '../../../../models/User';
-import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   AbstractEditUsecase,
   AbstractEditUsecaseInitParams,

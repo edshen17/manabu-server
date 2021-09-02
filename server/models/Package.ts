@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
+import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 
 const PackageSchema = createSchema({
   lessonAmount: Type.number({ required: true }),

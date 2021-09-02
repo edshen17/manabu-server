@@ -1,3 +1,4 @@
+import { StringKeyObject } from '../../../types/custom';
 import { IDbService } from '../../dataAccess/abstractions/IDbService';
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
 import { AbstractQueryValidator } from '../../validators/abstractions/AbstractQueryValidator';
@@ -8,7 +9,12 @@ type ControllerData = {
   routeData: RouteData;
 };
 
-type RouteData = { params: any; body: any; query: any; endpointPath: string };
+type RouteData = {
+  params: StringKeyObject;
+  body: StringKeyObject;
+  query: StringKeyObject;
+  endpointPath: string;
+};
 
 type UsecaseInitParams<OptionalUsecaseInitParams> = RequiredUsecaseInitParams &
   OptionalUsecaseInitParams;

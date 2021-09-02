@@ -1,6 +1,6 @@
-import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { UserSchema } from './User';
+import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 import { PackageTransactionDoc, PackageTransactionSchema } from './PackageTransaction';
+import { UserSchema } from './User';
 
 const AppointmentSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),

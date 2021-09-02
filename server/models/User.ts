@@ -1,5 +1,5 @@
 import mongooseUniqueValidator from 'mongoose-unique-validator';
-import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
+import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 import { TeacherSchema } from './Teacher';
 
 const UserContactMethodEmbed = {

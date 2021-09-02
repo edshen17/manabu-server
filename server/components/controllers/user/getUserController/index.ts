@@ -1,7 +1,7 @@
-import { makeGetUserUsecase } from '../../../usecases/user/getUserUsecase';
-import { GetUserController } from './getUserController';
 import { StatusCodes } from 'http-status-codes';
+import { makeGetUserUsecase } from '../../../usecases/user/getUserUsecase';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
+import { GetUserController } from './getUserController';
 
 const makeGetUserController = new GetUserController({
   successStatusCode: StatusCodes.OK,

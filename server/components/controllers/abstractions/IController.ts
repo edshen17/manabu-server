@@ -1,6 +1,6 @@
-import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { IUsecase } from '../../usecases/abstractions/IUsecase';
 import { QueryStringHandler } from '../../usecases/utils/queryStringHandler/queryStringHandler';
+import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 export type ControllerResponse<UsecaseResponse> = {
   headers: {};

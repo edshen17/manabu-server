@@ -84,11 +84,11 @@ describe('minuteBankDbService', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
-          const findMinuteBanks = await minuteBankDbService.find({
+          await minuteBankDbService.find({
             searchQuery: { _id: fakeMinuteBank._id },
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -128,7 +128,7 @@ describe('minuteBankDbService', () => {
             modelToInsert,
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -196,7 +196,7 @@ describe('minuteBankDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateMinuteBank();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -252,7 +252,7 @@ describe('minuteBankDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deleteMinuteBank();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

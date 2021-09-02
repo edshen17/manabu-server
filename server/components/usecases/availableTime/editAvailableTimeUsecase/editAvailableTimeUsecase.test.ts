@@ -1,16 +1,16 @@
 import { expect } from 'chai';
+import { makeEditAvailableTimeUsecase } from '.';
+import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
-import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import {
   EditAvailableTimeUsecase,
   EditAvailableTimeUsecaseResponse,
 } from './editAvailableTimeUsecase';
-import { makeEditAvailableTimeUsecase } from '.';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;

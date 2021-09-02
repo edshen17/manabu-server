@@ -1,15 +1,14 @@
 import { expect } from 'chai';
-import { GetMinuteBankUsecase } from './getMinuteBankUsecase';
 import { makeGetMinuteBankUsecase } from '.';
-import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
-import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { JoinedUserDoc } from '../../../../models/User';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
+import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { GetMinuteBankUsecase } from './getMinuteBankUsecase';
 
 let getMinuteBankUsecase: GetMinuteBankUsecase;
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;

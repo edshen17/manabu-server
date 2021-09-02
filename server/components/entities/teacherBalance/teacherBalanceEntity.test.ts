@@ -1,8 +1,7 @@
 import { expect } from 'chai';
+import { convertStringToObjectId } from '../utils/convertStringToObjectId';
 import { makeTeacherBalanceEntity } from './index';
 import { TeacherBalanceEntity } from './teacherBalanceEntity';
-import mongoose from 'mongoose';
-import { convertStringToObjectId } from '../utils/convertStringToObjectId';
 let teacherBalanceEntity: TeacherBalanceEntity;
 
 before(async () => {

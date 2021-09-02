@@ -1,22 +1,23 @@
-import mongoose from 'mongoose';
 import 'dotenv/config';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
+import mongoose from 'mongoose';
+import { StringKeyObject } from '../../types/custom';
 
 type MakeDbResponse = {
   mongoose: typeof mongoose;
   dbURI: string;
-  mongoDbOptions: any;
+  mongoDbOptions: StringKeyObject;
 };
 const mongod = MongoMemoryReplSet.create({ replSet: { count: 1, storageEngine: 'wiredTiger' } });
 
 const makeDb = async (): Promise<MakeDbResponse> => {
-  let dbHost = 'staging'; // change to users
-  let URIOptions = 'retryWrites=false&w=majority';
+  const dbHost = 'staging'; // change to users
+  const URIOptions = 'retryWrites=false&w=majority';
   let dbURI = `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?${URIOptions}`;
   if (process.env.NODE_ENV != 'production') {
     dbURI = `${(await mongod).getUri()}&${URIOptions}`;
   }
-  const mongoDbOptions: any = {
+  const mongoDbOptions: StringKeyObject = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,

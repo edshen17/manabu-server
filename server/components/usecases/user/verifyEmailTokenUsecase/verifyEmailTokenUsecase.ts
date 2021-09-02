@@ -1,9 +1,8 @@
-import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
-import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
-import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { JoinedUserDoc } from '../../../../models/User';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
+import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 
 type OptionalVerifyEmailTokenUsecaseInitParams = {
   makeRedirectUrlBuilder: RedirectUrlBuilder;

@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';

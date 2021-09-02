@@ -60,7 +60,7 @@ abstract class AbstractEmbeddedDbService<
   };
 
   private _hasReserved$ = (str: string): boolean => {
-    let hasReserved$ = str.startsWith('$');
+    const hasReserved$ = str.startsWith('$');
     return hasReserved$;
   };
 

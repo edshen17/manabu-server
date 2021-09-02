@@ -1,15 +1,15 @@
 import { expect } from 'chai';
-import { DeleteAvailableTimeController } from './deleteAvailableTimeController';
 import { makeDeleteAvailableTimeController } from '.';
-import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
-import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { StringKeyObject } from '../../../../types/custom';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
+import { DeleteAvailableTimeUsecaseResponse } from '../../../usecases/availableTime/deleteAvailableTimeUsecase/deleteAvailableTimeUsecase';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerResponse } from '../../abstractions/IController';
-import { DeleteAvailableTimeUsecaseResponse } from '../../../usecases/availableTime/deleteAvailableTimeUsecase/deleteAvailableTimeUsecase';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { StringKeyObject } from '../../../../types/custom';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { DeleteAvailableTimeController } from './deleteAvailableTimeController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let deleteAvailableTimeController: DeleteAvailableTimeController;

@@ -1,15 +1,15 @@
+import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
+import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
+import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import {
   CreateUserUsecase,
   CreateUserUsecaseResponse,
 } from '../createUserUsecase/createUserUsecase';
-import { JoinedUserDoc } from '../../../../models/User';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
 type OptionalLoginUserUsecaseInitParams = {
   makeCreateUserUsecase: Promise<CreateUserUsecase>;
@@ -80,7 +80,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
     dbServiceAccessOptionsCopy.isOverrideView = true;
     const dbService = <UserDbService>this._dbService;
-    let user = await dbService.authenticateUser(
+    const user = await dbService.authenticateUser(
       {
         searchQuery: { email },
         dbServiceAccessOptions: dbServiceAccessOptionsCopy,

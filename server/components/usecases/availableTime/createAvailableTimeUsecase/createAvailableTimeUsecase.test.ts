@@ -1,16 +1,16 @@
 import { expect } from 'chai';
+import { makeCreateAvailableTimeUsecase } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { makeCreateAvailableTimeUsecase } from '.';
 import {
   CreateAvailableTimeUsecase,
   CreateAvailableTimeUsecaseResponse,
 } from './createAvailableTimeUsecase';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
-import { JoinedUserDoc } from '../../../../models/User';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbUserFactory: FakeDbUserFactory;

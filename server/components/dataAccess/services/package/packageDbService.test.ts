@@ -244,7 +244,7 @@ describe('packageDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updatePackage();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -301,7 +301,7 @@ describe('packageDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deletePackage();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

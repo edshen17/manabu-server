@@ -129,7 +129,7 @@ describe('availableTimeDbService', () => {
             modelToInsert,
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -197,7 +197,7 @@ describe('availableTimeDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateAvailableTime();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -253,7 +253,7 @@ describe('availableTimeDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deleteAvailableTime();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

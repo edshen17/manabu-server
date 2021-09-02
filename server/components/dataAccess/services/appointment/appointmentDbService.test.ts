@@ -232,7 +232,7 @@ describe('appointmentDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateAppointment();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -288,7 +288,7 @@ describe('appointmentDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deleteAppointment();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

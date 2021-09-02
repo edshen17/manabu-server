@@ -1,10 +1,10 @@
 import fs from 'fs';
+import mjml from 'mjml';
 import nodemailer from 'nodemailer';
 import vue from 'vue';
 import { createRenderer } from 'vue-server-renderer';
-import mjml from 'mjml';
-import { EmailHandler } from './emailHandler';
 import { makeUserDbService } from '../../../dataAccess/services/user';
+import { EmailHandler } from './emailHandler';
 
 const makeEmailHandler = new EmailHandler().init({
   nodemailer,

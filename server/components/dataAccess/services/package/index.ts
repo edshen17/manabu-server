@@ -1,10 +1,10 @@
-import { makeDb } from '../..';
-import { PackageDbService } from './packageDbService';
 import cloneDeep from 'clone-deep';
-import { makeTeacherDbService } from '../teacher';
 import deepEqual from 'deep-equal';
-import { makeCacheDbService } from '../cache';
+import { makeDb } from '../..';
 import { Package } from '../../../../models/Package';
+import { makeCacheDbService } from '../cache';
+import { makeTeacherDbService } from '../teacher';
+import { PackageDbService } from './packageDbService';
 
 const makePackageDbService = new PackageDbService().init({
   makeDb,

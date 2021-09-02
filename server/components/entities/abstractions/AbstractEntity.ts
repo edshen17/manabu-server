@@ -44,7 +44,9 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
       } & OptionalEntityInitParams,
       'makeEntityValidator'
     >
-  ): Promise<void> | void => {};
+  ): Promise<void> | void => {
+    return;
+  };
 }
 
 export { AbstractEntity };

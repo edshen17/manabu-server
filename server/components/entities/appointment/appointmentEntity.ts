@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongoose';
-import { DbServiceAccessOptions } from '../../dataAccess/abstractions/IDbService';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
 type OptionalAppointmentEntityInitParams = {};

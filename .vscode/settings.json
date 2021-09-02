@@ -24,5 +24,6 @@
     "eslint.validate": [ "javascript", "vue", "html", "typescriptvue", "typescript" ],
     "eslint.workingDirectories": [
         "./client"
-    ]
+    ],
+    "files.eol": "\n"
 }

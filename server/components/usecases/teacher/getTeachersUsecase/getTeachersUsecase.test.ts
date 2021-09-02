@@ -89,7 +89,7 @@ describe('getTeachersUsecase', () => {
       context('invalid inputs', () => {
         it('should throw an error if no user is found', async () => {
           try {
-            routeData.params = '60979db0bb31ed001589a1ea';
+            routeData.params = {};
             await getTeachers();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -97,7 +97,7 @@ describe('getTeachersUsecase', () => {
         });
         it('should throw an error if an invalid id is given', async () => {
           try {
-            routeData.params = 'undefined';
+            routeData.params = { _id: undefined };
             await getTeachers();
           } catch (err) {
             expect(err).to.be.an('error');

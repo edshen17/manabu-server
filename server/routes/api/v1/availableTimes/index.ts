@@ -3,8 +3,8 @@ import { makeCreateAvailableTimeController } from '../../../../components/contro
 import { makeDeleteAvailableTimeController } from '../../../../components/controllers/availableTime/deleteAvailableTimeController';
 import { makeEditAvailableTimeController } from '../../../../components/controllers/availableTime/editAvailableTimeController';
 import { makeGetAvailableTimesController } from '../../../../components/controllers/availableTime/getAvailableTimesController';
-
 import { makeJSONExpressCallback } from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
+
 const availableTime = express.Router();
 
 availableTime.get('/self', makeJSONExpressCallback.consume(makeGetAvailableTimesController));

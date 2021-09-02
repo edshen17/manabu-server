@@ -1,25 +1,25 @@
 import { expect } from 'chai';
-import { DbServiceAccessOptions } from '../../abstractions/IDbService';
-import { UserDbService } from './userDbService';
 import { makeUserDbService } from '.';
-import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
-import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { AppointmentDoc } from '../../../../models/Appointment';
+import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { JoinedUserDoc } from '../../../../models/User';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
+import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
+import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
+import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
+import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
-import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
-import { makePackageTransactionDbService } from '../packageTransaction';
-import { AppointmentDbService } from '../appointment/appointmentDbService';
+import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeAppointmentDbService } from '../appointment';
-import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
-import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
-import { AppointmentDoc } from '../../../../models/Appointment';
-import { JoinedUserDoc } from '../../../../models/User';
-import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
-import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
-import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
+import { AppointmentDbService } from '../appointment/appointmentDbService';
 import { makeMinuteBankDbService } from '../minuteBank';
+import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
+import { makePackageTransactionDbService } from '../packageTransaction';
+import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
+import { UserDbService } from './userDbService';
 
 let userDbService: UserDbService;
 let packageTransactionDbService: PackageTransactionDbService;
@@ -203,7 +203,7 @@ describe('userDbService', () => {
             _id: fakeUser._id,
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err).to.be.an('error');
           expect(err.message).to.equal('Access denied.');
         }
@@ -383,7 +383,7 @@ describe('userDbService', () => {
             updateQuery: { profileImageUrl: 'updated image' },
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

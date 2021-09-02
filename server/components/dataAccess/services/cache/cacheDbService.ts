@@ -73,7 +73,7 @@ class CacheDbService {
   }): Promise<any> => {
     const { hashKey, key, value, ttlMs } = props;
     const isValueString = typeof value === 'string';
-    let valueToStore = isValueString ? value : JSON.stringify(value);
+    const valueToStore = isValueString ? value : JSON.stringify(value);
     await this._redisClient.hset(hashKey, key, valueToStore);
     this._redisClient.expire(hashKey, ttlMs);
   };

@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { PackageTransactionEntity } from './packageTransactionEntity';
 import { makePackageTransactionEntityValidator } from '../../validators/packageTransaction/entity';
+import { PackageTransactionEntity } from './packageTransactionEntity';
 
 const makePackageTransactionEntity = new PackageTransactionEntity().init({
   dayjs,

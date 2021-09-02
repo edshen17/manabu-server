@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { makeFakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeAvailableTimeEntity } from './index';
 import { AvailableTimeEntity } from './availableTimeEntity';
+import { makeAvailableTimeEntity } from './index';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let availableTimeEntity: AvailableTimeEntity;

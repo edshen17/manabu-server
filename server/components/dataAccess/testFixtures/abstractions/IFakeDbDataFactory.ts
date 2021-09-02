@@ -1,5 +1,5 @@
 import { IEntity } from '../../../entities/abstractions/IEntity';
-import { DbServiceAccessOptions, IDbService } from '../../abstractions/IDbService';
+import { IDbService } from '../../abstractions/IDbService';
 
 type FakeDbDataFactoryInitParams<
   OptionalFakeDbDataFactoryInitParams,

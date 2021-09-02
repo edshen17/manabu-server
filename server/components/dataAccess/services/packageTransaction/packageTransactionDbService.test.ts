@@ -159,7 +159,7 @@ describe('packageTransactionDbService', () => {
             modelToInsert,
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -234,7 +234,7 @@ describe('packageTransactionDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updatePackageTransaction();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -291,7 +291,7 @@ describe('packageTransactionDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deletePackageTransaction();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

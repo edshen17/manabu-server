@@ -1,13 +1,13 @@
 import { expect } from 'chai';
+import { JoinedUserDoc } from '../../../../models/User';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { RouteData } from '../../abstractions/IUsecase';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { GetUserUsecase } from './getUserUsecase';
 import { makeGetUserUsecase } from './index';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
-import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { RouteData } from '../../abstractions/IUsecase';
-import { JoinedUserDoc } from '../../../../models/User';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 let getUserUsecase: GetUserUsecase;
 let fakeDbUserFactory: FakeDbUserFactory;
@@ -75,7 +75,7 @@ describe('getUserUsecase', () => {
       context('invalid inputs', () => {
         it('should throw an error if no user is found', async () => {
           try {
-            routeData.params = '60979db0bb31ed001589a1ea';
+            routeData.params = {};
             await getUser();
           } catch (err) {
             expect(err).to.be.an('error');
@@ -83,7 +83,7 @@ describe('getUserUsecase', () => {
         });
         it('should throw an error if an invalid id is given', async () => {
           try {
-            routeData.params = 'undefined';
+            routeData.params = { _id: 'undefined' };
             await getUser();
           } catch (err) {
             expect(err).to.be.an('error');

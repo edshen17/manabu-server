@@ -1,7 +1,7 @@
-import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
-import { JoinedUserDoc, UserSchema } from './User';
-import { PackageDoc, PackageSchema } from './Package';
+import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 import { LocationData } from '../components/entities/utils/locationDataHandler/locationDataHandler';
+import { PackageDoc, PackageSchema } from './Package';
+import { JoinedUserDoc, UserSchema } from './User';
 
 const PackageTransactionSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),

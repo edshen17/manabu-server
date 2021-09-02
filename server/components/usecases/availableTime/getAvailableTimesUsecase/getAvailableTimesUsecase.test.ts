@@ -54,7 +54,7 @@ describe('getAvailableTimesUsecase', () => {
       context('invalid inputs', () => {
         it('should throw an error if an invalid id is given', async () => {
           try {
-            routeData.params = 'undefined';
+            routeData.params = {};
             await getAvailableTimes();
           } catch (err) {
             expect(err).to.be.an('error');

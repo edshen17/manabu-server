@@ -1,8 +1,8 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import {
-  PACKAGE_ENTITY_NAME,
   PackageEntity,
   PackageEntityBuildResponse,
+  PACKAGE_ENTITY_NAME,
 } from '../package/packageEntity';
 
 type OptionalTeacherEntityInitParams = {

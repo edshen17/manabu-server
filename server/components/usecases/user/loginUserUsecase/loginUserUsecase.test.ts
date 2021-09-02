@@ -1,5 +1,5 @@
-import faker from 'faker';
 import { expect } from 'chai';
+import faker from 'faker';
 import { makeLoginUserUsecase } from '.';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';

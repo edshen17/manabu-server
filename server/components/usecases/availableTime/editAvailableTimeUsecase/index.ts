@@ -1,10 +1,10 @@
 import cloneDeep from 'clone-deep';
-import { EditAvailableTimeUsecase } from './editAvailableTimeUsecase';
-import { makeBaseQueryValidator } from '../../../validators/base/query';
-import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
-import { makeAvailableTimeParamsValidator } from '../../../validators/availableTime/params';
 import deepEqual from 'deep-equal';
+import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
 import { makeAvailableTimeEntityValidator } from '../../../validators/availableTime/entity';
+import { makeAvailableTimeParamsValidator } from '../../../validators/availableTime/params';
+import { makeBaseQueryValidator } from '../../../validators/base/query';
+import { EditAvailableTimeUsecase } from './editAvailableTimeUsecase';
 
 const makeEditAvailableTimeUsecase = new EditAvailableTimeUsecase().init({
   cloneDeep,

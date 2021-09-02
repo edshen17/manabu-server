@@ -3,7 +3,7 @@ import { makeBaseQueryValidator } from '.';
 import { BaseQueryValidator } from './baseQueryValidator';
 
 let baseQueryValidator: BaseQueryValidator;
-let props = {
+const props = {
   query: {},
 };
 

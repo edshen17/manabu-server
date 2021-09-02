@@ -1,5 +1,5 @@
-import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 
 type PartialTeacherBalanceDbServiceInitParams = {};
 

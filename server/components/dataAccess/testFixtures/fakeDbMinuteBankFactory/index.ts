@@ -12,3 +12,4 @@ const makeFakeDbMinuteBankFactory = new FakeDbMinuteBankFactory().init({
 });
 
 export { makeFakeDbMinuteBankFactory };
+

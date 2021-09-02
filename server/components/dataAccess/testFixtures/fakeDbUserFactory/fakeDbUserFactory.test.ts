@@ -1,5 +1,5 @@
-import faker from 'faker';
 import { expect } from 'chai';
+import faker from 'faker';
 import { makeFakeDbUserFactory } from '.';
 import { makeUserDbService } from '../../services/user';
 import { UserDbService } from '../../services/user/userDbService';

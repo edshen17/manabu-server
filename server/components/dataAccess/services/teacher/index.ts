@@ -1,10 +1,10 @@
-import { makeDb } from '../..';
-import { TeacherDbService } from './teacherDbService';
 import cloneDeep from 'clone-deep';
-import { makeUserDbService } from '../user';
 import deepEqual from 'deep-equal';
-import { makeCacheDbService } from '../cache';
+import { makeDb } from '../..';
 import { Teacher } from '../../../../models/Teacher';
+import { makeCacheDbService } from '../cache';
+import { makeUserDbService } from '../user';
+import { TeacherDbService } from './teacherDbService';
 
 const makeTeacherDbService = new TeacherDbService().init({
   makeDb,

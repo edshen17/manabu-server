@@ -167,7 +167,9 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return true;
   };
 
-  protected _isValidRouteDataTemplate = (controllerData: ControllerData): void => {};
+  protected _isValidRouteDataTemplate = (controllerData: ControllerData): void => {
+    return;
+  };
 
   public init = async (initParams: UsecaseInitParams<OptionalUsecaseInitParams>): Promise<this> => {
     const {
@@ -192,7 +194,9 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
       UsecaseInitParams<OptionalUsecaseInitParams>,
       'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
     >
-  ): Promise<void> | void => {};
+  ): Promise<void> | void => {
+    return;
+  };
 }
 
 export { AbstractUsecase, MakeRequestTemplateParams };

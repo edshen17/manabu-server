@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { makeCacheDbService } from './index';
 import { CacheDbService } from './cacheDbService';
+import { makeCacheDbService } from './index';
 
 let cacheDbService: CacheDbService;
 let hashKey: string;
@@ -65,7 +65,7 @@ describe('cacheDbService', () => {
         'MATCH (a:person)-[:knows]->(:person) RETURN a.name'
       );
       while (res.hasNext()) {
-        let record = res.next();
+        const record = res.next();
         expect(record.get('a.name')).to.equal('roi');
       }
     });

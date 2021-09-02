@@ -1,4 +1,4 @@
-import { createSchema, Type, typedModel, ExtractDoc } from 'ts-mongoose';
+import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 
 const RevenueSchema = createSchema({
   revenue: Type.object({ required: true }),

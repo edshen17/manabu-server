@@ -1,10 +1,10 @@
-import faker from 'faker';
 import { expect } from 'chai';
+import faker from 'faker';
+import { makeCreateUserUsecase } from '.';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { CreateUserUsecase, CreateUserUsecaseResponse } from './createUserUsecase';
-import { makeCreateUserUsecase } from '.';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let createUserUsecase: CreateUserUsecase;

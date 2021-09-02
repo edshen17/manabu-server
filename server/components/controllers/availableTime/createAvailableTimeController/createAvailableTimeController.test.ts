@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { CreateAvailableTimeController } from './createAvailableTimeController';
-import { makeCreateAvailableTimeController } from '.';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
-import { JoinedUserDoc } from '../../../../models/User';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
 import dayjs from 'dayjs';
+import { makeCreateAvailableTimeController } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { CreateAvailableTimeController } from './createAvailableTimeController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let createAvailableTimeController: CreateAvailableTimeController;

@@ -1,14 +1,14 @@
 import { expect } from 'chai';
+import { makeGetMinuteBankController } from '.';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
+import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory';
 import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeGetMinuteBankController } from '.';
-import { GetMinuteBankController } from './getMinuteBankController';
-import { JoinedUserDoc } from '../../../../models/User';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { GetMinuteBankController } from './getMinuteBankController';
 
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
 let fakeDbUserFactory: FakeDbUserFactory;

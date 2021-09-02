@@ -23,7 +23,7 @@ abstract class AbstractFakeDbDataFactory<
     const fakeBuildParams = buildParams || (await this._createFakeBuildParams());
     const fakeEntity = await this._entity.build(fakeBuildParams);
     const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
-    let fakeDbData = await this._dbService.insert({
+    const fakeDbData = await this._dbService.insert({
       modelToInsert: fakeEntity,
       dbServiceAccessOptions,
     });
@@ -59,7 +59,9 @@ abstract class AbstractFakeDbDataFactory<
       } & OptionalFakeDbDataFactoryInitParams,
       'makeEntity' | 'makeDbService' | 'cloneDeep'
     >
-  ): Promise<void> => {};
+  ): Promise<void> => {
+    return;
+  };
 }
 
 export { AbstractFakeDbDataFactory };

@@ -1,16 +1,16 @@
 import { expect } from 'chai';
+import { makeDeleteAvailableTimeUsecase } from '.';
+import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { makeDeleteAvailableTimeUsecase } from '.';
-import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
-import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
 import {
   DeleteAvailableTimeUsecase,
   DeleteAvailableTimeUsecaseResponse,
 } from './deleteAvailableTimeUsecase';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;

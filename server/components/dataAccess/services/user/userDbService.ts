@@ -1,9 +1,9 @@
+import { JoinedUserDoc } from '../../../../models/User';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import {
   DbServiceParams,
   DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
 } from '../../abstractions/IDbService';
-import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import { JoinedUserDoc } from '../../../../models/User';
 
 type OptionalUserDbServiceInitParams = {
   comparePassword: any;

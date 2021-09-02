@@ -1,11 +1,10 @@
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { JoinedUserDoc } from '../../../../models/User';
+import { NGramHandler } from '../../../entities/utils/nGramHandler/nGramHandler';
 import {
   AbstractEditUsecase,
   AbstractEditUsecaseInitParams,
 } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { JoinedUserDoc } from '../../../../models/User';
-import { NGramHandler } from '../../../entities/utils/nGramHandler/nGramHandler';
 
 type OptionalEditUserUsecaseInitParams = {
   makeNGramHandler: NGramHandler;

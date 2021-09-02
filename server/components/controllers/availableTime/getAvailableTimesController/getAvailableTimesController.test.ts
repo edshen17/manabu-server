@@ -1,18 +1,18 @@
 import { expect } from 'chai';
-import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
-import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import dayjs from 'dayjs';
+import { makeGetAvailableTimesController } from '.';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
+import { StringKeyObject } from '../../../../types/custom';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
+import { GetAvailableTimesUsecaseResponse } from '../../../usecases/availableTime/getAvailableTimesUsecase/getAvailableTimesUsecase';
+import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
+import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerResponse } from '../../abstractions/IController';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { makeGetAvailableTimesController } from '.';
+import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
 import { GetAvailableTimesController } from './getAvailableTimesController';
-import { GetAvailableTimesUsecaseResponse } from '../../../usecases/availableTime/getAvailableTimesUsecase/getAvailableTimesUsecase';
-import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
-import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
-import dayjs from 'dayjs';
-import { StringKeyObject } from '../../../../types/custom';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let getAvailableTimesController: GetAvailableTimesController;

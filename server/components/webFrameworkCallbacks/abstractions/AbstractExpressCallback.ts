@@ -21,7 +21,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
         } else {
           this.consumeTemplate(res, body);
         }
-      } catch (err) {
+      } catch (err: any) {
         res.status(500).send({ err: err.message });
       }
     };

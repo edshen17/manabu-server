@@ -159,7 +159,7 @@ describe('teacherDbService', () => {
             _id: fakeTeacher.teacherData!._id,
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -264,7 +264,7 @@ describe('teacherDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateTeacher();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -329,7 +329,7 @@ describe('teacherDbService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deleteTeacher();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

@@ -3,18 +3,19 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Redis from 'ioredis';
 import { Graph } from 'redisgraph.js';
+import { StringKeyObject } from '../../../../types/custom';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CacheDbService } from './cacheDbService';
 dayjs.extend(customParseFormat);
 
-let clientOptions: {} = {
+const clientOptions: StringKeyObject = {
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
   password: process.env.REDIS_PASS,
 };
 
 const redisClient = new Redis(clientOptions);
-let redisGraph = new Graph('social-network', redisClient);
+const redisGraph = new Graph('social-network', redisClient);
 
 const makeCacheDbService = new CacheDbService().init({
   redisClient,

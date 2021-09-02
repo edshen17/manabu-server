@@ -138,7 +138,7 @@ describe('teacherBalanceService', () => {
             modelToInsert,
             dbServiceAccessOptions,
           });
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -204,7 +204,7 @@ describe('teacherBalanceService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await updateTeacherBalance();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });
@@ -260,7 +260,7 @@ describe('teacherBalanceService', () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         try {
           await deleteTeacherBalance();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

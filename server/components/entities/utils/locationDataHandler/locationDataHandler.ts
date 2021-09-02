@@ -86,8 +86,8 @@ class LocationDataHandler {
 
   private _sortByPrimaryContactMethod = (contactMethods: UserContactMethod[]) => {
     const sortedByPrimaryContactMethod = contactMethods.sort((a, b) => {
-      let aPrefOrder = a.isPrimaryMethod ? 1 : 0;
-      let bPrefOrder = b.isPrimaryMethod ? 1 : 0;
+      const aPrefOrder = a.isPrimaryMethod ? 1 : 0;
+      const bPrefOrder = b.isPrimaryMethod ? 1 : 0;
       return aPrefOrder - bPrefOrder;
     });
     return sortedByPrimaryContactMethod;

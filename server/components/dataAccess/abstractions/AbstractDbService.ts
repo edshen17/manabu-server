@@ -4,12 +4,12 @@ import { StringKeyObject } from '../../../types/custom';
 import { CacheDbService, TTL_MS } from '../services/cache/cacheDbService';
 import {
   DbServiceAccessOptions,
-  DbServiceModelViews,
-  IDbService,
   DbServiceInitParams,
+  DbServiceModelViews,
+  DB_SERVICE_CACHE_CLIENT,
   DB_SERVICE_JOIN_TYPE,
   DB_SERVICE_MODEL_VIEW,
-  DB_SERVICE_CACHE_CLIENT,
+  IDbService,
   PaginationOptions,
 } from './IDbService';
 
@@ -442,7 +442,9 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       DbServiceInitParams<OptionalDbServiceInitParams>,
       'makeDb' | 'cloneDeep' | 'dbModel' | 'makeCacheDbService'
     >
-  ): Promise<void> => {};
+  ): Promise<void> => {
+    return;
+  };
 
   public getDbServiceModelViews = (): DbServiceModelViews => {
     const dbServiceModelViews = this._getDbServiceModelViews();

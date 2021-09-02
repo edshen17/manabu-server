@@ -1,13 +1,13 @@
 import { expect } from 'chai';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { makeEditUserUsecase } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { RouteData } from '../../abstractions/IUsecase';
+import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 import { EditUserUsecase } from './editUserUsecase';
-import { makeEditUserUsecase } from '.';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { RouteData } from '../../abstractions/IUsecase';
-import { JoinedUserDoc } from '../../../../models/User';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
 let fakeDbUserFactory: FakeDbUserFactory;
 let controllerDataBuilder: ControllerDataBuilder;
@@ -117,7 +117,7 @@ describe('editUserUsecase', () => {
         currentAPIUser.userId = updaterUser._id;
         try {
           const updatedUser = await editUser();
-        } catch (err) {
+        } catch (err: any) {
           expect(err.message).to.equal('Access denied.');
         }
       });

@@ -1,10 +1,10 @@
 import cloneDeep from 'clone-deep';
-import { GetAvailableTimesUsecase } from './getAvailableTimesUsecase';
+import dayjs from 'dayjs';
 import deepEqual from 'deep-equal';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
-import dayjs from 'dayjs';
-import { makeUserParamsValidator } from '../../../validators/user/params';
 import { makeAvailableTimeQueryValidator } from '../../../validators/availableTime/query';
+import { makeUserParamsValidator } from '../../../validators/user/params';
+import { GetAvailableTimesUsecase } from './getAvailableTimesUsecase';
 
 const makeGetAvailableTimesUsecase = new GetAvailableTimesUsecase().init({
   makeDbService: makeAvailableTimeDbService,

@@ -1,8 +1,8 @@
-import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
-import { UserDbService } from '../user/userDbService';
-import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
 import { StringKeyObject } from '../../../../types/custom';
+import { AbstractDbService } from '../../abstractions/AbstractDbService';
+import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
+import { UserDbService } from '../user/userDbService';
 
 type OptionalMinuteBankDbServiceInitParams = {
   makeUserDbService: Promise<UserDbService>;

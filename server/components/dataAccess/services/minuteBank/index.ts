@@ -1,9 +1,9 @@
+import cloneDeep from 'clone-deep';
 import { makeDb } from '../..';
 import { MinuteBank } from '../../../../models/MinuteBank';
-import { MinuteBankDbService } from './minuteBankDbService';
-import cloneDeep from 'clone-deep';
-import { makeUserDbService } from '../user';
 import { makeCacheDbService } from '../cache';
+import { makeUserDbService } from '../user';
+import { MinuteBankDbService } from './minuteBankDbService';
 
 const makeMinuteBankDbService = new MinuteBankDbService().init({
   makeDb,

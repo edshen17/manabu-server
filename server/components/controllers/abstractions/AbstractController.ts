@@ -12,7 +12,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   protected _errorStatusCode!: number;
 
   constructor(props: ControllerParams) {
-    const { successStatusCode, errorStatusCode } = props
+    const { successStatusCode, errorStatusCode } = props;
     this._successStatusCode = successStatusCode;
     this._errorStatusCode = errorStatusCode;
   }
@@ -30,7 +30,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
         statusCode: this._successStatusCode,
         body: usecaseRes,
       };
-    } catch (err) {
+    } catch (err: any) {
       return {
         headers,
         statusCode: this._errorStatusCode,
@@ -62,4 +62,3 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
 }
 
 export { AbstractController, ControllerParams };
-
