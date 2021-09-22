@@ -4,7 +4,6 @@
       <mj-text color="#183b56" />
       <mj-font name="Work Sans" href="https://fonts.googleapis.com/css?family=Work+Sans:400,300,600" />
       <mj-all font-size="15px" line-height="26px" font-family="Work Sans,sans-serif,Arial" />
-
     </mj-attributes>
   </mj-head>
   <mj-body background-color="#ebf2fa">

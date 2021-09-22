@@ -1,9 +1,6 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
-import {
-  DbServiceAccessOptions,
-  PaginationOptions,
-} from '../../../dataAccess/abstractions/IDbService';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -35,7 +32,9 @@ class GetTeachersUsecase extends AbstractGetUsecase<
   }): Promise<JoinedUserDoc[]> => {
     const { query, dbServiceAccessOptions } = props;
     const searchQuery = this._processQuery(query);
-    const paginationOptions = this._getPaginationOptions(query);
+    const fallbackQuery = { page: 0, limit: 20 };
+    const sort = { 'teacherData.approvalDate': 1 };
+    const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
     const teachers = await this._dbService.find({
       searchQuery,
       dbServiceAccessOptions,
@@ -162,12 +161,6 @@ class GetTeachersUsecase extends AbstractGetUsecase<
         $in: lessonDurations,
       };
     }
-  };
-
-  private _getPaginationOptions = (query: StringKeyObject): PaginationOptions => {
-    const { page, limit } = query || { page: 0, limit: 20 };
-    const paginationOptions = { page, limit, sort: { 'teacherData.approvalDate': 1 } };
-    return paginationOptions;
   };
 }
 

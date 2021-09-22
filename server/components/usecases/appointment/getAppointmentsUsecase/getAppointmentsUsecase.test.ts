@@ -1,21 +1,24 @@
 // import { expect } from 'chai';
 // import dayjs from 'dayjs';
+// import { AppointmentDoc } from '../../../../models/Appointment';
+// import { makeFakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/fakeDbAppointmentFactory';
+// import { FakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
 // import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 // import { RouteData } from '../../abstractions/IUsecase';
 // import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 // import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
 
-// let getAvailableTimesUsecase: GetAvailableTimesUsecase;
+// let getAppointmentsUsecase: GetAppointmentsUsecase;
 // let controllerDataBuilder: ControllerDataBuilder;
 // let routeData: RouteData;
 // let currentAPIUser: CurrentAPIUser;
-// let fakeAvailableTime: AvailableTimeDoc;
-// let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;
+// let fakeAppointment: AppointmentDoc;
+// let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
 
 // before(async () => {
-//   getAvailableTimesUsecase = await makeGetAvailableTimesUsecase;
+//     getAppointmentsUsecase = await makeGetAppointmentsUsecase;
 //   controllerDataBuilder = makeControllerDataBuilder;
-//   fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
+//   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
 // });
 
 // beforeEach(async () => {

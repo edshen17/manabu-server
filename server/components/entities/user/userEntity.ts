@@ -109,7 +109,7 @@ class UserEntity extends AbstractEntity<
       name,
       email,
       password: encryptedPassword,
-      profileImageUrl: profileImageUrl || '',
+      profileImageUrl: profileImageUrl || `https://avatars.dicebear.com/api/initials/${name}.svg`,
       profileBio: '',
       createdDate: new Date(),
       languages: [],

@@ -70,7 +70,7 @@ beforeEach(async () => {
   secondAppointment = body.appointments[1];
 });
 
-describe('createAppointmentsTimeController', () => {
+describe('createAppointmentsController', () => {
   describe('makeRequest', () => {
     const createAppointments = async () => {
       const createAppointmentsHttpRequest = iHttpRequestBuilder

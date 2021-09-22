@@ -65,6 +65,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   }): Promise<AppointmentDoc[]> => {
     const { appointments, dbServiceAccessOptions } = props;
     const modelToInsert: AppointmentEntityBuildResponse[] = [];
+    // all go through or none go through
     for (const appointment of appointments) {
       await this._createAppointment({ ...props, appointment, modelToInsert });
     }
@@ -73,7 +74,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       modelToInsert,
       dbServiceAccessOptions,
     });
-    await this._reduceAppointments(savedDbAppointments);
+    await this._decrementAppointmentCount(savedDbAppointments);
     await this._splitAvailableTimeBrancher(savedDbAppointments);
     return savedDbAppointments;
   };
@@ -180,7 +181,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _reduceAppointments = async (appointments: AppointmentDoc[]): Promise<void> => {
+  private _decrementAppointmentCount = async (appointments: AppointmentDoc[]): Promise<void> => {
     const packageTransactionId = appointments[0].packageTransactionId;
     const dbServiceAccessOptions =
       this._packageTransactionDbService.getBaseDbServiceAccessOptions();

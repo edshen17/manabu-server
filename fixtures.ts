@@ -5,7 +5,8 @@ const mochaGlobalSetup = () => {
 };
 
 const mochaGlobalTeardown = async () => {
-  (await mongod).stop(true);
+  (await mongod).stop();
+  // (await mongod).cleanup();
 };
 
 export { mochaGlobalSetup, mochaGlobalTeardown };

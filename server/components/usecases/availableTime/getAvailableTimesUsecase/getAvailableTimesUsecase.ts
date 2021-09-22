@@ -1,10 +1,7 @@
 import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
-import {
-  DbServiceAccessOptions,
-  PaginationOptions,
-} from '../../../dataAccess/abstractions/IDbService';
+import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -43,7 +40,9 @@ class GetAvailableTimesUsecase extends AbstractGetUsecase<
   }): Promise<AvailableTimeDoc[]> => {
     const { userId, query, dbServiceAccessOptions } = props;
     const searchQuery = this._processQuery({ query, userId });
-    const paginationOptions = this._getPaginationOptions(query);
+    const fallbackQuery = { page: 0, limit: 24 * 7 * 2 };
+    const sort = { startDate: 1 };
+    const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
     const availableTimes = await this._dbService.find({
       searchQuery,
       dbServiceAccessOptions,
@@ -68,12 +67,6 @@ class GetAvailableTimesUsecase extends AbstractGetUsecase<
       },
     };
     return searchQuery;
-  };
-
-  private _getPaginationOptions = (query: StringKeyObject): PaginationOptions => {
-    const { page, limit } = query || { page: 0, limit: 30 };
-    const paginationOptions = { page, limit, sort: { startDate: 1 } };
-    return paginationOptions;
   };
 
   protected _initTemplate = async (

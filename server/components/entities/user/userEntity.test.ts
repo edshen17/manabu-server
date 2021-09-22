@@ -23,7 +23,9 @@ describe('user entity', () => {
           expect(testEntity.name).to.equal('test');
           expect(testEntity.password).to.not.equal('pass');
           expect(testEntity.email).to.equal('test@gmail.com');
-          expect(testEntity.profileImageUrl).to.equal('');
+          expect(testEntity.profileImageUrl).to.equal(
+            'https://avatars.dicebear.com/api/initials/test.svg'
+          );
           expect(testEntity.verificationToken).to.not.equal('');
           expect(testEntity.nameNGrams).to.not.equal('');
         }

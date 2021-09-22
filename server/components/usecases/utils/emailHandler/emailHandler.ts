@@ -100,7 +100,8 @@ class EmailHandler {
       data: { ...data, dirname },
       template,
     });
-    const html = this._mjml(await this._createRenderer().renderToString(app)).html;
+    const renderer = await this._createRenderer().renderToString(app);
+    const html = this._mjml(renderer).html;
     return html;
   };
 
