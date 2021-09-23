@@ -30,7 +30,7 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   ): Promise<EditAvailableTimeUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions } = props;
     const { availableTimeId } = params;
-    const availableTime = await this._editDbAvailableTime({
+    const availableTime = await this._editAvailableTime({
       availableTimeId,
       body,
       dbServiceAccessOptions,
@@ -41,7 +41,7 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
     return usecaseRes;
   };
 
-  private _editDbAvailableTime = async (props: {
+  private _editAvailableTime = async (props: {
     availableTimeId: ObjectId;
     body: any;
     dbServiceAccessOptions: DbServiceAccessOptions;

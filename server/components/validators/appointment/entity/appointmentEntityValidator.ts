@@ -33,8 +33,6 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
-      startDate: this._joi.date().forbidden(),
-      endDate: this._joi.date().forbidden(),
       isPast: this._joi.boolean().forbidden(),
       createdDate: this._joi.date().forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
