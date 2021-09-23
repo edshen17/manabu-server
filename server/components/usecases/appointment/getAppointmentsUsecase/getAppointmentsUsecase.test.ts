@@ -63,15 +63,19 @@ describe('getAppointmentsUsecase', () => {
       }
     };
 
+    const testAppointmentError = async () => {
+      try {
+        await getAppointments();
+      } catch (err) {
+        expect(err).to.be.an('error');
+      }
+    };
+
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if an invalid id is given', async () => {
-          try {
-            routeData.params = {};
-            await getAppointments();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          routeData.params = {};
+          await testAppointmentError();
         });
       });
       context('valid inputs', () => {

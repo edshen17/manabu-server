@@ -101,7 +101,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     let isResourceOwner = false;
     if (hasResourceAccessCheck) {
       const resourceId = params[`${paramIdName}`];
-      const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+      const dbServiceAccessOptions = this._dbService.getOverrideDbServiceAccessOptions();
       const resourceData = await this._dbService.findById({
         _id: resourceId,
         dbServiceAccessOptions,
