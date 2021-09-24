@@ -42,7 +42,10 @@ beforeEach(async () => {
       appointmentId: fakeAppointment._id,
     },
     body: {},
-    query: {},
+    query: {
+      startDate: fakePackageTransaction.createdDate,
+      endDate: fakePackageTransaction.terminationDate,
+    },
     endpointPath: '',
   };
   currentAPIUser = {

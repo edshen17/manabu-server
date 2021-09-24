@@ -1,8 +1,11 @@
 import { expect } from 'chai';
 import { makeGetAppointmentsUsecase } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { makeFakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/fakeDbAppointmentFactory';
 import { FakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
+import { makeFakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory';
+import { FakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
@@ -14,26 +17,39 @@ let controllerDataBuilder: ControllerDataBuilder;
 let routeData: RouteData;
 let currentAPIUser: CurrentAPIUser;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
+let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
+let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
 
 before(async () => {
   getAppointmentsUsecase = await makeGetAppointmentsUsecase;
   controllerDataBuilder = makeControllerDataBuilder;
+  fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
 });
 
 beforeEach(async () => {
-  fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData();
+  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
+  fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
+    hostedById: fakePackageTransaction.hostedById,
+    reservedById: fakePackageTransaction.reservedById,
+    packageTransactionId: fakePackageTransaction._id,
+    startDate: fakePackageTransaction.createdDate,
+    endDate: fakePackageTransaction.terminationDate,
+  });
   routeData = {
     params: {
-      userId: fakeAppointment.hostedById,
+      userId: fakePackageTransaction.hostedById,
     },
     body: {},
-    query: {},
+    query: {
+      startDate: fakePackageTransaction.createdDate,
+      endDate: fakePackageTransaction.terminationDate,
+    },
     endpointPath: '',
   };
   currentAPIUser = {
-    userId: fakeAppointment.reservedById,
+    userId: fakePackageTransaction.reservedById,
     role: 'user',
   };
 });

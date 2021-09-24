@@ -77,10 +77,12 @@ describe('getAvailableTimesController', () => {
     };
     context('valid inputs', () => {
       context('as a non-admin user', () => {
-        context('viewing self', async () => {
-          params = {};
-          path = '/self';
-          await testValidGetAvailableTimes();
+        context('viewing self', () => {
+          it('should get the available times for the user', async () => {
+            params = {};
+            path = '/self';
+            await testValidGetAvailableTimes();
+          });
         });
         context('viewing other', () => {
           it('should get the availableTimes', async () => {

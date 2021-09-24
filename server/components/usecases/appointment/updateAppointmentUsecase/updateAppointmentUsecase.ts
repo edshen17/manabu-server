@@ -61,12 +61,12 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AppointmentDoc> => {
     const { appointmentId, body, dbServiceAccessOptions } = props;
-    const availableTime = await this._dbService.findOneAndUpdate({
+    const appointment = await this._dbService.findOneAndUpdate({
       _id: appointmentId,
       updateQuery: body,
       dbServiceAccessOptions,
     });
-    return availableTime;
+    return appointment;
   };
 
   protected _initTemplate = async (
