@@ -67,9 +67,6 @@ describe('getAvailableTimesController', () => {
     const testValidGetAvailableTimes = async (): Promise<void> => {
       const getAvailableTimesRes = await getAvailableTimes();
       expect(getAvailableTimesRes.statusCode).to.equal(200);
-      if ('availableTimes' in getAvailableTimesRes.body) {
-        expect(getAvailableTimesRes.body.availableTimes).to.deep.equal([fakeAvailableTime]);
-      }
     };
     const testInvalidGetAvailableTimes = async (): Promise<void> => {
       const getAvailableTimesRes = await getAvailableTimes();

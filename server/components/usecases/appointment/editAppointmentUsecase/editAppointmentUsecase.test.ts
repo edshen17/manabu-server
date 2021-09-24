@@ -10,7 +10,7 @@ import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHtt
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
-import { EditAppointmentUsecase } from './updateAppointmentUsecase';
+import { EditAppointmentUsecase } from './editAppointmentUsecase';
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;

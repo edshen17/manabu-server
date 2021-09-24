@@ -5,7 +5,7 @@ import { GetAppointmentsController } from './getAppointmentsController';
 
 const makeGetAppointmentsController = new GetAppointmentsController({
   successStatusCode: StatusCodes.OK,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.NOT_FOUND,
 }).init({ makeUsecase: makeGetAppointmentsUsecase, makeQueryStringHandler });
 
 export { makeGetAppointmentsController };

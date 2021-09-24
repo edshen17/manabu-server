@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { makeGetAppointmentsController } from '.';
+import { makeGetAppointmentController } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { StringKeyObject } from '../../../../types/custom';
@@ -7,17 +7,15 @@ import { makeFakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/f
 import { FakeDbAppointmentFactory } from '../../../dataAccess/testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
 import { makeFakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
-import { GetAppointmentsUsecaseResponse } from '../../../usecases/appointment/getAppointmentsUsecase/getAppointmentsUsecase';
-import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
-import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
+import { GetAppointmentUsecaseResponse } from '../../../usecases/appointment/getAppointmentUsecase/getAppointmentUsecase';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerResponse } from '../../abstractions/IController';
 import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
 import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
-import { GetAppointmentsController } from './getAppointmentsController';
+import { GetAppointmentController } from './getAppointmentController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
-let getAppointmentsController: GetAppointmentsController;
+let getAppointmentController: GetAppointmentController;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
 let fakePackageTransaction: PackageTransactionDoc;
@@ -25,13 +23,10 @@ let fakeAppointment: AppointmentDoc;
 let body: StringKeyObject;
 let currentAPIUser: CurrentAPIUser;
 let params: StringKeyObject;
-let path: string;
-let query: string;
-let queryStringHandler: QueryStringHandler;
 
 before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
-  getAppointmentsController = await makeGetAppointmentsController;
+  getAppointmentController = await makeGetAppointmentController;
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
@@ -42,84 +37,70 @@ before(async () => {
     startDate: fakePackageTransaction.createdDate,
     endDate: fakePackageTransaction.terminationDate,
   });
-  queryStringHandler = makeQueryStringHandler;
 });
 
 beforeEach(async () => {
   params = {
-    userId: fakePackageTransaction.hostedById,
+    appointmentId: fakeAppointment._id,
   };
   body = {};
   currentAPIUser = {
     role: 'user',
     userId: fakePackageTransaction.reservedById,
   };
-  const filter = queryStringHandler.encodeQueryStringObj({
-    startDate: fakePackageTransaction.createdDate,
-    endDate: fakePackageTransaction.terminationDate,
-  });
-  query = queryStringHandler.parseQueryString(filter);
-  path = '';
 });
 
-describe('getAppointmentsController', () => {
+describe('getAppointmentController', () => {
   describe('makeRequest', () => {
-    const getAppointments = async (): Promise<
-      ControllerResponse<GetAppointmentsUsecaseResponse>
-    > => {
-      const getAppointmentsHttpRequest = iHttpRequestBuilder
+    const getAppointment = async (): Promise<ControllerResponse<GetAppointmentUsecaseResponse>> => {
+      const getAppointmentHttpRequest = iHttpRequestBuilder
         .params(params)
         .body(body)
         .currentAPIUser(currentAPIUser)
-        .query(query)
-        .path(path)
         .build();
-      const getAppointmentsRes = await getAppointmentsController.makeRequest(
-        getAppointmentsHttpRequest
+      const getAppointmentRes = await getAppointmentController.makeRequest(
+        getAppointmentHttpRequest
       );
-      return getAppointmentsRes;
+      return getAppointmentRes;
     };
-    const testValidGetAppointments = async (): Promise<void> => {
-      const getAppointmentsRes = await getAppointments();
-      expect(getAppointmentsRes.statusCode).to.equal(200);
-      if ('appointments' in getAppointmentsRes.body) {
-        expect(getAppointmentsRes.body.appointments.length).to.deep.equal([fakeAppointment].length);
+    const testValidGetAppointment = async (): Promise<void> => {
+      const getAppointmentRes = await getAppointment();
+      expect(getAppointmentRes.statusCode).to.equal(200);
+      if ('appointment' in getAppointmentRes.body) {
+        expect(getAppointmentRes.body.appointment._id).to.deep.equal(fakeAppointment._id);
       }
     };
-    const testInvalidGetAppointments = async (): Promise<void> => {
-      const getAppointmentsRes = await getAppointments();
-      expect(getAppointmentsRes.statusCode).to.equal(404);
+    const testInvalidGetAppointment = async (): Promise<void> => {
+      const getAppointmentRes = await getAppointment();
+      expect(getAppointmentRes.statusCode).to.equal(404);
     };
     context('valid inputs', () => {
       context('as a non-admin user', () => {
         context('viewing self', () => {
-          it('should get the appointments for the user', async () => {
-            params = {};
-            path = '/self';
-            await testValidGetAppointments();
+          it('should get the appointment for the user (reservedBy)', async () => {
+            await testValidGetAppointment();
           });
         });
         context('viewing other', () => {
-          it('should get the appointments', async () => {
+          it('should throw an error', async () => {
             currentAPIUser.userId = undefined;
-            const getAppointmentsRes = await getAppointments();
-            await testValidGetAppointments();
+            await testInvalidGetAppointment();
           });
         });
       });
       context('as an admin', () => {
-        it('should get the appointments', async () => {
+        it('should get the appointment', async () => {
           currentAPIUser.role = 'admin';
-          await testValidGetAppointments();
+          await testValidGetAppointment();
         });
       });
     });
     context('invalid inputs', () => {
       it('should throw an error if user input is invalid', async () => {
         params = {
-          userId: 'some id',
+          appointmentId: 'some id',
         };
-        await testInvalidGetAppointments();
+        await testInvalidGetAppointment();
       });
     });
   });

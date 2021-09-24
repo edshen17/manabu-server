@@ -4,7 +4,7 @@ import { makeAppointmentDbService } from '../../../dataAccess/services/appointme
 import { makeAppointmentEntityValidator } from '../../../validators/appointment/entity';
 import { makeAppointmentParamsValidator } from '../../../validators/appointment/params';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
-import { EditAppointmentUsecase } from './updateAppointmentUsecase';
+import { EditAppointmentUsecase } from './editAppointmentUsecase';
 
 const makeEditAppointmentUsecase = new EditAppointmentUsecase().init({
   cloneDeep,

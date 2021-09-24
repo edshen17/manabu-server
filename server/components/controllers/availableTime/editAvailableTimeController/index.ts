@@ -5,7 +5,7 @@ import { EditAvailableTimeController } from './editAvailableTimeController';
 
 const makeEditAvailableTimeController = new EditAvailableTimeController({
   successStatusCode: StatusCodes.OK,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.UNAUTHORIZED,
 }).init({ makeUsecase: makeEditAvailableTimeUsecase, makeQueryStringHandler });
 
 export { makeEditAvailableTimeController };

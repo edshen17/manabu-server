@@ -67,19 +67,19 @@ describe('editAvailableTimeController', () => {
       it('should throw an error if user input is invalid', async () => {
         params = {};
         const editAvailableTimeRes = await editAvailableTime();
-        expect(editAvailableTimeRes.statusCode).to.equal(500);
+        expect(editAvailableTimeRes.statusCode).to.equal(401);
       });
       it('should throw an error if user does not have access to the resource', async () => {
         params = {
           availableTimeId: '507f191e810c19729de860ea',
         };
         const editAvailableTimeRes = await editAvailableTime();
-        expect(editAvailableTimeRes.statusCode).to.equal(500);
+        expect(editAvailableTimeRes.statusCode).to.equal(401);
       });
       it('should throw an error if the user is not logged in', async () => {
         currentAPIUser.userId = undefined;
         const editAvailableTimeRes = await editAvailableTime();
-        expect(editAvailableTimeRes.statusCode).to.equal(500);
+        expect(editAvailableTimeRes.statusCode).to.equal(401);
       });
     });
   });
