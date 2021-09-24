@@ -3,8 +3,8 @@ import faker from 'faker';
 import { makeLoginUserController } from '.';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { LoginUserController } from './loginUserController';
 
 let fakeDbUserFactory: FakeDbUserFactory;

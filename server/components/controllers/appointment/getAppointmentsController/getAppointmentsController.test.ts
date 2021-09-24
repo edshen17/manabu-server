@@ -12,8 +12,8 @@ import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandl
 import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerResponse } from '../../abstractions/IController';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { GetAppointmentsController } from './getAppointmentsController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;

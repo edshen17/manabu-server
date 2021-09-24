@@ -6,8 +6,8 @@ import { makeFakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fa
 import { FakeDbMinuteBankFactory } from '../../../dataAccess/testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { GetMinuteBankController } from './getMinuteBankController';
 
 let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;

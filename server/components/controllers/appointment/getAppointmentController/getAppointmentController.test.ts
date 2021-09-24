@@ -10,8 +10,8 @@ import { FakeDbPackageTransactionFactory } from '../../../dataAccess/testFixture
 import { GetAppointmentUsecaseResponse } from '../../../usecases/appointment/getAppointmentUsecase/getAppointmentUsecase';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerResponse } from '../../abstractions/IController';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { GetAppointmentController } from './getAppointmentController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;

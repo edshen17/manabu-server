@@ -7,8 +7,8 @@ import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fak
 import { DeleteAvailableTimeUsecaseResponse } from '../../../usecases/availableTime/deleteAvailableTimeUsecase/deleteAvailableTimeUsecase';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerResponse } from '../../abstractions/IController';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { DeleteAvailableTimeController } from './deleteAvailableTimeController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;

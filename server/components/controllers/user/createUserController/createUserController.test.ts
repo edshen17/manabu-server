@@ -3,8 +3,8 @@ import faker from 'faker';
 import { makeCreateUserController } from '.';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
 import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { CreateUserController } from './createUserController';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;

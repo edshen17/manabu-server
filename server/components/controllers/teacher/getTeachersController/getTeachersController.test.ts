@@ -6,8 +6,8 @@ import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUs
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
 import { QueryStringHandler } from '../../../usecases/utils/queryStringHandler/queryStringHandler';
-import { makeIHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder';
-import { IHttpRequestBuilder } from '../../testFixtures/iHttpRequestBuilder/iHttpRequestBuilder';
+import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
+import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { GetTeachersController } from './getTeachersController';
 
 let fakeDbUserFactory: FakeDbUserFactory;
