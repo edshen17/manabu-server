@@ -5,8 +5,8 @@ import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures
 import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
 import {
   EditAvailableTimeUsecase,
   EditAvailableTimeUsecaseResponse,

@@ -7,8 +7,8 @@ import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUs
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
 import { GetTeachersUsecase } from './getTeachersUsecase';
 
 let getTeachersUsecase: GetTeachersUsecase;

@@ -3,8 +3,8 @@ import faker from 'faker';
 import { makeLoginUserUsecase } from '.';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
-import { makeControllerDataBuilder } from '../../testFixtures/controllerDataBuilder';
-import { ControllerDataBuilder } from '../../testFixtures/controllerDataBuilder/controllerDataBuilder';
+import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
+import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
 import { LoginUserUsecase } from './loginUserUsecase';
 
 let fakeDbUserFactory: FakeDbUserFactory;

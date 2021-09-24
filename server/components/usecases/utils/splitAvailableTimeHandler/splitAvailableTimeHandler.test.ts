@@ -74,7 +74,7 @@ describe('splitAvailableTimeHandler', () => {
       return updatedAvailableTime;
     };
     context("appointment startTime is the same as availableTime's startTime", () => {
-      it('should split the availableTime so that starts at the end of the appointment', async () => {
+      it('should split the availableTime so that it starts at the end of the appointment', async () => {
         const splitAvailableTimeParams = {
           availableTimeStartDate: dayjs().toDate(),
           availableTimeEndDate: dayjs().add(3, 'hour').toDate(),
