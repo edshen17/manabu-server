@@ -1,4 +1,5 @@
 import express from 'express';
+import { makeGetAppointmentsController } from '../../../../components/controllers/appointment/getAppointmentsController';
 import { makeGetAvailableTimesController } from '../../../../components/controllers/availableTime/getAvailableTimesController';
 import { makeCreateUserController } from '../../../../components/controllers/user/createUserController';
 import { makeEditUserController } from '../../../../components/controllers/user/editUserController';
@@ -16,6 +17,7 @@ users.get(
   '/:userId/availableTimes',
   makeJSONExpressCallback.consume(makeGetAvailableTimesController)
 );
+users.get('/:userId/appointments', makeJSONExpressCallback.consume(makeGetAppointmentsController));
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 users.use('/auth', auth);
 
