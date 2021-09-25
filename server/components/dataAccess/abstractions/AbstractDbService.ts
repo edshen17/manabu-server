@@ -341,15 +341,18 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   public findOneAndUpdate = async (dbServiceParams: {
     searchQuery?: StringKeyObject;
     updateQuery?: StringKeyObject;
+    queryOptions?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, session } = dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, session, queryOptions } =
+      dbServiceParams;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
       .findOneAndUpdate(searchQuery, updateQuery, {
         fields: modelView,
         new: true,
+        ...queryOptions,
       })
       .session(session)
       .lean();
@@ -365,14 +368,17 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     searchQuery?: StringKeyObject;
     updateQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    queryOptions?: StringKeyObject;
     session?: StringKeyObject;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, session } = dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions, session } =
+      dbServiceParams;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
       .updateMany(searchQuery, updateQuery, {
         fields: modelView,
         new: true,
+        ...queryOptions,
       })
       .session(session)
       .lean();

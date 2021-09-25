@@ -19,6 +19,7 @@ type DbServiceParams = {
   modelToInsert?: StringKeyObject;
   modelsToInsert?: StringKeyObject[];
   updateQuery?: StringKeyObject;
+  queryOptions?: StringKeyObject;
   paginationOptions?: PaginationOptions;
   session?: StringKeyObject;
 };

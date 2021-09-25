@@ -164,7 +164,9 @@ abstract class AbstractEmbeddedDbService<
     modelToInsert?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
-    throw new Error('Cannot insert an embedded document. Use findOneAndUpdate/updateMany instead.');
+    throw new Error(
+      'Cannot insert an embedded document. Use findOneAndUpdate/updateMany on the parent document instead.'
+    );
   };
 
   public insertMany = async (dbServiceParams: {
@@ -172,22 +174,24 @@ abstract class AbstractEmbeddedDbService<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
     throw new Error(
-      'Cannot insert many embedded documents. Use findOneAndUpdate/updateMany instead.'
+      'Cannot insert many embedded documents. Use findOneAndUpdate/updateMany on the parent document instead.'
     );
   };
 
   public findOneAndUpdate = async (dbServiceParams: {
     searchQuery?: {};
     updateQuery?: {};
+    queryOptions?: {};
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
+      queryOptions,
       dbServiceAccessOptions,
     });
     const dbQueryResult = await this._getDbQueryResult({
@@ -225,11 +229,12 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public updateMany = async (dbServiceParams: {
-    searchQuery?: {};
-    updateQuery?: {};
+    searchQuery?: StringKeyObject;
+    updateQuery?: StringKeyObject;
+    queryOptions?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
@@ -237,6 +242,7 @@ abstract class AbstractEmbeddedDbService<
       searchQuery: embeddedSearchQuery,
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
+      queryOptions,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,

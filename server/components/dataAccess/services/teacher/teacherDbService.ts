@@ -1,5 +1,4 @@
 import { TeacherDoc } from '../../../../models/Teacher';
-import { JoinedUserDoc } from '../../../../models/User';
 import {
   AbstractEmbeddedDbService,
   AbstractEmbeddedDbServiceInitParams,
@@ -11,7 +10,7 @@ type OptionalTeacherDbServiceInitParams = {};
 
 class TeacherDbService extends AbstractEmbeddedDbService<
   OptionalTeacherDbServiceInitParams,
-  TeacherDoc | JoinedUserDoc
+  TeacherDoc
 > {
   protected _getCacheDependencies = (): string[] => {
     return [

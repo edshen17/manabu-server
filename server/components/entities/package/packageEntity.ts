@@ -14,15 +14,21 @@ type PackageEntityBuildResponse = {
   lessonAmount: number;
   isOffering: boolean;
   packageType: string;
+  packageName: string;
   lessonDurations: number[];
   createdDate: Date;
   lastModifiedDate: Date;
 };
 
 enum PACKAGE_ENTITY_NAME {
-  LIGHT = 'Light Plan',
-  MODERATE = 'Moderate Plan',
-  MAINICHI = 'Mainichi Plan',
+  LIGHT = 'light plan',
+  MODERATE = 'moderate plan',
+  MAINICHI = 'mainichi plan',
+}
+
+enum PACKAGE_ENTITY_TYPE {
+  DEFAULT = 'default',
+  CUSTOM = 'custom',
 }
 
 class PackageEntity extends AbstractEntity<
@@ -47,4 +53,10 @@ class PackageEntity extends AbstractEntity<
   };
 }
 
-export { PackageEntity, PackageEntityBuildResponse, PackageEntityBuildParams, PACKAGE_ENTITY_NAME };
+export {
+  PackageEntity,
+  PackageEntityBuildResponse,
+  PackageEntityBuildParams,
+  PACKAGE_ENTITY_NAME,
+  PACKAGE_ENTITY_TYPE,
+};
