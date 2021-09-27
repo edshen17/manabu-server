@@ -25,7 +25,7 @@ before(async () => {
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
   routeData = {
     params: {
       userId: fakeTeacher._id,

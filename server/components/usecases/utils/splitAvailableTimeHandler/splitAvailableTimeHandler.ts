@@ -40,23 +40,21 @@ class SplitAvailableTimeHandler {
     const isSameStartDate =
       overlapAvailableTime.startDate.getTime() == appointment.startDate.getTime();
     const isSameEndDate = overlapAvailableTime.endDate.getTime() == appointment.endDate.getTime();
+    const updateAvailableTimeProps = { overlapAvailableTime, dbServiceAccessOptions };
     if (isSameStartDate) {
       await this._updateAvailableTime({
         updateQuery: { startDate: appointment.endDate },
-        overlapAvailableTime,
-        dbServiceAccessOptions,
+        ...updateAvailableTimeProps,
       });
     } else if (isSameEndDate) {
       await this._updateAvailableTime({
         updateQuery: { endDate: appointment.startDate },
-        overlapAvailableTime,
-        dbServiceAccessOptions,
+        ...updateAvailableTimeProps,
       });
     } else {
       await this._updateAvailableTime({
         updateQuery: { endDate: appointment.startDate },
-        overlapAvailableTime,
-        dbServiceAccessOptions,
+        ...updateAvailableTimeProps,
       });
       const modelToInsert = await this._availableTimeEntity.build({
         hostedById,

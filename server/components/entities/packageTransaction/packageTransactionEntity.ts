@@ -69,7 +69,7 @@ class PackageTransactionEntity extends AbstractEntity<
       transactionDate: new Date(),
       lessonDuration,
       priceData,
-      terminationDate: this._dayjs().add(1, 'month').toDate(),
+      terminationDate: this._dayjs().add(2, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       remainingReschedules: 5,

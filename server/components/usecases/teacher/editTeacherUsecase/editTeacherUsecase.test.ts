@@ -17,7 +17,7 @@ let routeData: RouteData;
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
   controllerDataBuilder = makeControllerDataBuilder;
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
   editTeacherUsecase = await makeEditTeacherUsecase;
 });
 
@@ -73,7 +73,7 @@ describe('editTeacherUsecase', () => {
       });
       it('should deny access when trying to update restricted properties (not self)', async () => {
         try {
-          const otherFakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+          const otherFakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
           routeData.params.teacherId = otherFakeTeacher._id;
           const buildEditTeacherControllerData = controllerDataBuilder.routeData(routeData).build();
           const editTeacherRes = await editTeacherUsecase.makeRequest(

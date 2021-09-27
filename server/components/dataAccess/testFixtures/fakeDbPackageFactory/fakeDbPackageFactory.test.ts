@@ -19,14 +19,14 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
 });
 
 describe('fakeDbPackageFactory', () => {
   describe('createFakeDbData', () => {
-    it('should create 3 fake db packages', async () => {
+    it('should create fake db packages', async () => {
       const fakePackages = await fakeDbPackageFactory.createFakePackages();
-      expect(fakePackages.length).to.equal(3);
+      expect(fakePackages.length).to.equal(4);
     });
   });
 });

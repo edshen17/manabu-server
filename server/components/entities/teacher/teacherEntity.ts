@@ -3,6 +3,7 @@ import {
   PackageEntity,
   PackageEntityBuildResponse,
   PACKAGE_ENTITY_NAME,
+  PACKAGE_ENTITY_TYPE,
 } from '../package/packageEntity';
 
 type OptionalTeacherEntityInitParams = {
@@ -59,21 +60,21 @@ class TeacherEntity extends AbstractEntity<
   private _createDefaultPackages = (): PackageEntityBuildResponse[] => {
     const lightPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 5,
-      packageType: 'default',
+      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
       packageName: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const moderatePackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 12,
-      packageType: 'default',
+      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
       packageName: PACKAGE_ENTITY_NAME.MODERATE,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const mainichiPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 22,
-      packageType: 'default',
+      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
       packageName: PACKAGE_ENTITY_NAME.MAINICHI,
       isOffering: true,
       lessonDurations: [30, 60],

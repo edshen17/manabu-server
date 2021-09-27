@@ -34,7 +34,7 @@ describe('fakeDbUserFactory', () => {
   });
   describe('createFakeDbTeacherWithDefaultPackages', () => {
     it('should create a fake db teacher with default packages', async () => {
-      const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+      const fakeDbTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
       const dbServiceAccessOptions = userDbService.getBaseDbServiceAccessOptions();
       const joinedTeacher = await userDbService.findById({
         _id: fakeDbTeacher._id,

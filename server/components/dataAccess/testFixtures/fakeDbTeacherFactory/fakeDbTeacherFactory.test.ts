@@ -12,7 +12,7 @@ describe('fakeDbTeacherFactory', () => {
   describe('createFakeDbData', () => {
     it('should create an fake teacher to embed', async () => {
       const newTeacher = await fakeDbTeacherFactory.createFakeDbData();
-      expect(newTeacher.packages.length).to.equal(3);
+      expect(newTeacher.packages.length).to.equal(4);
     });
   });
 });

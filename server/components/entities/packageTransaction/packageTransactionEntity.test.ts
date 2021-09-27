@@ -15,7 +15,7 @@ context('packageTransaction entity', () => {
   describe('build', async () => {
     context('given valid inputs', () => {
       it("should return a package transaction with the teacher's data", async () => {
-        const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+        const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
         const fakePackageTransaction = await packageTransactionEntity.build({
           hostedById: fakeTeacher._id,
           reservedById: fakeTeacher._id,

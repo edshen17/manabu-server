@@ -52,7 +52,14 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
       isOffering: true,
       lessonDurations: [30, 60],
     });
-    return [lightPackage, moderatePackage, mainichiPackage];
+    const customPackage = this._entity.build({
+      lessonAmount: 6,
+      packageType: PACKAGE_ENTITY_TYPE.CUSTOM,
+      packageName: 'custom package name',
+      isOffering: true,
+      lessonDurations: [30, 60, 90],
+    });
+    return [lightPackage, moderatePackage, mainichiPackage, customPackage];
   };
 }
 

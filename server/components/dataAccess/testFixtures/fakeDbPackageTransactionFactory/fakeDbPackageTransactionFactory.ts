@@ -19,7 +19,7 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeBuildParams = async (): Promise<PackageTransactionEntityBuildParams> => {
-    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithPackages();
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
       hostedById: fakeTeacher._id,

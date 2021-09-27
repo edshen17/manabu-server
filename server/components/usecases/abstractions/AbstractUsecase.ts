@@ -91,6 +91,8 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return isSelf;
   };
 
+  // This works well for non-embedded dbServices. For usecases that use embedded dbServices, this does not work.
+  // The work around is to set hasResourceAccessCheck to false.
   private _isResourceOwner = async (props: {
     currentAPIUser: CurrentAPIUser;
     params: any;

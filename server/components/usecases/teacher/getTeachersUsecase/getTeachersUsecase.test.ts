@@ -29,7 +29,7 @@ before(async () => {
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
   const dbServiceAccessOptions = teacherDbService.getBaseDbServiceAccessOptions();
   await teacherDbService.findOneAndUpdate({
     searchQuery: { _id: fakeTeacher.teacherData!._id },

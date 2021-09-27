@@ -20,7 +20,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
 });
 
 describe('createAvailableTimeController', () => {

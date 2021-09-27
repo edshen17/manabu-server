@@ -17,7 +17,7 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   private _faker: any;
   private _fakeDbTeacherFactory!: FakeDbTeacherFactory;
 
-  public createFakeDbTeacherWithDefaultPackages = async (): Promise<JoinedUserDoc> => {
+  public createFakeDbTeacherWithPackages = async (): Promise<JoinedUserDoc> => {
     const fakeBuildParams = await this._createFakeBuildParams();
     fakeBuildParams.teacherData = await this._fakeDbTeacherFactory.createFakeData();
     const fakeDbTeacher = await this.createFakeDbData(fakeBuildParams);

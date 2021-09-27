@@ -12,7 +12,7 @@ let fakeUser: JoinedUserDoc;
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
   packageEntity = await makePackageEntity;
-  fakeUser = await fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+  fakeUser = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
 });
 
 context('package entity', () => {

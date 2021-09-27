@@ -21,7 +21,7 @@ class FakeDbAvailableTimeFactory extends AbstractFakeDbDataFactory<
   private _dayjs!: any;
 
   protected _createFakeBuildParams = async (): Promise<AvailableTimeEntityBuildParams> => {
-    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithPackages();
     const fakeBuildParams = {
       hostedById: fakeTeacher._id,
       startDate: this._dayjs().toDate(),

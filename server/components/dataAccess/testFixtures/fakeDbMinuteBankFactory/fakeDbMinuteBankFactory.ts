@@ -1,7 +1,7 @@
 import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import {
   MinuteBankEntityBuildParams,
-  MinuteBankEntityBuildResponse
+  MinuteBankEntityBuildResponse,
 } from '../../../entities/minuteBank/minuteBankEntity';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbUserFactory } from '../fakeDbUserFactory/fakeDbUserFactory';
@@ -19,7 +19,7 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeBuildParams = async (): Promise<MinuteBankEntityBuildParams> => {
-    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithDefaultPackages();
+    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithPackages();
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
       hostedById: fakeTeacher._id,
@@ -37,4 +37,3 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
 }
 
 export { FakeDbMinuteBankFactory };
-
