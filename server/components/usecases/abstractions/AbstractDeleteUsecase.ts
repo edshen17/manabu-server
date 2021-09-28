@@ -28,6 +28,16 @@ abstract class AbstractDeleteUsecase<
       buildParams: body,
     });
   };
+
+  protected _initTemplate = async (
+    optionalInitParams: Omit<
+      AbstractDeleteUsecaseInitParams<OptionalUsecaseInitParams>,
+      'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
+    >
+  ) => {
+    const { makeDeleteEntityValidator } = optionalInitParams;
+    this._deleteEntityValidator = makeDeleteEntityValidator;
+  };
 }
 
 export { AbstractDeleteUsecase, AbstractDeleteUsecaseInitParams };

@@ -2,10 +2,7 @@ import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../models/Package';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import {
-  AbstractDeleteUsecase,
-  AbstractDeleteUsecaseInitParams,
-} from '../../abstractions/AbstractDeleteUsecase';
+import { AbstractDeleteUsecase } from '../../abstractions/AbstractDeleteUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalDeletePackageUsecaseInitParams = {};
@@ -50,13 +47,6 @@ class DeletePackageUsecase extends AbstractDeleteUsecase<
       dbServiceAccessOptions,
     });
     return deletedPackage;
-  };
-
-  protected _initTemplate = async (
-    optionalInitParams: AbstractDeleteUsecaseInitParams<OptionalDeletePackageUsecaseInitParams>
-  ) => {
-    const { makeDeleteEntityValidator } = optionalInitParams;
-    this._deleteEntityValidator = makeDeleteEntityValidator;
   };
 }
 

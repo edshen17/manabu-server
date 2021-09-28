@@ -2,10 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import {
-  AbstractEditUsecase,
-  AbstractEditUsecaseInitParams,
-} from '../../abstractions/AbstractEditUsecase';
+import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalEditAvailableTimeUsecaseInitParams = {};
@@ -53,13 +50,6 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
       dbServiceAccessOptions,
     });
     return availableTime;
-  };
-
-  protected _initTemplate = async (
-    optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditAvailableTimeUsecaseInitParams>
-  ) => {
-    const { makeEditEntityValidator } = optionalInitParams;
-    this._editEntityValidator = makeEditEntityValidator;
   };
 }
 

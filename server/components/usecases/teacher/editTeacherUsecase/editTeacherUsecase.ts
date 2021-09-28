@@ -26,13 +26,6 @@ class EditTeacherUsecase extends AbstractEditUsecase<
     const usecaseRes = { user };
     return usecaseRes;
   };
-
-  protected _initTemplate = async (
-    optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditTeacherUsecaseInitParams>
-  ) => {
-    const { makeEditEntityValidator } = optionalInitParams;
-    this._editEntityValidator = makeEditEntityValidator;
-  };
 }
 
 export { EditTeacherUsecase, EditTeacherUsecaseResponse };

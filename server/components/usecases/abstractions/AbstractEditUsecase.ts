@@ -28,6 +28,16 @@ abstract class AbstractEditUsecase<
       buildParams: body,
     });
   };
+
+  protected _initTemplate = async (
+    optionalInitParams: Omit<
+      AbstractEditUsecaseInitParams<OptionalUsecaseInitParams>,
+      'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
+    >
+  ): Promise<void> => {
+    const { makeEditEntityValidator } = optionalInitParams;
+    this._editEntityValidator = makeEditEntityValidator;
+  };
 }
 
 export { AbstractEditUsecase, AbstractEditUsecaseInitParams };
