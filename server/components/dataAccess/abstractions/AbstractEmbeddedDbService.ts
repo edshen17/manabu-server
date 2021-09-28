@@ -252,6 +252,7 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
+  // NOTE: The DELETE methods return the new embedded doc. For example, if you remove 1 from [1,2], this returns [2].
   public findByIdAndDelete = async (dbServiceParams: {
     _id?: any;
     dbServiceAccessOptions: DbServiceAccessOptions;

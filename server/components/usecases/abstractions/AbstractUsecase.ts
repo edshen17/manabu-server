@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { StringKeyObject } from '../../../types/custom';
 import { DbServiceAccessOptions, IDbService } from '../../dataAccess/abstractions/IDbService';
 import { AbstractParamsValidator } from '../../validators/abstractions/AbstractParamsValidator';
@@ -91,8 +92,6 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     return isSelf;
   };
 
-  // This works well for non-embedded dbServices. For usecases that use embedded dbServices, this does not work.
-  // The work around is to set hasResourceAccessCheck to false.
   private _isResourceOwner = async (props: {
     currentAPIUser: CurrentAPIUser;
     params: any;
@@ -104,14 +103,12 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     if (hasResourceAccessCheck) {
       const resourceId = params[`${paramIdName}`];
       const dbServiceAccessOptions = this._dbService.getOverrideDbServiceAccessOptions();
+      dbServiceAccessOptions.isReturningParent = true;
       const resourceData = await this._dbService.findById({
         _id: resourceId,
         dbServiceAccessOptions,
       });
-      for (const property in resourceData) {
-        const value = resourceData[property];
-        isResourceOwner = isResourceOwner || this._deepEqual(value, userId);
-      }
+      isResourceOwner = this._processResourceOwnership({ resourceData, userId });
     }
     return isResourceOwner;
   };
@@ -121,6 +118,31 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
       hasResourceAccessCheck: false,
       paramIdName: '',
     };
+  };
+
+  protected _processResourceOwnership = (props: {
+    resourceData: StringKeyObject;
+    userId?: ObjectId | string;
+  }): boolean => {
+    const { resourceData, userId } = props;
+    let isResourceOwner = false;
+    for (const property in resourceData) {
+      const value = resourceData[property];
+      const isObject = !!value && value.constructor === Object;
+      const isArray = Array.isArray(value);
+      if (isObject) {
+        this._processResourceOwnership({ resourceData: value, userId });
+      } else if (isArray) {
+        value.map((embeddedObj: any) => {
+          isResourceOwner =
+            isResourceOwner ||
+            this._processResourceOwnership({ resourceData: embeddedObj, userId });
+        });
+      } else {
+        isResourceOwner = isResourceOwner || this._deepEqual(value, userId);
+      }
+    }
+    return isResourceOwner;
   };
 
   protected _isProtectedResource = (): boolean => {
@@ -146,7 +168,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse>
     currentAPIUser: CurrentAPIUser;
     isCurrentAPIUserPermitted: boolean;
     isSelf: boolean;
-  }) => {
+  }): DbServiceAccessOptions => {
     const { currentAPIUser, isCurrentAPIUserPermitted, isSelf } = props;
     const dbServiceAccessOptions: DbServiceAccessOptions = {
       isCurrentAPIUserPermitted,

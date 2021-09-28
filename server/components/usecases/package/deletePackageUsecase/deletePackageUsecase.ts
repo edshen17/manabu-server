@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../models/Package';
+import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   AbstractDeleteUsecase,
@@ -17,12 +18,18 @@ class DeletePackageUsecase extends AbstractDeleteUsecase<
   OptionalDeletePackageUsecaseInitParams,
   DeletePackageUsecaseResponse
 > {
+  protected _getResourceAccessData = (): StringKeyObject => {
+    return {
+      hasResourceAccessCheck: true,
+      paramIdName: 'packageId',
+    };
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<DeletePackageUsecaseResponse> => {
     const { params, dbServiceAccessOptions } = props;
     const { packageId } = params;
-    console.log(dbServiceAccessOptions, 'here1');
     const deletedPackage = await this._deletePackage({
       packageId,
       dbServiceAccessOptions,

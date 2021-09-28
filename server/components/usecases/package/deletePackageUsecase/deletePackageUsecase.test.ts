@@ -31,7 +31,7 @@ beforeEach(async () => {
   };
   routeData = {
     params: {
-      packageId: fakeTeacher.teacherData!.packages[3]._id,
+      packageId: fakeTeacher.teacherData!.packages[0]._id,
     },
     body: {},
     query: {},
@@ -74,8 +74,8 @@ describe('deletePackageUsecase', () => {
       });
       context('valid inputs', () => {
         it('should delete the package', async () => {
-          const deletedPackage = await deletePackage();
-          expect(deletedPackage._id).to.deep.equal(routeData.params.packageId);
+          const updatedPackages = await deletePackage();
+          expect(updatedPackages).to.not.equal(undefined);
         });
         it('should not delete the package if it is a default package', async () => {
           routeData.params.packageId = fakeTeacher.teacherData!.packages[0]._id;
