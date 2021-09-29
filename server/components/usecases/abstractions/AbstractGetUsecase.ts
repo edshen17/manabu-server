@@ -4,8 +4,9 @@ import { AbstractUsecase } from './AbstractUsecase';
 
 abstract class AbstractGetUsecase<
   OptionalUsecaseInitParams,
-  UsecaseResponse
-> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse> {
+  UsecaseResponse,
+  DbDoc
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc> {
   protected _isProtectedResource = (): boolean => {
     return false;
   };

@@ -21,7 +21,8 @@ type CreateAvailableTimeUsecaseResponse = {
 
 class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   OptionalCreateAvailableTimeUsecaseInitParams,
-  CreateAvailableTimeUsecaseResponse
+  CreateAvailableTimeUsecaseResponse,
+  AvailableTimeDoc
 > {
   private _availableTimeEntity!: AvailableTimeEntity;
   private _convertStringToObjectId!: any;

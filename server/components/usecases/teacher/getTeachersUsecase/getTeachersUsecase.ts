@@ -9,7 +9,8 @@ type GetTeachersUsecaseResponse = { teachers: JoinedUserDoc[] };
 
 class GetTeachersUsecase extends AbstractGetUsecase<
   OptionalGetTeachersUsecaseInitParams,
-  GetTeachersUsecaseResponse
+  GetTeachersUsecaseResponse,
+  JoinedUserDoc
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

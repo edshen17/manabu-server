@@ -11,10 +11,12 @@ type AbstractEditUsecaseInitParams<OptionalUsecaseInitParams> = {
 
 abstract class AbstractEditUsecase<
   OptionalUsecaseInitParams,
-  UsecaseResponse
+  UsecaseResponse,
+  DbDoc
 > extends AbstractUsecase<
   AbstractEditUsecaseInitParams<OptionalUsecaseInitParams>,
-  UsecaseResponse
+  UsecaseResponse,
+  DbDoc
 > {
   protected _editEntityValidator!: AbstractEntityValidator;
 

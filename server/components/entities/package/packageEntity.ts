@@ -24,6 +24,7 @@ enum PACKAGE_ENTITY_NAME {
   LIGHT = 'light plan',
   MODERATE = 'moderate plan',
   MAINICHI = 'mainichi plan',
+  CUSTOM = 'custom plan',
 }
 
 enum PACKAGE_ENTITY_TYPE {

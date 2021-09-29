@@ -2,16 +2,18 @@ import { IUsecase } from '../../usecases/abstractions/IUsecase';
 import { QueryStringHandler } from '../../usecases/utils/queryStringHandler/queryStringHandler';
 import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
 
-export type ControllerResponse<UsecaseResponse> = {
+type ControllerResponse<UsecaseResponse> = {
   headers: {};
   statusCode: number;
   body: UsecaseResponse | { err: string };
 };
 
-export interface IController<UsecaseResponse> {
+interface IController<UsecaseResponse> {
   makeRequest: (httpRequest: IHttpRequest) => Promise<ControllerResponse<UsecaseResponse>>;
   init: (props: {
-    makeUsecase: Promise<IUsecase<any, UsecaseResponse>>;
+    makeUsecase: Promise<IUsecase<any, UsecaseResponse, any>>;
     makeQueryStringHandler: QueryStringHandler;
   }) => Promise<this>;
 }
+
+export { ControllerResponse, IController };

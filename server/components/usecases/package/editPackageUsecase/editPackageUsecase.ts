@@ -13,7 +13,8 @@ type EditPackageUsecaseResponse = {
 
 class EditPackageUsecase extends AbstractEditUsecase<
   OptionalEditPackageUsecaseInitParams,
-  EditPackageUsecaseResponse
+  EditPackageUsecaseResponse,
+  PackageDoc
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
@@ -25,28 +26,31 @@ class EditPackageUsecase extends AbstractEditUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<EditPackageUsecaseResponse> => {
-    const { params, dbServiceAccessOptions } = props;
+    const { params, body, dbServiceAccessOptions } = props;
     const { packageId } = params;
-    const deletedPackage = await this._deletePackage({
+    const updatedPackage = await this._editAvailableTime({
       packageId,
+      body,
       dbServiceAccessOptions,
     });
     const usecaseRes = {
-      package: deletedPackage,
+      package: updatedPackage,
     };
     return usecaseRes;
   };
 
-  private _deletePackage = async (props: {
+  private _editAvailableTime = async (props: {
     packageId: ObjectId;
+    body: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<PackageDoc> => {
-    const { packageId, dbServiceAccessOptions } = props;
-    const deletedPackage = await this._dbService.findByIdAndDelete({
+    const { packageId, body, dbServiceAccessOptions } = props;
+    const availableTime = await this._dbService.findOneAndUpdate({
       _id: packageId,
+      updateQuery: body,
       dbServiceAccessOptions,
     });
-    return deletedPackage;
+    return availableTime;
   };
 }
 

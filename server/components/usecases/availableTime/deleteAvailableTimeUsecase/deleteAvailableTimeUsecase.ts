@@ -13,7 +13,8 @@ type DeleteAvailableTimeUsecaseResponse = {
 
 class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
   OptionalDeleteAvailableTimeUsecaseInitParams,
-  DeleteAvailableTimeUsecaseResponse
+  DeleteAvailableTimeUsecaseResponse,
+  AvailableTimeDoc
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {

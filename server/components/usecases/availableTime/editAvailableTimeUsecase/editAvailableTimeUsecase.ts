@@ -13,7 +13,8 @@ type EditAvailableTimeUsecaseResponse = {
 
 class EditAvailableTimeUsecase extends AbstractEditUsecase<
   OptionalEditAvailableTimeUsecaseInitParams,
-  EditAvailableTimeUsecaseResponse
+  EditAvailableTimeUsecaseResponse,
+  AvailableTimeDoc
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {

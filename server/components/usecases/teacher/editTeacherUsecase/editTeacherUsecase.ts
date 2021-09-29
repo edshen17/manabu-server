@@ -1,3 +1,4 @@
+import { TeacherDoc } from '../../../../models/Teacher';
 import { JoinedUserDoc } from '../../../../models/User';
 import {
   AbstractEditUsecase,
@@ -11,7 +12,8 @@ type EditTeacherUsecaseResponse = { user: JoinedUserDoc };
 
 class EditTeacherUsecase extends AbstractEditUsecase<
   AbstractEditUsecaseInitParams<OptionalEditTeacherUsecaseInitParams>,
-  EditTeacherUsecaseResponse
+  EditTeacherUsecaseResponse,
+  TeacherDoc | JoinedUserDoc
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

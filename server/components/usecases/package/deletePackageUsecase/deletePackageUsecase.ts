@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../models/Package';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { PACKAGE_ENTITY_TYPE } from '../../../entities/package/packageEntity';
 import { AbstractDeleteUsecase } from '../../abstractions/AbstractDeleteUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -13,7 +14,8 @@ type DeletePackageUsecaseResponse = {
 
 class DeletePackageUsecase extends AbstractDeleteUsecase<
   OptionalDeletePackageUsecaseInitParams,
-  DeletePackageUsecaseResponse
+  DeletePackageUsecaseResponse,
+  PackageDoc
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
@@ -42,11 +44,19 @@ class DeletePackageUsecase extends AbstractDeleteUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<PackageDoc> => {
     const { packageId, dbServiceAccessOptions } = props;
-    const deletedPackage = await this._dbService.findByIdAndDelete({
+    const packageToDelete: PackageDoc = await this._dbService.findById({
       _id: packageId,
       dbServiceAccessOptions,
     });
-    return deletedPackage;
+    const isDefaultPackage = packageToDelete.packageType == PACKAGE_ENTITY_TYPE.DEFAULT;
+    if (!isDefaultPackage) {
+      const deletedPackage = await this._dbService.findByIdAndDelete({
+        _id: packageId,
+        dbServiceAccessOptions,
+      });
+      return deletedPackage;
+    }
+    throw new Error('You cannot delete a default package.');
   };
 }
 

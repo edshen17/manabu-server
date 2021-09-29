@@ -10,7 +10,8 @@ type GetMinuteBankUsecaseResponse = { minuteBanks: MinuteBankDoc[] };
 
 class GetMinuteBankUsecase extends AbstractGetUsecase<
   OptionalGetMinuteBankUsecaseInitParams,
-  GetMinuteBankUsecaseResponse
+  GetMinuteBankUsecaseResponse,
+  MinuteBankDoc
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

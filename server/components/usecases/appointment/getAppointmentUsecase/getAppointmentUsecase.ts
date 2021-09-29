@@ -11,7 +11,8 @@ type GetAppointmentUsecaseResponse = { appointment: AppointmentDoc };
 
 class GetAppointmentUsecase extends AbstractGetUsecase<
   OptionalGetAppointmentUsecaseInitParams,
-  GetAppointmentUsecaseResponse
+  GetAppointmentUsecaseResponse,
+  AppointmentDoc
 > {
   protected _isProtectedResource = (): boolean => {
     return true;
@@ -48,11 +49,11 @@ class GetAppointmentUsecase extends AbstractGetUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AppointmentDoc> => {
     const { appointmentId, dbServiceAccessOptions } = props;
-    const appointments = await this._dbService.findById({
+    const appointment = await this._dbService.findById({
       _id: appointmentId,
       dbServiceAccessOptions,
     });
-    return appointments;
+    return appointment;
   };
 }
 

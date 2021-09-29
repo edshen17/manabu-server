@@ -52,12 +52,12 @@ class TeacherEntity extends AbstractEntity<
       studentCount: 0,
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-      packages: this._createDefaultPackages(),
+      packages: this._createPackages(),
     });
     return teacherEntity;
   };
 
-  private _createDefaultPackages = (): PackageEntityBuildResponse[] => {
+  private _createPackages = (): PackageEntityBuildResponse[] => {
     const lightPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 5,
       packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
@@ -79,7 +79,14 @@ class TeacherEntity extends AbstractEntity<
       isOffering: true,
       lessonDurations: [30, 60],
     });
-    return [lightPackage, moderatePackage, mainichiPackage];
+    const customPackage = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 10,
+      packageType: PACKAGE_ENTITY_TYPE.CUSTOM,
+      packageName: PACKAGE_ENTITY_NAME.CUSTOM,
+      isOffering: false,
+      lessonDurations: [30, 60],
+    });
+    return [lightPackage, moderatePackage, mainichiPackage, customPackage];
   };
 
   protected _initTemplate = async (

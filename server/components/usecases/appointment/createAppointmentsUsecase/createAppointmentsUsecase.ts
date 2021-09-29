@@ -32,7 +32,8 @@ type CreateAppointmentsUsecaseResponse = {
 
 class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   OptionalCreateAppointmentsUsecaseInitParams,
-  CreateAppointmentsUsecaseResponse
+  CreateAppointmentsUsecaseResponse,
+  AppointmentDoc
 > {
   private _appointmentEntity!: AppointmentEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;

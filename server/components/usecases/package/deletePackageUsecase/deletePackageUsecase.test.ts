@@ -31,7 +31,7 @@ beforeEach(async () => {
   };
   routeData = {
     params: {
-      packageId: fakeTeacher.teacherData!.packages[0]._id,
+      packageId: fakeTeacher.teacherData!.packages[3]._id,
     },
     body: {},
     query: {},

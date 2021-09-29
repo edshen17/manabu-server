@@ -1,5 +1,5 @@
 // import { expect } from 'chai';
-// import { makeDeletePackageUsecase } from '.';
+// import { makeEditPackageUsecase } from '.';
 // import { JoinedUserDoc } from '../../../../models/User';
 // import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
@@ -7,18 +7,18 @@
 // import { RouteData } from '../../abstractions/IUsecase';
 // import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 // import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
-// import { DeletePackageUsecase } from './deletePackageUsecase';
+// import { EditPackageUsecase } from './editPackageUsecase';
 
 // let controllerDataBuilder: ControllerDataBuilder;
 // let fakeDbUserFactory: FakeDbUserFactory;
-// let deletePackageUsecase: DeletePackageUsecase;
+// let editPackageUsecase: EditPackageUsecase;
 // let routeData: RouteData;
 // let fakeTeacher: JoinedUserDoc;
 // let currentAPIUser: CurrentAPIUser;
 
 // before(async () => {
 //   controllerDataBuilder = makeControllerDataBuilder;
-//   deletePackageUsecase = await makeDeletePackageUsecase;
+//   editPackageUsecase = await makeEditPackageUsecase;
 //   fakeDbUserFactory = await makeFakeDbUserFactory;
 // });
 
@@ -39,21 +39,21 @@
 //   };
 // });
 
-// describe('deletePackageUsecase', () => {
+// describe('editPackageUsecase', () => {
 //   describe('makeRequest', () => {
-//     const deletePackage = async () => {
+//     const editPackage = async () => {
 //       const controllerData = controllerDataBuilder
 //         .currentAPIUser(currentAPIUser)
 //         .routeData(routeData)
 //         .build();
-//       const deletePackagesRes = await deletePackageUsecase.makeRequest(controllerData);
-//       const deletedPackage = deletePackagesRes.package;
-//       return deletedPackage;
+//       const editPackagesRes = await editPackageUsecase.makeRequest(controllerData);
+//       const editedPackage = editPackagesRes.package;
+//       return editedPackage;
 //     };
 
 //     const testPackageError = async () => {
 //       try {
-//         await deletePackage();
+//         await editPackage();
 //       } catch (err) {
 //         expect(err).to.be.an('error');
 //       }
@@ -73,13 +73,9 @@
 //         });
 //       });
 //       context('valid inputs', () => {
-//         it('should delete the package', async () => {
-//           const updatedPackages = await deletePackage();
+//         it('should edit the package and change package type if', async () => {
+//           const updatedPackages = await editPackage();
 //           expect(updatedPackages).to.not.equal(undefined);
-//         });
-//         it('should not delete the package if it is a default package', async () => {
-//           routeData.params.packageId = fakeTeacher.teacherData!.packages[0]._id;
-//           await testPackageError();
 //         });
 //       });
 //     });

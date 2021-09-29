@@ -13,7 +13,8 @@ type GetAppointmentsUsecaseResponse = { appointments: AppointmentDoc[] };
 
 class GetAppointmentsUsecase extends AbstractGetUsecase<
   OptionalGetAppointmentsUsecaseInitParams,
-  GetAppointmentsUsecaseResponse
+  GetAppointmentsUsecaseResponse,
+  AppointmentDoc
 > {
   private _dayjs!: any;
 

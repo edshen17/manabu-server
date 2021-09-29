@@ -11,10 +11,12 @@ type AbstractDeleteUsecaseInitParams<OptionalUsecaseInitParams> = {
 
 abstract class AbstractDeleteUsecase<
   OptionalUsecaseInitParams,
-  UsecaseResponse
+  UsecaseResponse,
+  DbDoc
 > extends AbstractUsecase<
   AbstractDeleteUsecaseInitParams<OptionalUsecaseInitParams>,
-  UsecaseResponse
+  UsecaseResponse,
+  DbDoc
 > {
   protected _deleteEntityValidator!: AbstractEntityValidator;
 

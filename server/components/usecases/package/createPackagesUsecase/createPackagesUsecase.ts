@@ -20,7 +20,8 @@ type CreatePackagesUsecaseResponse = {
 
 class CreatePackagesUsecase extends AbstractCreateUsecase<
   OptionalCreatePackagesUsecaseInitParams,
-  CreatePackagesUsecaseResponse
+  CreatePackagesUsecaseResponse,
+  TeacherDoc
 > {
   private _packageEntity!: PackageEntity;
 

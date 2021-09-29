@@ -11,7 +11,8 @@ type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectUrl: strin
 
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   OptionalVerifyEmailTokenUsecaseInitParams,
-  VerifyEmailTokenUsecaseResponse
+  VerifyEmailTokenUsecaseResponse,
+  JoinedUserDoc
 > {
   private _redirectUrlBuilder!: RedirectUrlBuilder;
 

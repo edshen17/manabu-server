@@ -17,7 +17,8 @@ type EditAppointmentUsecaseResponse = {
 
 class EditAppointmentUsecase extends AbstractEditUsecase<
   OptionalEditAppointmentUsecaseInitParams,
-  EditAppointmentUsecaseResponse
+  EditAppointmentUsecaseResponse,
+  AppointmentDoc
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {

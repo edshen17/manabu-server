@@ -54,7 +54,8 @@ type CreateUserUsecaseResponse = {
 
 class CreateUserUsecase extends AbstractCreateUsecase<
   OptionalCreateUserUsecaseInitParams,
-  CreateUserUsecaseResponse
+  CreateUserUsecaseResponse,
+  JoinedUserDoc
 > {
   private _userEntity!: UserEntity;
   private _packageTransactionEntity!: PackageTransactionEntity;

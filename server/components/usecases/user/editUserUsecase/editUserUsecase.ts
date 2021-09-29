@@ -14,7 +14,8 @@ type EditUserUsecaseResponse = { user: JoinedUserDoc };
 
 class EditUserUsecase extends AbstractEditUsecase<
   AbstractEditUsecaseInitParams<OptionalEditUserUsecaseInitParams>,
-  EditUserUsecaseResponse
+  EditUserUsecaseResponse,
+  JoinedUserDoc
 > {
   private _nGramHandler!: NGramHandler;
 

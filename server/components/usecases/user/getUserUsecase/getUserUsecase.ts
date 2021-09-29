@@ -9,7 +9,8 @@ type GetUserUsecaseResponse = { user: JoinedUserDoc };
 
 class GetUserUsecase extends AbstractGetUsecase<
   OptionalGetUserUsecaseInitParams,
-  GetUserUsecaseResponse
+  GetUserUsecaseResponse,
+  JoinedUserDoc
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

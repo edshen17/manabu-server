@@ -26,7 +26,8 @@ enum SERVER_LOGIN_ENDPOINTS {
 
 class LoginUserUsecase extends AbstractCreateUsecase<
   OptionalLoginUserUsecaseInitParams,
-  LoginUserUsecaseResponse
+  LoginUserUsecaseResponse,
+  JoinedUserDoc
 > {
   private _createUserUsecase!: CreateUserUsecase;
   private _oauth2Client!: any;

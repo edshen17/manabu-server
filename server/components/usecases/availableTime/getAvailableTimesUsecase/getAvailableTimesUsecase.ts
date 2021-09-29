@@ -12,7 +12,8 @@ type GetAvailableTimesUsecaseResponse = { availableTimes: AvailableTimeDoc[] };
 
 class GetAvailableTimesUsecase extends AbstractGetUsecase<
   OptionalGetAvailableTimesUsecaseInitParams,
-  GetAvailableTimesUsecaseResponse
+  GetAvailableTimesUsecaseResponse,
+  AvailableTimeDoc
 > {
   private _dayjs!: any;
 
