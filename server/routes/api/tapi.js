@@ -1,5 +1,3 @@
-const router = express.Router();
-const VerifyToken = require('../../components/VerifyToken');
 const scheduler = require('../../components/scheduler/schedule');
 const { fetchExchangeRate } = require('../../components/scheduler/exchangeRateFetcher');
 const verifyTransactionData = require('../../components/verifyTransactionData');

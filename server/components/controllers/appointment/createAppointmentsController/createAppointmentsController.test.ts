@@ -10,6 +10,8 @@ import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures
 import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
 import { makeFakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
+import { AppointmentEntityBuildParams } from '../../../entities/appointment/appointmentEntity';
+import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
 import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
@@ -25,8 +27,8 @@ let fakeAvailableTime: AvailableTimeDoc;
 let currentAPIUser: CurrentAPIUser;
 let body: StringKeyObject;
 let createAppointmentsController: CreateAppointmentsController;
-let firstAppointment: any;
-let secondAppointment: any;
+let firstAppointment: AppointmentEntityBuildParams;
+let secondAppointment: AppointmentEntityBuildParams;
 
 before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
@@ -95,7 +97,7 @@ describe('createAppointmentsController', () => {
     });
     context('invalid inputs', () => {
       it('should throw an error if user input is invalid', async () => {
-        firstAppointment.startDate = 'some id';
+        firstAppointment.startDate = new Date();
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
@@ -104,15 +106,16 @@ describe('createAppointmentsController', () => {
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
+
       it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
-        firstAppointment.hostedById = '507f1f77bcf86cd799439011';
+        firstAppointment.hostedById = convertStringToObjectId('507f1f77bcf86cd799439011');
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
       it('should throw an error if body contains an foreign keys that do not exist', async () => {
-        firstAppointment.hostedById = '507f1f77bcf86cd799439011';
-        firstAppointment.reservedById = '507f1f77bcf86cd799439011';
-        firstAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
+        firstAppointment.hostedById = convertStringToObjectId('507f1f77bcf86cd799439011');
+        firstAppointment.reservedById = convertStringToObjectId('507f1f77bcf86cd799439011');
+        firstAppointment.packageTransactionId = convertStringToObjectId('507f1f77bcf86cd799439011');
         const createAppointmentsRes = await createAppointments();
         expect(createAppointmentsRes.statusCode).to.equal(500);
       });
