@@ -8,8 +8,14 @@ import { makeJSONExpressCallback } from '../../../../components/webFrameworkCall
 const appointments = express.Router();
 
 appointments.get('/self', makeJSONExpressCallback.consume(makeGetAppointmentsController));
+
 appointments.get('/:appointmentId', makeJSONExpressCallback.consume(makeGetAppointmentController));
+
 appointments.post('/create', makeJSONExpressCallback.consume(makeCreateAppointmentsController));
-appointments.put('/:appointmentId', makeJSONExpressCallback.consume(makeEditAppointmentController));
+
+appointments.patch(
+  '/:appointmentId',
+  makeJSONExpressCallback.consume(makeEditAppointmentController)
+);
 
 export { appointments };

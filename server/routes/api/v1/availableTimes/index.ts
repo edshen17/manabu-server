@@ -5,20 +5,20 @@ import { makeEditAvailableTimeController } from '../../../../components/controll
 import { makeGetAvailableTimesController } from '../../../../components/controllers/availableTime/getAvailableTimesController';
 import { makeJSONExpressCallback } from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 
-const availableTime = express.Router();
+const availableTimes = express.Router();
 
-availableTime.get('/self', makeJSONExpressCallback.consume(makeGetAvailableTimesController));
+availableTimes.get('/self', makeJSONExpressCallback.consume(makeGetAvailableTimesController));
 
-availableTime.put(
+availableTimes.patch(
   '/:availableTimeId',
   makeJSONExpressCallback.consume(makeEditAvailableTimeController)
 );
 
-availableTime.delete(
+availableTimes.delete(
   '/:availableTimeId',
   makeJSONExpressCallback.consume(makeDeleteAvailableTimeController)
 );
 
-availableTime.post('/create', makeJSONExpressCallback.consume(makeCreateAvailableTimeController));
+availableTimes.post('/create', makeJSONExpressCallback.consume(makeCreateAvailableTimeController));
 
-export { availableTime };
+export { availableTimes };

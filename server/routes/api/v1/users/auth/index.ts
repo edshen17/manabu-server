@@ -11,7 +11,9 @@ auth.get(
   '/emailToken/:verificationToken/verify',
   makeRedirectExpressCallback.consume(makeVerifyEmailTokenController)
 );
+
 auth.post('/base/login', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
+
 auth.get('/google/login', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
 
 export { auth };

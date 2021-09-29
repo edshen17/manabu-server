@@ -12,13 +12,18 @@ import { auth } from './auth/index';
 const users = express.Router();
 
 users.get('/:userId', makeJSONExpressCallback.consume(makeGetUserController));
+
 users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController));
+
 users.get(
   '/:userId/availableTimes',
   makeJSONExpressCallback.consume(makeGetAvailableTimesController)
 );
+
 users.get('/:userId/appointments', makeJSONExpressCallback.consume(makeGetAppointmentsController));
+
 users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
+
 users.use('/auth', auth);
 
 export { users };
