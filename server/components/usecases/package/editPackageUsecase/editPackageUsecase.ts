@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../models/Package';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { PACKAGE_ENTITY_TYPE } from '../../../entities/package/packageEntity';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -28,7 +29,7 @@ class EditPackageUsecase extends AbstractEditUsecase<
   ): Promise<EditPackageUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions } = props;
     const { packageId } = params;
-    const updatedPackage = await this._editAvailableTime({
+    const updatedPackage = await this._editPackage({
       packageId,
       body,
       dbServiceAccessOptions,
@@ -39,18 +40,29 @@ class EditPackageUsecase extends AbstractEditUsecase<
     return usecaseRes;
   };
 
-  private _editAvailableTime = async (props: {
+  private _editPackage = async (props: {
     packageId: ObjectId;
     body: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<PackageDoc> => {
     const { packageId, body, dbServiceAccessOptions } = props;
-    const availableTime = await this._dbService.findOneAndUpdate({
+    const packageToUpdate = await this._dbService.findById({
       _id: packageId,
-      updateQuery: body,
       dbServiceAccessOptions,
     });
-    return availableTime;
+    const { lessonAmount, packageDesc, packageName } = body;
+    const isDefaultPackage = packageToUpdate.packageType == PACKAGE_ENTITY_TYPE.DEFAULT;
+    const isEditingDefaultPackageRestrictedFields =
+      isDefaultPackage && (lessonAmount || packageDesc || packageName);
+    if (!isEditingDefaultPackageRestrictedFields) {
+      const updatedPackage = await this._dbService.findOneAndUpdate({
+        searchQuery: { _id: packageId },
+        updateQuery: body,
+        dbServiceAccessOptions,
+      });
+      return updatedPackage;
+    }
+    throw new Error('You cannot edit those default fields.');
   };
 }
 

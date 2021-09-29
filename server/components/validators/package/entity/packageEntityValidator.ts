@@ -6,7 +6,7 @@ class PackageEntityValidator extends AbstractEntityValidator {
         currency: this._joi.string().max(5),
         hourlyRate: this._joi.number().min(0),
       }),
-      lessonAmount: this._joi.number().min(1),
+      lessonAmount: this._joi.number().min(1).max(30),
       isOffering: this._joi.boolean(),
       packageName: this._joi.string(),
       packageType: this._joi.string().valid('default', 'custom'),
