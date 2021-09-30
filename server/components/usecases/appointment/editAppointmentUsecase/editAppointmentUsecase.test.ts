@@ -77,11 +77,13 @@ describe('editAppointmentUsecase', () => {
     };
 
     const testAppointmentError = async () => {
+      let error;
       try {
-        await editAppointment();
+        error = await editAppointment();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {

@@ -14,7 +14,7 @@ before(() => {
 beforeEach(() => {
   props = {
     params: {
-      packageId: '605bc5ad9db900001528f77c',
+      packageTransactionId: '605bc5ad9db900001528f77c',
     },
   };
 });

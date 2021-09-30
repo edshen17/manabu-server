@@ -1,13 +1,14 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
-import { makeAppointmentParamsValidator } from '../../../validators/appointment/params';
-import { makeAppointmentQueryValidator } from '../../../validators/appointment/query';
+import { makeBaseQueryValidator } from '../../../validators/base/query';
+import { makePackageTransactionParamsValidator } from '../../../validators/packageTransaction/params';
+import { GetPackageTransactionUsecase } from './getPackageTransactionUsecase';
 
 const makeGetPackageTransactionUsecase = new GetPackageTransactionUsecase().init({
   makeDbService: makePackageTransactionDbService,
-  makeParamsValidator: makeAppointmentParamsValidator,
-  makeQueryValidator: makeAppointmentQueryValidator,
+  makeParamsValidator: makePackageTransactionParamsValidator,
+  makeQueryValidator: makeBaseQueryValidator,
   cloneDeep,
   deepEqual,
 });

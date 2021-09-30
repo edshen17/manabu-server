@@ -45,14 +45,16 @@ describe('getPackageTransactionUsecase', () => {
         .currentAPIUser(currentAPIUser)
         .routeData(routeData)
         .build();
-      const getAppointmentsRes = await getPackageTransactionUsecase.makeRequest(controllerData);
-      const packageTransactions = getAppointmentsRes.packageTransactions;
-      return packageTransactions;
+      const getPackageTransactionRes = await getPackageTransactionUsecase.makeRequest(
+        controllerData
+      );
+      const packageTransaction = getPackageTransactionRes.packageTransaction;
+      return packageTransaction;
     };
 
     const testPackageTransaction = async () => {
       const packageTransactions = await getPackageTransaction();
-      expect(packageTransactions.length > 0).to.equal(true);
+      expect(packageTransactions._id).to.deep.equal(fakePackageTransaction._id);
     };
 
     const testPackageTransactionError = async () => {
@@ -87,20 +89,8 @@ describe('getPackageTransactionUsecase', () => {
           });
           context('as an unlogged-in user', async () => {
             it('should throw an error', async () => {
-              currentAPIUser = { role: 'user', userId: undefined };
-              await testPackageTransactionError();
-            });
-          });
-        });
-        context('as an admin', () => {
-          context('viewing other', () => {
-            it("should get the user's packageTransactions", async () => {
               currentAPIUser.userId = undefined;
-              currentAPIUser.role = 'admin';
-              routeData.params = {
-                userId: fakePackageTransaction.hostedById,
-              };
-              await testPackageTransaction();
+              await testPackageTransactionError();
             });
           });
         });

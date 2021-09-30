@@ -43,8 +43,10 @@ describe('getPackageTransactionsUsecase', () => {
         .currentAPIUser(currentAPIUser)
         .routeData(routeData)
         .build();
-      const getAppointmentsRes = await getPackageTransactionsUsecase.makeRequest(controllerData);
-      const packageTransactions = getAppointmentsRes.packageTransactions;
+      const getPackageTransactionsRes = await getPackageTransactionsUsecase.makeRequest(
+        controllerData
+      );
+      const packageTransactions = getPackageTransactionsRes.packageTransactions;
       return packageTransactions;
     };
 

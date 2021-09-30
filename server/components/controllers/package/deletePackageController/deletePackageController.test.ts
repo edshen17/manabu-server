@@ -54,7 +54,6 @@ describe('deletePackageController', () => {
     context('valid inputs', () => {
       it('should delete the package', async () => {
         const deletePackageRes = await deletePackage();
-        console.log(deletePackageRes, 'here1');
         expect(deletePackageRes.statusCode).to.equal(200);
       });
       it('should throw error if deleting default package', async () => {

@@ -45,7 +45,7 @@ beforeEach(async () => {
   };
   body = {
     startDate: new Date(),
-    status: 'confirmed',
+    status: 'cancelled',
   };
   currentAPIUser = {
     role: 'user',
@@ -73,7 +73,7 @@ describe('editAppointmentController', () => {
         const editAppointmentRes = await editAppointment();
         expect(editAppointmentRes.statusCode).to.equal(200);
         if ('appointment' in editAppointmentRes.body) {
-          expect(editAppointmentRes.body.appointment).to.not.deep.equal(fakeAppointment);
+          expect(editAppointmentRes.body.appointment.status).to.equal('cancelled');
         }
       });
     });

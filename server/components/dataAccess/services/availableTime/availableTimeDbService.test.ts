@@ -84,14 +84,16 @@ describe('availableTimeDbService', () => {
     context('db access denied', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
+        let err;
         try {
-          const findByIdAvailableTime = await availableTimeDbService.findById({
+          err = await availableTimeDbService.findById({
             _id: fakeAvailableTime._id,
             dbServiceAccessOptions,
           });
         } catch (err) {
-          expect(err).to.be.an('error');
+          return;
         }
+        expect(err).to.be.an('error');
       });
     });
   });

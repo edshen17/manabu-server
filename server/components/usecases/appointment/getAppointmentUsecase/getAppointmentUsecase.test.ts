@@ -79,16 +79,19 @@ describe('getAppointmentUsecase', () => {
     };
 
     const testAppointmentError = async () => {
+      let error;
       try {
-        await getAppointment();
+        error = await getAppointment();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if an invalid id is given', async () => {
+          routeData.params = {};
           await testAppointmentError();
         });
       });
@@ -107,7 +110,7 @@ describe('getAppointmentUsecase', () => {
           });
           context('viewing other', () => {
             it('should throw an error', async () => {
-              currentAPIUser = { role: 'user', userId: undefined };
+              currentAPIUser.userId = undefined;
               await testAppointmentError();
             });
           });

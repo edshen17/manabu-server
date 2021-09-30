@@ -80,17 +80,21 @@ describe('getAppointmentsUsecase', () => {
     };
 
     const testAppointmentError = async () => {
+      let error;
       try {
-        await getAppointments();
+        error = await getAppointments();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if an invalid id is given', async () => {
-          routeData.params = {};
+          routeData.params = {
+            userId: 'some id',
+          };
           await testAppointmentError();
         });
       });

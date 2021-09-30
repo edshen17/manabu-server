@@ -33,18 +33,19 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     };
   };
 
-  public findOne = async (dbServiceParams: {
+  public findOne = async (props: {
     searchQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc> => {
-    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions, session } = props;
     const { modelView, modelViewName } = this._getDbServiceModelView(dbServiceAccessOptions);
     const cacheKey = this._getCacheKey({
       searchQuery,
       modelViewName,
       cacheClient: DB_SERVICE_CACHE_CLIENT.FIND_ONE,
     });
+    this._testAccessPermitted(dbServiceAccessOptions);
     const cacheData = await this._getCacheData(cacheKey);
     const dbQueryPromise = this._dbModel.findOne(searchQuery, modelView).session(session).lean();
     const storedData = await this._handleStoredData({
@@ -54,6 +55,13 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
     });
     return storedData;
+  };
+
+  private _testAccessPermitted = (dbServiceAccessOptions: DbServiceAccessOptions) => {
+    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
+    if (!isCurrentAPIUserPermitted) {
+      throw new Error('Access denied.');
+    }
   };
 
   private _getDbServiceModelView = (
@@ -91,7 +99,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     searchQuery?: StringKeyObject;
   }): Promise<any> => {
     const { dbServiceAccessOptions, dbQueryPromise } = props;
-    let dbQueryResult = await this._executeQuery({ dbServiceAccessOptions, dbQueryPromise });
+    let dbQueryResult = await this._executeQuery({ dbQueryPromise });
     const hasJoin = this._joinType != DB_SERVICE_JOIN_TYPE.NONE;
     const isResultArray = Array.isArray(dbQueryResult);
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
@@ -106,15 +114,8 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  private _executeQuery = async (props: {
-    dbServiceAccessOptions: DbServiceAccessOptions;
-    dbQueryPromise: Promise<any>;
-  }): Promise<any> => {
-    const { dbServiceAccessOptions, dbQueryPromise } = props;
-    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
-    if (!isCurrentAPIUserPermitted) {
-      throw new Error('Access denied.');
-    }
+  private _executeQuery = async (props: { dbQueryPromise: Promise<any> }): Promise<any> => {
+    const { dbQueryPromise } = props;
     const dbQueryResult = await dbQueryPromise.then((doc) => {
       return doc;
     });
@@ -249,18 +250,19 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return [];
   };
 
-  public findById = async (dbServiceParams: {
+  public findById = async (props: {
     _id?: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc> => {
-    const { _id, dbServiceAccessOptions, session } = dbServiceParams;
+    const { _id, dbServiceAccessOptions, session } = props;
     const { modelView, modelViewName } = this._getDbServiceModelView(dbServiceAccessOptions);
     const cacheKey = this._getCacheKey({
       searchQuery: { _id },
       modelViewName,
       cacheClient: DB_SERVICE_CACHE_CLIENT.FIND_BY_ID,
     });
+    this._testAccessPermitted(dbServiceAccessOptions);
     const cacheData = await this._getCacheData(cacheKey);
     const dbQueryPromise = this._dbModel.findById(_id, modelView).session(session).lean();
     const storedData = await this._handleStoredData({
@@ -272,13 +274,13 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return storedData;
   };
 
-  public find = async (dbServiceParams: {
+  public find = async (props: {
     searchQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     paginationOptions?: PaginationOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, paginationOptions, dbServiceAccessOptions, session } = dbServiceParams;
+    const { searchQuery, paginationOptions, dbServiceAccessOptions, session } = props;
     const { modelView, modelViewName } = this._getDbServiceModelView(dbServiceAccessOptions);
     const { page, limit, sort } = paginationOptions || {
       page: 0,
@@ -290,6 +292,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       modelViewName,
       cacheClient: DB_SERVICE_CACHE_CLIENT.FIND,
     });
+    this._testAccessPermitted(dbServiceAccessOptions);
     const cacheData = await this._getCacheData(cacheKey);
     const dbQueryPromise = this._dbModel
       .find(searchQuery, modelView)
@@ -307,11 +310,12 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return storedData;
   };
 
-  public insert = async (dbServiceParams: {
+  public insert = async (props: {
     modelToInsert?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<DbDoc> => {
-    const { modelToInsert, dbServiceAccessOptions } = dbServiceParams;
+    const { modelToInsert, dbServiceAccessOptions } = props;
+    this._testAccessPermitted(dbServiceAccessOptions);
     const insertedModel = await this._dbModel.create(modelToInsert).then((doc: any) => {
       return doc.toObject(); // lean
     });
@@ -320,13 +324,14 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  public insertMany = async (dbServiceParams: {
+  public insertMany = async (props: {
     modelToInsert?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc[]> => {
-    const { modelToInsert, dbServiceAccessOptions, session } = dbServiceParams;
+    const { modelToInsert, dbServiceAccessOptions, session } = props;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
+    this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.insertMany(modelToInsert, modelView, {
       lean: true,
       session,
@@ -338,16 +343,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  public findOneAndUpdate = async (dbServiceParams: {
+  public findOneAndUpdate = async (props: {
     searchQuery?: StringKeyObject;
     updateQuery?: StringKeyObject;
     queryOptions?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, session, queryOptions } =
-      dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, session, queryOptions } = props;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
+    this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
       .findOneAndUpdate(searchQuery, updateQuery, {
         fields: modelView,
@@ -364,16 +369,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  public updateMany = async (dbServiceParams: {
+  public updateMany = async (props: {
     searchQuery?: StringKeyObject;
     updateQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     queryOptions?: StringKeyObject;
     session?: StringKeyObject;
   }): Promise<DbDoc[]> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions, session } =
-      dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions, session } = props;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
+    this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
       .updateMany(searchQuery, updateQuery, {
         fields: modelView,
@@ -390,12 +395,13 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  public findByIdAndDelete = async (dbServiceParams: {
+  public findByIdAndDelete = async (props: {
     _id?: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc> => {
-    const { _id, dbServiceAccessOptions, session } = dbServiceParams;
+    const { _id, dbServiceAccessOptions, session } = props;
+    this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.findByIdAndDelete(_id).session(session).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -405,12 +411,13 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  public findOneAndDelete = async (dbServiceParams: {
+  public findOneAndDelete = async (props: {
     searchQuery?: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session?: StringKeyObject;
   }): Promise<DbDoc> => {
-    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions, session } = props;
+    this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.findOneAndDelete(searchQuery).session(session).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,

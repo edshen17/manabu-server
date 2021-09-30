@@ -1,11 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
-import { makeGetAppointmentUsecase } from '../../../usecases/appointment/getAppointmentUsecase';
+import { makeEditAppointmentUsecase } from '../../../usecases/appointment/editAppointmentUsecase';
 import { makeQueryStringHandler } from '../../../usecases/utils/queryStringHandler';
 import { EditAppointmentController } from './editAppointmentController';
 
 const makeEditAppointmentController = new EditAppointmentController({
   successStatusCode: StatusCodes.OK,
   errorStatusCode: StatusCodes.UNAUTHORIZED,
-}).init({ makeUsecase: makeGetAppointmentUsecase, makeQueryStringHandler });
+}).init({ makeUsecase: makeEditAppointmentUsecase, makeQueryStringHandler });
 
 export { makeEditAppointmentController };

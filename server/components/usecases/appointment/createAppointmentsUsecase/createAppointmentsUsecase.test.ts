@@ -112,64 +112,78 @@ describe('createAppointmentUsecase', () => {
           }
         });
         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
+          let error;
           try {
             firstAppointment.hostedById = '507f1f77bcf86cd799439011';
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
         it('should throw an error if body contains an foreign keys that do not exist', async () => {
+          let error;
           try {
             firstAppointment.hostedById = '507f1f77bcf86cd799439011';
             firstAppointment.reservedById = '507f1f77bcf86cd799439011';
             firstAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
         it('should throw an error if the lesson duration is wrong', async () => {
+          let error;
           try {
             firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
         it('should throw an error if no corresponding available time exists', async () => {
+          let error;
           try {
             firstAppointment.startDate = dayjs().add(5, 'hour').toDate();
             firstAppointment.endDate = dayjs().add(6, 'hour').toDate();
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
         it('should throw an error if appointment goes over available time', async () => {
+          let error;
           try {
             firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
             firstAppointment.endDate = dayjs(firstAppointment.startDate).add(1, 'hour').toDate();
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
         it('should throw an error if user is not logged in', async () => {
+          let error;
           try {
             currentAPIUser.userId = undefined;
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
         it('should throw an error if one of the appointments is not of the same type', async () => {
+          let error;
           try {
             secondAppointment.packageTransactionId = secondFakePackageTransaction._id;
             await createAppointments();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(error).to.be.an('error');
         });
       });
       context('valid inputs', () => {

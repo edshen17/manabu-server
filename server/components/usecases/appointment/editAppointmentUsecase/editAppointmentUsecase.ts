@@ -3,10 +3,7 @@ import { AppointmentDoc } from '../../../../models/Appointment';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
-import {
-  AbstractEditUsecase,
-  AbstractEditUsecaseInitParams,
-} from '../../abstractions/AbstractEditUsecase';
+import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalEditAppointmentUsecaseInitParams = {};
@@ -32,7 +29,7 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
   ): Promise<EditAppointmentUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions, currentAPIUser } = props;
     const { appointmentId } = params;
-    await this._testIsValidEdit({ body, currentAPIUser });
+    this._testIsValidEdit({ body, currentAPIUser });
     const appointment = await this._editAppointment({
       appointmentId,
       body,
@@ -68,13 +65,6 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
       dbServiceAccessOptions,
     });
     return appointment;
-  };
-
-  protected _initTemplate = async (
-    optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditAppointmentUsecaseInitParams>
-  ) => {
-    const { makeEditEntityValidator } = optionalInitParams;
-    this._editEntityValidator = makeEditEntityValidator;
   };
 }
 

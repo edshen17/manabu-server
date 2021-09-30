@@ -28,12 +28,8 @@ class GetAppointmentUsecase extends AbstractGetUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetAppointmentUsecaseResponse> => {
-    const { currentAPIUser, endpointPath, params, dbServiceAccessOptions } = props;
-    const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
+    const { params, dbServiceAccessOptions } = props;
     const { appointmentId } = params;
-    if (!isSelf) {
-      throw new Error('Access denied.');
-    }
     const appointment = await this._getAppointment({
       appointmentId,
       dbServiceAccessOptions,
