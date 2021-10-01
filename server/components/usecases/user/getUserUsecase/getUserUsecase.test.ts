@@ -70,24 +70,25 @@ describe('getUserUsecase', () => {
         expect(savedDbUser).to.not.have.property('verificationToken');
       }
     };
+    const testUserError = async () => {
+      let error;
+      try {
+        error = await getUser();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
 
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if no user is found', async () => {
-          try {
-            routeData.params = {};
-            await getUser();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          routeData.params = {};
+          await testUserError();
         });
         it('should throw an error if an invalid id is given', async () => {
-          try {
-            routeData.params = { _id: 'undefined' };
-            await getUser();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          routeData.params = { _id: 'undefined' };
+          await testUserError();
         });
       });
       context('valid inputs', () => {
@@ -98,9 +99,8 @@ describe('getUserUsecase', () => {
               testUserViews(savedDbUser, 'self');
             });
             it('should get the user and return a less restricted view on the self endpoint', async () => {
-              let { params } = routeData;
-              routeData.endpointPath = '/self/me';
-              params = {};
+              routeData.endpointPath = '/self';
+              routeData.params = {};
               const savedDbUser = await getUser();
               testUserViews(savedDbUser, 'self');
             });

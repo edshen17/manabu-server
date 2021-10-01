@@ -3,6 +3,7 @@ import { makeEditTeacherUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
@@ -13,6 +14,7 @@ let controllerDataBuilder: ControllerDataBuilder;
 let fakeTeacher: JoinedUserDoc;
 let editTeacherUsecase: EditTeacherUsecase;
 let routeData: RouteData;
+let currentAPIUser: CurrentAPIUser;
 
 before(async () => {
   fakeDbUserFactory = await makeFakeDbUserFactory;
@@ -22,6 +24,11 @@ before(async () => {
 });
 
 beforeEach(() => {
+  currentAPIUser = {
+    userId: fakeTeacher._id,
+    teacherId: fakeTeacher.teacherData!._id,
+    role: fakeTeacher.role,
+  };
   routeData = {
     body: {
       licensePathUrl: 'https://fakeimg.pl/300/',
@@ -36,68 +43,45 @@ beforeEach(() => {
 
 describe('editTeacherUsecase', () => {
   describe('makeRequest', async () => {
+    const editTeacher = async () => {
+      const controllerData = controllerDataBuilder
+        .routeData(routeData)
+        .currentAPIUser(currentAPIUser)
+        .build();
+      const editTeacherRes = await editTeacherUsecase.makeRequest(controllerData);
+      const editedTeacher = editTeacherRes.user;
+      return editedTeacher;
+    };
+    const testTeacherError = async () => {
+      let error;
+      try {
+        error = await editTeacher();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
+
     describe('editing teacher data', () => {
       it('should update the teacher in the db and return the correct properties (self)', async () => {
-        const buildEditTeacherControllerData = controllerDataBuilder
-          .currentAPIUser({
-            userId: fakeTeacher._id,
-            role: fakeTeacher.role,
-            teacherId: fakeTeacher.teacherData!._id,
-          })
-          .routeData(routeData)
-          .build();
-        const editTeacherRes = await editTeacherUsecase.makeRequest(buildEditTeacherControllerData);
-        expect(editTeacherRes).to.have.property('user');
-        if ('user' in editTeacherRes) {
-          expect(editTeacherRes.user.teacherData!.licensePathUrl).to.equal(
-            'https://fakeimg.pl/300/'
-          );
-        }
+        const editedTeacher = await editTeacher();
+        expect(editedTeacher.teacherData!.licensePathUrl).to.equal('https://fakeimg.pl/300/');
       });
       it('should deny access when updating restricted properties (self)', async () => {
-        try {
-          const fakeUser = await fakeDbUserFactory.createFakeDbUser();
-          const buildEditTeacherControllerData = controllerDataBuilder
-            .currentAPIUser({
-              userId: fakeUser._id,
-              role: fakeUser.role,
-            })
-            .routeData(routeData)
-            .build();
-          const editTeacherRes = await editTeacherUsecase.makeRequest(
-            buildEditTeacherControllerData
-          );
-        } catch (err: any) {
-          expect(err.message).to.equal('Access denied.');
-        }
+        routeData.body = {
+          createdDate: new Date(),
+        };
+        await testTeacherError();
       });
       it('should deny access when trying to update restricted properties (not self)', async () => {
-        try {
-          const otherFakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
-          routeData.params.teacherId = otherFakeTeacher._id;
-          const buildEditTeacherControllerData = controllerDataBuilder.routeData(routeData).build();
-          const editTeacherRes = await editTeacherUsecase.makeRequest(
-            buildEditTeacherControllerData
-          );
-        } catch (err: any) {
-          expect(err.message).to.equal('Access denied.');
-        }
+        const otherFakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+        routeData.params.teacherId = otherFakeTeacher.teacherData!._id;
+        await testTeacherError();
       });
       it('should deny access with not logged in', async () => {
-        try {
-          const buildEditTeacherControllerData = controllerDataBuilder
-            .currentAPIUser({
-              userId: undefined,
-              role: 'user',
-            })
-            .routeData(routeData)
-            .build();
-          const editTeacherRes = await editTeacherUsecase.makeRequest(
-            buildEditTeacherControllerData
-          );
-        } catch (err: any) {
-          expect(err.message).to.equal('Access denied.');
-        }
+        currentAPIUser.userId = undefined;
+        currentAPIUser.teacherId = undefined;
+        await testTeacherError();
       });
     });
   });

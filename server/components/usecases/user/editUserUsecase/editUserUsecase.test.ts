@@ -57,6 +57,15 @@ describe('editUserUsecase', () => {
       expect(savedDbUser).to.not.have.property('password');
       expect(savedDbUser).to.not.have.property('verificationToken');
     };
+    const testUserError = async () => {
+      let error;
+      try {
+        error = await editUser();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if restricted fields found in body', async () => {
@@ -66,11 +75,7 @@ describe('editUserUsecase', () => {
             dateRegistered: new Date(),
             verificationToken: 'new token',
           };
-          try {
-            await editUser();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testUserError();
         });
       });
       context('valid inputs', () => {
@@ -81,7 +86,6 @@ describe('editUserUsecase', () => {
               routeData.body = {
                 profileBio: 'new profile bio',
               };
-
               const updatedUser = await editUser();
               expect(updatedUser.profileBio).to.equal('new profile bio');
               testUserViews(updatedUser);
@@ -115,11 +119,7 @@ describe('editUserUsecase', () => {
         body.profileBio = 'new profile bio';
         params.userId = updateeUser._id;
         currentAPIUser.userId = updaterUser._id;
-        try {
-          const updatedUser = await editUser();
-        } catch (err: any) {
-          expect(err.message).to.equal('Access denied.');
-        }
+        await testUserError();
       });
     });
   });

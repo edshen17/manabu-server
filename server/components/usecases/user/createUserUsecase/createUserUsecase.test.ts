@@ -21,7 +21,7 @@ beforeEach(() => {
     body: {
       name: faker.name.findName(),
       email: faker.internet.email(),
-      password: `${faker.internet.password()}A1!`,
+      password: faker.internet.password(),
     },
     query: {
       state: {
@@ -39,6 +39,17 @@ describe('createUserUsecase', () => {
       const createUserRes = await createUserUsecase.makeRequest(controllerData);
       return createUserRes;
     };
+
+    const testUserError = async () => {
+      let error;
+      try {
+        error = await createUser();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
+
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if restricted fields found in body', async () => {
@@ -47,12 +58,7 @@ describe('createUserUsecase', () => {
           routeDataBody.role = 'admin';
           routeDataBody.dateRegistered = new Date();
           routeDataBody.verificationToken = 'new token';
-
-          try {
-            await createUser();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testUserError();
         });
       });
       context('valid inputs', () => {

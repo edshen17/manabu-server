@@ -84,24 +84,22 @@ describe('getTeachersUsecase', () => {
         expect(teacher).to.not.have.property('verificationToken');
       }
     };
-
+    const testTeacherError = async () => {
+      let error;
+      try {
+        error = await getTeachers();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should throw an error if no user is found', async () => {
-          try {
-            routeData.params = {};
-            await getTeachers();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
-        });
-        it('should throw an error if an invalid id is given', async () => {
-          try {
-            routeData.params = { _id: undefined };
-            await getTeachers();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+        it('should throw an error if invalid input is given', async () => {
+          routeData.query = {
+            lessonDurations: ['a', 'b'],
+          };
+          await testTeacherError();
         });
       });
       context('valid inputs', () => {

@@ -57,13 +57,6 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return storedData;
   };
 
-  private _testAccessPermitted = (dbServiceAccessOptions: DbServiceAccessOptions) => {
-    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
-    if (!isCurrentAPIUserPermitted) {
-      throw new Error('Access denied.');
-    }
-  };
-
   private _getDbServiceModelView = (
     dbServiceAccessOptions: DbServiceAccessOptions
   ): { modelView: {}; modelViewName: string } => {
@@ -91,6 +84,46 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceModelView.modelViewName = DB_SERVICE_MODEL_VIEW.DEFAULT;
     }
     return dbServiceModelView;
+  };
+
+  protected _getCacheKey = (props: {
+    searchQuery?: StringKeyObject;
+    modelViewName: string;
+    cacheClient: string;
+  }): string => {
+    const { searchQuery, modelViewName, cacheClient } = props;
+    return `${this._dbModelName}-${cacheClient}-${JSON.stringify(searchQuery)}-${modelViewName}`;
+  };
+
+  private _testAccessPermitted = (dbServiceAccessOptions: DbServiceAccessOptions) => {
+    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
+    if (!isCurrentAPIUserPermitted) {
+      throw new Error('Access denied.');
+    }
+  };
+
+  private _getCacheData = async (cacheKey: string): Promise<any> => {
+    const cacheData = await this._cacheDbService.get({ hashKey: this._dbModelName, key: cacheKey });
+    return cacheData;
+  };
+
+  private _handleStoredData = async (props: {
+    cacheKey: string;
+    cacheData: any;
+    dbQueryPromise: Promise<any>;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<any> => {
+    const { cacheKey, cacheData, dbQueryPromise, dbServiceAccessOptions } = props;
+    if (cacheData) {
+      return cacheData;
+    } else {
+      const dbQueryResult = await this._getDbQueryResult({
+        dbServiceAccessOptions,
+        dbQueryPromise,
+      });
+      await this._setCacheData({ hashKey: this._dbModelName, cacheKey, dbQueryResult });
+      return dbQueryResult;
+    }
   };
 
   protected _getDbQueryResult = async (props: {
@@ -122,13 +155,6 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  protected _getComputedProps = async (props: {
-    dbDoc: any;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<StringKeyObject> => {
-    return {};
-  };
-
   private _joinDbDoc = async (props: {
     dbDoc: any;
     modelView: StringKeyObject;
@@ -153,16 +179,6 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbDocCopy;
   };
 
-  protected _getDbDataById = async (props: {
-    dbService: IDbService<any, any>;
-    _id: ObjectId;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<any> => {
-    const { dbService, _id, dbServiceAccessOptions } = props;
-    const dbData = await dbService.findById({ _id, dbServiceAccessOptions });
-    return dbData;
-  };
-
   public getBaseDbServiceAccessOptions = (): DbServiceAccessOptions => {
     const dbServiceAccessOptions: DbServiceAccessOptions = {
       isCurrentAPIUserPermitted: true,
@@ -172,47 +188,11 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbServiceAccessOptions;
   };
 
-  public getOverrideDbServiceAccessOptions = (): DbServiceAccessOptions => {
-    const dbServiceAccessOptions: DbServiceAccessOptions = {
-      isCurrentAPIUserPermitted: true,
-      currentAPIUserRole: 'user',
-      isSelf: false,
-      isOverrideView: true,
-    };
-    return dbServiceAccessOptions;
-  };
-
-  protected _getCacheKey = (props: {
-    searchQuery?: StringKeyObject;
-    modelViewName: string;
-    cacheClient: string;
-  }): string => {
-    const { searchQuery, modelViewName, cacheClient } = props;
-    return `${this._dbModelName}-${cacheClient}-${JSON.stringify(searchQuery)}-${modelViewName}`;
-  };
-
-  private _getCacheData = async (cacheKey: string): Promise<any> => {
-    const cacheData = await this._cacheDbService.get({ hashKey: this._dbModelName, key: cacheKey });
-    return cacheData;
-  };
-
-  private _handleStoredData = async (props: {
-    cacheKey: string;
-    cacheData: any;
-    dbQueryPromise: Promise<any>;
+  protected _getComputedProps = async (props: {
+    dbDoc: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<any> => {
-    const { cacheKey, cacheData, dbQueryPromise, dbServiceAccessOptions } = props;
-    if (cacheData) {
-      return cacheData;
-    } else {
-      const dbQueryResult = await this._getDbQueryResult({
-        dbServiceAccessOptions,
-        dbQueryPromise,
-      });
-      await this._setCacheData({ hashKey: this._dbModelName, cacheKey, dbQueryResult });
-      return dbQueryResult;
-    }
+  }): Promise<StringKeyObject> => {
+    return {};
   };
 
   private _setCacheData = async (props: {
@@ -229,13 +209,24 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     });
   };
 
-  private _clearCacheBrancher = async (): Promise<void> => {
-    const isAsync = process.env.NODE_ENV != 'production';
-    if (isAsync) {
-      await this._clearCacheDependencies();
-    } else {
-      this._clearCacheDependencies();
-    }
+  protected _getDbDataById = async (props: {
+    dbService: IDbService<any, any>;
+    _id: ObjectId;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<any> => {
+    const { dbService, _id, dbServiceAccessOptions } = props;
+    const dbData = await dbService.findById({ _id, dbServiceAccessOptions });
+    return dbData;
+  };
+
+  public getOverrideDbServiceAccessOptions = (): DbServiceAccessOptions => {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: 'user',
+      isSelf: false,
+      isOverrideView: true,
+    };
+    return dbServiceAccessOptions;
   };
 
   private _clearCacheDependencies = async (): Promise<void> => {
@@ -367,6 +358,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     });
     await this._clearCacheBrancher();
     return dbQueryResult;
+  };
+
+  private _clearCacheBrancher = async (): Promise<void> => {
+    const isAsync = process.env.NODE_ENV != 'production';
+    if (isAsync) {
+      await this._clearCacheDependencies();
+    } else {
+      this._clearCacheDependencies();
+    }
   };
 
   public updateMany = async (props: {
