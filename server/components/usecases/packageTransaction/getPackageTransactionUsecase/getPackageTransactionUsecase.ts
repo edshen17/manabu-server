@@ -28,16 +28,12 @@ class GetPackageTransactionUsecase extends AbstractGetUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetPackageTransactionUsecaseResponse> => {
-    const { params, dbServiceAccessOptions, currentAPIUser, endpointPath } = props;
+    const { params, dbServiceAccessOptions } = props;
     const { packageTransactionId } = params;
-    const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const packageTransaction = await this._getPackageTransaction({
       packageTransactionId,
       dbServiceAccessOptions,
     });
-    if (!isSelf) {
-      throw new Error('Access denied.');
-    }
     if (!packageTransaction) {
       throw new Error('Package transaction not found.');
     }

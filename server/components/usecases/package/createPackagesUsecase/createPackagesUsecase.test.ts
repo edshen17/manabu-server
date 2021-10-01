@@ -61,28 +61,25 @@ describe('createPackageUsecase', () => {
     };
 
     const testPackagesError = async () => {
+      let err;
       try {
-        await createPackages();
+        err = await createPackages();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      console.log(err, 'here1');
+      expect(err).to.be.an('error');
     };
 
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if restricted fields found in body', async () => {
-          const routeDataBody = routeData.body;
-          routeDataBody.hostedById = 'some id';
-          routeDataBody.createdDate = new Date();
+          routeData.body = {};
           await testPackagesError();
         });
         it('should throw an error if user does not have access', async () => {
-          try {
-            currentAPIUser.teacherId = undefined;
-            await createPackages();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          currentAPIUser.teacherId = undefined;
+          await testPackagesError();
         });
       });
       context('valid inputs', () => {

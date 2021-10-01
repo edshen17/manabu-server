@@ -82,7 +82,10 @@ describe('splitAvailableTimeHandler', () => {
           appointmentEndDate: dayjs().add(1, 'hour').toDate(),
         };
         const updatedAvailableTime = await splitAvailableTime(splitAvailableTimeParams);
-        expect(updatedAvailableTime.startDate).to.not.deep.equal(fakeAvailableTime.startDate);
+
+        expect(
+          dayjs(updatedAvailableTime.startDate).isSame(dayjs(fakeAvailableTime.startDate))
+        ).to.equal(false);
         expect(updatedAvailableTime.endDate).to.deep.equal(fakeAvailableTime.endDate);
         expect(updatedAvailableTime.startDate).to.deep.equal(
           splitAvailableTimeParams.appointmentEndDate

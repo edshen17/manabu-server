@@ -56,11 +56,13 @@ describe('getPackageTransactionsUsecase', () => {
     };
 
     const testPackageTransactionError = async () => {
+      let err;
       try {
-        await getPackageTransactions();
+        err = await getPackageTransactions();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(err).to.be.an('error');
     };
 
     context('db access permitted', () => {
@@ -87,7 +89,8 @@ describe('getPackageTransactionsUsecase', () => {
           });
           context('as an unlogged-in user', async () => {
             it('should throw an error', async () => {
-              currentAPIUser = { role: 'user', userId: undefined };
+              currentAPIUser.userId = undefined;
+              routeData.endpointPath = '';
               await testPackageTransactionError();
             });
           });

@@ -26,14 +26,14 @@ class AvailableTimeEntity extends AbstractEntity<
     buildParams: AvailableTimeEntityBuildParams
   ): Promise<AvailableTimeEntityBuildResponse> => {
     const { hostedById, startDate, endDate } = buildParams;
-    const minuteBankEntity = Object.freeze({
+    const availableTimeEntity = Object.freeze({
       hostedById,
       startDate,
       endDate,
       createdDate: new Date(),
       lastModifiedDate: new Date(),
     });
-    return minuteBankEntity;
+    return availableTimeEntity;
   };
 }
 

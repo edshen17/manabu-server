@@ -54,11 +54,13 @@ describe('editPackageUsecase', () => {
     };
 
     const testPackageError = async () => {
+      let err;
       try {
-        await editPackage();
+        err = await editPackage();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(err).to.be.an('error');
     };
 
     context('db access permitted', () => {
@@ -71,6 +73,7 @@ describe('editPackageUsecase', () => {
         });
         it('should throw an error if user does not have access', async () => {
           currentAPIUser.teacherId = undefined;
+          currentAPIUser.userId = undefined;
           await testPackageError();
         });
         it('should throw an error if editing restricted fields on default package', async () => {

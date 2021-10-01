@@ -53,15 +53,20 @@ describe('deleteAvailableTimeUsecase', () => {
       );
       return deleteAvailableTimeUsecaseRes;
     };
+    const testAvailableTimeError = async () => {
+      let error;
+      try {
+        error = await deleteAvailableTime();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if not self/admin', async () => {
           currentAPIUser.userId = '507f1f77bcf86cd799439011';
-          try {
-            await deleteAvailableTime();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testAvailableTimeError();
         });
       });
       context('valid inputs', () => {

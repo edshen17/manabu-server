@@ -65,7 +65,7 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
     const { body, dbServiceAccessOptions } = props;
     const { hostedById, startDate, endDate } = body;
     const availableTime = await this._dbService.findOne({
-      searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
+      searchQuery: { hostedById, startDate: { $lte: endDate }, endDate: { $gte: startDate } },
       dbServiceAccessOptions,
     });
     if (availableTime) {

@@ -52,11 +52,13 @@ describe('deletePackageUsecase', () => {
     };
 
     const testPackageError = async () => {
+      let err;
       try {
-        await deletePackage();
+        err = await deletePackage();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(err).to.be.an('error');
     };
 
     context('db access permitted', () => {
@@ -68,6 +70,7 @@ describe('deletePackageUsecase', () => {
           await testPackageError();
         });
         it('should throw an error if user does not have access', async () => {
+          currentAPIUser.userId = undefined;
           currentAPIUser.teacherId = undefined;
           await testPackageError();
         });

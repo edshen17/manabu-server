@@ -55,25 +55,26 @@ describe('editAvailableTimeUsecase', () => {
       );
       return editAvailableTimeUsecaseRes;
     };
+    const testAvailableTimeError = async () => {
+      let err;
+      try {
+        err = await editAvailableTime();
+      } catch (err) {
+        return;
+      }
+      expect(err).to.be.an('error');
+    };
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if not self/admin', async () => {
           currentAPIUser.userId = undefined;
-          try {
-            await editAvailableTime();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testAvailableTimeError();
         });
         it('should throw if bad inputs are provided', async () => {
           routeData.body = {
             hostedById: 'some id',
           };
-          try {
-            await editAvailableTime();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testAvailableTimeError();
         });
       });
       context('valid inputs', () => {

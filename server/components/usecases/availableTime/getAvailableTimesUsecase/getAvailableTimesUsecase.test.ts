@@ -49,16 +49,23 @@ describe('getAvailableTimesUsecase', () => {
       const availableTimes = getAvailableTimesRes.availableTimes;
       expect(availableTimes.length > 0).to.equal(true);
     };
+    const testAvailableTimeError = async () => {
+      let error;
+      try {
+        error = await getAvailableTimes();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
 
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if an invalid id is given', async () => {
-          try {
-            routeData.params = {};
-            await getAvailableTimes();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          routeData.params = {
+            userId: 'some id',
+          };
+          await testAvailableTimeError();
         });
       });
       context('valid inputs', () => {

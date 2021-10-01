@@ -53,33 +53,37 @@ describe('createAvailableTimeUsecase', () => {
       const createAvailableTimeRes = await createAvailableTimeUsecase.makeRequest(controllerData);
       return createAvailableTimeRes;
     };
+    const testAvailableTimeError = async () => {
+      let error;
+      try {
+        error = await createAvailableTime();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
+
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if restricted fields found in body', async () => {
           const routeDataBody = routeData.body;
           routeDataBody.hostedById = 'some id';
           routeDataBody.createdDate = new Date();
-          try {
-            await createAvailableTime();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testAvailableTimeError();
         });
         it('should throw an error if there is an availableTime overlap', async () => {
+          let err;
           try {
             await createAvailableTime();
-            await createAvailableTime();
+            err = await createAvailableTime();
           } catch (err) {
-            expect(err).to.be.an('error');
+            return;
           }
+          expect(err).to.be.an('error');
         });
         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
-          try {
-            routeData.body.hostedById = '507f1f77bcf86cd799439011';
-            await createAvailableTime();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          routeData.body.hostedById = '507f1f77bcf86cd799439011';
+          await testAvailableTimeError();
         });
       });
       context('valid inputs', () => {

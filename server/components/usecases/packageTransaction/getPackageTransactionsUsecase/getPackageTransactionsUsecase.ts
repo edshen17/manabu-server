@@ -14,6 +14,17 @@ class GetPackageTransactionsUsecase extends AbstractGetUsecase<
   GetPackageTransactionsUsecaseResponse,
   PackageTransactionDoc
 > {
+  protected _isProtectedResource = (): boolean => {
+    return true;
+  };
+
+  protected _getResourceAccessData = (): StringKeyObject => {
+    return {
+      hasResourceAccessCheck: true,
+      paramIdName: 'packageTransactionId',
+    };
+  };
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetPackageTransactionsUsecaseResponse> => {
@@ -28,7 +39,7 @@ class GetPackageTransactionsUsecase extends AbstractGetUsecase<
     });
     const isAccessUnathorized = params.userId && role != 'admin';
     if (!packageTransactions) {
-      throw new Error('Appointments not found.');
+      throw new Error('Package transactions not found.');
     }
     if (isAccessUnathorized) {
       throw new Error('Access denied.');

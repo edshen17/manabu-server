@@ -58,11 +58,13 @@ describe('getPackageTransactionUsecase', () => {
     };
 
     const testPackageTransactionError = async () => {
+      let err;
       try {
-        await getPackageTransaction();
+        err = await getPackageTransaction();
       } catch (err) {
-        expect(err).to.be.an('error');
+        return;
       }
+      expect(err).to.be.an('error');
     };
 
     context('db access permitted', () => {
