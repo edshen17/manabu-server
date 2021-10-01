@@ -28,8 +28,12 @@ describe('cacheDbService', () => {
   });
   describe('set', () => {
     it('should set an item in the cache', async () => {
-      await cacheDbService.set({ hashKey, key: 'otherItem', value: { _id: 10 }, ttlMs: 60 * 1000 });
-      const storedItem = await cacheDbService.get({ hashKey, key: 'otherItem' });
+      const storedItem = await cacheDbService.set({
+        hashKey,
+        key: 'otherItem',
+        value: { _id: 10 },
+        ttlMs: 60 * 1000,
+      });
       expect(storedItem).to.deep.equal({ _id: 10 });
     });
   });

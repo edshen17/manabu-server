@@ -70,7 +70,7 @@ describe('getAvailableTimesController', () => {
     };
     const testInvalidGetAvailableTimes = async (): Promise<void> => {
       const getAvailableTimesRes = await getAvailableTimes();
-      expect(getAvailableTimesRes.statusCode).to.equal(500);
+      expect(getAvailableTimesRes.statusCode).to.equal(404);
     };
     context('valid inputs', () => {
       context('as a non-admin user', () => {

@@ -146,18 +146,6 @@ describe('minuteBankDbService', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return the original minuteBank if update field does not exist', async () => {
-          const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
-            searchQuery: {
-              hostedById: fakeMinuteBank.hostedById,
-            },
-            updateQuery: {
-              nonExistentField: 'some non-existent field',
-            },
-            dbServiceAccessOptions,
-          });
-          expect(updatedMinuteBank).to.deep.equal(fakeMinuteBank);
-        });
         it('should return null if the minuteBank to update does not exist', async () => {
           const updatedMinuteBank = await minuteBankDbService.findOneAndUpdate({
             searchQuery: {

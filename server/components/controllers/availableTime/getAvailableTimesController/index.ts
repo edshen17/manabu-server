@@ -5,7 +5,7 @@ import { GetAvailableTimesController } from './getAvailableTimesController';
 
 const makeGetAvailableTimesController = new GetAvailableTimesController({
   successStatusCode: StatusCodes.OK,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.NOT_FOUND,
 }).init({ makeUsecase: makeGetAvailableTimesUsecase, makeQueryStringHandler });
 
 export { makeGetAvailableTimesController };

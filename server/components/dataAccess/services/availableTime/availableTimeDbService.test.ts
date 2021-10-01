@@ -149,19 +149,7 @@ describe('availableTimeDbService', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return the original AvailableTime if update field does not exist', async () => {
-          const updatedAvailableTime = await availableTimeDbService.findOneAndUpdate({
-            searchQuery: {
-              hostedById: fakeAvailableTime.hostedById,
-            },
-            updateQuery: {
-              nonExistentField: 'some non-existent field',
-            },
-            dbServiceAccessOptions,
-          });
-          expect(updatedAvailableTime).to.deep.equal(fakeAvailableTime);
-        });
-        it('should return null if the AvailableTime to update does not exist', async () => {
+        it('should return null if the availableTime to update does not exist', async () => {
           const updatedAvailableTime = await availableTimeDbService.findOneAndUpdate({
             searchQuery: {
               _id: fakeAvailableTime.hostedById,
@@ -175,19 +163,19 @@ describe('availableTimeDbService', () => {
       context('valid inputs', () => {
         context('as a non-admin user', () => {
           context('updating self', () => {
-            it('should update the AvailableTime', async () => {
+            it('should update the availableTime', async () => {
               dbServiceAccessOptions.isSelf = true;
               await updateAvailableTime();
             });
           });
           context('updating other', async () => {
-            it('should update the AvailableTime', async () => {
+            it('should update the availableTime', async () => {
               await updateAvailableTime();
             });
           });
         });
         context('as an admin', async () => {
-          it('should update the AvailableTime', async () => {
+          it('should update the availableTime', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
             await updateAvailableTime();
           });
@@ -220,7 +208,7 @@ describe('availableTimeDbService', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return null if the minuteBank to delete does not exist', async () => {
+        it('should return null if the availableTime to delete does not exist', async () => {
           const deletedAvailableTime = await availableTimeDbService.findByIdAndDelete({
             _id: fakeAvailableTime.hostedById,
             dbServiceAccessOptions,
@@ -231,19 +219,19 @@ describe('availableTimeDbService', () => {
       context('valid inputs', () => {
         context('as a non-admin user', () => {
           context('deleting self', () => {
-            it('should update the minuteBank', async () => {
+            it('should update the availableTime', async () => {
               dbServiceAccessOptions.isSelf = true;
               await deleteAvailableTime();
             });
           });
           context('deleting other', async () => {
-            it('should update the minuteBank', async () => {
+            it('should update the availableTime', async () => {
               await deleteAvailableTime();
             });
           });
         });
         context('as an admin', async () => {
-          it('should update the minuteBank', async () => {
+          it('should update the availableTime', async () => {
             dbServiceAccessOptions.currentAPIUserRole = 'admin';
             await deleteAvailableTime();
           });

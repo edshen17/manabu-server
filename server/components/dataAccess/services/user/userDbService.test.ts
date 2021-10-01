@@ -356,14 +356,6 @@ describe('userDbService', () => {
         });
       });
       context('invalid inputs', () => {
-        it('should return the original user if the update field does not exist', async () => {
-          const updatedTeacher = await userDbService.findOneAndUpdate({
-            searchQuery: { _id: fakeTeacher._id },
-            updateQuery: { nonExistentField: 'some-non-existent-field' },
-            dbServiceAccessOptions,
-          });
-          expect(updatedTeacher).to.deep.equal(fakeTeacher);
-        });
         it('should return undefined if the user to update does not exist', async () => {
           const updatedTeacher = await userDbService.findOneAndUpdate({
             searchQuery: { email: fakeTeacher._id },

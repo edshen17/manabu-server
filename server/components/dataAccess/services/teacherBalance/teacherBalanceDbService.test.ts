@@ -156,16 +156,6 @@ describe('teacherBalanceService', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return the original teacherBalance if update field does not exist', async () => {
-          const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
-            searchQuery: { _id: fakeTeacherBalance._id },
-            updateQuery: {
-              nonExistentField: 'some non-existent field',
-            },
-            dbServiceAccessOptions,
-          });
-          expect(updatedTeacherBalance).to.deep.equal(fakeTeacherBalance);
-        });
         it('should return null if the teacherBalance to update does not exist', async () => {
           const updatedTeacherBalance = await teacherBalanceDbService.findOneAndUpdate({
             searchQuery: {

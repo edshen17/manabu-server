@@ -25,20 +25,6 @@ paypal.configure(paypalConfig);
 
 scheduler();
 
-const exchangeRateScheduler = async () => {
-  if (!exchangeRate) exchangeRate = await fetchExchangeRate();
-  setInterval(async () => {
-    exchangeRate = await fetchExchangeRate();
-  }, 60 * 60 * 24 * 1000);
-};
-exchangeRateScheduler();
-
-// Route for fetching exchange rate information
-router.get('/utils/exchangeRate', VerifyToken, async (req, res, next) => {
-  if (!exchangeRate) exchangeRate = await fetchExchangeRate();
-  return res.status(200).json(exchangeRate);
-});
-
 // Route for validating transaction information
 router.get('/utils/verifyTransactionData', VerifyToken, async (req, res, next) => {
   verifyTransactionData(req, res, exchangeRate).then((transactionData) => {

@@ -10,6 +10,7 @@ type CacheDbServiceInitParams = {
 
 enum TTL_MS {
   WEEK = 24 * 60 * 60 * 7 * 1000,
+  DAY = 24 * 60 * 60 * 1000,
 }
 
 class CacheDbService {
@@ -76,6 +77,7 @@ class CacheDbService {
     const valueToStore = isValueString ? value : JSON.stringify(value);
     await this._redisClient.hset(hashKey, key, valueToStore);
     this._redisClient.expire(hashKey, ttlMs);
+    return value;
   };
 
   public clearKey = async (props: { hashKey: string; key: string }): Promise<void> => {

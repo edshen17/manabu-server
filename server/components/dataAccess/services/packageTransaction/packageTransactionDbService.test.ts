@@ -184,18 +184,6 @@ describe('packageTransactionDbService', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return the original packageTransaction if update field does not exist', async () => {
-          const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
-            searchQuery: {
-              hostedById: fakePackageTransaction.hostedById,
-            },
-            updateQuery: {
-              nonExistentField: 'some non-existent field',
-            },
-            dbServiceAccessOptions,
-          });
-          expect(updatedPackageTransaction).to.deep.equal(fakePackageTransaction);
-        });
         it('should return null if the packageTransaction to update does not exist', async () => {
           const updatedPackageTransaction = await packageTransactionDbService.findOneAndUpdate({
             searchQuery: {

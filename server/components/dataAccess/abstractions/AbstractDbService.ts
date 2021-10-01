@@ -345,11 +345,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
-      .findOneAndUpdate(searchQuery, updateQuery, {
-        fields: modelView,
-        new: true,
-        ...queryOptions,
-      })
+      .findOneAndUpdate(
+        searchQuery,
+        { ...updateQuery, lastModifiedDate: new Date() },
+        {
+          fields: modelView,
+          new: true,
+          ...queryOptions,
+        }
+      )
       .session(session)
       .lean();
     const dbQueryResult = await this._getDbQueryResult({
@@ -380,11 +384,15 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
-      .updateMany(searchQuery, updateQuery, {
-        fields: modelView,
-        new: true,
-        ...queryOptions,
-      })
+      .updateMany(
+        searchQuery,
+        { ...updateQuery, lastModifiedDate: new Date() },
+        {
+          fields: modelView,
+          new: true,
+          ...queryOptions,
+        }
+      )
       .session(session)
       .lean();
     const dbQueryResult = await this._getDbQueryResult({

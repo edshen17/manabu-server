@@ -185,18 +185,6 @@ describe('appointmentDbService', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should return the original appointment if update field does not exist', async () => {
-          const updatedAppointment = await appointmentDbService.findOneAndUpdate({
-            searchQuery: {
-              hostedById: fakeAppointment.hostedById,
-            },
-            updateQuery: {
-              nonExistentField: 'some non-existent field',
-            },
-            dbServiceAccessOptions,
-          });
-          expect(updatedAppointment).to.deep.equal(fakeAppointment);
-        });
         it('should return null if the appointment to update does not exist', async () => {
           const updatedAppointment = await appointmentDbService.findOneAndUpdate({
             searchQuery: {
