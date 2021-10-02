@@ -61,14 +61,12 @@ beforeEach(async () => {
       appointments: [
         {
           hostedById: firstFakePackageTransaction.hostedById,
-          reservedById: firstFakePackageTransaction.reservedById,
           packageTransactionId: firstFakePackageTransaction._id,
           startDate: fakeAvailableTime.startDate,
           endDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
         },
         {
           hostedById: firstFakePackageTransaction.hostedById,
-          reservedById: firstFakePackageTransaction.reservedById,
           packageTransactionId: firstFakePackageTransaction._id,
           startDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
           endDate: dayjs(fakeAvailableTime.startDate).add(2, 'hour').toDate(),
@@ -92,16 +90,21 @@ describe('createAppointmentUsecase', () => {
       const createAppointmentRes = await createAppointmentsUsecase.makeRequest(controllerData);
       return createAppointmentRes;
     };
+    const testAppointmentsError = async () => {
+      let error;
+      try {
+        error = await createAppointments();
+      } catch (err) {
+        return;
+      }
+      expect(error).to.be.an('error');
+    };
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if body is invalid', async () => {
           firstAppointment.hostedById = 'some id';
           firstAppointment.createdDate = new Date();
-          try {
-            await createAppointments();
-          } catch (err) {
-            expect(err).to.be.an('error');
-          }
+          await testAppointmentsError();
         });
         it('should throw an error if there is an appointment overlap', async () => {
           try {
@@ -112,78 +115,36 @@ describe('createAppointmentUsecase', () => {
           }
         });
         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
-          let error;
-          try {
-            firstAppointment.hostedById = '507f1f77bcf86cd799439011';
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          firstAppointment.hostedById = '507f1f77bcf86cd799439011';
+          await testAppointmentsError();
         });
         it('should throw an error if body contains an foreign keys that do not exist', async () => {
-          let error;
-          try {
-            firstAppointment.hostedById = '507f1f77bcf86cd799439011';
-            firstAppointment.reservedById = '507f1f77bcf86cd799439011';
-            firstAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          firstAppointment.hostedById = '507f1f77bcf86cd799439011';
+          firstAppointment.reservedById = '507f1f77bcf86cd799439011';
+          firstAppointment.packageTransactionId = '507f1f77bcf86cd799439011';
+          await testAppointmentsError();
         });
         it('should throw an error if the lesson duration is wrong', async () => {
-          let error;
-          try {
-            firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
+          await testAppointmentsError();
         });
         it('should throw an error if no corresponding available time exists', async () => {
-          let error;
-          try {
-            firstAppointment.startDate = dayjs().add(5, 'hour').toDate();
-            firstAppointment.endDate = dayjs().add(6, 'hour').toDate();
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          firstAppointment.startDate = dayjs().add(5, 'hour').toDate();
+          firstAppointment.endDate = dayjs().add(6, 'hour').toDate();
+          await testAppointmentsError();
         });
         it('should throw an error if appointment goes over available time', async () => {
-          let error;
-          try {
-            firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
-            firstAppointment.endDate = dayjs(firstAppointment.startDate).add(1, 'hour').toDate();
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
+          firstAppointment.endDate = dayjs(firstAppointment.startDate).add(1, 'hour').toDate();
+          await testAppointmentsError();
         });
         it('should throw an error if user is not logged in', async () => {
-          let error;
-          try {
-            currentAPIUser.userId = undefined;
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          currentAPIUser.userId = undefined;
+          await testAppointmentsError();
         });
         it('should throw an error if one of the appointments is not of the same type', async () => {
-          let error;
-          try {
-            secondAppointment.packageTransactionId = secondFakePackageTransaction._id;
-            await createAppointments();
-          } catch (err) {
-            return;
-          }
-          expect(error).to.be.an('error');
+          secondAppointment.packageTransactionId = secondFakePackageTransaction._id;
+          await testAppointmentsError();
         });
       });
       context('valid inputs', () => {

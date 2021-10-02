@@ -50,14 +50,12 @@ beforeEach(async () => {
     appointments: [
       {
         hostedById: firstFakePackageTransaction.hostedById,
-        reservedById: firstFakePackageTransaction.reservedById,
         packageTransactionId: firstFakePackageTransaction._id,
         startDate: fakeAvailableTime.startDate,
         endDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
       },
       {
         hostedById: firstFakePackageTransaction.hostedById,
-        reservedById: firstFakePackageTransaction.reservedById,
         packageTransactionId: firstFakePackageTransaction._id,
         startDate: dayjs(fakeAvailableTime.startDate).add(1, 'hour').toDate(),
         endDate: dayjs(fakeAvailableTime.startDate).add(2, 'hour').toDate(),

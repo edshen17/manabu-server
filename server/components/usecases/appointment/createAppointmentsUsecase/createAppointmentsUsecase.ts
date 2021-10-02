@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -94,7 +95,10 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       currentAPIUser,
     });
-    const appointmentEntity = await this._appointmentEntity.build(appointment);
+    const appointmentEntity = await this._appointmentEntity.build({
+      ...appointment,
+      reservedById: <ObjectId>currentAPIUser.userId,
+    });
     modelToInsert.push(appointmentEntity);
   };
 
@@ -112,13 +116,14 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       packageTransaction.hostedById,
       appointment.hostedById
     );
-    const isReservedByIdEqual =
-      this._deepEqual(packageTransaction.reservedById, appointment.reservedById) &&
-      this._deepEqual(packageTransaction.reservedById, currentAPIUser.userId);
+    const isReservedByIdEqual = this._deepEqual(
+      packageTransaction.reservedById,
+      currentAPIUser.userId
+    );
+    const hasResourceAccess = isHostedByIdEqual && isReservedByIdEqual;
     const timeDifference = this._dayjs(appointment.endDate).diff(appointment.startDate, 'minute');
     const isCorrectDuration = timeDifference == packageTransaction.lessonDuration;
-    const hasResourceOwnership = isHostedByIdEqual && isReservedByIdEqual;
-    if (!hasResourceOwnership) {
+    if (!hasResourceAccess) {
       throw new Error('Appointment foreign key mismatch.');
     } else if (!isCorrectDuration) {
       throw new Error('Appointment duration mismatch.');

@@ -1,18 +1,16 @@
+import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
-import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   AvailableTimeEntity,
   AvailableTimeEntityBuildParams,
   AvailableTimeEntityBuildResponse,
 } from '../../../entities/availableTime/availableTimeEntity';
-import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalCreateAvailableTimeUsecaseInitParams = {
   makeAvailableTimeEntity: Promise<AvailableTimeEntity>;
-  convertStringToObjectId: any;
 };
 
 type CreateAvailableTimeUsecaseResponse = {
@@ -25,15 +23,16 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   AvailableTimeDoc
 > {
   private _availableTimeEntity!: AvailableTimeEntity;
-  private _convertStringToObjectId!: any;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateAvailableTimeUsecaseResponse> => {
     const { body, dbServiceAccessOptions, currentAPIUser } = props;
-    this._testResourceOwnership({ body, currentAPIUser });
     await this._testTimeConflict({ body, dbServiceAccessOptions });
-    const availableTimeEntity = await this._availableTimeEntity.build(body);
+    const availableTimeEntity = await this._availableTimeEntity.build({
+      ...body,
+      hostedById: <ObjectId>currentAPIUser.userId,
+    });
     const availableTime = await this._createAvailableTime({
       availableTimeEntity,
       dbServiceAccessOptions,
@@ -42,20 +41,6 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
       availableTime,
     };
     return usecaseRes;
-  };
-
-  private _testResourceOwnership = (props: {
-    body: StringKeyObject;
-    currentAPIUser: CurrentAPIUser;
-  }): void => {
-    const { body, currentAPIUser } = props;
-    const { hostedById } = body;
-    const { userId } = currentAPIUser;
-    const convertedHostedById = this._convertStringToObjectId(hostedById);
-    const isResourceOwner = this._deepEqual(convertedHostedById, userId);
-    if (!isResourceOwner) {
-      throw new Error('Id mismatch.');
-    }
   };
 
   private _testTimeConflict = async (props: {
@@ -88,9 +73,8 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateAvailableTimeUsecaseInitParams
   ): Promise<void> => {
-    const { makeAvailableTimeEntity, convertStringToObjectId } = optionalInitParams;
+    const { makeAvailableTimeEntity } = optionalInitParams;
     this._availableTimeEntity = await makeAvailableTimeEntity;
-    this._convertStringToObjectId = convertStringToObjectId;
   };
 }
 

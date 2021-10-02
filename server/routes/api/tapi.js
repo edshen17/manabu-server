@@ -10,14 +10,11 @@ const paypalConfig = {
   client_secret: process.env.PAYPAL_CLIENT_SECRET_DEV,
 };
 
-let dbHost;
 if (process.env.NODE_ENV == 'production') {
-  dbHost = 'users';
   paypalConfig.client_id = process.env.PAYPAL_CLIENT_ID;
   paypalConfig.client_secret = process.env.PAYPAL_CLIENT_SECRET;
   paypalConfig.mode = 'live';
 } else {
-  dbHost = 'dev';
 }
 
 paypal.configure(paypalConfig);

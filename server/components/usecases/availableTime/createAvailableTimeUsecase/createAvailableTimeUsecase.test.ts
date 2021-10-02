@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeCreateAvailableTimeUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
@@ -34,7 +35,6 @@ beforeEach(async () => {
   routeData = {
     params: {},
     body: {
-      hostedById: fakeUser._id,
       startDate: new Date(),
       endDate: new Date(),
     },
@@ -81,10 +81,6 @@ describe('createAvailableTimeUsecase', () => {
           }
           expect(err).to.be.an('error');
         });
-        it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
-          routeData.body.hostedById = '507f1f77bcf86cd799439011';
-          await testAvailableTimeError();
-        });
       });
       context('valid inputs', () => {
         const validResOutput = (createAvailableTimeRes: CreateAvailableTimeUsecaseResponse) => {
@@ -95,6 +91,7 @@ describe('createAvailableTimeUsecase', () => {
         };
         it('should return a new available time', async () => {
           const createAvailableTimeRes = await createAvailableTime();
+          routeData.body.startDate = dayjs().add(1, 'hour');
           validResOutput(createAvailableTimeRes);
         });
       });

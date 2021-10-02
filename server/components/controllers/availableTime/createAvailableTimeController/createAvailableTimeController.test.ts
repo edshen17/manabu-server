@@ -2,8 +2,12 @@ import { expect } from 'chai';
 import dayjs from 'dayjs';
 import { makeCreateAvailableTimeController } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { StringKeyObject } from '../../../../types/custom';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { CreateAvailableTimeUsecaseResponse } from '../../../usecases/availableTime/createAvailableTimeUsecase/createAvailableTimeUsecase';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
+import { ControllerResponse } from '../../abstractions/IController';
 import { makeIHttpRequestBuilder } from '../../utils/iHttpRequestBuilder';
 import { IHttpRequestBuilder } from '../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
 import { CreateAvailableTimeController } from './createAvailableTimeController';
@@ -12,6 +16,9 @@ let iHttpRequestBuilder: IHttpRequestBuilder;
 let createAvailableTimeController: CreateAvailableTimeController;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeTeacher: JoinedUserDoc;
+let params: StringKeyObject;
+let body: StringKeyObject;
+let currentAPIUser: CurrentAPIUser;
 
 before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
@@ -21,60 +28,57 @@ before(async () => {
 
 beforeEach(async () => {
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  params = {};
+  body = {};
+  currentAPIUser = {
+    role: 'user',
+    userId: fakeTeacher._id,
+    teacherId: fakeTeacher.teacherData!._id,
+  };
 });
 
 describe('createAvailableTimeController', () => {
   describe('makeRequest', () => {
+    const createAvailableTime = async (): Promise<
+      ControllerResponse<CreateAvailableTimeUsecaseResponse>
+    > => {
+      const createAvailableTimeHttpRequest = iHttpRequestBuilder
+        .params(params)
+        .body(body)
+        .currentAPIUser(currentAPIUser)
+        .build();
+      const createdAvailableTimeRes = await createAvailableTimeController.makeRequest(
+        createAvailableTimeHttpRequest
+      );
+      return createdAvailableTimeRes;
+    };
     context('valid inputs', () => {
       it('should create a new available time document', async () => {
-        const body = {
+        body = {
           hostedById: fakeTeacher._id,
           startDate: dayjs().toDate(),
           endDate: dayjs().add(30, 'minute').toDate(),
         };
-        const createAvailableTimeHttpRequest = iHttpRequestBuilder
-          .body(body)
-          .currentAPIUser({
-            userId: fakeTeacher._id,
-            teacherId: fakeTeacher.teacherData!._id,
-            role: fakeTeacher.role,
-          })
-          .build();
-        const createAvailableTime = await createAvailableTimeController.makeRequest(
-          createAvailableTimeHttpRequest
-        );
-        expect(createAvailableTime.statusCode).to.equal(201);
-        if ('availableTime' in createAvailableTime.body) {
-          expect(createAvailableTime.body.availableTime.hostedById).to.deep.equal(fakeTeacher._id);
+        const createAvailableTimeRes = await createAvailableTime();
+        expect(createAvailableTimeRes.statusCode).to.equal(201);
+        if ('availableTime' in createAvailableTimeRes.body) {
+          expect(createAvailableTimeRes.body.availableTime.hostedById).to.deep.equal(
+            fakeTeacher._id
+          );
         }
       });
     });
     context('invalid inputs', () => {
       it('should throw an error if user input is invalid', async () => {
-        const createAvailableTimeHttpRequest = iHttpRequestBuilder
-          .body({})
-          .currentAPIUser({
-            userId: fakeTeacher._id,
-            teacherId: fakeTeacher.teacherData!._id,
-            role: fakeTeacher.role,
-          })
-          .build();
-        const createAvailableTime = await createAvailableTimeController.makeRequest(
-          createAvailableTimeHttpRequest
-        );
-        expect(createAvailableTime.statusCode).to.equal(500);
+        body = {};
+        const createAvailableTimeRes = await createAvailableTime();
+        expect(createAvailableTimeRes.statusCode).to.equal(500);
       });
       it('should throw an error if the user is not logged in', async () => {
-        const createAvailableTimeHttpRequest = iHttpRequestBuilder
-          .body({})
-          .currentAPIUser({
-            role: 'user',
-          })
-          .build();
-        const createAvailableTime = await createAvailableTimeController.makeRequest(
-          createAvailableTimeHttpRequest
-        );
-        expect(createAvailableTime.statusCode).to.equal(500);
+        currentAPIUser.userId = undefined;
+        currentAPIUser.teacherId = undefined;
+        const createAvailableTimeRes = await createAvailableTime();
+        expect(createAvailableTimeRes.statusCode).to.equal(500);
       });
     });
   });
