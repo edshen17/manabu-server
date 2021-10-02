@@ -1,69 +1,33 @@
 import { StringKeyObject } from '../../../../types/custom';
-import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { ExchangeRateHandler } from '../../utils/exchangeRateHandler/exchangeRateHandler';
 
 type OptionalGetExchangeRatesUsecaseInitParams = {
-  makeCacheDbService: Promise<CacheDbService>;
-  axios: any;
+  makeExchangeRateHandler: Promise<ExchangeRateHandler>;
 };
 
 type GetExchangeRatesUsecaseResponse = { exchangeRates: StringKeyObject };
 
-type OpenExchangeRateResponse = {
-  disclaimer: string;
-  license: string;
-  timestamp: Date;
-  base: string;
-  rates: StringKeyObject;
-};
-
 class GetExchangeRatesUsecase extends AbstractGetUsecase<
   OptionalGetExchangeRatesUsecaseInitParams,
   GetExchangeRatesUsecaseResponse,
-  any
+  undefined
 > {
-  private _cacheDbService!: CacheDbService;
-  private _axios!: any;
+  private _exchangeRateHandler!: ExchangeRateHandler;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetExchangeRatesUsecaseResponse> => {
-    const cacheKey = {
-      hashKey: 'exchangeRate',
-      key: 'latest',
-    };
-    const exchangeRateAPIUrl = this._getExchangeRateAPIUrl();
-    let cachedExchangeRates = await this._cacheDbService.get(cacheKey);
-    if (!cachedExchangeRates) {
-      const latestExchangeRatesRes: OpenExchangeRateResponse = (
-        await this._axios.get(exchangeRateAPIUrl)
-      ).data;
-      cachedExchangeRates = await this._cacheDbService.set({
-        ...cacheKey,
-        value: latestExchangeRatesRes.rates,
-        ttlMs: TTL_MS.DAY,
-      });
-    }
-    return { exchangeRates: cachedExchangeRates };
-  };
-
-  private _getExchangeRateAPIUrl = () => {
-    let apiKey;
-    if (process.env.NODE_ENV == 'production') {
-      apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY;
-    } else {
-      apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY_DEV;
-    }
-    return `https://openexchangerates.org/api/latest.json?app_id=${apiKey}`;
+    const exchangeRates = await this._exchangeRateHandler.getRates();
+    return { exchangeRates };
   };
 
   protected _initTemplate = async (
     optionalInitParams: OptionalGetExchangeRatesUsecaseInitParams
   ): Promise<void> => {
-    const { axios, makeCacheDbService } = optionalInitParams;
-    this._axios = axios;
-    this._cacheDbService = await makeCacheDbService;
+    const { makeExchangeRateHandler } = optionalInitParams;
+    this._exchangeRateHandler = await makeExchangeRateHandler;
   };
 }
 

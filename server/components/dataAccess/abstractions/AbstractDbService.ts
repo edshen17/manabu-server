@@ -452,7 +452,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     this._makeDbResponse = await makeDb();
     this._cloneDeep = cloneDeep;
     this._dbModel = dbModel;
-    this._dbModelName = this._dbModel.collection.collectionName;
+    this._dbModelName = this._dbModel ? this._dbModel.collection.collectionName : '';
     this._cacheDbService = await makeCacheDbService;
     await this._initTemplate(optionalDbServiceInitParams);
     return this;

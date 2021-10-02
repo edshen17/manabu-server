@@ -1,5 +1,4 @@
 const scheduler = require('../../components/scheduler/schedule');
-const { fetchExchangeRate } = require('../../components/scheduler/exchangeRateFetcher');
 const verifyTransactionData = require('../../components/verifyTransactionData');
 const fx = require('money');
 let exchangeRate;
@@ -24,17 +23,6 @@ if (process.env.NODE_ENV == 'production') {
 paypal.configure(paypalConfig);
 
 scheduler();
-
-// Route for validating transaction information
-router.get('/utils/verifyTransactionData', VerifyToken, async (req, res, next) => {
-  verifyTransactionData(req, res, exchangeRate).then((transactionData) => {
-    if (transactionData.status == 200) {
-      return res.status(200).json(transactionData);
-    } else {
-      return res.status(500).send('invalid transaction');
-    }
-  });
-});
 
 router.post('/pay', VerifyToken, (req, res, next) => {
   // handle paypal
