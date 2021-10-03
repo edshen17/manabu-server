@@ -2,23 +2,6 @@ const scheduler = require('../../components/scheduler/schedule');
 const verifyTransactionData = require('../../components/verifyTransactionData');
 const fx = require('money');
 let exchangeRate;
-const dayjs = require('dayjs');
-const paypal = require('paypal-rest-sdk');
-const paypalConfig = {
-  mode: 'sandbox', //sandbox or live, change to use process env
-  client_id: process.env.PAYPAL_CLIENT_ID_DEV,
-  client_secret: process.env.PAYPAL_CLIENT_SECRET_DEV,
-};
-
-if (process.env.NODE_ENV == 'production') {
-  paypalConfig.client_id = process.env.PAYPAL_CLIENT_ID;
-  paypalConfig.client_secret = process.env.PAYPAL_CLIENT_SECRET;
-  paypalConfig.mode = 'live';
-} else {
-}
-
-paypal.configure(paypalConfig);
-
 scheduler();
 
 router.post('/pay', VerifyToken, (req, res, next) => {

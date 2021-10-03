@@ -60,11 +60,11 @@ class RedirectUrlBuilder {
   public build = (): string => {
     const { host, endpoint, queryStrings } = this._redirectExpressCallbackOptions || {};
     this._setDefaultProperties();
-    let redirectPath = `${host}${endpoint}`;
+    let redirectUrl = `${host}${endpoint}`;
     if (queryStrings) {
-      redirectPath = `${redirectPath}?${queryStrings}`;
+      redirectUrl = `${redirectUrl}?${queryStrings}`;
     }
-    return redirectPath;
+    return redirectUrl;
   };
 
   public init = (initParams: { makeQueryStringHandler: QueryStringHandler }) => {

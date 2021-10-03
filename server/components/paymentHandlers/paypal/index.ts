@@ -1,0 +1,20 @@
+import paypal from 'paypal-rest-sdk';
+import { PaypalHandler } from './paypalHandler';
+
+const paypalConfig = {
+  mode: 'sandbox',
+  client_id: process.env.PAYPAL_CLIENT_ID_DEV!,
+  client_secret: process.env.PAYPAL_CLIENT_SECRET_DEV!,
+};
+
+if (process.env.NODE_ENV == 'production') {
+  paypalConfig.mode = 'live';
+  paypalConfig.client_id = process.env.PAYPAL_CLIENT_ID!;
+  paypalConfig.client_secret = process.env.PAYPAL_CLIENT_SECRET!;
+}
+
+paypal.configure(paypalConfig);
+
+const makePaypalHandler = new PaypalHandler().init({ paymentLib: paypal });
+
+export { makePaypalHandler };

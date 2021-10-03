@@ -67,7 +67,6 @@ describe('createPackageUsecase', () => {
       } catch (err) {
         return;
       }
-      console.log(err, 'here1');
       expect(err).to.be.an('error');
     };
 
