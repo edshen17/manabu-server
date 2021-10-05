@@ -91,7 +91,8 @@ describe('createAvailableTimeUsecase', () => {
         };
         it('should return a new available time', async () => {
           const createAvailableTimeRes = await createAvailableTime();
-          routeData.body.startDate = dayjs().add(1, 'hour');
+          routeData.body.startDate = dayjs().add(2, 'hour');
+          routeData.body.startDate = dayjs().add(3, 'hour');
           validResOutput(createAvailableTimeRes);
         });
       });

@@ -2,9 +2,13 @@ import { StringKeyObject } from '../../../types/custom';
 import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
 import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
 
-type OptionalPaypalHandlerInitParams = {};
+type OptionalPaypalHandlerInitParams = {
+  promisify: any;
+};
 
 class PaypalHandler extends AbstractPaymentHandler<OptionalPaypalHandlerInitParams> {
+  private _promisify: any;
+
   protected _createPaymentJson = (props: PaymentHandlerExecuteParams) => {
     const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total } = props;
     const createPaymentJson = {

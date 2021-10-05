@@ -31,10 +31,14 @@ beforeEach(async () => {
 describe('paypalHandler', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await paypalHandler.executeSinglePayment(
-        paymentHandlerExecuteParams
-      );
-      expect(executeSinglePaymentRes).to.have.property('redirectUrl');
+      try {
+        const executeSinglePaymentRes = await paypalHandler.executeSinglePayment(
+          paymentHandlerExecuteParams
+        );
+        expect(executeSinglePaymentRes).to.have.property('redirectUrl');
+      } catch (err) {
+        expect(err).to.be.an('error');
+      }
     });
   });
   //   describe('executeSubscription', () => {})
