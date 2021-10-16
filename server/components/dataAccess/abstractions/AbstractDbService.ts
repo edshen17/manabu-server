@@ -312,6 +312,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     });
     // return findById result rather than insertedModel to ensure caller gets correct select modelView
     const dbQueryResult = await this.findById({ _id: insertedModel._id, dbServiceAccessOptions });
+    await this._clearCacheBrancher();
     return dbQueryResult;
   };
 
@@ -331,6 +332,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
+    await this._clearCacheBrancher();
     return dbQueryResult;
   };
 
