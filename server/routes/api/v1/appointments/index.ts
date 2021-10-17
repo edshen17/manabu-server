@@ -11,7 +11,7 @@ appointments.get('/self', makeJSONExpressCallback.consume(makeGetAppointmentsCon
 
 appointments.get('/:appointmentId', makeJSONExpressCallback.consume(makeGetAppointmentController));
 
-appointments.post('/create', makeJSONExpressCallback.consume(makeCreateAppointmentsController));
+appointments.post('/', makeJSONExpressCallback.consume(makeCreateAppointmentsController));
 
 appointments.patch(
   '/:appointmentId',

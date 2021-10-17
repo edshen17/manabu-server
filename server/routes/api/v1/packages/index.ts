@@ -10,6 +10,6 @@ packages.patch('/:packageId', makeJSONExpressCallback.consume(makeEditPackageCon
 
 packages.delete('/:packageId', makeJSONExpressCallback.consume(makeDeletePackageController));
 
-packages.post('/create', makeJSONExpressCallback.consume(makeCreatePackagesController));
+packages.post('/', makeJSONExpressCallback.consume(makeCreatePackagesController));
 
 export { packages };

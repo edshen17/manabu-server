@@ -22,7 +22,7 @@ users.get(
 
 users.get('/:userId/appointments', makeJSONExpressCallback.consume(makeGetAppointmentsController));
 
-users.post('/create', makeJSONCookieExpressCallback.consume(makeCreateUserController));
+users.post('/', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 
 users.use('/auth', auth);
 

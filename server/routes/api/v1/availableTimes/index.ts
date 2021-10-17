@@ -19,6 +19,6 @@ availableTimes.delete(
   makeJSONExpressCallback.consume(makeDeleteAvailableTimeController)
 );
 
-availableTimes.post('/create', makeJSONExpressCallback.consume(makeCreateAvailableTimeController));
+availableTimes.post('/', makeJSONExpressCallback.consume(makeCreateAvailableTimeController));
 
 export { availableTimes };
