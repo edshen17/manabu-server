@@ -46,7 +46,7 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   }): Promise<AvailableTimeDoc> => {
     const { availableTimeId, body, dbServiceAccessOptions } = props;
     const availableTime = await this._dbService.findOneAndUpdate({
-      _id: availableTimeId,
+      searchQuery: { _id: availableTimeId },
       updateQuery: body,
       dbServiceAccessOptions,
     });

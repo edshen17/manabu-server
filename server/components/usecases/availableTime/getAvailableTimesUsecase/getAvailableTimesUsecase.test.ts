@@ -47,7 +47,7 @@ describe('getAvailableTimesUsecase', () => {
         .build();
       const getAvailableTimesRes = await getAvailableTimesUsecase.makeRequest(controllerData);
       const availableTimes = getAvailableTimesRes.availableTimes;
-      expect(availableTimes.length > 0).to.equal(true);
+      expect(availableTimes).to.be.an('array');
     };
     const testAvailableTimeError = async () => {
       let error;

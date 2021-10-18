@@ -68,10 +68,10 @@ class GetAvailableTimesUsecase extends AbstractGetUsecase<
         },
       ],
       startDate: {
-        $gte: startDate || this._dayjs().startOf('week').toDate(),
+        $gte: this._dayjs(startDate).toDate() || this._dayjs().startOf('week').toDate(),
       },
       endDate: {
-        $lte: endDate || this._dayjs().endOf('week').toDate(),
+        $lte: this._dayjs(endDate).toDate() || this._dayjs().endOf('week').toDate(),
       },
     };
     return searchQuery;
