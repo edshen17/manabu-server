@@ -2,10 +2,14 @@ import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { AvailableTimeConflictHandler } from '../../utils/availableTimeConflictHandler/availableTimeConflictHandler';
 
-type OptionalEditAvailableTimeUsecaseInitParams = {};
+type OptionalEditAvailableTimeUsecaseInitParams = {
+  makeAvailableTimeConflictHandler: Promise<AvailableTimeConflictHandler>;
+};
 
 type EditAvailableTimeUsecaseResponse = {
   availableTime: AvailableTimeDoc;
@@ -16,6 +20,8 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   EditAvailableTimeUsecaseResponse,
   AvailableTimeDoc
 > {
+  private _availableTimeConflictHandler!: AvailableTimeConflictHandler;
+
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
       hasResourceAccessCheck: true,
@@ -26,8 +32,9 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<EditAvailableTimeUsecaseResponse> => {
-    const { params, body, dbServiceAccessOptions } = props;
+    const { params, body, dbServiceAccessOptions, currentAPIUser } = props;
     const { availableTimeId } = params;
+    await this._testTimeConflict({ currentAPIUser, body });
     const availableTime = await this._editAvailableTime({
       availableTimeId,
       body,
@@ -37,6 +44,16 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
       availableTime,
     };
     return usecaseRes;
+  };
+
+  private _testTimeConflict = async (props: {
+    currentAPIUser: CurrentAPIUser;
+    body: StringKeyObject;
+  }) => {
+    const { currentAPIUser, body } = props;
+    const hostedById = <ObjectId>currentAPIUser.userId;
+    const { startDate, endDate } = body;
+    await this._availableTimeConflictHandler.testTime({ hostedById, startDate, endDate });
   };
 
   private _editAvailableTime = async (props: {
@@ -51,6 +68,13 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
       dbServiceAccessOptions,
     });
     return availableTime;
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalEditAvailableTimeUsecaseInitParams
+  ): Promise<void> => {
+    const { makeAvailableTimeConflictHandler } = optionalInitParams;
+    this._availableTimeConflictHandler = await makeAvailableTimeConflictHandler;
   };
 }
 

@@ -4,6 +4,7 @@ import { makeAvailableTimeDbService } from '../../../dataAccess/services/availab
 import { makeAvailableTimeEntityValidator } from '../../../validators/availableTime/entity';
 import { makeAvailableTimeParamsValidator } from '../../../validators/availableTime/params';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
+import { makeAvailableTimeConflictHandler } from '../../utils/availableTimeConflictHandler';
 import { EditAvailableTimeUsecase } from './editAvailableTimeUsecase';
 
 const makeEditAvailableTimeUsecase = new EditAvailableTimeUsecase().init({
@@ -13,6 +14,7 @@ const makeEditAvailableTimeUsecase = new EditAvailableTimeUsecase().init({
   makeDbService: makeAvailableTimeDbService,
   deepEqual,
   makeEditEntityValidator: makeAvailableTimeEntityValidator,
+  makeAvailableTimeConflictHandler,
 });
 
 export { makeEditAvailableTimeUsecase };

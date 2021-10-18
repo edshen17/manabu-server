@@ -78,8 +78,8 @@ describe('availableTimeConflictHandler', () => {
     });
     context('valid inputs', () => {
       it('should not throw an error', async () => {
-        body.startDate = dayjs().add(3, 'hour').toDate();
-        body.endDate = dayjs().add(4, 'hour').toDate();
+        body.startDate = dayjs().minute(0).add(3, 'hour').toDate();
+        body.endDate = dayjs().minute(0).add(4, 'hour').toDate();
         const validRes = await testTime();
         expect(validRes).to.equal(undefined);
       });

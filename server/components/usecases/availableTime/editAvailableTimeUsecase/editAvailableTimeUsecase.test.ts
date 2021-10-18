@@ -76,6 +76,13 @@ describe('editAvailableTimeUsecase', () => {
           };
           await testAvailableTimeError();
         });
+        it('should throw if invalid date', async () => {
+          routeData.body = {
+            startDate: new Date(),
+            endDate: new Date(),
+          };
+          await testAvailableTimeError();
+        });
       });
       context('valid inputs', () => {
         const validResOutput = (editAvailableTimeUsecase: EditAvailableTimeUsecaseResponse) => {

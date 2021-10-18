@@ -8,9 +8,11 @@ import {
 } from '../../../entities/availableTime/availableTimeEntity';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { AvailableTimeConflictHandler } from '../../utils/availableTimeConflictHandler/availableTimeConflictHandler';
 
 type OptionalCreateAvailableTimeUsecaseInitParams = {
   makeAvailableTimeEntity: Promise<AvailableTimeEntity>;
+  makeAvailableTimeConflictHandler: Promise<AvailableTimeConflictHandler>;
 };
 
 type CreateAvailableTimeUsecaseResponse = {
@@ -23,12 +25,13 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   AvailableTimeDoc
 > {
   private _availableTimeEntity!: AvailableTimeEntity;
+  private _availableTimeConflictHandler!: AvailableTimeConflictHandler;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateAvailableTimeUsecaseResponse> => {
     const { body, dbServiceAccessOptions, currentAPIUser } = props;
-    await this._testTimeConflict({ body, dbServiceAccessOptions });
+    await this._testTimeConflict(body);
     const availableTimeEntity = await this._availableTimeEntity.build({
       ...body,
       hostedById: <ObjectId>currentAPIUser.userId,
@@ -43,19 +46,9 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
     return usecaseRes;
   };
 
-  private _testTimeConflict = async (props: {
-    body: AvailableTimeEntityBuildParams;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<void> => {
-    const { body, dbServiceAccessOptions } = props;
+  private _testTimeConflict = async (body: AvailableTimeEntityBuildParams): Promise<void> => {
     const { hostedById, startDate, endDate } = body;
-    const availableTime = await this._dbService.findOne({
-      searchQuery: { hostedById, startDate: { $lte: endDate }, endDate: { $gte: startDate } },
-      dbServiceAccessOptions,
-    });
-    if (availableTime) {
-      throw new Error('You cannot have timeslots that overlap.');
-    }
+    await this._availableTimeConflictHandler.testTime({ hostedById, startDate, endDate });
   };
 
   private _createAvailableTime = async (props: {
@@ -73,8 +66,9 @@ class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateAvailableTimeUsecaseInitParams
   ): Promise<void> => {
-    const { makeAvailableTimeEntity } = optionalInitParams;
+    const { makeAvailableTimeEntity, makeAvailableTimeConflictHandler } = optionalInitParams;
     this._availableTimeEntity = await makeAvailableTimeEntity;
+    this._availableTimeConflictHandler = await makeAvailableTimeConflictHandler;
   };
 }
 
