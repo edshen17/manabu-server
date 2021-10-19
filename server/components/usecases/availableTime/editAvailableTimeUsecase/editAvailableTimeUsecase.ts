@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AvailableTimeEntityValidator } from '../../../validators/availableTime/entity/availableTimeEntityValidator';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -9,6 +10,7 @@ import { AvailableTimeConflictHandler } from '../../utils/availableTimeConflictH
 
 type OptionalEditAvailableTimeUsecaseInitParams = {
   makeAvailableTimeConflictHandler: Promise<AvailableTimeConflictHandler>;
+  makeEditEntityValidator: AvailableTimeEntityValidator;
 };
 
 type EditAvailableTimeUsecaseResponse = {
@@ -53,7 +55,13 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
     const { currentAPIUser, body } = props;
     const hostedById = <ObjectId>currentAPIUser.userId;
     const { startDate, endDate } = body;
-    await this._availableTimeConflictHandler.testTime({ hostedById, startDate, endDate });
+    const isEditing = true;
+    await this._availableTimeConflictHandler.testTime({
+      hostedById,
+      isEditing,
+      startDate,
+      endDate,
+    });
   };
 
   private _editAvailableTime = async (props: {
@@ -73,8 +81,9 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalEditAvailableTimeUsecaseInitParams
   ): Promise<void> => {
-    const { makeAvailableTimeConflictHandler } = optionalInitParams;
+    const { makeAvailableTimeConflictHandler, makeEditEntityValidator } = optionalInitParams;
     this._availableTimeConflictHandler = await makeAvailableTimeConflictHandler;
+    this._editEntityValidator = makeEditEntityValidator;
   };
 }
 

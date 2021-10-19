@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeEditAvailableTimeController } from '.';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
@@ -31,7 +32,8 @@ beforeEach(async () => {
     availableTimeId: fakeAvailableTime._id,
   };
   body = {
-    endDate: new Date(),
+    startDate: dayjs().minute(0).toDate(),
+    endDate: dayjs().minute(30).toDate(),
   };
   currentAPIUser = {
     role: 'user',

@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeEditAvailableTimeUsecase } from '.';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
@@ -32,7 +33,8 @@ beforeEach(async () => {
       availableTimeId: fakeAvailableTime._id,
     },
     body: {
-      endDate: new Date(),
+      startDate: dayjs().minute(0).toDate(),
+      endDate: dayjs().minute(30).toDate(),
     },
     query: {},
     endpointPath: '',
@@ -89,7 +91,7 @@ describe('editAvailableTimeUsecase', () => {
           const availableTime = editAvailableTimeUsecase.availableTime;
           expect(availableTime).to.not.deep.equal(fakeAvailableTime);
         };
-        it('should return a new available time', async () => {
+        it('should edit the available time', async () => {
           const editAvailableTimeRes = await editAvailableTime();
           validResOutput(editAvailableTimeRes);
         });

@@ -56,8 +56,8 @@ describe('createAvailableTimeController', () => {
       it('should create a new available time document', async () => {
         body = {
           hostedById: fakeTeacher._id,
-          startDate: dayjs().toDate(),
-          endDate: dayjs().add(30, 'minute').toDate(),
+          startDate: dayjs().minute(0).toDate(),
+          endDate: dayjs().minute(30).toDate(),
         };
         const createAvailableTimeRes = await createAvailableTime();
         expect(createAvailableTimeRes.statusCode).to.equal(201);

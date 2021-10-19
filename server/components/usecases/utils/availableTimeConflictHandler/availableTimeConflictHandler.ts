@@ -7,17 +7,18 @@ class AvailableTimeConflictHandler {
 
   public testTime = async (props: {
     hostedById: ObjectId;
+    isEditing?: boolean;
     startDate: Date;
     endDate: Date;
   }): Promise<void> => {
-    const { hostedById, startDate, endDate } = props;
+    const { hostedById, isEditing, startDate, endDate } = props;
     const dbServiceAccessOptions = this._availableTimeDbService.getBaseDbServiceAccessOptions();
     const isValidDuration = this._dayjs(endDate).diff(startDate, 'minute') % 30 == 0;
     const isValidStartTime = [0, 30].includes(this._dayjs(startDate).minute());
     const isValidEndTime = [0, 30].includes(this._dayjs(endDate).minute());
     const isValidTime = isValidStartTime && isValidEndTime;
     const availableTime = await this._availableTimeDbService.findOne({
-      searchQuery: { hostedById, startDate: { $lte: endDate }, endDate: { $gte: startDate } },
+      searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
       dbServiceAccessOptions,
     });
     if (!isValidDuration) {
@@ -26,7 +27,7 @@ class AvailableTimeConflictHandler {
     if (!isValidTime) {
       throw new Error('Timeslots must begin at the start of the hour or 30 minutes into the hour.');
     }
-    if (availableTime) {
+    if (availableTime && !isEditing) {
       throw new Error('You cannot have timeslots that overlap.');
     }
   };
