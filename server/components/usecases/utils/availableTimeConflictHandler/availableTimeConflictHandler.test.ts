@@ -31,7 +31,7 @@ beforeEach(async () => {
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
   body = {
     hostedById: fakeTeacher._id,
-    startDate: dayjs().toDate(),
+    startDate: dayjs().minute(0).toDate(),
     endDate: dayjs().add(1, 'hour').toDate(),
   };
   fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData(body);
@@ -61,12 +61,11 @@ describe('availableTimeConflictHandler', () => {
         await testTimeError();
       });
       it('should throw an error if available time overlaps at the end', async () => {
-        body.startDate = body.endDate;
+        body.startDate = dayjs(body.endDate).subtract(30, 'minutes').toDate();
         body.endDate = dayjs().add(1, 'hour').toDate();
         await testTimeError();
       });
       it('should throw an error if available time is not divisible by 30mins', async () => {
-        body.startDate = dayjs().minute(0).toDate();
         body.endDate = dayjs().add(1, 'minute').toDate();
         await testTimeError();
       });

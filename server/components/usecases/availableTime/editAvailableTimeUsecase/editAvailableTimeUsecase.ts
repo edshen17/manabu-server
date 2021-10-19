@@ -36,7 +36,7 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   ): Promise<EditAvailableTimeUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions, currentAPIUser } = props;
     const { availableTimeId } = params;
-    await this._testTimeConflict({ currentAPIUser, body });
+    await this._testTimeConflict({ currentAPIUser, body, availableTimeId });
     const availableTime = await this._editAvailableTime({
       availableTimeId,
       body,
@@ -51,14 +51,14 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
   private _testTimeConflict = async (props: {
     currentAPIUser: CurrentAPIUser;
     body: StringKeyObject;
+    availableTimeId: ObjectId;
   }) => {
-    const { currentAPIUser, body } = props;
+    const { currentAPIUser, body, availableTimeId } = props;
     const hostedById = <ObjectId>currentAPIUser.userId;
     const { startDate, endDate } = body;
-    const isEditing = true;
     await this._availableTimeConflictHandler.testTime({
       hostedById,
-      isEditing,
+      availableTimeId,
       startDate,
       endDate,
     });

@@ -51,7 +51,7 @@ class CacheDbService {
         const isDateProperty = property.includes('Date');
         const isDateStr = this._isDateStr(value) && isDateProperty;
         if (isObjectId) {
-          obj[property] = this._convertStringToObjectId(obj[property]);
+          obj[property] = this._convertStringToObjectId(value);
         } else if (isDateStr) {
           obj[property] = new Date(value);
         }

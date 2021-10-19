@@ -80,8 +80,8 @@ describe('editAvailableTimeUsecase', () => {
         });
         it('should throw if invalid date', async () => {
           routeData.body = {
-            startDate: new Date(),
-            endDate: new Date(),
+            startDate: dayjs().minute(1).toDate(),
+            endDate: dayjs().minute(2).toDate(),
           };
           await testAvailableTimeError();
         });

@@ -35,8 +35,8 @@ beforeEach(async () => {
   routeData = {
     params: {},
     body: {
-      startDate: new Date(),
-      endDate: new Date(),
+      startDate: dayjs().minute(1).toDate(),
+      endDate: dayjs().minute(2).toDate(),
     },
     query: {},
     endpointPath: '',
@@ -71,7 +71,7 @@ describe('createAvailableTimeUsecase', () => {
           routeDataBody.createdDate = new Date();
           await testAvailableTimeError();
         });
-        it('should throw an error if there is an availableTime overlap', async () => {
+        it('should throw an error when creating an invalid availableTime', async () => {
           let err;
           try {
             await createAvailableTime();
@@ -90,9 +90,9 @@ describe('createAvailableTimeUsecase', () => {
           expect(availableTime).to.have.property('endDate');
         };
         it('should return a new available time', async () => {
-          const createAvailableTimeRes = await createAvailableTime();
           routeData.body.startDate = dayjs().minute(0).toDate();
           routeData.body.endDate = dayjs().minute(30).toDate();
+          const createAvailableTimeRes = await createAvailableTime();
           validResOutput(createAvailableTimeRes);
         });
       });

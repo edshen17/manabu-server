@@ -13,6 +13,7 @@ interface IController<UsecaseResponse> {
   init: (props: {
     makeUsecase: Promise<IUsecase<any, UsecaseResponse, any>>;
     makeQueryStringHandler: QueryStringHandler;
+    convertStringToObjectId: any;
   }) => Promise<this>;
 }
 
