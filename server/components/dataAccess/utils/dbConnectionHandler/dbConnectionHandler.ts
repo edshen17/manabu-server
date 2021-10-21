@@ -3,23 +3,31 @@ import { Mongoose } from 'mongoose';
 import { StringKeyObject } from '../../../../types/custom';
 
 class DbConnectionHandler {
-  private _dbConnection!: Mongoose;
   private _mongoose!: Mongoose;
   private _replicaSets: MongoMemoryReplSet[] = [];
   private _mongoMemoryReplSet!: typeof MongoMemoryReplSet;
 
   public connect = async (): Promise<void> => {
-    const isDbConnected = this._dbConnection && this._dbConnection.connection.readyState != 0;
+    const isDbConnected = this._mongoose.connection.readyState != 0;
     if (!isDbConnected) {
-      const URIOptions = 'retryWrites=false&w=majority';
+      const dbUri = await this._getDbUri();
+      const mongoDbOptions = this._getMongoDbOptions();
+      await this._mongoose.connect(dbUri, mongoDbOptions);
+    }
+  };
+
+  private _getDbUri = async (): Promise<string> => {
+    const dbHost = 'staging'; // change to users
+    const uriOptions = 'retryWrites=false&w=majority';
+    let dbUri = `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?${uriOptions}`;
+    if (process.env.NODE_ENV != 'production') {
       const mongod = await this._mongoMemoryReplSet.create({
         replSet: { count: 1, storageEngine: 'wiredTiger' },
       });
       this._replicaSets.push(mongod);
-      const dbURI = `${mongod.getUri()}&${URIOptions}`;
-      const mongoDbOptions = this._getMongoDbOptions();
-      this._dbConnection = await this._mongoose.connect(dbURI, mongoDbOptions);
+      dbUri = `${mongod.getUri()}&${uriOptions}`;
     }
+    return dbUri;
   };
 
   private _getMongoDbOptions = (): StringKeyObject => {
@@ -38,8 +46,9 @@ class DbConnectionHandler {
   };
 
   public stop = async (): Promise<void> => {
-    if (this._dbConnection) {
-      await this._dbConnection.disconnect();
+    const isDbConnected = this._mongoose.connection.readyState != 0;
+    if (isDbConnected) {
+      await this._mongoose.disconnect();
     }
     for (const replicaSet of this._replicaSets) {
       await replicaSet.stop();

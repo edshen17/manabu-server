@@ -90,8 +90,8 @@ describe('createAvailableTimeUsecase', () => {
           expect(availableTime).to.have.property('endDate');
         };
         it('should return a new available time', async () => {
-          routeData.body.startDate = dayjs().minute(0).toDate();
-          routeData.body.endDate = dayjs().minute(30).toDate();
+          routeData.body.startDate = dayjs().hour(7).minute(0).toDate();
+          routeData.body.endDate = dayjs().hour(7).minute(30).toDate();
           const createAvailableTimeRes = await createAvailableTime();
           validResOutput(createAvailableTimeRes);
         });

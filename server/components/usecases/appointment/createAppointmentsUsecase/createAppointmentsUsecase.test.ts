@@ -134,8 +134,7 @@ describe('createAppointmentUsecase', () => {
           await testAppointmentsError();
         });
         it('should throw an error if appointment goes over available time', async () => {
-          firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
-          firstAppointment.endDate = dayjs(firstAppointment.startDate).add(1, 'hour').toDate();
+          firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
           await testAppointmentsError();
         });
         it('should throw an error if user is not logged in', async () => {
