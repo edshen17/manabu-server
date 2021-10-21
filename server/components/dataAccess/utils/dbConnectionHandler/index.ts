@@ -6,6 +6,10 @@ const makeMongod = MongoMemoryReplSet.create({
   replSet: { count: 1, storageEngine: 'wiredTiger' },
 });
 
-const makeDbConnectionHandler = new DbConnectionHandler().init({ mongoose, makeMongod });
+const makeDbConnectionHandler = new DbConnectionHandler().init({
+  mongoose,
+  makeMongod,
+  MongoMemoryReplSet,
+});
 
 export { makeDbConnectionHandler };

@@ -6,6 +6,7 @@ class DbConnectionHandler {
   private _dbConnection!: Mongoose;
   private _mongoose!: Mongoose;
   private _mongod!: MongoMemoryReplSet;
+  private _mongoMemoryReplSet!: typeof MongoMemoryReplSet;
 
   public connect = async (): Promise<void> => {
     if (
@@ -13,6 +14,11 @@ class DbConnectionHandler {
       (this._dbConnection && this._dbConnection.connection.readyState == 0)
     ) {
       const URIOptions = 'retryWrites=false&w=majority';
+      if (this._mongod.state == 'stopped') {
+        this._mongod = await this._mongoMemoryReplSet.create({
+          replSet: { count: 1, storageEngine: 'wiredTiger' },
+        });
+      }
       const dbURI = `${this._mongod.getUri()}&${URIOptions}`;
       const mongoDbOptions: StringKeyObject = {
         useNewUrlParser: true,
@@ -20,26 +26,33 @@ class DbConnectionHandler {
         useFindAndModify: false,
         ignoreUndefined: true,
         useCreateIndex: true,
-        readPreference: 'nearest',
+        readPreference: 'primary',
       };
       this._dbConnection = await this._mongoose.connect(dbURI, mongoDbOptions);
-      console.log('connected');
     }
   };
 
   public stop = async (): Promise<void> => {
-    if (this._dbConnection) {
-      await this._dbConnection.disconnect();
-      await this._mongod.stop();
-      console.log('stopped');
+    this._mongod.state;
+    try {
+      if (this._dbConnection) {
+        await this._dbConnection.disconnect();
+      }
+      if (this._mongod && ['running', 'init'].includes(this._mongod.state)) {
+        await this._mongod.stop();
+      }
+    } catch (err) {
+      return;
     }
   };
 
   public init = async (props: {
     mongoose: Mongoose;
     makeMongod: Promise<MongoMemoryReplSet>;
+    MongoMemoryReplSet: typeof MongoMemoryReplSet;
   }): Promise<this> => {
-    const { mongoose, makeMongod } = props;
+    const { mongoose, makeMongod, MongoMemoryReplSet } = props;
+    this._mongoMemoryReplSet = MongoMemoryReplSet;
     this._mongoose = mongoose;
     this._mongod = await makeMongod;
     return this;
