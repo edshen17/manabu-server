@@ -17,9 +17,4 @@ const mochaGlobalSetup = async () => {
   const ENV_VARIABLES = require('dotenv').config();
 };
 
-const mochaGlobalTeardown = async () => {
-  // await dbConnectionHandler.stop();
-  // return;
-};
-
-export { mochaGlobalSetup, mochaGlobalTeardown, mochaHooks };
+export { mochaGlobalSetup, mochaHooks };
