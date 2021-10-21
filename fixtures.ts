@@ -1,14 +1,43 @@
-import { makeDb, mongod } from './server/components/dataAccess';
+import { makeDbConnectionHandler } from './server/components/dataAccess/utils/dbConnectionHandler';
+import { DbConnectionHandler } from './server/components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
 
-const mochaGlobalSetup = () => {
+let dbConnectionHandler: DbConnectionHandler;
+
+(async () => {
+  dbConnectionHandler = await makeDbConnectionHandler;
+  await dbConnectionHandler.connect();
+})();
+
+const mochaHooks = {
+  async beforeAll(): Promise<void> {
+    // dbConnectionHandler = await makeDbConnectionHandler;
+    // await dbConnectionHandler.connect();
+  },
+  async afterAll(): Promise<void> {
+    // await dbConnectionHandler.stop();
+    // const collectionNames = mongoose.modelNames().map((modelName) => {
+    //   return modelName.toLowerCase();
+    // });
+    // for (const name of collectionNames) {
+    //   console.log(name);
+    //   await mongoose.connection.dropCollection(name);
+    // }
+    // const db = await mongoose.connection.dropCollection();
+    // console.log(db);
+    // const collections = await mongoose.connection.db.collections();
+    // for (const collection of collections) {
+    //   await collection.drop();
+    // }
+  },
+};
+
+const mochaGlobalSetup = async () => {
   const ENV_VARIABLES = require('dotenv').config();
 };
 
 const mochaGlobalTeardown = async () => {
-  const { mongoose } = await makeDb();
-  await mongoose.disconnect();
-  (await mongod).stop();
-  (await mongod).cleanup(true);
+  await dbConnectionHandler.stop();
+  return;
 };
 
-export { mochaGlobalSetup, mochaGlobalTeardown };
+export { mochaGlobalSetup, mochaGlobalTeardown, mochaHooks };

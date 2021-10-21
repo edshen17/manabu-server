@@ -1,12 +1,12 @@
 import cloneDeep from 'clone-deep';
-import { makeDb } from '../..';
+import mongoose from 'mongoose';
 import { Appointment } from '../../../../models/Appointment';
 import { makeCacheDbService } from '../cache';
 import { makePackageTransactionDbService } from '../packageTransaction';
 import { AppointmentDbService } from './appointmentDbService';
 
 const makeAppointmentDbService = new AppointmentDbService().init({
-  makeDb,
+  mongoose,
   dbModel: Appointment,
   cloneDeep,
   makePackageTransactionDbService,

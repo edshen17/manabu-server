@@ -1,5 +1,4 @@
-import { ObjectId } from 'mongoose';
-import { MakeDbResponse } from '..';
+import { ClientSession, Mongoose, ObjectId } from 'mongoose';
 import { StringKeyObject } from '../../../types/custom';
 import { CacheDbService, TTL_MS } from '../services/cache/cacheDbService';
 import {
@@ -22,7 +21,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   protected _joinType: string = DB_SERVICE_JOIN_TYPE.NONE;
   protected _ttlMs: number = TTL_MS.WEEK;
   protected _cacheDbService!: CacheDbService;
-  protected _makeDbResponse!: MakeDbResponse;
+  protected _mongoose!: Mongoose;
 
   protected _getDbServiceModelViews = (): DbServiceModelViews => {
     return {
@@ -437,21 +436,17 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
     return dbQueryResult;
   };
 
-  public startSession = async (): Promise<any> => {
-    const { dbURI, mongoDbOptions, mongoose } = this._makeDbResponse;
-    const mongoDbOptionsCopy = this._cloneDeep(mongoDbOptions);
-    mongoDbOptionsCopy.readPreference = 'primary';
-    const db = await mongoose.createConnection(dbURI, mongoDbOptionsCopy);
-    const session = await db.startSession();
+  public startSession = async (): Promise<ClientSession> => {
+    const session = await this._mongoose.startSession();
     return session;
   };
 
   public init = async (
     initParams: DbServiceInitParams<OptionalDbServiceInitParams>
   ): Promise<this> => {
-    const { makeDb, cloneDeep, dbModel, makeCacheDbService, ...optionalDbServiceInitParams } =
+    const { mongoose, cloneDeep, dbModel, makeCacheDbService, ...optionalDbServiceInitParams } =
       initParams;
-    this._makeDbResponse = await makeDb();
+    this._mongoose = mongoose;
     this._cloneDeep = cloneDeep;
     this._dbModel = dbModel;
     this._dbModelName = this._dbModel ? this._dbModel.collection.collectionName : '';
@@ -463,7 +458,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   protected _initTemplate = async (
     optionalDbServiceInitParams: Omit<
       DbServiceInitParams<OptionalDbServiceInitParams>,
-      'makeDb' | 'cloneDeep' | 'dbModel' | 'makeCacheDbService'
+      'mongoose' | 'cloneDeep' | 'dbModel' | 'makeCacheDbService'
     >
   ): Promise<void> => {
     return;

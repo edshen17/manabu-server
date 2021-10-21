@@ -1,10 +1,10 @@
 import cloneDeep from 'clone-deep';
-import { makeDb } from '../..';
+import mongoose from 'mongoose';
 import { makeCacheDbService } from '../cache';
 import { StubDbService } from './stubDbService';
 
 const makeStubDbService = new StubDbService().init({
-  makeDb,
+  mongoose,
   dbModel: undefined,
   cloneDeep,
   makeCacheDbService,

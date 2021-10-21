@@ -1,12 +1,12 @@
 import { compareSync as comparePassword } from 'bcryptjs';
 import cloneDeep from 'clone-deep';
-import { makeDb } from '../..';
+import mongoose from 'mongoose';
 import { User } from '../../../../models/User';
 import { makeCacheDbService } from '../cache';
 import { UserDbService } from './userDbService';
 
 const makeUserDbService = new UserDbService().init({
-  makeDb,
+  mongoose,
   dbModel: User,
   comparePassword,
   cloneDeep,

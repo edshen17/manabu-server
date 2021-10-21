@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { Mongoose, ObjectId } from 'mongoose';
 import { StringKeyObject } from '../../../types/custom';
 import { CacheDbService } from '../services/cache/cacheDbService';
 
@@ -6,7 +6,7 @@ type DbServiceInitParams<OptionalDbServiceInitParams> = RequiredDbServiceInitPar
   OptionalDbServiceInitParams;
 
 type RequiredDbServiceInitParams = {
-  makeDb: () => Promise<any>;
+  mongoose: Mongoose;
   cloneDeep: any;
   dbModel: any;
   makeCacheDbService: Promise<CacheDbService>;
