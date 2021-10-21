@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '.env' });
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -6,6 +7,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
+import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
 
@@ -55,4 +57,8 @@ const port = process.env.PORT || 5000;
 
 http.createServer(app).listen(port, function () {
   console.log(`Express server listening on port ${port}`);
+});
+
+makeDbConnectionHandler.then(async (dbConnectionHandler) => {
+  await dbConnectionHandler.connect();
 });
