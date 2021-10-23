@@ -1,10 +1,10 @@
 import { StringKeyObject } from '../../../types/custom';
 
-type PaymentHandlerInitParams<OptionalPaymentHandlerInitParams> = RequiredPaymentHandlerInitParams &
-  OptionalPaymentHandlerInitParams;
+type PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams> =
+  RequiredPaymentHandlerInitParams<PaymentLibType> & OptionalPaymentHandlerInitParams;
 
-type RequiredPaymentHandlerInitParams = {
-  paymentLib: any;
+type RequiredPaymentHandlerInitParams<PaymentLibType> = {
+  paymentLib: PaymentLibType;
 };
 
 type PaymentHandlerExecuteParams = {
@@ -17,10 +17,25 @@ type PaymentHandlerExecuteParams = {
   subscription?: boolean;
 };
 
-interface IPaymentHandler<OptionalPaymentHandlerInitParams> {
-  executeSinglePayment: (props: PaymentHandlerExecuteParams) => Promise<any>;
-  executeSubscription: (props: PaymentHandlerExecuteParams) => Promise<any>;
-  init: (initParams: PaymentHandlerInitParams<OptionalPaymentHandlerInitParams>) => Promise<this>;
+type PaymentHandlerExecutePaymentRes = {
+  redirectUrl: string;
+};
+
+interface IPaymentHandler<PaymentLibType, OptionalPaymentHandlerInitParams> {
+  executeSinglePayment: (
+    props: PaymentHandlerExecuteParams
+  ) => Promise<PaymentHandlerExecutePaymentRes>;
+  executeSubscription: (
+    props: PaymentHandlerExecuteParams
+  ) => Promise<PaymentHandlerExecutePaymentRes>;
+  init: (
+    initParams: PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams>
+  ) => Promise<this>;
 }
 
-export { IPaymentHandler, PaymentHandlerInitParams, PaymentHandlerExecuteParams };
+export {
+  IPaymentHandler,
+  PaymentHandlerInitParams,
+  PaymentHandlerExecuteParams,
+  PaymentHandlerExecutePaymentRes,
+};

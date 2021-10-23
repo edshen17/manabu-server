@@ -1,5 +1,4 @@
 import paypal from 'paypal-rest-sdk';
-import { promisify } from 'util';
 import { PaypalHandler } from './paypalHandler';
 
 const paypalConfig = {
@@ -16,6 +15,6 @@ if (process.env.NODE_ENV == 'production') {
 
 paypal.configure(paypalConfig);
 
-const makePaypalHandler = new PaypalHandler().init({ paymentLib: paypal, promisify });
+const makePaypalHandler = new PaypalHandler().init({ paymentLib: paypal });
 
 export { makePaypalHandler };

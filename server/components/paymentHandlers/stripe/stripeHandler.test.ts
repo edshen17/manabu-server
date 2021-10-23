@@ -1,13 +1,12 @@
 import { expect } from 'chai';
-import { makePaypalHandler } from '.';
+import { makeStripeHandler } from '.';
 import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
-import { PaypalHandler } from './paypalHandler';
-
-let paypalHandler: PaypalHandler;
+import { StripeHandler } from './stripeHandler';
+let stripeHandler: StripeHandler;
 let paymentHandlerExecuteParams: PaymentHandlerExecuteParams;
 
 before(async () => {
-  paypalHandler = await makePaypalHandler;
+  stripeHandler = await makeStripeHandler;
 });
 
 beforeEach(async () => {
@@ -16,10 +15,13 @@ beforeEach(async () => {
     cancelRedirectUrl: 'https://manabu.sg/cancel',
     items: [
       {
-        name: 'test item',
-        sku: '123',
-        price: '100',
-        currency: 'SGD',
+        price_data: {
+          currency: 'sgd',
+          product_data: {
+            name: 'T-shirt',
+          },
+          unit_amount: 2000,
+        },
         quantity: 1,
       },
     ],
@@ -28,10 +30,10 @@ beforeEach(async () => {
   };
 });
 
-describe('paypalHandler', () => {
+describe('stripeHandler', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await paypalHandler.executeSinglePayment(
+      const executeSinglePaymentRes = await stripeHandler.executeSinglePayment(
         paymentHandlerExecuteParams
       );
       expect(executeSinglePaymentRes).to.have.property('redirectUrl');

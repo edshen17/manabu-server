@@ -2,17 +2,18 @@ import { StringKeyObject } from '../../../types/custom';
 import {
   IPaymentHandler,
   PaymentHandlerExecuteParams,
+  PaymentHandlerExecutePaymentRes,
   PaymentHandlerInitParams,
 } from '../abstractions/IPaymentHandler';
 
-abstract class AbstractPaymentHandler<OptionalPaymentHandlerInitParams>
-  implements IPaymentHandler<OptionalPaymentHandlerInitParams>
+abstract class AbstractPaymentHandler<PaymentLibType, OptionalPaymentHandlerInitParams>
+  implements IPaymentHandler<PaymentLibType, OptionalPaymentHandlerInitParams>
 {
-  protected _paymentLib!: any;
+  protected _paymentLib!: PaymentLibType;
 
   public executeSinglePayment = async (
     props: PaymentHandlerExecuteParams
-  ): Promise<StringKeyObject> => {
+  ): Promise<PaymentHandlerExecutePaymentRes> => {
     const createPaymentJson = this._createPaymentJson(props);
     const executePaymentRes = await this._executePaymentTemplate(createPaymentJson);
     return executePaymentRes;
@@ -22,14 +23,16 @@ abstract class AbstractPaymentHandler<OptionalPaymentHandlerInitParams>
 
   protected abstract _executePaymentTemplate(
     createPaymentJson: StringKeyObject
-  ): Promise<StringKeyObject>;
+  ): Promise<PaymentHandlerExecutePaymentRes>;
 
-  public executeSubscription = async () => {
-    return;
+  public executeSubscription = async (): Promise<PaymentHandlerExecutePaymentRes> => {
+    return {
+      redirectUrl: '',
+    };
   };
 
   public init = async (
-    initParams: PaymentHandlerInitParams<OptionalPaymentHandlerInitParams>
+    initParams: PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams>
   ): Promise<this> => {
     const { paymentLib, ...optionalInitParams } = initParams;
     this._paymentLib = paymentLib;
@@ -39,7 +42,7 @@ abstract class AbstractPaymentHandler<OptionalPaymentHandlerInitParams>
 
   protected _initTemplate = (
     optionalInitParams: Omit<
-      PaymentHandlerInitParams<OptionalPaymentHandlerInitParams>,
+      PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams>,
       'paymentLib'
     >
   ): Promise<void> | void => {
@@ -47,4 +50,4 @@ abstract class AbstractPaymentHandler<OptionalPaymentHandlerInitParams>
   };
 }
 
-export { AbstractPaymentHandler };
+export { AbstractPaymentHandler, PaymentHandlerExecutePaymentRes };

@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
 import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler';
+import { DbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
 
@@ -19,6 +20,7 @@ const corsConfig = {
   preflightContinue: false,
   optionsSuccessStatus: 204,
 };
+let dbConnectionHandler: DbConnectionHandler;
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -59,6 +61,16 @@ http.createServer(app).listen(port, function () {
   console.log(`Express server listening on port ${port}`);
 });
 
-makeDbConnectionHandler.then(async (dbConnectionHandler) => {
+makeDbConnectionHandler.then(async (dbHandler) => {
+  dbConnectionHandler = dbHandler;
   await dbConnectionHandler.connect();
+});
+
+process.on('SIGINT', async (signal) => {
+  try {
+    await dbConnectionHandler.stop();
+  } catch (err) {
+    return;
+  }
+  process.exitCode = 1;
 });
