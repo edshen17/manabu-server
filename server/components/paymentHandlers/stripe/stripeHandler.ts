@@ -8,15 +8,22 @@ import {
 type OptionalStripeHandlerInitParams = {};
 
 class StripeHandler extends AbstractPaymentHandler<Stripe | null, OptionalStripeHandlerInitParams> {
-  protected _createPaymentJson = (props: PaymentHandlerExecuteParams) => {
+  protected _createPaymentJson = (
+    props: PaymentHandlerExecuteParams
+  ): Stripe.Checkout.SessionCreateParams => {
     const { successRedirectUrl, cancelRedirectUrl, items } = props;
     const createPaymentJson = {
       line_items: items,
-      payment_method_types: ['card', 'grabpay'],
+      payment_method_types: ['card', 'wechat_pay', 'grabpay', 'alipay'],
       mode: 'payment',
       success_url: successRedirectUrl,
       cancel_url: cancelRedirectUrl,
-    };
+      payment_method_options: {
+        wechat_pay: {
+          client: 'web',
+        },
+      },
+    } as Stripe.Checkout.SessionCreateParams;
     return createPaymentJson;
   };
 

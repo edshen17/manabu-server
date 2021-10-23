@@ -1,4 +1,5 @@
-import { StringKeyObject } from '../../../types/custom';
+import { Item } from 'paypal-rest-sdk';
+import Stripe from 'stripe';
 
 type PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams> =
   RequiredPaymentHandlerInitParams<PaymentLibType> & OptionalPaymentHandlerInitParams;
@@ -10,7 +11,7 @@ type RequiredPaymentHandlerInitParams<PaymentLibType> = {
 type PaymentHandlerExecuteParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
-  items: StringKeyObject[];
+  items: Item[] | Array<Stripe.Checkout.SessionCreateParams.LineItem>;
   currency: string;
   description?: string;
   total: string;

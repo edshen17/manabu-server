@@ -1,4 +1,4 @@
-import Stripe from 'stripe';
+import { Stripe } from 'stripe';
 import { StripeHandler } from './stripeHandler';
 
 let stripeKey = process.env.STRIPE_SECRET_KEY!;

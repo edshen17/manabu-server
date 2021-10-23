@@ -1,4 +1,4 @@
-import paypal, { Payment, SDKError } from 'paypal-rest-sdk';
+import paypal, { Item, Payment, SDKError } from 'paypal-rest-sdk';
 import { StringKeyObject } from '../../../types/custom';
 import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
 import {
@@ -6,12 +6,14 @@ import {
   PaymentHandlerExecutePaymentRes,
 } from '../abstractions/IPaymentHandler';
 
+type PaypalType = typeof paypal;
 type OptionalPaypalHandlerInitParams = {};
 
-class PaypalHandler extends AbstractPaymentHandler<typeof paypal, OptionalPaypalHandlerInitParams> {
-  protected _createPaymentJson = (props: PaymentHandlerExecuteParams) => {
-    const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total } = props;
-    const createPaymentJson = {
+class PaypalHandler extends AbstractPaymentHandler<PaypalType, OptionalPaypalHandlerInitParams> {
+  protected _createPaymentJson = (props: PaymentHandlerExecuteParams): Payment => {
+    const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total } =
+      props as PaymentHandlerExecuteParams & { items: Item[] };
+    const createPaymentJson: Payment = {
       intent: 'sale',
       payer: {
         payment_method: 'paypal',
