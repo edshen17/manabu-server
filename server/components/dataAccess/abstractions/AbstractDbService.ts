@@ -294,13 +294,26 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbDoc>
   };
 
   public insert = async (props: DbServiceInsertParams): Promise<DbDoc> => {
-    const { modelToInsert, dbServiceAccessOptions } = props;
+    const { modelToInsert, dbServiceAccessOptions, session } = props;
     this._testAccessPermitted(dbServiceAccessOptions);
-    const insertedModel = await this._dbModel.create(modelToInsert).then((doc: any) => {
-      return doc.toObject(); // lean
-    });
-    // return findById result rather than insertedModel to ensure caller gets correct select modelView
-    const dbQueryResult = await this.findById({ _id: insertedModel._id, dbServiceAccessOptions });
+    let dbQueryResult: DbDoc;
+    if (!session) {
+      const insertedModel = await this._dbModel.create(modelToInsert).then((doc: any) => {
+        return doc.toObject(); // lean
+      });
+      // return findById result rather than insertedModel to ensure caller gets correct select modelView
+      dbQueryResult = await this.findById({ _id: insertedModel._id, dbServiceAccessOptions });
+    } else {
+      const insertedModel = await this.insertMany({
+        modelToInsert: [modelToInsert],
+        dbServiceAccessOptions,
+        session,
+      });
+      dbQueryResult = await this.findById({
+        _id: (insertedModel[0] as any)._id,
+        dbServiceAccessOptions,
+      });
+    }
     await this._clearCacheBrancher();
     return dbQueryResult;
   };

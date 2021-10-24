@@ -62,7 +62,7 @@ class SplitAvailableTimeHandler {
         startDate: appointment.endDate,
         endDate: overlapAvailableTime.endDate,
       });
-      await this._availableTimeDbService.insert({ modelToInsert, dbServiceAccessOptions });
+      await this._availableTimeDbService.insert({ modelToInsert, dbServiceAccessOptions, session });
     }
   };
 

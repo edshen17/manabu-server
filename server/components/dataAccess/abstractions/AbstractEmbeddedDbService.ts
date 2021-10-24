@@ -38,11 +38,12 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public findOne = async (dbServiceParams: DbServiceFindOneParams): Promise<DbDoc> => {
-    const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOne({
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
+      session,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -127,12 +128,13 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public findById = async (dbServiceParams: DbServiceFindByIdParams): Promise<DbDoc> => {
-    const { _id, dbServiceAccessOptions } = dbServiceParams;
+    const { _id, dbServiceAccessOptions, session } = dbServiceParams;
     const searchQuery = { _id };
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOne({
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
+      session,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -143,11 +145,12 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public find = async (dbServiceParams: DbServiceFindParams): Promise<DbDoc[]> => {
-    const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.find({
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
+      session,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -170,7 +173,8 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public findOneAndUpdate = async (dbServiceParams: DbServiceUpdateParams): Promise<DbDoc> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions } = dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions, session } =
+      dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
@@ -179,6 +183,7 @@ abstract class AbstractEmbeddedDbService<
       updateQuery: processedUpdateQuery,
       queryOptions,
       dbServiceAccessOptions,
+      session,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -215,7 +220,8 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public updateMany = async (dbServiceParams: DbServiceUpdateParams): Promise<DbDoc[]> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions } = dbServiceParams;
+    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions, session } =
+      dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
     const processedUpdateQuery = this._configureEmbeddedUpdateQuery(embeddedUpdateQuery);
@@ -224,6 +230,7 @@ abstract class AbstractEmbeddedDbService<
       updateQuery: processedUpdateQuery,
       dbServiceAccessOptions,
       queryOptions,
+      session,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
@@ -235,22 +242,24 @@ abstract class AbstractEmbeddedDbService<
 
   // NOTE: The DELETE methods return the new embedded doc. For example, if you remove 1 from [1,2], this returns [2].
   public findByIdAndDelete = async (dbServiceParams: DbServiceFindByIdParams): Promise<DbDoc> => {
-    const { _id, dbServiceAccessOptions } = dbServiceParams;
+    const { _id, dbServiceAccessOptions, session } = dbServiceParams;
     const dbQueryResult = await this.findOneAndDelete({
       searchQuery: { _id },
       dbServiceAccessOptions,
+      session,
     });
     return dbQueryResult;
   };
 
   public findOneAndDelete = async (dbServiceParams: DbServiceFindOneParams): Promise<DbDoc> => {
-    const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const updateQuery = this._configureDeleteUpdateQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOneAndUpdate({
       searchQuery: embeddedSearchQuery,
       updateQuery,
       dbServiceAccessOptions,
+      session,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
