@@ -33,7 +33,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
     return usecaseRes;
   };
 
-  protected _getMakeRequestTemplateParams = async (
+  private _getMakeRequestTemplateParams = async (
     controllerData: ControllerData
   ): Promise<MakeRequestTemplateParams> => {
     const { routeData, currentAPIUser } = controllerData;
@@ -64,7 +64,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
     return makeRequestTemplateParams;
   };
 
-  protected _isCurrentAPIUserPermitted = (props: {
+  private _isCurrentAPIUserPermitted = (props: {
     isSelf: boolean;
     currentAPIUser: CurrentAPIUser;
   }): boolean => {
@@ -120,7 +120,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
     };
   };
 
-  protected _processResourceOwnership = (props: {
+  private _processResourceOwnership = (props: {
     resourceData: StringKeyObject;
     userId?: ObjectId | string;
   }): boolean => {
@@ -149,7 +149,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
     return true;
   };
 
-  protected _isValidRequest = (props: {
+  private _isValidRequest = (props: {
     controllerData: ControllerData;
     isSelf: boolean;
   }): boolean => {
@@ -182,7 +182,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
     props: MakeRequestTemplateParams
   ): Promise<UsecaseResponse>;
 
-  protected _isValidRouteData = (controllerData: ControllerData): boolean => {
+  private _isValidRouteData = (controllerData: ControllerData): boolean => {
     const { routeData } = controllerData;
     const { query, params } = routeData;
     this._queryValidator.validate({ query });

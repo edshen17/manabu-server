@@ -1,11 +1,18 @@
 import { expect } from 'chai';
 import { makeIHttpRequestBuilder } from '.';
+import { JoinedUserDoc } from '../../../../models/User';
+import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
+import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { IHttpRequestBuilder } from './iHttpRequestBuilder';
 
 let iHttpRequestBuilder: IHttpRequestBuilder;
+let fakeDbUserFactory: FakeDbUserFactory;
+let fakeUser: JoinedUserDoc;
 
-before(() => {
+before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
+  fakeDbUserFactory = await makeFakeDbUserFactory;
+  fakeUser = await fakeDbUserFactory.createFakeDbUser();
 });
 
 describe('IHttpRequestBuilder', () => {
@@ -32,7 +39,7 @@ describe('IHttpRequestBuilder', () => {
         .query({})
         .params({})
         .currentAPIUser({
-          userId: 'some userId',
+          userId: fakeUser._id,
           role: 'some role',
         })
         .build();
@@ -45,7 +52,7 @@ describe('IHttpRequestBuilder', () => {
         query: {},
         params: {},
         currentAPIUser: {
-          userId: 'some userId',
+          userId: fakeUser._id,
           role: 'some role',
         },
       });

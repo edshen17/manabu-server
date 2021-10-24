@@ -9,8 +9,8 @@ interface IHttpRequest {
 }
 
 type CurrentAPIUser = {
-  userId?: ObjectId | string;
-  teacherId?: ObjectId | string;
+  userId?: ObjectId;
+  teacherId?: ObjectId;
   role: string;
 };
 

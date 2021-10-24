@@ -65,7 +65,7 @@ describe('deleteAvailableTimeUsecase', () => {
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if not self/admin', async () => {
-          currentAPIUser.userId = '507f1f77bcf86cd799439011';
+          currentAPIUser.userId = undefined;
           await testAvailableTimeError();
         });
       });
