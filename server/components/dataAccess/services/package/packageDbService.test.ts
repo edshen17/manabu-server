@@ -268,7 +268,7 @@ describe('packageDbService', () => {
       context('invalid inputs', () => {
         it('should return null if the package to delete does not exist', async () => {
           const deletedPackage = await packageDbService.findByIdAndDelete({
-            _id: null,
+            _id: undefined,
             dbServiceAccessOptions,
           });
           expect(deletedPackage).to.equal(null);

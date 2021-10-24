@@ -5,4 +5,6 @@ const convertStringToObjectId = (objectIdString: string): ObjectId => {
   return objectId;
 };
 
-export { convertStringToObjectId };
+type ConvertStringToObjectId = typeof convertStringToObjectId;
+
+export { convertStringToObjectId, ConvertStringToObjectId };

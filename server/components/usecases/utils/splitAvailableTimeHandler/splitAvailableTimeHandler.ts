@@ -1,3 +1,4 @@
+import { ClientSession } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
@@ -27,7 +28,7 @@ class SplitAvailableTimeHandler {
 
   private _splitAvailableTime = async (props: {
     appointment: AppointmentDoc;
-    session: StringKeyObject;
+    session: ClientSession;
   }): Promise<void> => {
     const { appointment, session } = props;
     const { hostedById, startDate, endDate } = appointment;

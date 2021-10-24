@@ -1,4 +1,6 @@
-import { Mongoose, ObjectId } from 'mongoose';
+import cloneDeep from 'clone-deep';
+import deepEqual from 'deep-equal';
+import { ClientSession, Mongoose, ObjectId } from 'mongoose';
 import { StringKeyObject } from '../../../types/custom';
 import { CacheDbService } from '../services/cache/cacheDbService';
 
@@ -7,21 +9,18 @@ type DbServiceInitParams<OptionalDbServiceInitParams> = RequiredDbServiceInitPar
 
 type RequiredDbServiceInitParams = {
   mongoose: Mongoose;
-  cloneDeep: any;
+  cloneDeep: CloneDeep;
   dbModel: any;
   makeCacheDbService: Promise<CacheDbService>;
 };
 
-type DbServiceParams = {
-  _id?: ObjectId;
-  searchQuery?: StringKeyObject;
-  dbServiceAccessOptions: DbServiceAccessOptions;
-  modelToInsert?: StringKeyObject;
-  modelsToInsert?: StringKeyObject[];
-  updateQuery?: StringKeyObject;
+type CloneDeep = typeof cloneDeep;
+type DeepEqual = typeof deepEqual;
+
+type BaseDbServiceParams = {
   queryOptions?: StringKeyObject;
-  paginationOptions?: PaginationOptions;
-  session?: StringKeyObject;
+  dbServiceAccessOptions: DbServiceAccessOptions;
+  session?: ClientSession;
 };
 
 type DbServiceAccessOptions = {
@@ -31,6 +30,10 @@ type DbServiceAccessOptions = {
   isOverrideView?: boolean;
   isReturningParent?: boolean;
 };
+
+type SearchIdDbServiceParams = { _id: ObjectId | string | undefined };
+
+type SearchQueryDbServiceParams = { searchQuery: StringKeyObject };
 
 type PaginationOptions = {
   page: number;
@@ -73,26 +76,34 @@ enum DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS {
   TEACHERS = 'teachers',
 }
 
+type DbServiceFindByIdParams = BaseDbServiceParams & SearchIdDbServiceParams;
+type DbServiceFindOneParams = BaseDbServiceParams & SearchQueryDbServiceParams;
+type DbServiceFindParams = BaseDbServiceParams &
+  SearchQueryDbServiceParams & { paginationOptions?: PaginationOptions };
+type DbServiceInsertParams = BaseDbServiceParams & { modelToInsert: StringKeyObject };
+type DbServiceInsertManyParams = BaseDbServiceParams & { modelToInsert: StringKeyObject[] };
+type DbServiceUpdateParams = BaseDbServiceParams &
+  SearchQueryDbServiceParams & { updateQuery: StringKeyObject };
+
 interface IDbService<OptionalDbServiceInitParams, DbDoc> {
-  findById: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  findOne: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  find: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
-  insert: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  insertMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
-  findOneAndUpdate: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  updateMany: (dbServiceParams: DbServiceParams) => Promise<DbDoc[]>;
-  findByIdAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
-  findOneAndDelete: (dbServiceParams: DbServiceParams) => Promise<DbDoc>;
+  findById: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbDoc>;
+  findOne: (dbServiceParams: DbServiceFindOneParams) => Promise<DbDoc>;
+  find: (dbServiceParams: DbServiceFindParams) => Promise<DbDoc[]>;
+  insert: (dbServiceParams: DbServiceInsertParams) => Promise<DbDoc>;
+  insertMany: (dbServiceParams: DbServiceInsertManyParams) => Promise<DbDoc[]>;
+  findOneAndUpdate: (dbServiceParams: DbServiceUpdateParams) => Promise<DbDoc>;
+  updateMany: (dbServiceParams: DbServiceUpdateParams) => Promise<DbDoc[]>;
+  findByIdAndDelete: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbDoc>;
+  findOneAndDelete: (dbServiceParams: DbServiceFindOneParams) => Promise<DbDoc>;
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
   getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;
   getOverrideDbServiceAccessOptions: () => DbServiceAccessOptions;
-  startSession: () => Promise<any>;
+  startSession: () => Promise<ClientSession>;
 }
 
 export {
   DbServiceAccessOptions,
-  DbServiceParams,
   IDbService,
   PaginationOptions,
   DbServiceModelViews,
@@ -101,4 +112,12 @@ export {
   DB_SERVICE_MODEL_VIEW,
   DB_SERVICE_CACHE_CLIENT,
   DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
+  DbServiceFindByIdParams,
+  DbServiceFindOneParams,
+  DbServiceFindParams,
+  DbServiceInsertParams,
+  DbServiceInsertManyParams,
+  DbServiceUpdateParams,
+  CloneDeep,
+  DeepEqual,
 };

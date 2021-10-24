@@ -1,7 +1,7 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import {
-  DbServiceParams,
+  DbServiceFindOneParams,
   DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
 } from '../../abstractions/IDbService';
 
@@ -48,7 +48,7 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
   };
 
   public authenticateUser = async (
-    dbServiceParams: DbServiceParams,
+    dbServiceParams: DbServiceFindOneParams,
     inputtedPassword: string
   ): Promise<any> => {
     const userData = await this.findOne(dbServiceParams);

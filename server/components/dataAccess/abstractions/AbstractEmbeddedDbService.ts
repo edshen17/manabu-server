@@ -1,10 +1,20 @@
 import { StringKeyObject } from '../../../types/custom';
 import { AbstractDbService } from './AbstractDbService';
-import { DbServiceAccessOptions, IDbService } from './IDbService';
+import {
+  DbServiceAccessOptions,
+  DbServiceFindByIdParams,
+  DbServiceFindOneParams,
+  DbServiceFindParams,
+  DbServiceInsertManyParams,
+  DbServiceInsertParams,
+  DbServiceUpdateParams,
+  DeepEqual,
+  IDbService,
+} from './IDbService';
 
 type AbstractEmbeddedDbServiceInitParams<OptionalDbServiceInitParams> = {
   makeParentDbService: Promise<IDbService<any, any>>;
-  deepEqual: any;
+  deepEqual: DeepEqual;
 } & OptionalDbServiceInitParams;
 
 enum DB_SERVICE_EMBED_TYPE {
@@ -20,17 +30,14 @@ abstract class AbstractEmbeddedDbService<
   DbDoc
 > {
   protected _parentDbService!: IDbService<any, any>;
-  protected _deepEqual!: any;
+  protected _deepEqual!: DeepEqual;
   protected _embeddedFieldData!: {
     parentFieldName: string;
     childFieldName?: string;
     embedType: string;
   };
 
-  public findOne = async (dbServiceParams: {
-    searchQuery?: {};
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc> => {
+  public findOne = async (dbServiceParams: DbServiceFindOneParams): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.findOne({
@@ -119,10 +126,7 @@ abstract class AbstractEmbeddedDbService<
     }
   };
 
-  public findById = async (dbServiceParams: {
-    _id?: any;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc> => {
+  public findById = async (dbServiceParams: DbServiceFindByIdParams): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const searchQuery = { _id };
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
@@ -138,10 +142,7 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  public find = async (dbServiceParams: {
-    searchQuery?: {};
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc[]> => {
+  public find = async (dbServiceParams: DbServiceFindParams): Promise<DbDoc[]> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.find({
@@ -156,30 +157,19 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  public insert = async (dbServiceParams: {
-    modelToInsert?: {};
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc> => {
+  public insert = async (dbServiceParams: DbServiceInsertParams): Promise<DbDoc> => {
     throw new Error(
       'Cannot insert an embedded document. Use findOneAndUpdate/updateMany on the parent document instead.'
     );
   };
 
-  public insertMany = async (dbServiceParams: {
-    modelToInsert?: {};
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc[]> => {
+  public insertMany = async (dbServiceParams: DbServiceInsertManyParams): Promise<DbDoc[]> => {
     throw new Error(
       'Cannot insert many embedded documents. Use findOneAndUpdate/updateMany on the parent document instead.'
     );
   };
 
-  public findOneAndUpdate = async (dbServiceParams: {
-    searchQuery?: {};
-    updateQuery?: {};
-    queryOptions?: {};
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc> => {
+  public findOneAndUpdate = async (dbServiceParams: DbServiceUpdateParams): Promise<DbDoc> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
@@ -198,7 +188,7 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  private _configureEmbeddedUpdateQuery = (updateQuery?: StringKeyObject) => {
+  private _configureEmbeddedUpdateQuery = (updateQuery: StringKeyObject) => {
     const isSingleEmbed = this._embeddedFieldData.embedType == DB_SERVICE_EMBED_TYPE.SINGLE;
     const embeddedChildFieldName = this._embeddedFieldData.childFieldName;
     if (isSingleEmbed) {
@@ -224,12 +214,7 @@ abstract class AbstractEmbeddedDbService<
     }
   };
 
-  public updateMany = async (dbServiceParams: {
-    searchQuery?: StringKeyObject;
-    updateQuery?: StringKeyObject;
-    queryOptions?: StringKeyObject;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc[]> => {
+  public updateMany = async (dbServiceParams: DbServiceUpdateParams): Promise<DbDoc[]> => {
     const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const embeddedUpdateQuery = this._convertToEmbeddedQuery(updateQuery);
@@ -249,10 +234,7 @@ abstract class AbstractEmbeddedDbService<
   };
 
   // NOTE: The DELETE methods return the new embedded doc. For example, if you remove 1 from [1,2], this returns [2].
-  public findByIdAndDelete = async (dbServiceParams: {
-    _id?: any;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc> => {
+  public findByIdAndDelete = async (dbServiceParams: DbServiceFindByIdParams): Promise<DbDoc> => {
     const { _id, dbServiceAccessOptions } = dbServiceParams;
     const dbQueryResult = await this.findOneAndDelete({
       searchQuery: { _id },
@@ -261,10 +243,7 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
-  public findOneAndDelete = async (dbServiceParams: {
-    searchQuery?: {};
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<DbDoc> => {
+  public findOneAndDelete = async (dbServiceParams: DbServiceFindOneParams): Promise<DbDoc> => {
     const { searchQuery, dbServiceAccessOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const updateQuery = this._configureDeleteUpdateQuery(searchQuery);

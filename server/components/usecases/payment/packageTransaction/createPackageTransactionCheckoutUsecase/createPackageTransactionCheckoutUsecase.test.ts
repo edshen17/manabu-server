@@ -1,4 +1,5 @@
 // import { expect } from 'chai';
+// import { makeCreatePackageTransactionCheckoutUsecase } from '.';
 // import { JoinedUserDoc } from '../../../../../models/User';
 // import { makeFakeDbUserFactory } from '../../../../dataAccess/testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
@@ -6,12 +7,15 @@
 // import { RouteData } from '../../../abstractions/IUsecase';
 // import { makeControllerDataBuilder } from '../../../utils/controllerDataBuilder';
 // import { ControllerDataBuilder } from '../../../utils/controllerDataBuilder/controllerDataBuilder';
+// import { CreatePackageTransactionCheckoutUsecase } from './createPackageTransactionCheckoutUsecase';
 
 // let controllerDataBuilder: ControllerDataBuilder;
 // let fakeDbUserFactory: FakeDbUserFactory;
 // let routeData: RouteData;
 // let fakeUser: JoinedUserDoc;
+// let fakeTeacher: JoinedUserDoc;
 // let currentAPIUser: CurrentAPIUser;
+// let createPackageTransactionCheckoutUsecase: CreatePackageTransactionCheckoutUsecase;
 
 // before(async () => {
 //   controllerDataBuilder = makeControllerDataBuilder;
@@ -21,15 +25,22 @@
 
 // beforeEach(async () => {
 //   fakeUser = await fakeDbUserFactory.createFakeDbUser();
+//   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
 //   currentAPIUser = {
 //     userId: fakeUser._id,
 //     role: fakeUser.role,
 //   };
 //   routeData = {
 //     params: {},
-//     body: {},
+//     body: {
+//       teacherId: fakeTeacher.teacherData!._id,
+//       packageId: fakeTeacher.teacherData!.packages[0]._id,
+//       lessonDuration: 60,
+//       lessonLanguage: 'ja',
+//       lessonAmount: 5,
+//     },
 //     query: {
-//       paymentGateway: 'paypal',
+//       //   paymentGateway: 'paypal',
 //     },
 //     endpointPath: '',
 //   };
@@ -66,6 +77,10 @@
 //         });
 //         it('should throw an error if body contains an invalid userId', async () => {
 //           routeData.body.hostedById = 'bad id';
+//           await testPackageTransactionCheckoutError();
+//         });
+//         it('should throw an error if user not logged in', async () => {
+//           currentAPIUser.userId = undefined;
 //           await testPackageTransactionCheckoutError();
 //         });
 //       });
