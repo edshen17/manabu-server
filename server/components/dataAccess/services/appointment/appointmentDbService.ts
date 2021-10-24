@@ -12,9 +12,11 @@ type OptionalAppointmentDbServiceInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
 };
 
+type AppointmentDbServiceResponse = AppointmentDoc;
+
 class AppointmentDbService extends AbstractDbService<
   OptionalAppointmentDbServiceInitParams,
-  AppointmentDoc
+  AppointmentDbServiceResponse
 > {
   private _packageTransactionDbService!: PackageTransactionDbService;
 
@@ -56,4 +58,4 @@ class AppointmentDbService extends AbstractDbService<
   };
 }
 
-export { AppointmentDbService };
+export { AppointmentDbService, AppointmentDbServiceResponse };

@@ -1,6 +1,9 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+import {
+  UserDbService,
+  UserDbServiceResponse,
+} from '../../../dataAccess/services/user/userDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -27,7 +30,7 @@ enum SERVER_LOGIN_ENDPOINTS {
 class LoginUserUsecase extends AbstractCreateUsecase<
   OptionalLoginUserUsecaseInitParams,
   LoginUserUsecaseResponse,
-  JoinedUserDoc
+  UserDbServiceResponse
 > {
   private _createUserUsecase!: CreateUserUsecase;
   private _oauth2Client!: any;

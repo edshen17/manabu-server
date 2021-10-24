@@ -18,14 +18,14 @@ type MakeRequestTemplateParams = {
   controllerData: ControllerData;
 };
 
-abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc>
-  implements IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc>
+abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbServiceResponse>
+  implements IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbServiceResponse>
 {
   protected _queryValidator!: AbstractQueryValidator;
   protected _paramsValidator!: AbstractParamsValidator;
   protected _cloneDeep!: any;
   protected _deepEqual!: any;
-  protected _dbService!: IDbService<any, DbDoc>;
+  protected _dbService!: IDbService<any, DbServiceResponse>;
 
   public makeRequest = async (controllerData: ControllerData): Promise<UsecaseResponse> => {
     const makeRequestTemplateParams = await this._getMakeRequestTemplateParams(controllerData);
@@ -196,7 +196,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
   };
 
   public init = async (
-    initParams: UsecaseInitParams<OptionalUsecaseInitParams, DbDoc>
+    initParams: UsecaseInitParams<OptionalUsecaseInitParams, DbServiceResponse>
   ): Promise<this> => {
     const {
       makeQueryValidator,
@@ -217,7 +217,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc
 
   protected _initTemplate = (
     optionalInitParams: Omit<
-      UsecaseInitParams<OptionalUsecaseInitParams, DbDoc>,
+      UsecaseInitParams<OptionalUsecaseInitParams, DbServiceResponse>,
       'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
     >
   ): Promise<void> | void => {

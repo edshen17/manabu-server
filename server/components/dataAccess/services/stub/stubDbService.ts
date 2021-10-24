@@ -2,6 +2,11 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 
 type OptionalStubDbServiceInitParams = {};
 
-class StubDbService extends AbstractDbService<OptionalStubDbServiceInitParams, undefined> {}
+type StubDbServiceResponse = undefined;
 
-export { StubDbService };
+class StubDbService extends AbstractDbService<
+  OptionalStubDbServiceInitParams,
+  StubDbServiceResponse
+> {}
+
+export { StubDbService, StubDbServiceResponse };

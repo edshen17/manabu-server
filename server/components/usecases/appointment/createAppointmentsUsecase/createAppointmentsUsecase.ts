@@ -4,6 +4,7 @@ import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc, USER_EMAIL_ALERT_NAME } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import {
@@ -34,7 +35,7 @@ type CreateAppointmentsUsecaseResponse = {
 class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   OptionalCreateAppointmentsUsecaseInitParams,
   CreateAppointmentsUsecaseResponse,
-  AppointmentDoc
+  AppointmentDbServiceResponse
 > {
   private _appointmentEntity!: AppointmentEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;

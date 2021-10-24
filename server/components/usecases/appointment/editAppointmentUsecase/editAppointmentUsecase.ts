@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -15,7 +16,7 @@ type EditAppointmentUsecaseResponse = {
 class EditAppointmentUsecase extends AbstractEditUsecase<
   OptionalEditAppointmentUsecaseInitParams,
   EditAppointmentUsecaseResponse,
-  AppointmentDoc
+  AppointmentDbServiceResponse
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {

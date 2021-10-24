@@ -9,7 +9,12 @@ type OptionalUserDbServiceInitParams = {
   comparePassword: any;
 };
 
-class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, JoinedUserDoc> {
+type UserDbServiceResponse = JoinedUserDoc;
+
+class UserDbService extends AbstractDbService<
+  OptionalUserDbServiceInitParams,
+  UserDbServiceResponse
+> {
   private _comparePassword!: any;
 
   protected _getDbServiceModelViews = () => {
@@ -85,4 +90,4 @@ class UserDbService extends AbstractDbService<OptionalUserDbServiceInitParams, J
   };
 }
 
-export { UserDbService };
+export { UserDbService, UserDbServiceResponse };

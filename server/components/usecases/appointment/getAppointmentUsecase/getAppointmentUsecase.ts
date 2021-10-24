@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -12,7 +13,7 @@ type GetAppointmentUsecaseResponse = { appointment: AppointmentDoc };
 class GetAppointmentUsecase extends AbstractGetUsecase<
   OptionalGetAppointmentUsecaseInitParams,
   GetAppointmentUsecaseResponse,
-  AppointmentDoc
+  AppointmentDbServiceResponse
 > {
   protected _isProtectedResource = (): boolean => {
     return true;

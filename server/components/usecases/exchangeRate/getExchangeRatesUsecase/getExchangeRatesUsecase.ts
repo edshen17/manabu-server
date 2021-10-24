@@ -1,4 +1,5 @@
 import { StringKeyObject } from '../../../../types/custom';
+import { StubDbServiceResponse } from '../../../dataAccess/services/stub/stubDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ExchangeRateHandler } from '../../utils/exchangeRateHandler/exchangeRateHandler';
@@ -12,7 +13,7 @@ type GetExchangeRatesUsecaseResponse = { exchangeRates: StringKeyObject };
 class GetExchangeRatesUsecase extends AbstractGetUsecase<
   OptionalGetExchangeRatesUsecaseInitParams,
   GetExchangeRatesUsecaseResponse,
-  undefined
+  StubDbServiceResponse
 > {
   private _exchangeRateHandler!: ExchangeRateHandler;
 

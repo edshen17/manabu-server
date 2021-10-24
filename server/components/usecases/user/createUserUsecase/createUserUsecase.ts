@@ -7,11 +7,13 @@ import { PackageDbService } from '../../../dataAccess/services/package/packageDb
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
+import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
 import { PackageEntity } from '../../../entities/package/packageEntity';
 import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
 import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
 import { UserEntity, UserEntityBuildResponse } from '../../../entities/user/userEntity';
+import { ConvertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -33,7 +35,7 @@ type OptionalCreateUserUsecaseInitParams = {
   signJwt: any;
   makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
-  convertStringToObjectId: any;
+  convertStringToObjectId: ConvertStringToObjectId;
 };
 
 type CookieData = {
@@ -55,7 +57,7 @@ type CreateUserUsecaseResponse = {
 class CreateUserUsecase extends AbstractCreateUsecase<
   OptionalCreateUserUsecaseInitParams,
   CreateUserUsecaseResponse,
-  JoinedUserDoc
+  UserDbServiceResponse
 > {
   private _userEntity!: UserEntity;
   private _packageTransactionEntity!: PackageTransactionEntity;

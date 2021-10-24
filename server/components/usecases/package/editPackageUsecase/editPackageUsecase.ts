@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../models/Package';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { PackageDbServiceResponse } from '../../../dataAccess/services/package/packageDbService';
 import { PACKAGE_ENTITY_TYPE } from '../../../entities/package/packageEntity';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -15,7 +16,7 @@ type EditPackageUsecaseResponse = {
 class EditPackageUsecase extends AbstractEditUsecase<
   OptionalEditPackageUsecaseInitParams,
   EditPackageUsecaseResponse,
-  PackageDoc
+  PackageDbServiceResponse
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
@@ -46,7 +47,7 @@ class EditPackageUsecase extends AbstractEditUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<PackageDoc> => {
     const { packageId, body, dbServiceAccessOptions } = props;
-    const packageToUpdate = await this._dbService.findById({
+    const packageToUpdate = <PackageDoc>await this._dbService.findById({
       _id: packageId,
       dbServiceAccessOptions,
     });
@@ -55,7 +56,7 @@ class EditPackageUsecase extends AbstractEditUsecase<
     const isEditingDefaultPackageRestrictedFields =
       isDefaultPackage && (lessonAmount || packageDesc || packageName);
     if (!isEditingDefaultPackageRestrictedFields) {
-      const updatedPackage = await this._dbService.findOneAndUpdate({
+      const updatedPackage = <PackageDoc>await this._dbService.findOneAndUpdate({
         searchQuery: { _id: packageId },
         updateQuery: body,
         dbServiceAccessOptions,

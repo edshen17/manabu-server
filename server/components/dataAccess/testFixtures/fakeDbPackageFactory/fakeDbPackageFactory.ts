@@ -4,6 +4,7 @@ import {
   PACKAGE_ENTITY_NAME,
   PACKAGE_ENTITY_TYPE,
 } from '../../../entities/package/packageEntity';
+import { PackageDbServiceResponse } from '../../services/package/packageDbService';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
 type PartialFakeDbPackageFactoryInitParams = {};
@@ -12,7 +13,7 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   PartialFakeDbPackageFactoryInitParams,
   PackageEntityBuildParams,
   PackageEntityBuildResponse,
-  PackageEntityBuildParams
+  PackageDbServiceResponse
 > {
   protected _createFakeBuildParams = async (): Promise<PackageEntityBuildParams> => {
     const fakeBuildParams = {

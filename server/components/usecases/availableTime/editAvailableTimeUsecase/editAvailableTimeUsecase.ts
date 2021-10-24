@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AvailableTimeDbServiceResponse } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { AvailableTimeEntityValidator } from '../../../validators/availableTime/entity/availableTimeEntityValidator';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
@@ -20,7 +21,7 @@ type EditAvailableTimeUsecaseResponse = {
 class EditAvailableTimeUsecase extends AbstractEditUsecase<
   OptionalEditAvailableTimeUsecaseInitParams,
   EditAvailableTimeUsecaseResponse,
-  AvailableTimeDoc
+  AvailableTimeDbServiceResponse
 > {
   private _availableTimeConflictHandler!: AvailableTimeConflictHandler;
 

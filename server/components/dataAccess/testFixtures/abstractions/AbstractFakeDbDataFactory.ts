@@ -6,20 +6,20 @@ abstract class AbstractFakeDbDataFactory<
   OptionalFakeDbDataFactoryInitParams,
   EntityBuildParams,
   EntityBuildResponse,
-  DbDoc
+  DbServiceResponse
 > implements
     IFakeDbDataFactory<
       OptionalFakeDbDataFactoryInitParams,
       EntityBuildParams,
       EntityBuildResponse,
-      DbDoc
+      DbServiceResponse
     >
 {
   protected _entity!: IEntity<any, EntityBuildParams, EntityBuildResponse>;
-  protected _dbService!: IDbService<any, DbDoc>;
+  protected _dbService!: IDbService<any, DbServiceResponse>;
   protected _cloneDeep!: any;
 
-  public createFakeDbData = async (buildParams?: EntityBuildParams): Promise<DbDoc> => {
+  public createFakeDbData = async (buildParams?: EntityBuildParams): Promise<DbServiceResponse> => {
     const fakeBuildParams = buildParams || (await this._createFakeBuildParams());
     const fakeEntity = await this._entity.build(fakeBuildParams);
     const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
@@ -37,7 +37,7 @@ abstract class AbstractFakeDbDataFactory<
       OptionalFakeDbDataFactoryInitParams,
       EntityBuildParams,
       EntityBuildResponse,
-      DbDoc
+      DbServiceResponse
     >
   ): Promise<this> => {
     const { makeEntity, makeDbService, cloneDeep, ...optionalInitParams } = initParams;
@@ -54,7 +54,7 @@ abstract class AbstractFakeDbDataFactory<
         makeEntity:
           | Promise<IEntity<any, EntityBuildParams, EntityBuildResponse>>
           | IEntity<any, EntityBuildParams, EntityBuildResponse>;
-        makeDbService: Promise<IDbService<any, DbDoc>>;
+        makeDbService: Promise<IDbService<any, DbServiceResponse>>;
         cloneDeep: any;
       } & OptionalFakeDbDataFactoryInitParams,
       'makeEntity' | 'makeDbService' | 'cloneDeep'

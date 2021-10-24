@@ -1,4 +1,5 @@
 import { PackageDoc } from '../../../../models/Package';
+import { JoinedUserDoc } from '../../../../models/User';
 import {
   AbstractEmbeddedDbService,
   AbstractEmbeddedDbServiceInitParams,
@@ -8,9 +9,11 @@ import { DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS } from '../../abstractions/IDbS
 
 type OptionalPackageDbServiceInitParams = {};
 
+type PackageDbServiceResponse = PackageDoc | JoinedUserDoc;
+
 class PackageDbService extends AbstractEmbeddedDbService<
   OptionalPackageDbServiceInitParams,
-  PackageDoc
+  PackageDbServiceResponse
 > {
   protected _getCacheDependencies = (): string[] => {
     return [
@@ -35,4 +38,4 @@ class PackageDbService extends AbstractEmbeddedDbService<
   };
 }
 
-export { PackageDbService };
+export { PackageDbService, PackageDbServiceResponse };

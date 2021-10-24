@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongoose';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -10,7 +11,7 @@ type GetUserUsecaseResponse = { user: JoinedUserDoc };
 class GetUserUsecase extends AbstractGetUsecase<
   OptionalGetUserUsecaseInitParams,
   GetUserUsecaseResponse,
-  JoinedUserDoc
+  UserDbServiceResponse
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

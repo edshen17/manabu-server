@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AvailableTimeDbServiceResponse } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import {
   AvailableTimeEntity,
   AvailableTimeEntityBuildParams,
@@ -22,7 +23,7 @@ type CreateAvailableTimeUsecaseResponse = {
 class CreateAvailableTimeUsecase extends AbstractCreateUsecase<
   OptionalCreateAvailableTimeUsecaseInitParams,
   CreateAvailableTimeUsecaseResponse,
-  AvailableTimeDoc
+  AvailableTimeDbServiceResponse
 > {
   private _availableTimeEntity!: AvailableTimeEntity;
   private _availableTimeConflictHandler!: AvailableTimeConflictHandler;

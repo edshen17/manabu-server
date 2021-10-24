@@ -1,4 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
+import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
 import { NGramHandler } from '../../../entities/utils/nGramHandler/nGramHandler';
 import {
   AbstractEditUsecase,
@@ -15,7 +16,7 @@ type EditUserUsecaseResponse = { user: JoinedUserDoc };
 class EditUserUsecase extends AbstractEditUsecase<
   AbstractEditUsecaseInitParams<OptionalEditUserUsecaseInitParams>,
   EditUserUsecaseResponse,
-  JoinedUserDoc
+  UserDbServiceResponse
 > {
   private _nGramHandler!: NGramHandler;
 

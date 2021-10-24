@@ -4,8 +4,8 @@ import { AbstractUsecase } from './AbstractUsecase';
 abstract class AbstractCreateUsecase<
   OptionalUsecaseInitParams,
   UsecaseResponse,
-  DbDoc
-> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc> {
+  DbServiceResponse
+> extends AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbServiceResponse> {
   protected _isSelf = async (props: {
     params: any;
     currentAPIUser: CurrentAPIUser;

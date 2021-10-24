@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { makePackageDbService } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
+import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
@@ -114,8 +115,8 @@ describe('packageDbService', () => {
             dbServiceAccessOptions,
           });
           const findPackages = await packageDbService.find(findParams);
-          expect(findByIdPackage.lessonDurations).to.deep.equal(
-            findByIdPackageCache.lessonDurations
+          expect((findByIdPackage as PackageDoc).lessonDurations).to.deep.equal(
+            (findByIdPackageCache as PackageDoc).lessonDurations
           );
           expect(findByIdPackage).to.deep.equal(findOnePackage);
           expect(findByIdPackage).to.deep.equal(findPackages[0]);
@@ -174,11 +175,11 @@ describe('packageDbService', () => {
     const updatePackage = async () => {
       const overrideDbServiceAccessOptions =
         appointmentDbService.getOverrideDbServiceAccessOptions();
-      const updatedPackage = await packageDbService.findOneAndUpdate({
+      const updatedPackage = (await packageDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackage._id },
         updateQuery: { packageType: 'custom' },
         dbServiceAccessOptions,
-      });
+      })) as PackageDoc;
       const updatedPackageTransaction = await packageTransactionDbService.findOne({
         searchQuery: { packageId: fakePackage._id },
         dbServiceAccessOptions,

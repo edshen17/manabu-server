@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { PackageTransactionDbServiceResponse } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -12,7 +13,7 @@ type GetPackageTransactionUsecaseResponse = { packageTransaction: PackageTransac
 class GetPackageTransactionUsecase extends AbstractGetUsecase<
   OptionalGetPackageTransactionUsecaseInitParams,
   GetPackageTransactionUsecaseResponse,
-  PackageTransactionDoc
+  PackageTransactionDbServiceResponse
 > {
   protected _isProtectedResource = (): boolean => {
     return true;

@@ -16,20 +16,22 @@ type RouteData = {
   endpointPath: string;
 };
 
-type UsecaseInitParams<OptionalUsecaseInitParams, DbDoc> = RequiredUsecaseInitParams<DbDoc> &
-  OptionalUsecaseInitParams;
+type UsecaseInitParams<OptionalUsecaseInitParams, DbServiceResponse> =
+  RequiredUsecaseInitParams<DbServiceResponse> & OptionalUsecaseInitParams;
 
-type RequiredUsecaseInitParams<DbDoc> = {
+type RequiredUsecaseInitParams<DbServiceResponse> = {
   makeQueryValidator: AbstractQueryValidator;
   makeParamsValidator: AbstractParamsValidator;
   cloneDeep: any;
   deepEqual: any;
-  makeDbService: Promise<IDbService<any, DbDoc>>;
+  makeDbService: Promise<IDbService<any, DbServiceResponse>>;
 };
 
-interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbDoc> {
+interface IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbServiceResponse> {
   makeRequest: (controllerData: ControllerData) => Promise<UsecaseResponse>;
-  init: (usecaseInitParams: UsecaseInitParams<OptionalUsecaseInitParams, DbDoc>) => Promise<this>;
+  init: (
+    usecaseInitParams: UsecaseInitParams<OptionalUsecaseInitParams, DbServiceResponse>
+  ) => Promise<this>;
 }
 
 export { ControllerData, IUsecase, RouteData, UsecaseInitParams };

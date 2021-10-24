@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../models/Package';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { TeacherDbServiceResponse } from '../../../dataAccess/services/teacher/teacherDbService';
 import {
   PackageEntity,
   PackageEntityBuildParams,
@@ -21,7 +22,7 @@ type CreatePackagesUsecaseResponse = {
 class CreatePackagesUsecase extends AbstractCreateUsecase<
   OptionalCreatePackagesUsecaseInitParams,
   CreatePackagesUsecaseResponse,
-  TeacherDoc
+  TeacherDbServiceResponse
 > {
   private _packageEntity!: PackageEntity;
 
@@ -55,7 +56,7 @@ class CreatePackagesUsecase extends AbstractCreateUsecase<
     for (const pkg of packages) {
       await this._createPackage({ pkg, modelToInsert });
     }
-    const updatedDbTeacher: TeacherDoc = await this._dbService.findOneAndUpdate({
+    const updatedDbTeacher = <TeacherDoc>await this._dbService.findOneAndUpdate({
       searchQuery: { _id: teacherId },
       dbServiceAccessOptions,
       updateQuery: {

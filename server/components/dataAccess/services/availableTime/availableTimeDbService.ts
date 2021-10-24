@@ -3,9 +3,11 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 
 type OptionalAvailableTimeDbServiceInitParams = {};
 
+type AvailableTimeDbServiceResponse = AvailableTimeDoc;
+
 class AvailableTimeDbService extends AbstractDbService<
   OptionalAvailableTimeDbServiceInitParams,
-  AvailableTimeDoc
+  AvailableTimeDbServiceResponse
 > {}
 
-export { AvailableTimeDbService };
+export { AvailableTimeDbService, AvailableTimeDbServiceResponse };

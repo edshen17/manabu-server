@@ -1,4 +1,5 @@
 import { TeacherDoc } from '../../../../models/Teacher';
+import { JoinedUserDoc } from '../../../../models/User';
 import {
   AbstractEmbeddedDbService,
   AbstractEmbeddedDbServiceInitParams,
@@ -8,9 +9,11 @@ import { DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS } from '../../abstractions/IDbS
 
 type OptionalTeacherDbServiceInitParams = {};
 
+type TeacherDbServiceResponse = TeacherDoc | JoinedUserDoc;
+
 class TeacherDbService extends AbstractEmbeddedDbService<
   OptionalTeacherDbServiceInitParams,
-  TeacherDoc
+  TeacherDbServiceResponse
 > {
   protected _getCacheDependencies = (): string[] => {
     return [
@@ -34,4 +37,4 @@ class TeacherDbService extends AbstractEmbeddedDbService<
   };
 }
 
-export { TeacherDbService };
+export { TeacherDbService, TeacherDbServiceResponse };

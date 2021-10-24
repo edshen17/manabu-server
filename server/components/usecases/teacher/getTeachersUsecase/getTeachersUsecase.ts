@@ -1,6 +1,7 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { TeacherDbServiceResponse } from '../../../dataAccess/services/teacher/teacherDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -10,7 +11,7 @@ type GetTeachersUsecaseResponse = { teachers: JoinedUserDoc[] };
 class GetTeachersUsecase extends AbstractGetUsecase<
   OptionalGetTeachersUsecaseInitParams,
   GetTeachersUsecaseResponse,
-  JoinedUserDoc
+  TeacherDbServiceResponse
 > {
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -36,7 +37,7 @@ class GetTeachersUsecase extends AbstractGetUsecase<
     const fallbackQuery = { page: 0, limit: 20 };
     const sort = { 'teacherData.approvalDate': 1 };
     const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
-    const teachers = await this._dbService.find({
+    const teachers = <JoinedUserDoc[]>await this._dbService.find({
       searchQuery,
       dbServiceAccessOptions,
       paginationOptions,

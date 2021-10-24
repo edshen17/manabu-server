@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AvailableTimeDbServiceResponse } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -13,7 +14,7 @@ type GetAvailableTimesUsecaseResponse = { availableTimes: AvailableTimeDoc[] };
 class GetAvailableTimesUsecase extends AbstractGetUsecase<
   OptionalGetAvailableTimesUsecaseInitParams,
   GetAvailableTimesUsecaseResponse,
-  AvailableTimeDoc
+  AvailableTimeDbServiceResponse
 > {
   private _dayjs!: any;
 

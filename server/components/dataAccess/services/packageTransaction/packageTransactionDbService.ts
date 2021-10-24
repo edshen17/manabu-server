@@ -20,9 +20,11 @@ type OptionalPackageTransactionDbServiceInitParams = {
   makeLocationDataHandler: LocationDataHandler;
 };
 
+type PackageTransactionDbServiceResponse = PackageTransactionDoc;
+
 class PackageTransactionDbService extends AbstractDbService<
   OptionalPackageTransactionDbServiceInitParams,
-  PackageTransactionDoc
+  PackageTransactionDbServiceResponse
 > {
   private _userDbService!: UserDbService;
   private _packageDbService!: PackageDbService;
@@ -97,4 +99,4 @@ class PackageTransactionDbService extends AbstractDbService<
   };
 }
 
-export { PackageTransactionDbService };
+export { PackageTransactionDbService, PackageTransactionDbServiceResponse };

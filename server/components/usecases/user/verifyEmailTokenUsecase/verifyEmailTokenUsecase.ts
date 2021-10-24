@@ -1,4 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
+import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
@@ -12,7 +13,7 @@ type VerifyEmailTokenUsecaseResponse = { user: JoinedUserDoc; redirectUrl: strin
 class VerifyEmailTokenUsecase extends AbstractGetUsecase<
   OptionalVerifyEmailTokenUsecaseInitParams,
   VerifyEmailTokenUsecaseResponse,
-  JoinedUserDoc
+  UserDbServiceResponse
 > {
   private _redirectUrlBuilder!: RedirectUrlBuilder;
 

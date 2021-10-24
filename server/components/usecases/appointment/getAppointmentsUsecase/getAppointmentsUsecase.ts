@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -14,7 +15,7 @@ type GetAppointmentsUsecaseResponse = { appointments: AppointmentDoc[] };
 class GetAppointmentsUsecase extends AbstractGetUsecase<
   OptionalGetAppointmentsUsecaseInitParams,
   GetAppointmentsUsecaseResponse,
-  AppointmentDoc
+  AppointmentDbServiceResponse
 > {
   private _dayjs!: any;
 

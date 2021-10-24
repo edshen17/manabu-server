@@ -5,15 +5,19 @@ type FakeDbDataFactoryInitParams<
   OptionalFakeDbDataFactoryInitParams,
   EntityBuildParams,
   EntityBuildResponse,
-  DbDoc
-> = RequiredFakeDbDataFactoryInitParams<EntityBuildParams, EntityBuildResponse, DbDoc> &
+  DbServiceResponse
+> = RequiredFakeDbDataFactoryInitParams<EntityBuildParams, EntityBuildResponse, DbServiceResponse> &
   OptionalFakeDbDataFactoryInitParams;
 
-type RequiredFakeDbDataFactoryInitParams<EntityBuildParams, EntityBuildResponse, DbDoc> = {
+type RequiredFakeDbDataFactoryInitParams<
+  EntityBuildParams,
+  EntityBuildResponse,
+  DbServiceResponse
+> = {
   makeEntity:
     | Promise<IEntity<any, EntityBuildParams, EntityBuildResponse>>
     | IEntity<any, EntityBuildParams, EntityBuildResponse>;
-  makeDbService: Promise<IDbService<any, DbDoc>>;
+  makeDbService: Promise<IDbService<any, DbServiceResponse>>;
   cloneDeep: any;
 };
 
@@ -21,17 +25,17 @@ interface IFakeDbDataFactory<
   OptionalFakeDbDataFactoryInitParams,
   EntityBuildParams,
   EntityBuildResponse,
-  DbDoc
+  DbServiceResponse
 > {
   init: (
     initParams: FakeDbDataFactoryInitParams<
       OptionalFakeDbDataFactoryInitParams,
       EntityBuildParams,
       EntityBuildResponse,
-      DbDoc
+      DbServiceResponse
     >
   ) => Promise<this> | this;
-  createFakeDbData?: (buildParams: EntityBuildParams) => Promise<DbDoc>;
+  createFakeDbData?: (buildParams: EntityBuildParams) => Promise<DbServiceResponse>;
 }
 
 export { IFakeDbDataFactory, FakeDbDataFactoryInitParams };

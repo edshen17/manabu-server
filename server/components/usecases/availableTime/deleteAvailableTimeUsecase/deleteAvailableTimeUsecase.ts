@@ -2,6 +2,7 @@ import { ObjectId } from 'mongoose';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
+import { AvailableTimeDbServiceResponse } from '../../../dataAccess/services/availableTime/availableTimeDbService';
 import { AbstractDeleteUsecase } from '../../abstractions/AbstractDeleteUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -14,7 +15,7 @@ type DeleteAvailableTimeUsecaseResponse = {
 class DeleteAvailableTimeUsecase extends AbstractDeleteUsecase<
   OptionalDeleteAvailableTimeUsecaseInitParams,
   DeleteAvailableTimeUsecaseResponse,
-  AvailableTimeDoc
+  AvailableTimeDbServiceResponse
 > {
   protected _getResourceAccessData = (): StringKeyObject => {
     return {

@@ -3,9 +3,11 @@ import { AbstractDbService } from '../../abstractions/AbstractDbService';
 
 type PartialTeacherBalanceDbServiceInitParams = {};
 
+type TeacherBalanceResponse = TeacherBalanceDoc;
+
 class TeacherBalanceDbService extends AbstractDbService<
   PartialTeacherBalanceDbServiceInitParams,
-  TeacherBalanceDoc
+  TeacherBalanceResponse
 > {}
 
-export { TeacherBalanceDbService };
+export { TeacherBalanceDbService, TeacherBalanceResponse };
