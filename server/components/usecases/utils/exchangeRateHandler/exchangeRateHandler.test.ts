@@ -15,4 +15,14 @@ describe('exchangeRateHandler', () => {
       expect(exchangeRates).to.have.property('SGD');
     });
   });
+  describe('convert', () => {
+    it('should convert the currencies', async () => {
+      const convertedRate = await exchangeRateHandler.convert({
+        amount: 10,
+        fromCurrency: 'usd',
+        toCurrency: 'jpy',
+      });
+      expect(convertedRate > 10).to.equal(true);
+    });
+  });
 });

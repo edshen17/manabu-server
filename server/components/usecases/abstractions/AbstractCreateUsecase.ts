@@ -11,7 +11,9 @@ abstract class AbstractCreateUsecase<
     currentAPIUser: CurrentAPIUser;
     endpointPath: string;
   }): Promise<boolean> => {
-    return true;
+    const { currentAPIUser } = props;
+    const isSelf = currentAPIUser.userId ? true : false;
+    return isSelf;
   };
 }
 
