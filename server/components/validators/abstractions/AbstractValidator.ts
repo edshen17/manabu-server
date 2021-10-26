@@ -1,3 +1,4 @@
+import { StringKeyObject } from '../../../types/custom';
 import { IValidator, ValidatorInitParams } from './IValidator';
 
 type JoiValidationObject = {
@@ -10,7 +11,7 @@ abstract class AbstractValidator<OptionalValidatorInitParams, ValidatorValidateP
 {
   protected _joi!: any;
 
-  public validate = (props: ValidatorValidateParams): {} | Error => {
+  public validate = (props: ValidatorValidateParams): StringKeyObject => {
     const validationObj = this._validateProps(props);
     if ('error' in validationObj) {
       const errMessage = validationObj.error;

@@ -76,7 +76,7 @@ describe('createPackageTransactionCheckoutUsecase', () => {
           await testPackageTransactionCheckoutError();
         });
         it('should throw an error if body contains an invalid userId', async () => {
-          routeData.body.hostedById = 'bad id';
+          routeData.body.teacherId = 'bad id';
           await testPackageTransactionCheckoutError();
         });
         it('should throw an error if user not logged in', async () => {

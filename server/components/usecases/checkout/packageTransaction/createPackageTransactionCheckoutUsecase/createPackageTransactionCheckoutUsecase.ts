@@ -6,6 +6,11 @@ import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teache
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
 import { PaypalHandler } from '../../../../paymentHandlers/paypal/paypalHandler';
 import { StripeHandler } from '../../../../paymentHandlers/stripe/stripeHandler';
+import {
+  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+} from '../../../../validators/abstractions/AbstractEntityValidator';
+import { PackageTransactionCheckoutEntityValidator } from '../../../../validators/checkout/packageTransaction/entity/packageTransactionCheckoutEntityValidator';
 import { AbstractCreateUsecase } from '../../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../../abstractions/AbstractUsecase';
 import { ConvertToTitlecase } from '../../../utils/convertToTitlecase';
@@ -15,6 +20,7 @@ type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePaypalHandler: Promise<PaypalHandler>;
   makeStripeHandler: Promise<StripeHandler>;
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
+  makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
   convertStringToObjectId: ConvertStringToObjectId;
   convertToTitlecase: ConvertToTitlecase;
 };
@@ -39,6 +45,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _paypalHandler!: PaypalHandler;
   private _stripeHandler!: StripeHandler;
   private _exchangeRateHandler!: ExchangeRateHandler;
+  private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
 
@@ -63,7 +70,12 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<TestBodyResponse> => {
     const { body, dbServiceAccessOptions } = props;
-    const { teacherId, packageId, lessonDuration, lessonLanguage, lessonAmount } = body;
+    const validatedBody = this._packageTransactionCheckoutEntityValidator.validate({
+      buildParams: body,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
+    });
+    const { teacherId, packageId, lessonDuration, lessonLanguage, lessonAmount } = validatedBody;
     const teacher = <JoinedUserDoc>await this._dbService.findById({
       _id: this._convertStringToObjectId(teacherId),
       dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
@@ -179,12 +191,14 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       makePaypalHandler,
       makeStripeHandler,
       makeExchangeRateHandler,
+      makePackageTransactionCheckoutEntityValidator,
       convertStringToObjectId,
       convertToTitlecase,
     } = optionalInitParams;
     this._paypalHandler = await makePaypalHandler;
     this._stripeHandler = await makeStripeHandler;
     this._exchangeRateHandler = await makeExchangeRateHandler;
+    this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
     this._convertStringToObjectId = convertStringToObjectId;
     this._convertToTitlecase = convertToTitlecase;
   };

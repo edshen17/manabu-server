@@ -5,6 +5,7 @@ import { convertStringToObjectId } from '../../../../entities/utils/convertStrin
 import { makePaypalHandler } from '../../../../paymentHandlers/paypal';
 import { makeStripeHandler } from '../../../../paymentHandlers/stripe';
 import { makeBaseParamsValidator } from '../../../../validators/base/params';
+import { makePackageTransactionCheckoutEntityValidator } from '../../../../validators/checkout/packageTransaction/entity';
 import { makePackageTransactionCheckoutQueryValidator } from '../../../../validators/checkout/packageTransaction/query';
 import { convertToTitlecase } from '../../../utils/convertToTitlecase';
 import { makeExchangeRateHandler } from '../../../utils/exchangeRateHandler';
@@ -15,6 +16,7 @@ const makeCreatePackageTransactionCheckoutUsecase =
     makeDbService: makeTeacherDbService,
     makeParamsValidator: makeBaseParamsValidator,
     makeQueryValidator: makePackageTransactionCheckoutQueryValidator,
+    makePackageTransactionCheckoutEntityValidator,
     cloneDeep,
     deepEqual,
     makePaypalHandler,
