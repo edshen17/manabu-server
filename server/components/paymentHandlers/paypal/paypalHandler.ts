@@ -28,8 +28,8 @@ class PaypalHandler extends AbstractPaymentHandler<PaypalType, OptionalPaypalHan
             items,
           },
           amount: {
-            currency,
-            total,
+            currency: currency!,
+            total: <string>total!,
           },
           description,
         },

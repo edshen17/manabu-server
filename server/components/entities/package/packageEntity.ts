@@ -41,7 +41,7 @@ class PackageEntity extends AbstractEntity<
     buildParams: PackageEntityBuildParams
   ): PackageEntityBuildResponse => {
     const { lessonAmount, isOffering, packageType, lessonDurations, packageName } = buildParams;
-    const packageEntity = Object.freeze({
+    const packageEntity = {
       lessonAmount,
       isOffering,
       packageType,
@@ -49,7 +49,7 @@ class PackageEntity extends AbstractEntity<
       lessonDurations,
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-    });
+    };
     return packageEntity;
   };
 }

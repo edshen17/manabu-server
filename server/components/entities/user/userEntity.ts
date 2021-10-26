@@ -105,7 +105,7 @@ class UserEntity extends AbstractEntity<
       buildParams || {};
     const encryptedPassword = this._encryptPassword(password);
     const verificationToken = this._createVerificationToken(name, email);
-    const userEntity = Object.freeze({
+    const userEntity = {
       name,
       email,
       password: encryptedPassword,
@@ -138,7 +138,7 @@ class UserEntity extends AbstractEntity<
         amount: 0,
         currency: 'SGD',
       },
-    });
+    };
     return userEntity;
   };
 

@@ -38,7 +38,7 @@ class TeacherEntity extends AbstractEntity<
   protected _buildTemplate = (
     buildParams: TeacherEntityBuildParams
   ): TeacherEntityBuildResponse => {
-    const teacherEntity = Object.freeze({
+    const teacherEntity = {
       teachingLanguages: [],
       alsoSpeaks: [],
       introductionVideoUrl: '',
@@ -53,7 +53,7 @@ class TeacherEntity extends AbstractEntity<
       createdDate: new Date(),
       lastModifiedDate: new Date(),
       packages: this._createPackages(),
-    });
+    };
     return teacherEntity;
   };
 

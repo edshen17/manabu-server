@@ -25,8 +25,7 @@ beforeEach(async () => {
         quantity: 1,
       },
     ],
-    currency: 'SGD',
-    total: '100',
+    total: 2000,
   };
 });
 

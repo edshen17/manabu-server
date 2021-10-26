@@ -62,7 +62,7 @@ class PackageTransactionEntity extends AbstractEntity<
       paymentData,
     } = buildParams;
 
-    const packageTransactionEntity = Object.freeze({
+    const packageTransactionEntity = {
       hostedById,
       reservedById,
       packageId,
@@ -79,7 +79,7 @@ class PackageTransactionEntity extends AbstractEntity<
       status: 'confirmed',
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-    });
+    };
     return packageTransactionEntity;
   };
 

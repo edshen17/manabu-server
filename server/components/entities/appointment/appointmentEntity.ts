@@ -33,7 +33,7 @@ class AppointmentEntity extends AbstractEntity<
     buildParams: AppointmentEntityBuildParams
   ): Promise<AppointmentEntityBuildResponse> => {
     const { hostedById, reservedById, packageTransactionId, startDate, endDate } = buildParams;
-    const appointmentEntity = Object.freeze({
+    const appointmentEntity = {
       hostedById,
       reservedById,
       packageTransactionId,
@@ -43,7 +43,7 @@ class AppointmentEntity extends AbstractEntity<
       status: 'pending',
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-    });
+    };
     return appointmentEntity;
   };
 }

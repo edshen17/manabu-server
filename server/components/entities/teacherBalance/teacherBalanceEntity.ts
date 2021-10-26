@@ -20,13 +20,13 @@ class TeacherBalanceEntity extends AbstractEntity<
 > {
   protected _buildTemplate = (buildParams: TeacherBalanceEntityBuildParams) => {
     const { userId } = buildParams;
-    const teacherBalanceEntity = Object.freeze({
+    const teacherBalanceEntity = {
       userId,
       balance: 0,
       currency: 'SGD',
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-    });
+    };
     return teacherBalanceEntity;
   };
 }

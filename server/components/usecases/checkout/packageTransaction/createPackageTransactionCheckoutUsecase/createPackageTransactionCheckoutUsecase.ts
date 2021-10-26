@@ -1,155 +1,193 @@
-// import { PackageDoc } from '../../../../../models/Package';
-// import { JoinedUserDoc } from '../../../../../models/User';
-// import { StringKeyObject } from '../../../../../types/custom';
-// import { DbServiceAccessOptions } from '../../../../dataAccess/abstractions/IDbService';
-// import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
-// import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
-// import { PaypalHandler } from '../../../../paymentHandlers/paypal/paypalHandler';
-// import { StripeHandler } from '../../../../paymentHandlers/stripe/stripeHandler';
-// import { AbstractCreateUsecase } from '../../../abstractions/AbstractCreateUsecase';
-// import { MakeRequestTemplateParams } from '../../../abstractions/AbstractUsecase';
-// import { ConvertToTitlecase } from '../../../utils/convertToTitlecase';
+import { PackageDoc } from '../../../../../models/Package';
+import { JoinedUserDoc } from '../../../../../models/User';
+import { Await, StringKeyObject } from '../../../../../types/custom';
+import { DbServiceAccessOptions } from '../../../../dataAccess/abstractions/IDbService';
+import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
+import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
+import { PaypalHandler } from '../../../../paymentHandlers/paypal/paypalHandler';
+import { StripeHandler } from '../../../../paymentHandlers/stripe/stripeHandler';
+import { AbstractCreateUsecase } from '../../../abstractions/AbstractCreateUsecase';
+import { MakeRequestTemplateParams } from '../../../abstractions/AbstractUsecase';
+import { ConvertToTitlecase } from '../../../utils/convertToTitlecase';
+import { ExchangeRateHandler } from '../../../utils/exchangeRateHandler/exchangeRateHandler';
 
-// type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
-//   makePaypalHandler: Promise<PaypalHandler>;
-//   makeStripeHandler: Promise<StripeHandler>;
-//   convertStringToObjectId: ConvertStringToObjectId;
-//   convertToTitlecase: ConvertToTitlecase;
-// };
+type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
+  makePaypalHandler: Promise<PaypalHandler>;
+  makeStripeHandler: Promise<StripeHandler>;
+  makeExchangeRateHandler: Promise<ExchangeRateHandler>;
+  convertStringToObjectId: ConvertStringToObjectId;
+  convertToTitlecase: ConvertToTitlecase;
+};
 
-// type CreatePackageTransactionCheckoutUsecaseResponse = {
-//   redirectUrl: string;
-// };
+type CreatePackageTransactionCheckoutUsecaseResponse = {
+  redirectUrl: string;
+};
 
-// type TestBodyResponse = {
-//   teacher: JoinedUserDoc;
-//   teacherData: JoinedUserDoc['teacherData'];
-//   teacherPackage: PackageDoc;
-// };
+type TestBodyResponse = {
+  teacher: JoinedUserDoc;
+  teacherData: JoinedUserDoc['teacherData'];
+  teacherPackage: PackageDoc;
+};
 
-// type GetRedirectUrlParams = MakeRequestTemplateParams & TestBodyResponse;
+type GetRedirectUrlParams = MakeRequestTemplateParams & TestBodyResponse;
 
-// class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
-//   OptionalCreatePackageTransactionCheckoutUsecaseInitParams,
-//   CreatePackageTransactionCheckoutUsecaseResponse,
-//   TeacherDbServiceResponse
-// > {
-//   private _paypalHandler!: PaypalHandler;
-//   private _stripeHandler!: StripeHandler;
-//   private _convertStringToObjectId!: ConvertStringToObjectId;
-//   private _convertToTitlecase!: ConvertToTitlecase;
+class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
+  OptionalCreatePackageTransactionCheckoutUsecaseInitParams,
+  CreatePackageTransactionCheckoutUsecaseResponse,
+  TeacherDbServiceResponse
+> {
+  private _paypalHandler!: PaypalHandler;
+  private _stripeHandler!: StripeHandler;
+  private _exchangeRateHandler!: ExchangeRateHandler;
+  private _convertStringToObjectId!: ConvertStringToObjectId;
+  private _convertToTitlecase!: ConvertToTitlecase;
 
-//   protected _makeRequestTemplate = async (
-//     props: MakeRequestTemplateParams
-//   ): Promise<CreatePackageTransactionCheckoutUsecaseResponse> => {
-//     const { teacher, teacherData, teacherPackage } = await this._testBody(props);
-//     const redirectUrl = await this._getRedirectUrl({
-//       ...props,
-//       teacher,
-//       teacherData,
-//       teacherPackage,
-//     });
-//     const usecaseRes = {
-//       redirectUrl,
-//     };
-//     return usecaseRes;
-//   };
+  protected _makeRequestTemplate = async (
+    props: MakeRequestTemplateParams
+  ): Promise<CreatePackageTransactionCheckoutUsecaseResponse> => {
+    const { teacher, teacherData, teacherPackage } = await this._testBody(props);
+    const redirectUrl = await this._getRedirectUrl({
+      ...props,
+      teacher,
+      teacherData,
+      teacherPackage,
+    });
+    const usecaseRes = {
+      redirectUrl,
+    };
+    return usecaseRes;
+  };
 
-//   private _testBody = async (props: {
-//     body: StringKeyObject;
-//     dbServiceAccessOptions: DbServiceAccessOptions;
-//   }): Promise<TestBodyResponse> => {
-//     const { body, dbServiceAccessOptions } = props;
-//     const { teacherId, packageId, lessonDuration, lessonLanguage, lessonAmount } = body;
-//     const teacher = <JoinedUserDoc>await this._dbService.findById({
-//       _id: this._convertStringToObjectId(teacherId),
-//       dbServiceAccessOptions,
-//     });
-//     const teacherData = teacher.teacherData!;
-//     const teacherPackage = <PackageDoc>teacherData.packages.find((pkg) => {
-//       return this._deepEqual(this._convertStringToObjectId(packageId), pkg._id);
-//     });
-//     const isTeacherApproved = teacherData.applicationStatus == 'approved';
-//     const isValidLessonDuration = teacherPackage.lessonDurations.includes(lessonDuration);
-//     const isValidLessonLanguage =
-//       teacherData.teachingLanguages.findIndex((teachingLanguage) => {
-//         return teachingLanguage.language == lessonLanguage;
-//       }) != -1;
-//     const isValidLessonAmount = teacherPackage.lessonAmount == lessonAmount;
-//     const isValidBody =
-//       isTeacherApproved && isValidLessonDuration && isValidLessonLanguage && isValidLessonAmount;
-//     if (!isValidBody) {
-//       throw new Error('Invalid body.');
-//     }
-//     return { teacher, teacherData, teacherPackage };
-//   };
+  private _testBody = async (props: {
+    body: StringKeyObject;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<TestBodyResponse> => {
+    const { body, dbServiceAccessOptions } = props;
+    const { teacherId, packageId, lessonDuration, lessonLanguage, lessonAmount } = body;
+    const teacher = <JoinedUserDoc>await this._dbService.findById({
+      _id: this._convertStringToObjectId(teacherId),
+      dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
+    });
+    const teacherData = teacher.teacherData!;
+    const teacherPackage = <PackageDoc>teacherData.packages.find((pkg) => {
+      return this._deepEqual(this._convertStringToObjectId(packageId), pkg._id);
+    });
+    const isTeacherApproved = teacherData.applicationStatus == 'approved';
+    const isValidLessonDuration = teacherPackage.lessonDurations.includes(lessonDuration);
+    const isValidLessonLanguage =
+      teacherData.teachingLanguages.findIndex((teachingLanguage) => {
+        return teachingLanguage.language == lessonLanguage;
+      }) != -1;
+    const isValidLessonAmount = teacherPackage.lessonAmount == lessonAmount;
+    const isValidBody =
+      isTeacherApproved && isValidLessonDuration && isValidLessonLanguage && isValidLessonAmount;
 
-//   private _getRedirectUrl = async (props: GetRedirectUrlParams): Promise<string> => {
-//     const { query } = props;
-//     const { paymentHandler } = query;
-//     const processedPaymentHandlerParams = this._getProcessedPaymentHandlerParams();
-//     let redirectUrl = '';
-//     switch (paymentHandler) {
-//       case 'paypal':
-//         redirectUrl = await this._getPaypalRedirectUrl(props);
-//         break;
-//       case 'stripe':
-//         break;
-//       case 'payNow':
-//         break;
-//       default:
-//         throw new Error('Invalid payment handler query.');
-//     }
-//     return redirectUrl;
-//   };
+    if (!isValidBody) {
+      throw new Error('Invalid body.');
+    }
+    return { teacher, teacherData, teacherPackage };
+  };
 
-//   private _getProcessedPaymentHandlerParams = (props: GetRedirectUrlParams) => {
-//     const { teacher, teacherData, teacherPackage, currentAPIUser, query } = props;
-//     const { paymentHandler } = query;
+  private _getRedirectUrl = async (props: GetRedirectUrlParams): Promise<string> => {
+    const { query } = props;
+    const { paymentGateway } = query;
+    const processedPaymentHandlerParams = await this._getProcessedPaymentHandlerParams(props);
+    let redirectUrl = '';
+    switch (paymentGateway) {
+      case 'paypal':
+        redirectUrl = await this._getPaypalRedirectUrl(processedPaymentHandlerParams);
+        break;
+      case 'stripe':
+        break;
+      case 'payNow':
+        break;
+      default:
+        throw new Error('Invalid payment handler query.');
+    }
+    return redirectUrl;
+  };
 
-//     subTotal =
-//     const item = {
-//       id: `h-${teacher._id}-r-${currentAPIUser.userId}`,
-//       name: this._convertToTitlecase(`${teacherPackage.packageName} with ${teacher.name}`),
-//       price: '',
-//     };
-//     return item;
-//   };
+  private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
+    const { teacher, teacherData, teacherPackage, currentAPIUser, query, body } = props;
+    const { lessonDuration, lessonLanguage } = body;
+    const { paymentGateway } = query;
+    const DEFAULT_CURRENCY = 'SGD';
+    const { hourlyRate, currency } = teacherData!.priceData;
+    const paymentMethodRate: StringKeyObject = {
+      paypal: 0.025,
+      stripe: 0.01,
+      paynow: 0.01,
+    };
+    const packageTransactionSubtotal =
+      hourlyRate * (lessonDuration / 60) * teacherPackage.lessonAmount;
+    const packageTransactionTotal =
+      packageTransactionSubtotal * (1 + paymentMethodRate[paymentGateway]);
+    const item = {
+      id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
+      name: this._convertToTitlecase(
+        `Minato Manabu - ${teacherPackage.packageName} / ${teacher.name}`
+      ),
+      price: await this._exchangeRateHandler.convert({
+        amount: packageTransactionTotal,
+        fromCurrency: currency,
+        toCurrency: DEFAULT_CURRENCY,
+      }),
+      quantity: 1,
+    };
+    const processedPaymentHandlerParams = {
+      item,
+      successRedirectUrl: 'https://manabu.sg/success',
+      cancelRedirectUrl: 'https://manabu.sg/cancel',
+      currency: DEFAULT_CURRENCY,
+    };
+    return processedPaymentHandlerParams;
+  };
 
-//   private _getPaypalRedirectUrl = async (props: GetRedirectUrlParams): Promise<string> => {
-//     const { teacher, teacherData, teacherPackage, body } = props;
-//     const paymentHandlerExecuteParams = {
-//       successRedirectUrl: 'https://manabu.sg/success',
-//       cancelRedirectUrl: 'https://manabu.sg/cancel',
-//       items: [
-//         {
-//           name: `${teacherPackage.packageName}`, // title case util...
-//           sku: '123',
-//           price: '100',
-//           currency: 'SGD',
-//           quantity: 1,
-//         },
-//       ],
-//       currency: 'SGD',
-//       total: '100',
-//     };
-//     const paypalCheckoutRes = await this._paypalHandler.executeSinglePayment(
-//       paymentHandlerExecuteParams
-//     );
-//     const { redirectUrl } = paypalCheckoutRes;
-//     return redirectUrl;
-//   };
+  private _getPaypalRedirectUrl = async (
+    props: Await<
+      ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerParams']>
+    >
+  ): Promise<string> => {
+    const { item, successRedirectUrl, cancelRedirectUrl, currency } = props;
+    const price = item.price.toString();
+    const paymentHandlerExecuteParams = {
+      successRedirectUrl,
+      cancelRedirectUrl,
+      items: [
+        {
+          name: item.name,
+          sku: item.id,
+          price,
+          currency,
+          quantity: item.quantity,
+        },
+      ],
+      currency,
+      total: price,
+    };
+    const paypalCheckoutRes = await this._paypalHandler.executeSinglePayment(
+      paymentHandlerExecuteParams
+    );
+    const { redirectUrl } = paypalCheckoutRes;
+    return redirectUrl;
+  };
 
-//   protected _initTemplate = async (
-//     optionalInitParams: OptionalCreatePackageTransactionCheckoutUsecaseInitParams
-//   ): Promise<void> => {
-//     const { makePaypalHandler, makeStripeHandler, convertStringToObjectId, convertToTitlecase } =
-//       optionalInitParams;
-//     this._paypalHandler = await makePaypalHandler;
-//     this._stripeHandler = await makeStripeHandler;
-//     this._convertStringToObjectId = convertStringToObjectId;
-//     this._convertToTitlecase = convertToTitlecase;
-//   };
-// }
+  protected _initTemplate = async (
+    optionalInitParams: OptionalCreatePackageTransactionCheckoutUsecaseInitParams
+  ): Promise<void> => {
+    const {
+      makePaypalHandler,
+      makeStripeHandler,
+      makeExchangeRateHandler,
+      convertStringToObjectId,
+      convertToTitlecase,
+    } = optionalInitParams;
+    this._paypalHandler = await makePaypalHandler;
+    this._stripeHandler = await makeStripeHandler;
+    this._exchangeRateHandler = await makeExchangeRateHandler;
+    this._convertStringToObjectId = convertStringToObjectId;
+    this._convertToTitlecase = convertToTitlecase;
+  };
+}
 
-// export { CreatePackageTransactionCheckoutUsecase };
+export { CreatePackageTransactionCheckoutUsecase };

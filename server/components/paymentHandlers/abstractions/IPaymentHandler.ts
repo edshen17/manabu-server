@@ -12,9 +12,9 @@ type PaymentHandlerExecuteParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
   items: Item[] | Array<Stripe.Checkout.SessionCreateParams.LineItem>;
-  currency: string;
+  currency?: string;
   description?: string;
-  total: string;
+  total: string | number;
   subscription?: boolean;
 };
 

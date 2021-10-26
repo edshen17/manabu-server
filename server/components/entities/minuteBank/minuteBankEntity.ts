@@ -25,13 +25,13 @@ class MinuteBankEntity extends AbstractEntity<
     buildParams: MinuteBankEntityBuildParams
   ): Promise<MinuteBankEntityBuildResponse> => {
     const { hostedById, reservedById } = buildParams;
-    const minuteBankEntity = Object.freeze({
+    const minuteBankEntity = {
       hostedById,
       reservedById,
       minuteBank: 0,
       createdDate: new Date(),
       lastModifiedDate: new Date(),
-    });
+    };
     return minuteBankEntity;
   };
 }

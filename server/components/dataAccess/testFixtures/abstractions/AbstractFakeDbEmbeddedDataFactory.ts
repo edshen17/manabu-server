@@ -25,7 +25,7 @@ abstract class AbstractFakeDbEmbeddedDataFactory<
     const fakeData = this._entity.build(fakeBuildParams);
     return fakeData;
   };
-  protected abstract _createFakeBuildParams(): EntityBuildParams;
+  protected abstract _createFakeBuildParams(): Promise<EntityBuildParams>;
 
   public init = async (
     props: FakeDbEmbeddedDataFactoryInitParams<
