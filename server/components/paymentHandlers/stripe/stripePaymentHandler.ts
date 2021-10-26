@@ -7,7 +7,10 @@ import {
 
 type OptionalStripeHandlerInitParams = {};
 
-class StripeHandler extends AbstractPaymentHandler<Stripe | null, OptionalStripeHandlerInitParams> {
+class StripePaymentHandler extends AbstractPaymentHandler<
+  Stripe | null,
+  OptionalStripeHandlerInitParams
+> {
   protected _createPaymentJson = (
     props: PaymentHandlerExecuteParams
   ): Stripe.Checkout.SessionCreateParams => {
@@ -36,4 +39,4 @@ class StripeHandler extends AbstractPaymentHandler<Stripe | null, OptionalStripe
   };
 }
 
-export { StripeHandler };
+export { StripePaymentHandler };

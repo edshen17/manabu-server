@@ -1,5 +1,5 @@
 import { Stripe } from 'stripe';
-import { StripeHandler } from './stripeHandler';
+import { StripePaymentHandler } from './stripePaymentHandler';
 
 let stripeKey = process.env.STRIPE_SECRET_KEY!;
 if (process.env.NODE_ENV != 'production') {
@@ -10,6 +10,6 @@ const stripe = new Stripe(stripeKey, {
   typescript: true,
 });
 
-const makeStripeHandler = new StripeHandler().init({ paymentLib: stripe });
+const makeStripePaymentHandler = new StripePaymentHandler().init({ paymentLib: stripe });
 
-export { makeStripeHandler };
+export { makeStripePaymentHandler };

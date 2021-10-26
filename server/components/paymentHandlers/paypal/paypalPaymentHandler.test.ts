@@ -1,13 +1,13 @@
 import { expect } from 'chai';
-import { makePaypalHandler } from '.';
+import { makePaypalPaymentHandler } from '.';
 import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
-import { PaypalHandler } from './paypalHandler';
+import { PaypalPaymentHandler } from './paypalPaymentHandler';
 
-let paypalHandler: PaypalHandler;
+let paypalPaymentHandler: PaypalPaymentHandler;
 let paymentHandlerExecuteParams: PaymentHandlerExecuteParams;
 
 before(async () => {
-  paypalHandler = await makePaypalHandler;
+  paypalPaymentHandler = await makePaypalPaymentHandler;
 });
 
 beforeEach(async () => {
@@ -28,10 +28,10 @@ beforeEach(async () => {
   };
 });
 
-describe('paypalHandler', () => {
+describe('paypalPaymentHandler', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await paypalHandler.executeSinglePayment(
+      const executeSinglePaymentRes = await paypalPaymentHandler.executeSinglePayment(
         paymentHandlerExecuteParams
       );
       expect(executeSinglePaymentRes).to.have.property('redirectUrl');

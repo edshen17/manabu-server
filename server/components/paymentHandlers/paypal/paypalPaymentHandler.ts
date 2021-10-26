@@ -9,7 +9,10 @@ import {
 type PaypalType = typeof paypal;
 type OptionalPaypalHandlerInitParams = {};
 
-class PaypalHandler extends AbstractPaymentHandler<PaypalType, OptionalPaypalHandlerInitParams> {
+class PaypalPaymentHandler extends AbstractPaymentHandler<
+  PaypalType,
+  OptionalPaypalHandlerInitParams
+> {
   protected _createPaymentJson = (props: PaymentHandlerExecuteParams): Payment => {
     const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total } =
       props as PaymentHandlerExecuteParams & { items: Item[] };
@@ -59,4 +62,4 @@ class PaypalHandler extends AbstractPaymentHandler<PaypalType, OptionalPaypalHan
   };
 }
 
-export { PaypalHandler };
+export { PaypalPaymentHandler };

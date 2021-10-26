@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { makeStripeHandler } from '.';
+import { makeStripePaymentHandler } from '.';
 import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
-import { StripeHandler } from './stripeHandler';
-let stripeHandler: StripeHandler;
+import { StripePaymentHandler } from './stripePaymentHandler';
+let stripePaymentHandler: StripePaymentHandler;
 let paymentHandlerExecuteParams: PaymentHandlerExecuteParams;
 
 before(async () => {
-  stripeHandler = await makeStripeHandler;
+  stripePaymentHandler = await makeStripePaymentHandler;
 });
 
 beforeEach(async () => {
@@ -29,10 +29,10 @@ beforeEach(async () => {
   };
 });
 
-describe('stripeHandler', () => {
+describe('stripePaymentHandler', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await stripeHandler.executeSinglePayment(
+      const executeSinglePaymentRes = await stripePaymentHandler.executeSinglePayment(
         paymentHandlerExecuteParams
       );
       expect(executeSinglePaymentRes).to.have.property('redirectUrl');

@@ -1,5 +1,5 @@
 import paypal from 'paypal-rest-sdk';
-import { PaypalHandler } from './paypalHandler';
+import { PaypalPaymentHandler } from './paypalPaymentHandler';
 
 const paypalConfig = {
   mode: 'sandbox',
@@ -15,6 +15,6 @@ if (process.env.NODE_ENV == 'production') {
 
 paypal.configure(paypalConfig);
 
-const makePaypalHandler = new PaypalHandler().init({ paymentLib: paypal });
+const makePaypalPaymentHandler = new PaypalPaymentHandler().init({ paymentLib: paypal });
 
-export { makePaypalHandler };
+export { makePaypalPaymentHandler };

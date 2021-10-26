@@ -2,8 +2,8 @@ import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
 import { makeTeacherDbService } from '../../../../dataAccess/services/teacher';
 import { convertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
-import { makePaypalHandler } from '../../../../paymentHandlers/paypal';
-import { makeStripeHandler } from '../../../../paymentHandlers/stripe';
+import { makePaypalPaymentHandler } from '../../../../paymentHandlers/paypal';
+import { makeStripePaymentHandler } from '../../../../paymentHandlers/stripe';
 import { makeBaseParamsValidator } from '../../../../validators/base/params';
 import { makePackageTransactionCheckoutEntityValidator } from '../../../../validators/checkout/packageTransaction/entity';
 import { makePackageTransactionCheckoutQueryValidator } from '../../../../validators/checkout/packageTransaction/query';
@@ -19,8 +19,8 @@ const makeCreatePackageTransactionCheckoutUsecase =
     makePackageTransactionCheckoutEntityValidator,
     cloneDeep,
     deepEqual,
-    makePaypalHandler,
-    makeStripeHandler,
+    makePaypalPaymentHandler,
+    makeStripePaymentHandler,
     convertStringToObjectId,
     convertToTitlecase,
     makeExchangeRateHandler,
