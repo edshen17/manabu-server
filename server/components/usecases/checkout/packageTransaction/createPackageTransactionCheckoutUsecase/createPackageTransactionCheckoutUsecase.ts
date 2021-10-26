@@ -191,26 +191,29 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     props: GetPaymentHandlerRedirectUrlParams
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency } = props;
-    const price = item.price.toString();
+    const price = item.price * 100;
     const paymentHandlerExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: [
         {
-          name: item.name,
-          sku: item.id,
-          price,
-          currency,
+          price_data: {
+            currency: currency.toLowerCase(),
+            product_data: {
+              name: item.name,
+            },
+            unit_amount: 2000,
+          },
           quantity: item.quantity,
         },
       ],
       currency,
       total: price,
     };
-    const paypalCheckoutRes = await this._paypalPaymentHandler.executeSinglePayment(
+    const stripeCheckoutRes = await this._stripePaymentHandler.executeSinglePayment(
       paymentHandlerExecuteParams
     );
-    const { redirectUrl } = paypalCheckoutRes;
+    const { redirectUrl } = stripeCheckoutRes;
     return redirectUrl;
   };
 
