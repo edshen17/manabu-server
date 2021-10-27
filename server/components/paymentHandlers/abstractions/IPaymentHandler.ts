@@ -1,3 +1,4 @@
+import Omise from 'omise';
 import { Item } from 'paypal-rest-sdk';
 import Stripe from 'stripe';
 
@@ -11,7 +12,7 @@ type RequiredPaymentHandlerInitParams<PaymentLibType> = {
 type PaymentHandlerExecuteParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
-  items: Item[] | Array<Stripe.Checkout.SessionCreateParams.LineItem>;
+  items: Item[] | Array<Stripe.Checkout.SessionCreateParams.LineItem> | Omise.Sources.ISource;
   currency?: string;
   description?: string;
   total: string | number;

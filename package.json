@@ -61,6 +61,7 @@
     "mongoose-unique-validator": "^2.0.3",
     "nodemailer": "^6.5.0",
     "npm": "^7.6.3",
+    "omise": "^0.8.5",
     "paypal-rest-sdk": "^1.8.1",
     "query-string": "^7.0.1",
     "querystring": "^0.2.1",

@@ -7,10 +7,7 @@ import {
 
 type OptionalStripeHandlerInitParams = {};
 
-class StripePaymentHandler extends AbstractPaymentHandler<
-  Stripe | null,
-  OptionalStripeHandlerInitParams
-> {
+class StripePaymentHandler extends AbstractPaymentHandler<Stripe, OptionalStripeHandlerInitParams> {
   protected _createPaymentJson = (
     props: PaymentHandlerExecuteParams
   ): Stripe.Checkout.SessionCreateParams => {
@@ -33,8 +30,8 @@ class StripePaymentHandler extends AbstractPaymentHandler<
   protected _executePaymentTemplate = async (
     createPaymentJson: Stripe.Checkout.SessionCreateParams
   ): Promise<PaymentHandlerExecutePaymentRes> => {
-    const session = await this._paymentLib!.checkout.sessions.create(createPaymentJson);
-    const executePaymentRes = { redirectUrl: session.url! };
+    const session = await this._paymentLib.checkout.sessions.create(createPaymentJson);
+    const executePaymentRes = { redirectUrl: <string>session.url };
     return executePaymentRes;
   };
 }

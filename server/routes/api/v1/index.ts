@@ -13,5 +13,8 @@ api.use('/packages', packages);
 api.use('/teachers', teachers);
 api.use('/users', users);
 api.use('/utils', utils);
+api.get('/test', () => {
+  console.log('hi');
+});
 
 export { api };
