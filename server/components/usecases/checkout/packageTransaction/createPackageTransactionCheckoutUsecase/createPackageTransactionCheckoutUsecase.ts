@@ -237,4 +237,4 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 }
 
-export { CreatePackageTransactionCheckoutUsecase };
+export { CreatePackageTransactionCheckoutUsecase, CreatePackageTransactionCheckoutUsecaseResponse };

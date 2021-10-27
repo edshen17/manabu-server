@@ -44,7 +44,7 @@ beforeEach(async () => {
   };
 });
 
-describe('createAppointmentsController', () => {
+describe('createPackagesController', () => {
   describe('makeRequest', () => {
     const createPackages = async () => {
       const createPackagesHttpRequest = iHttpRequestBuilder

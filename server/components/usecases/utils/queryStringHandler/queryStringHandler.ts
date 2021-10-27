@@ -30,18 +30,18 @@ class QueryStringHandler {
     return stringifiedQueryStrings;
   };
 
-  public decodeQueryString = (queryStringValue: string): any => {
-    const queryStringObj: StringKeyObject = this.parseQueryString(queryStringValue);
-    const decodedQueryStringObj: StringKeyObject = this.decodeQueryStringObj(queryStringObj);
+  public decodeQueryString = (queryStringValue: string): StringKeyObject => {
+    const queryStringObj = this.parseQueryString(queryStringValue);
+    const decodedQueryStringObj = this.decodeQueryStringObj(queryStringObj);
     return decodedQueryStringObj;
   };
 
-  public parseQueryString = (queryString: string): any => {
+  public parseQueryString = (queryString: string): StringKeyObject => {
     const parsedQueryStrings = this._queryStringLib.parse(queryString);
     return parsedQueryStrings;
   };
 
-  public decodeQueryStringObj = (queryStringObj: StringKeyObject): any => {
+  public decodeQueryStringObj = (queryStringObj: StringKeyObject): StringKeyObject => {
     const decodedQueryStringObj: StringKeyObject = {};
     for (const queryString in queryStringObj) {
       const queryStringValue = queryStringObj[queryString];

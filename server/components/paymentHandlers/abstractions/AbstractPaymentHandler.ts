@@ -4,7 +4,7 @@ import {
   PaymentHandlerExecuteParams,
   PaymentHandlerExecutePaymentRes,
   PaymentHandlerInitParams,
-} from '../abstractions/IPaymentHandler';
+} from './IPaymentHandler';
 
 abstract class AbstractPaymentHandler<PaymentLibType, OptionalPaymentHandlerInitParams>
   implements IPaymentHandler<PaymentLibType, OptionalPaymentHandlerInitParams>
