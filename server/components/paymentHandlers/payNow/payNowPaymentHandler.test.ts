@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import Omise from 'omise';
 import { makePayNowPaymentHandler } from '.';
 import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
 import { PayNowPaymentHandler } from './payNowPaymentHandler';
@@ -16,11 +15,18 @@ beforeEach(async () => {
     successRedirectUrl: 'https://manabu.sg/success',
     cancelRedirectUrl: 'https://manabu.sg/cancel',
     items: {
-      type: 'paynow',
-      amount: 500000,
-      currency: 'sgd',
-    } as Omise.Sources.ISource,
-    total: 2000,
+      source: {
+        type: 'paynow',
+        amount: 5000,
+        currency: 'sgd',
+      },
+      charge: {
+        amount: 5000,
+        currency: 'sgd',
+        description: 'some description',
+      },
+    },
+    total: 5000,
   };
 });
 

@@ -2,6 +2,7 @@ import Omise from 'omise';
 import { StringKeyObject } from '../../../types/custom';
 import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
 import {
+  OmiseItems,
   PaymentHandlerExecuteParams,
   PaymentHandlerExecutePaymentRes,
 } from '../abstractions/IPaymentHandler';
@@ -12,26 +13,26 @@ class PayNowPaymentHandler extends AbstractPaymentHandler<
   Omise.IOmise,
   OptionalPayNowPaymentHandlerInitParams
 > {
-  protected _createPaymentJson = (props: PaymentHandlerExecuteParams): Omise.Sources.ISource => {
+  protected _createPaymentJson = (props: PaymentHandlerExecuteParams): OmiseItems => {
     const { items } = props;
-    const createPaymentJson = {
-      ...items,
-    } as Omise.Sources.ISource;
+    const createPaymentJson = items as OmiseItems;
     return createPaymentJson;
   };
 
   protected _executePaymentTemplate = async (
-    createPaymentJson: Omise.Sources.IRequest
+    createPaymentJson: OmiseItems
   ): Promise<PaymentHandlerExecutePaymentRes> => {
-    const source = await this._paymentLib.sources.create(createPaymentJson);
-    const { id, amount, currency } = source;
-    const charge = await this._paymentLib.charges.create({
+    const { source, charge } = createPaymentJson;
+    const sourceRes = await this._paymentLib.sources.create(source);
+    const { id, amount, currency } = sourceRes;
+    const chargeRes = await this._paymentLib.charges.create({
+      ...charge,
       source: id,
       amount: amount,
       currency: currency,
     });
     const executePaymentRes = {
-      redirectUrl: (charge.source! as StringKeyObject).scannable_code.image.download_uri,
+      redirectUrl: (chargeRes.source as StringKeyObject).scannable_code.image.download_uri,
     };
     return executePaymentRes;
   };

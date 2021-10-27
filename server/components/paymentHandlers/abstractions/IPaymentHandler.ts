@@ -9,10 +9,17 @@ type RequiredPaymentHandlerInitParams<PaymentLibType> = {
   paymentLib: PaymentLibType;
 };
 
+type PaypalItems = Item[];
+type StripeItems = Array<Stripe.Checkout.SessionCreateParams.LineItem>;
+type OmiseItems = {
+  source: Omise.Sources.IRequest;
+  charge: Omise.Charges.IRequest;
+};
+
 type PaymentHandlerExecuteParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
-  items: Item[] | Array<Stripe.Checkout.SessionCreateParams.LineItem> | Omise.Sources.ISource;
+  items: PaypalItems | StripeItems | OmiseItems;
   currency?: string;
   description?: string;
   total: string | number;
@@ -40,4 +47,7 @@ export {
   PaymentHandlerInitParams,
   PaymentHandlerExecuteParams,
   PaymentHandlerExecutePaymentRes,
+  PaypalItems,
+  StripeItems,
+  OmiseItems,
 };
