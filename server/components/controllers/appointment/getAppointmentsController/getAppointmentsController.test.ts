@@ -26,7 +26,7 @@ let body: StringKeyObject;
 let currentAPIUser: CurrentAPIUser;
 let params: StringKeyObject;
 let path: string;
-let query: string;
+let query: StringKeyObject;
 let queryStringHandler: QueryStringHandler;
 
 before(async () => {

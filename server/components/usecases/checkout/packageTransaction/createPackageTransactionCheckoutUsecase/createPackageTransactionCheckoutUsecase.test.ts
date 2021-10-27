@@ -101,6 +101,12 @@ describe('createPackageTransactionCheckoutUsecase', () => {
               await validResOutput();
             });
           });
+          context('payNow', () => {
+            it('should get a valid paypal checkout link', async () => {
+              routeData.query.paymentGateway = 'payNow';
+              await validResOutput();
+            });
+          });
         });
       });
     });

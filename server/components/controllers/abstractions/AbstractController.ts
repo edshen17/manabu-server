@@ -33,6 +33,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
         body: usecaseRes,
       };
     } catch (err: any) {
+      console.log(err);
       return {
         headers,
         statusCode: this._errorStatusCode,

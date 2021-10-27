@@ -36,6 +36,7 @@ describe('paypalPaymentHandler', () => {
       const executeSinglePaymentRes = await payNowPaymentHandler.executeSinglePayment(
         paymentHandlerExecuteParams
       );
+      console.log(executeSinglePaymentRes);
       expect(executeSinglePaymentRes).to.have.property('redirectUrl');
     });
   });
