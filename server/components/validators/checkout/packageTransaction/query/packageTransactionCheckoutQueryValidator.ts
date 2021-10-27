@@ -3,7 +3,7 @@ import { AbstractQueryValidator } from '../../../abstractions/AbstractQueryValid
 class PackageTransactionCheckoutQueryValidator extends AbstractQueryValidator {
   protected _initValidationSchemas = () => {
     this._queryValidationSchema = this._joi.object().keys({
-      paymentGateway: this._joi.string().valid('paypal', 'payNow', 'stripe'),
+      paymentGateway: this._joi.string().valid('paypal', 'paynow', 'stripe'),
     });
   };
 }

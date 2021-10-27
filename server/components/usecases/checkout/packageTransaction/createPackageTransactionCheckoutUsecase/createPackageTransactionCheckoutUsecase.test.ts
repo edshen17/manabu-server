@@ -91,19 +91,19 @@ describe('createPackageTransactionCheckoutUsecase', () => {
         };
         context('one-time payment', () => {
           context('paypal', () => {
-            it('should get a valid paypal checkout link', async () => {
+            it('should get a valid checkout link', async () => {
               await validResOutput();
             });
           });
           context('stripe', () => {
-            it('should get a valid paypal checkout link', async () => {
+            it('should get a valid checkout link', async () => {
               routeData.query.paymentGateway = 'stripe';
               await validResOutput();
             });
           });
-          context('payNow', () => {
-            it('should get a valid paypal checkout link', async () => {
-              routeData.query.paymentGateway = 'payNow';
+          context('paynow', () => {
+            it('should get a valid checkout link', async () => {
+              routeData.query.paymentGateway = 'paynow';
               await validResOutput();
             });
           });

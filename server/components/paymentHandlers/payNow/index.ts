@@ -1,4 +1,4 @@
-import { PayNowPaymentHandler } from './payNowPaymentHandler';
+import { PaynowPaymentHandler } from './paynowPaymentHandler';
 
 // add production keys
 const publicKey = process.env.PAYNOW_PUBLIC_KEY_DEV!;
@@ -10,6 +10,6 @@ const Omise = require('omise')({
   omiseVersion: '2019-05-29',
 });
 
-const makePayNowPaymentHandler = new PayNowPaymentHandler().init({ paymentLib: Omise });
+const makePaynowPaymentHandler = new PaynowPaymentHandler().init({ paymentLib: Omise });
 
-export { makePayNowPaymentHandler };
+export { makePaynowPaymentHandler };

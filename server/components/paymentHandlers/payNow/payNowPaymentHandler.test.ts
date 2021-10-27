@@ -1,13 +1,13 @@
 import { expect } from 'chai';
-import { makePayNowPaymentHandler } from '.';
+import { makePaynowPaymentHandler } from '.';
 import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
-import { PayNowPaymentHandler } from './payNowPaymentHandler';
+import { PaynowPaymentHandler } from './paynowPaymentHandler';
 
-let payNowPaymentHandler: PayNowPaymentHandler;
+let paynowPaymentHandler: PaynowPaymentHandler;
 let paymentHandlerExecuteParams: PaymentHandlerExecuteParams;
 
 before(async () => {
-  payNowPaymentHandler = await makePayNowPaymentHandler;
+  paynowPaymentHandler = await makePaynowPaymentHandler;
 });
 
 beforeEach(async () => {
@@ -33,7 +33,7 @@ beforeEach(async () => {
 describe('paypalPaymentHandler', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await payNowPaymentHandler.executeSinglePayment(
+      const executeSinglePaymentRes = await paynowPaymentHandler.executeSinglePayment(
         paymentHandlerExecuteParams
       );
       console.log(executeSinglePaymentRes);

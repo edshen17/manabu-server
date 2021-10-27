@@ -5,7 +5,7 @@ import { DbServiceAccessOptions } from '../../../../dataAccess/abstractions/IDbS
 import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
 import { PaymentHandlerExecuteParams } from '../../../../paymentHandlers/abstractions/IPaymentHandler';
-import { PayNowPaymentHandler } from '../../../../paymentHandlers/payNow/payNowPaymentHandler';
+import { PaynowPaymentHandler } from '../../../../paymentHandlers/paynow/paynowPaymentHandler';
 import { PaypalPaymentHandler } from '../../../../paymentHandlers/paypal/paypalPaymentHandler';
 import { StripePaymentHandler } from '../../../../paymentHandlers/stripe/stripePaymentHandler';
 import {
@@ -21,7 +21,7 @@ import { ExchangeRateHandler } from '../../../utils/exchangeRateHandler/exchange
 type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePaypalPaymentHandler: Promise<PaypalPaymentHandler>;
   makeStripePaymentHandler: Promise<StripePaymentHandler>;
-  makePayNowPaymentHandler: Promise<PayNowPaymentHandler>;
+  makePaynowPaymentHandler: Promise<PaynowPaymentHandler>;
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
   makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
   convertStringToObjectId: ConvertStringToObjectId;
@@ -51,7 +51,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
 > {
   private _paypalPaymentHandler!: PaypalPaymentHandler;
   private _stripePaymentHandler!: StripePaymentHandler;
-  private _payNowPaymentHandler!: PayNowPaymentHandler;
+  private _paynowPaymentHandler!: PaynowPaymentHandler;
   private _exchangeRateHandler!: ExchangeRateHandler;
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
@@ -120,8 +120,8 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       case 'stripe':
         redirectUrl = await this._getStripeRedirectUrl(processedPaymentHandlerParams);
         break;
-      case 'payNow':
-        redirectUrl = await this._getPayNowRedirectUrl(processedPaymentHandlerParams);
+      case 'paynow':
+        redirectUrl = await this._getPaynowRedirectUrl(processedPaymentHandlerParams);
         break;
       default:
         throw new Error('Invalid payment handler query.');
@@ -138,7 +138,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const paymentMethodRate: StringKeyObject = {
       paypal: 0.025,
       stripe: 0.01,
-      payNow: 0.01,
+      paynow: 0.01,
     };
     const packageTransactionSubtotal =
       hourlyRate * (lessonDuration / 60) * teacherPackage.lessonAmount;
@@ -223,23 +223,23 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return redirectUrl;
   };
 
-  private _getPayNowRedirectUrl = async (
+  private _getPaynowRedirectUrl = async (
     props: GetPaymentHandlerRedirectUrlParams
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency } = props;
     const { price, name } = item;
-    const payNowPrice = price * 100;
+    const paynowPrice = price * 100;
     const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: {
         source: {
           type: 'paynow',
-          amount: payNowPrice,
+          amount: paynowPrice,
           currency: currency.toLowerCase(),
         },
         charge: {
-          amount: payNowPrice,
+          amount: paynowPrice,
           currency: currency.toLowerCase(),
           description: name,
         },
@@ -247,10 +247,10 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       currency,
       total: price,
     };
-    const payNowCheckoutRes = await this._payNowPaymentHandler.executeSinglePayment(
+    const paynowCheckoutRes = await this._paynowPaymentHandler.executeSinglePayment(
       paymentHandlerExecuteParams
     );
-    const { redirectUrl } = payNowCheckoutRes;
+    const { redirectUrl } = paynowCheckoutRes;
     return redirectUrl;
   };
 
@@ -260,7 +260,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const {
       makePaypalPaymentHandler,
       makeStripePaymentHandler,
-      makePayNowPaymentHandler,
+      makePaynowPaymentHandler,
       makeExchangeRateHandler,
       makePackageTransactionCheckoutEntityValidator,
       convertStringToObjectId,
@@ -268,7 +268,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     } = optionalInitParams;
     this._paypalPaymentHandler = await makePaypalPaymentHandler;
     this._stripePaymentHandler = await makeStripePaymentHandler;
-    this._payNowPaymentHandler = await makePayNowPaymentHandler;
+    this._paynowPaymentHandler = await makePaynowPaymentHandler;
     this._exchangeRateHandler = await makeExchangeRateHandler;
     this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
     this._convertStringToObjectId = convertStringToObjectId;

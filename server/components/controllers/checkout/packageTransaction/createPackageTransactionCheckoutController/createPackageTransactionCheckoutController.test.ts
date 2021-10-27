@@ -62,7 +62,6 @@ describe('createAppointmentsController', () => {
         await createPackageTransactionCheckoutController.makeRequest(
           createPackageTransactionCheckoutHttpRequest
         );
-      console.log(createPackageTransactionCheckoutRes.body);
       return createPackageTransactionCheckoutRes;
     };
     const testValidPackageTransactionCheckout = async () => {
@@ -75,37 +74,37 @@ describe('createAppointmentsController', () => {
       expect(createPackageTransactionCheckoutRes.statusCode).to.equal(500);
     };
     context('valid inputs', () => {
-      // context('paypal', () => {
-      //   it('should create a checkout', async () => {
-      //     await testValidPackageTransactionCheckout();
-      //   });
-      // });
-      // context('stripe', () => {
-      //   it('should create a checkout', async () => {
-      //     queryToEncode.paymentGateway = 'stripe';
-      //     await testValidPackageTransactionCheckout();
-      //   });
-      // });
-      context('payNow', () => {
+      context('paypal', () => {
         it('should create a checkout', async () => {
-          queryToEncode.paymentGateway = 'payNow';
+          await testValidPackageTransactionCheckout();
+        });
+      });
+      context('stripe', () => {
+        it('should create a checkout', async () => {
+          queryToEncode.paymentGateway = 'stripe';
+          await testValidPackageTransactionCheckout();
+        });
+      });
+      context('paynow', () => {
+        it('should create a checkout', async () => {
+          queryToEncode.paymentGateway = 'paynow';
           await testValidPackageTransactionCheckout();
         });
       });
     });
-    // context('invalid inputs', () => {
-    //   it('should throw an error if gateway is invalid', async () => {
-    //     queryToEncode.paymentGateway = 'some unsupported gateway';
-    //     await testInvalidPackageTransactionCheckout();
-    //   });
-    //   it('should throw an error if body is invalid', async () => {
-    //     body.lessonAmount = 99;
-    //     await testInvalidPackageTransactionCheckout();
-    //   });
-    //   it('should throw an error if the user is not logged in', async () => {
-    //     currentAPIUser.userId = undefined;
-    //     await testInvalidPackageTransactionCheckout();
-    //   });
-    // });
+    context('invalid inputs', () => {
+      it('should throw an error if gateway is invalid', async () => {
+        queryToEncode.paymentGateway = 'some unsupported gateway';
+        await testInvalidPackageTransactionCheckout();
+      });
+      it('should throw an error if body is invalid', async () => {
+        body.lessonAmount = 99;
+        await testInvalidPackageTransactionCheckout();
+      });
+      it('should throw an error if the user is not logged in', async () => {
+        currentAPIUser.userId = undefined;
+        await testInvalidPackageTransactionCheckout();
+      });
+    });
   });
 });

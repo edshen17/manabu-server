@@ -7,11 +7,11 @@ import {
   PaymentHandlerExecutePaymentRes,
 } from '../abstractions/IPaymentHandler';
 
-type OptionalPayNowPaymentHandlerInitParams = {};
+type OptionalPaynowPaymentHandlerInitParams = {};
 
-class PayNowPaymentHandler extends AbstractPaymentHandler<
+class PaynowPaymentHandler extends AbstractPaymentHandler<
   Omise.IOmise,
-  OptionalPayNowPaymentHandlerInitParams
+  OptionalPaynowPaymentHandlerInitParams
 > {
   protected _createPaymentJson = (props: PaymentHandlerExecuteParams): OmiseItems => {
     const { items } = props;
@@ -38,4 +38,4 @@ class PayNowPaymentHandler extends AbstractPaymentHandler<
   };
 }
 
-export { PayNowPaymentHandler };
+export { PaynowPaymentHandler };
