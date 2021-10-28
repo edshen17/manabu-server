@@ -19,7 +19,7 @@ type PackageTransactionEntityBuildParams = {
 };
 
 type PriceData = { currency: string; subTotal: number; total: number };
-type PaymentData = { gatewayName: string; gatewayTransactionId: string } | {};
+type PaymentData = { gateway: string; id: string } | {};
 
 type PackageTransactionEntityBuildResponse = {
   hostedById: ObjectId;

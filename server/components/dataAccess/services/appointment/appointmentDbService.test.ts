@@ -12,24 +12,24 @@ import { AppointmentDbService } from './appointmentDbService';
 
 let appointmentDbService: AppointmentDbService;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
-let fakeDbAppointmentTransactionFactory: FakeDbPackageTransactionFactory;
+let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let dbServiceAccessOptions: DbServiceAccessOptions;
-let fakeAppointmentTransaction: PackageTransactionDoc;
+let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
 
 before(async () => {
   appointmentDbService = await makeAppointmentDbService;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
-  fakeDbAppointmentTransactionFactory = await makeFakeDbPackageTransactionFactory;
+  fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
 });
 
 beforeEach(async () => {
   dbServiceAccessOptions = appointmentDbService.getBaseDbServiceAccessOptions();
-  fakeAppointmentTransaction = await fakeDbAppointmentTransactionFactory.createFakeDbData();
+  fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   fakeAppointment = await fakeDbAppointmentFactory.createFakeDbData({
-    hostedById: fakeAppointmentTransaction.hostedById,
-    reservedById: fakeAppointmentTransaction.reservedById,
-    packageTransactionId: fakeAppointmentTransaction._id,
+    hostedById: fakePackageTransaction.hostedById,
+    reservedById: fakePackageTransaction.reservedById,
+    packageTransactionId: fakePackageTransaction._id,
     startDate: dayjs().toDate(),
     endDate: dayjs().add(30, 'minute').toDate(),
   });

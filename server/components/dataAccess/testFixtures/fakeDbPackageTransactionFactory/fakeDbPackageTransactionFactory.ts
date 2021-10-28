@@ -30,7 +30,10 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
       remainingAppointments: 0,
       lessonLanguage: 'ja',
       isSubscription: false,
-      paymentData: {},
+      paymentData: {
+        id: '123',
+        gateway: 'paypal',
+      },
     };
     return fakeBuildParams;
   };

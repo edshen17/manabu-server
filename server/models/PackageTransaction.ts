@@ -1,5 +1,4 @@
 import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
-import { LocationData } from '../components/entities/utils/locationDataHandler/locationDataHandler';
 import { PackageDoc, PackageSchema } from './Package';
 import { JoinedUserDoc, UserSchema } from './User';
 
@@ -20,8 +19,11 @@ const PackageTransactionSchema = createSchema({
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
   paymentData: Type.object({ required: false }).of({
-    gatewayName: Type.string(),
-    gatewayTransactionId: Type.string(),
+    gateway: Type.string({ required: true }),
+    id: Type.string({
+      required: true,
+      enum: ['paypal', 'stripe', 'paynow'],
+    }),
   }),
   status: Type.string({
     required: true,
@@ -36,7 +38,6 @@ type PackageTransactionDoc = ExtractDoc<typeof PackageTransactionSchema> & {
   packageData: PackageDoc;
   hostedByData: JoinedUserDoc;
   reservedByData: JoinedUserDoc;
-  locationData: LocationData;
 };
 
 export { PackageTransaction, PackageTransactionSchema, PackageTransactionDoc };

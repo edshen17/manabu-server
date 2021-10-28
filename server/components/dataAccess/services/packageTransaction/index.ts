@@ -1,7 +1,6 @@
 import cloneDeep from 'clone-deep';
 import mongoose from 'mongoose';
 import { PackageTransaction } from '../../../../models/PackageTransaction';
-import { makeLocationDataHandler } from '../../../entities/utils/locationDataHandler';
 import { makeCacheDbService } from '../cache';
 import { makePackageDbService } from '../package';
 import { makeUserDbService } from '../user';
@@ -14,7 +13,6 @@ const makePackageTransactionDbService = new PackageTransactionDbService().init({
   makeUserDbService,
   makePackageDbService,
   makeCacheDbService,
-  makeLocationDataHandler,
 });
 
 export { makePackageTransactionDbService };

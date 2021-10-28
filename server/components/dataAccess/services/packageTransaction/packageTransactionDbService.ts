@@ -1,10 +1,5 @@
-import { ObjectId } from 'mongoose';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { StringKeyObject } from '../../../../types/custom';
-import {
-  LocationData,
-  LocationDataHandler,
-} from '../../../entities/utils/locationDataHandler/locationDataHandler';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import {
   DbServiceAccessOptions,
@@ -17,7 +12,6 @@ import { UserDbService } from '../user/userDbService';
 type OptionalPackageTransactionDbServiceInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makePackageDbService: Promise<PackageDbService>;
-  makeLocationDataHandler: LocationDataHandler;
 };
 
 type PackageTransactionDbServiceResponse = PackageTransactionDoc;
@@ -28,16 +22,13 @@ class PackageTransactionDbService extends AbstractDbService<
 > {
   private _userDbService!: UserDbService;
   private _packageDbService!: PackageDbService;
-  private _locationDataHandler!: LocationDataHandler;
 
   protected _getComputedProps = async (props: {
-    dbDoc: StringKeyObject;
+    dbDoc: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<StringKeyObject> => {
     const { dbDoc, dbServiceAccessOptions } = props;
-    const hostedById = dbDoc['hostedById'];
-    const reservedById = dbDoc['reservedById'];
-    const packageId = dbDoc['packageId'];
+    const { hostedById, reservedById, packageId } = dbDoc;
     const hostedByData = await this._getDbDataById({
       dbService: this._userDbService,
       dbServiceAccessOptions,
@@ -53,34 +44,12 @@ class PackageTransactionDbService extends AbstractDbService<
       dbServiceAccessOptions,
       _id: packageId,
     });
-    const locationData = await this._getLocationData({ hostedById, reservedById });
-    return {
+    const computedProps = {
       hostedByData,
       reservedByData,
       packageData,
-      locationData,
     };
-  };
-
-  private _getLocationData = async (props: {
-    hostedById: ObjectId;
-    reservedById: ObjectId;
-  }): Promise<LocationData> => {
-    const { hostedById, reservedById } = props;
-    const overrideDbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
-    const overrideHostedByData = await this._userDbService.findById({
-      _id: hostedById,
-      dbServiceAccessOptions: overrideDbServiceAccessOptions,
-    });
-    const overrideReservedByData = await this._userDbService.findById({
-      _id: reservedById,
-      dbServiceAccessOptions: overrideDbServiceAccessOptions,
-    });
-    const locationData = this._locationDataHandler.getLocationData({
-      hostedByData: overrideHostedByData,
-      reservedByData: overrideReservedByData,
-    });
-    return locationData;
+    return computedProps;
   };
 
   protected _getCacheDependencies = (): string[] => {
@@ -90,11 +59,9 @@ class PackageTransactionDbService extends AbstractDbService<
   protected _initTemplate = async (
     optionalDbServiceInitParams: OptionalPackageTransactionDbServiceInitParams
   ) => {
-    const { makeUserDbService, makePackageDbService, makeLocationDataHandler } =
-      optionalDbServiceInitParams;
+    const { makeUserDbService, makePackageDbService } = optionalDbServiceInitParams;
     this._userDbService = await makeUserDbService;
     this._packageDbService = await makePackageDbService;
-    this._locationDataHandler = makeLocationDataHandler;
     this._joinType = DB_SERVICE_JOIN_TYPE.LEFT_OUTER;
   };
 }

@@ -25,8 +25,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       lessonLanguage: this._joi.string().max(5),
       isSubscription: this._joi.boolean(),
       paymentData: this._joi.object({
-        gatewayName: this._joi.string().max(256),
-        gatewayTransactionId: this._joi.string().alphanum().max(256),
+        gateway: this._joi.string().max(256),
+        id: this._joi.string().alphanum().max(256),
       }),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       lastModifiedDate: this._joi.date(),

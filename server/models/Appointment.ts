@@ -1,11 +1,12 @@
 import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
+import { LocationData } from '../components/entities/utils/locationDataHandler/locationDataHandler';
 import { PackageTransactionDoc, PackageTransactionSchema } from './PackageTransaction';
 import { UserSchema } from './User';
 
 const AppointmentSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   reservedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  packageTransactionId: Type.ref(Type.objectId({ required: true, index: true })).to(
+  packageTransactionId: Type.ref(Type.objectId({ required: false, index: true })).to(
     'PackageTransaction',
     PackageTransactionSchema
   ),
@@ -24,6 +25,7 @@ const AppointmentSchema = createSchema({
 const Appointment = typedModel('Appointment', AppointmentSchema);
 type AppointmentDoc = ExtractDoc<typeof AppointmentSchema> & {
   packageTransactionData: PackageTransactionDoc;
+  locationData: LocationData;
 };
 
 export { Appointment, AppointmentSchema, AppointmentDoc };
