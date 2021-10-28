@@ -19,10 +19,15 @@ abstract class AbstractFakeDbDataFactory<
   protected _dbService!: IDbService<any, DbServiceResponse>;
   protected _cloneDeep!: any;
 
-  public createFakeDbData = async (buildParams?: EntityBuildParams): Promise<DbServiceResponse> => {
+  public createFakeDbData = async (
+    buildParams?: EntityBuildParams,
+    isOverrideView?: boolean
+  ): Promise<DbServiceResponse> => {
     const fakeBuildParams = buildParams || (await this._createFakeBuildParams());
     const fakeEntity = await this._entity.build(fakeBuildParams);
-    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+    const dbServiceAccessOptions = isOverrideView
+      ? this._dbService.getOverrideDbServiceAccessOptions()
+      : this._dbService.getBaseDbServiceAccessOptions();
     const fakeDbData = await this._dbService.insert({
       modelToInsert: fakeEntity,
       dbServiceAccessOptions,

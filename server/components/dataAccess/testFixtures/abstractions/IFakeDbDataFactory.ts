@@ -35,7 +35,10 @@ interface IFakeDbDataFactory<
       DbServiceResponse
     >
   ) => Promise<this> | this;
-  createFakeDbData?: (buildParams: EntityBuildParams) => Promise<DbServiceResponse>;
+  createFakeDbData?: (
+    buildParams: EntityBuildParams,
+    isOverrideView: boolean
+  ) => Promise<DbServiceResponse>;
 }
 
 export { IFakeDbDataFactory, FakeDbDataFactoryInitParams };
