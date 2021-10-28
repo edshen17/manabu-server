@@ -85,16 +85,16 @@ type DbServiceInsertManyParams = BaseDbServiceParams & { modelToInsert: StringKe
 type DbServiceUpdateParams = BaseDbServiceParams &
   SearchQueryDbServiceParams & { updateQuery: StringKeyObject };
 
-interface IDbService<OptionalDbServiceInitParams, DbDoc> {
-  findById: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbDoc>;
-  findOne: (dbServiceParams: DbServiceFindOneParams) => Promise<DbDoc>;
-  find: (dbServiceParams: DbServiceFindParams) => Promise<DbDoc[]>;
-  insert: (dbServiceParams: DbServiceInsertParams) => Promise<DbDoc>;
-  insertMany: (dbServiceParams: DbServiceInsertManyParams) => Promise<DbDoc[]>;
-  findOneAndUpdate: (dbServiceParams: DbServiceUpdateParams) => Promise<DbDoc>;
-  updateMany: (dbServiceParams: DbServiceUpdateParams) => Promise<DbDoc[]>;
-  findByIdAndDelete: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbDoc>;
-  findOneAndDelete: (dbServiceParams: DbServiceFindOneParams) => Promise<DbDoc>;
+interface IDbService<OptionalDbServiceInitParams, DbServiceResponse> {
+  findById: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbServiceResponse>;
+  findOne: (dbServiceParams: DbServiceFindOneParams) => Promise<DbServiceResponse>;
+  find: (dbServiceParams: DbServiceFindParams) => Promise<DbServiceResponse[]>;
+  insert: (dbServiceParams: DbServiceInsertParams) => Promise<DbServiceResponse>;
+  insertMany: (dbServiceParams: DbServiceInsertManyParams) => Promise<DbServiceResponse[]>;
+  findOneAndUpdate: (dbServiceParams: DbServiceUpdateParams) => Promise<DbServiceResponse>;
+  updateMany: (dbServiceParams: DbServiceUpdateParams) => Promise<DbServiceResponse[]>;
+  findByIdAndDelete: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbServiceResponse>;
+  findOneAndDelete: (dbServiceParams: DbServiceFindOneParams) => Promise<DbServiceResponse>;
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
   getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;

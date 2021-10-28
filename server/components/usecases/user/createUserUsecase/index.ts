@@ -1,6 +1,5 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
-import { sign as signJwt } from 'jsonwebtoken';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
 import { makePackageDbService } from '../../../dataAccess/services/package';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
@@ -16,6 +15,7 @@ import { convertStringToObjectId } from '../../../entities/utils/convertStringTo
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeUserQueryValidator } from '../../../validators/user/query';
 import { makeEmailHandler } from '../../utils/emailHandler';
+import { makeJwtHandler } from '../../utils/jwtHandler';
 import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { CreateUserUsecase } from './createUserUsecase';
 
@@ -31,7 +31,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makePackageTransactionDbService,
   makeTeacherBalanceDbService,
   makeCacheDbService,
-  signJwt,
+  makeJwtHandler,
   makeEmailHandler,
   makeRedirectUrlBuilder,
   cloneDeep,

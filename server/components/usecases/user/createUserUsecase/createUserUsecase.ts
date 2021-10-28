@@ -19,6 +19,7 @@ import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase'
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { EmailHandler, EMAIL_SENDER_NAME } from '../../utils/emailHandler/emailHandler';
 import { EMAIL_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
+import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 
 type OptionalCreateUserUsecaseInitParams = {
@@ -32,7 +33,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   makeCacheDbService: Promise<CacheDbService>;
-  signJwt: any;
+  makeJwtHandler: JwtHandler;
   makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: ConvertStringToObjectId;
@@ -65,7 +66,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _teacherEntity!: TeacherEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _teacherBalanceDbService!: TeacherBalanceDbService;
-  private _signJwt!: any;
+  private _jwtHandler!: JwtHandler;
   private _emailHandler!: EmailHandler;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _convertStringToObjectId!: any;
@@ -230,9 +231,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     });
   };
 
-  // can be refactored to a cookie handler
   public splitLoginCookies = (user: JoinedUserDoc): CookieData[] => {
-    const token = this._signClientJwt(user);
+    const token = this._jwtHandler.sign({ toTokenObj: user, expiresIn: '7d' });
     const tokenArr: string[] = token.split('.');
     const options = this._setCookieOptions();
     const hpCookie = {
@@ -247,19 +247,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     };
     const loginCookies = [hpCookie, sigCookie];
     return loginCookies;
-  };
-
-  private _signClientJwt = (user: any): string => {
-    const token = this._signJwt(
-      {
-        ...user,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: '7d',
-      }
-    );
-    return token;
   };
 
   private _setCookieOptions = (): CookieData['options'] => {
@@ -288,7 +275,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makePackageTransactionDbService,
       makeTeacherBalanceDbService,
       makeCacheDbService,
-      signJwt,
+      makeJwtHandler,
       makeEmailHandler,
       makeRedirectUrlBuilder,
       convertStringToObjectId,
@@ -300,7 +287,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._cacheDbService = await makeCacheDbService;
-    this._signJwt = signJwt;
+    this._jwtHandler = makeJwtHandler;
     this._emailHandler = await makeEmailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;

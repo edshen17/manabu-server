@@ -1,5 +1,5 @@
 // import { expect } from 'chai';
-// import { makeCreateAvailableTimeUsecase } from '.';
+// import { sign as signJwt } from 'jsonwebtoken';
 // import { JoinedUserDoc } from '../../../../models/User';
 // import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
@@ -14,6 +14,7 @@
 // let routeData: RouteData;
 // let fakeUser: JoinedUserDoc;
 // let currentAPIUser: CurrentAPIUser;
+// let toTokenObj: string;
 
 // before(async () => {
 //   controllerDataBuilder = makeControllerDataBuilder;
@@ -29,12 +30,12 @@
 //   };
 //   routeData = {
 //     params: {},
-//     body: {
-//       hostedById: fakeUser._id,
-//       startDate: new Date(),
-//       endDate: new Date(),
+//     body: {},
+//     query: {
+//       token: signJwt(toTokenObj, process.env.JWT_SECRET!, {
+//         expiresIn: '1d',
+//       }),
 //     },
-//     query: {},
 //     endpointPath: '',
 //   };
 // });
@@ -42,14 +43,17 @@
 // describe('createPackageTransactionUsecase', () => {
 //   describe('makeRequest', () => {
 //     const createPackageTransaction = async () => {
+//       const token = signJwt(toTokenObj, process.env.JWT_SECRET, {});
 //       const controllerData = controllerDataBuilder
 //         .routeData(routeData)
 //         .currentAPIUser(currentAPIUser)
 //         .build();
-//       const createAvailableTimeRes = await createAvailableTimeUsecase.makeRequest(controllerData);
-//       return createAvailableTimeRes;
+//       const createPackageTransactionRes = await createPackageTransactionUsecase.makeRequest(
+//         controllerData
+//       );
+//       return createPackageTransactionRes;
 //     };
-//     const testAvailableTimeError = async () => {
+//     const testPackageTransactionError = async () => {
 //       let error;
 //       try {
 //         error = await createPackageTransaction();
@@ -65,7 +69,7 @@
 //           const routeDataBody = routeData.body;
 //           routeDataBody.hostedById = 'some id';
 //           routeDataBody.createdDate = new Date();
-//           await testAvailableTimeError();
+//           await testPackageTransactionError();
 //         });
 //         it('should throw an error if there is an availableTime overlap', async () => {
 //           let err;
@@ -79,7 +83,7 @@
 //         });
 //         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
 //           routeData.body.hostedById = '507f1f77bcf86cd799439011';
-//           await testAvailableTimeError();
+//           await testPackageTransactionError();
 //         });
 //       });
 //       context('valid inputs', () => {
