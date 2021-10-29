@@ -31,6 +31,7 @@ beforeEach(async () => {
     role: fakeUser.role,
   };
   routeData = {
+    headers: {},
     params: {},
     body: {
       teacherId: fakeTeacher.teacherData!._id,

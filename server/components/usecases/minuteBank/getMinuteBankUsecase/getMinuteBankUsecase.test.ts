@@ -45,6 +45,7 @@ describe('getMinuteBankUsecase', () => {
             query: {},
             params: {},
             body: {},
+            headers: {},
             endpointPath: '/self/minuteBanks',
           })
           .build();

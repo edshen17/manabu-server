@@ -10,7 +10,6 @@ import { makePackageTransactionCheckoutEntityValidator } from '../../../../valid
 import { makePackageTransactionCheckoutQueryValidator } from '../../../../validators/checkout/packageTransaction/query';
 import { convertToTitlecase } from '../../../utils/convertToTitlecase';
 import { makeExchangeRateHandler } from '../../../utils/exchangeRateHandler';
-import { makeJwtHandler } from '../../../utils/jwtHandler';
 import { CreatePackageTransactionCheckoutUsecase } from './createPackageTransactionCheckoutUsecase';
 
 const makeCreatePackageTransactionCheckoutUsecase =
@@ -27,7 +26,6 @@ const makeCreatePackageTransactionCheckoutUsecase =
     convertToTitlecase,
     makeExchangeRateHandler,
     makePaynowPaymentHandler,
-    makeJwtHandler,
   });
 
 export { makeCreatePackageTransactionCheckoutUsecase };

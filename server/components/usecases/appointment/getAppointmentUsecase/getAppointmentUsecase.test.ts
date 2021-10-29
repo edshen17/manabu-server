@@ -47,6 +47,7 @@ beforeEach(async () => {
       endDate: fakePackageTransaction.terminationDate,
     },
     endpointPath: '',
+    headers: {},
   };
   currentAPIUser = {
     userId: fakePackageTransaction.reservedById,

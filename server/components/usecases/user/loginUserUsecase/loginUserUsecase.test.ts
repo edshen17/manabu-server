@@ -32,6 +32,7 @@ describe('loginUserUsecase', () => {
             body: fakeUserEntityData,
             params: {},
             query: {},
+            headers: {},
             endpointPath: '/base/login',
           })
           .build();

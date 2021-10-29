@@ -40,6 +40,7 @@ beforeEach(async () => {
     },
     query: {},
     endpointPath: '',
+    headers: {},
   };
 });
 

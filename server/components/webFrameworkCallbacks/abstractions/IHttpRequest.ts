@@ -5,6 +5,7 @@ interface IHttpRequest {
   path: Request['path'];
   query: Request['query'];
   params: Request['params'];
+  headers: Request['headers'];
   currentAPIUser: CurrentAPIUser;
 }
 

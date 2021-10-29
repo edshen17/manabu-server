@@ -25,6 +25,7 @@ before(async () => {
 beforeEach(async () => {
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData();
   routeData = {
+    headers: {},
     params: {},
     body: {},
     query: {},

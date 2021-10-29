@@ -25,6 +25,7 @@ before(async () => {
 beforeEach(async () => {
   fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData();
   routeData = {
+    headers: {},
     params: {
       userId: fakeAvailableTime.hostedById,
     },

@@ -1,10 +1,12 @@
-// // create package transaction. once done, blacklist token in cachedb
 // import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 // import { PackageTransactionDbServiceResponse } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 // import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 // import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+// import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 
-// type OptionalCreatePackageTransactionUsecaseInitParams = {};
+// type OptionalCreatePackageTransactionUsecaseInitParams = {
+//   makeJwtHandler: Promise<JwtHandler>;
+// };
 
 // type CreatePackageTransactionUsecaseResponse = {
 //   packageTransaction: PackageTransactionDoc;
@@ -15,10 +17,14 @@
 //   CreatePackageTransactionUsecaseResponse,
 //   PackageTransactionDbServiceResponse
 // > {
+//   private _jwtHandler!: JwtHandler;
+
 //   protected _makeRequestTemplate = async (
 //     props: MakeRequestTemplateParams
 //   ): Promise<CreatePackageTransactionUsecaseResponse> => {
-//     const { dbServiceAccessOptions, currentAPIUser } = props;
+//     const { query, dbServiceAccessOptions, currentAPIUser } = props;
+//     const { token } = query;
+//     const packageTransactionBody = await this.
 //     if (isValidToken) {
 //       const packageTransaction = await this._createPackageTransaction({
 //         appointments,
@@ -37,7 +43,8 @@
 //   protected _initTemplate = async (
 //     optionalInitParams: OptionalCreatePackageTransactionUsecaseInitParams
 //   ): Promise<void> => {
-//     // const {} = optionalInitParams;
+//     const { makeJwtHandler } = optionalInitParams;
+//     this._jwtHandler = await makeJwtHandler;
 //   };
 // }
 

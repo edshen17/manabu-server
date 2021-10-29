@@ -30,6 +30,7 @@ beforeEach(() => {
     role: fakeTeacher.role,
   };
   routeData = {
+    headers: {},
     body: {
       licensePathUrl: 'https://fakeimg.pl/300/',
     },

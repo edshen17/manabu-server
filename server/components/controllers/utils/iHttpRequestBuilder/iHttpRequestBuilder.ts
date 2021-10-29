@@ -9,6 +9,7 @@ class IHttpRequestBuilder {
   private _query!: {};
   private _params!: {};
   private _currentAPIUser!: CurrentAPIUser;
+  private _headers!: {};
   constructor() {
     this._setDefaultProperties();
   }
@@ -22,6 +23,7 @@ class IHttpRequestBuilder {
       userId: undefined,
       role: 'user',
     };
+    this._headers = {};
   };
 
   public body = (body: {}): this => {
@@ -44,6 +46,11 @@ class IHttpRequestBuilder {
     return this;
   };
 
+  public headers = (params: {}): this => {
+    this._headers = params;
+    return this;
+  };
+
   public currentAPIUser = (currentAPIUser: CurrentAPIUser): this => {
     this._currentAPIUser = currentAPIUser;
     return this;
@@ -56,6 +63,7 @@ class IHttpRequestBuilder {
       query: this._query,
       params: this._params,
       currentAPIUser: this._currentAPIUser,
+      headers: this._params,
     };
     this._setDefaultProperties();
     return iHttpRequest;

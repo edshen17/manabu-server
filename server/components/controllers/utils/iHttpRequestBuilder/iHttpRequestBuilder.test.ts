@@ -28,6 +28,7 @@ describe('IHttpRequestBuilder', () => {
           userId: undefined,
           role: 'user',
         },
+        headers: {},
       });
     });
     it('should build a valid httpRequest from the given inputs', () => {
@@ -55,6 +56,7 @@ describe('IHttpRequestBuilder', () => {
           userId: fakeUser._id,
           role: 'some role',
         },
+        headers: {},
       });
     });
   });

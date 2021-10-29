@@ -25,6 +25,7 @@ before(async () => {
 
 beforeEach(() => {
   routeData = {
+    headers: {},
     params: {
       userId: fakeTeacher._id,
     },

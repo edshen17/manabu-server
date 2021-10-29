@@ -17,6 +17,7 @@ before(async () => {
 
 beforeEach(() => {
   routeData = {
+    headers: {},
     params: {},
     body: {
       name: faker.name.findName(),

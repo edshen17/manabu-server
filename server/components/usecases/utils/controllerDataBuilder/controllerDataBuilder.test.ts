@@ -24,6 +24,7 @@ describe('controllerDataBuilder', () => {
       expect(controllerData.routeData).to.deep.equal({
         params: {},
         body: {},
+        headers: {},
         query: {},
         endpointPath: '',
       });
@@ -40,6 +41,7 @@ describe('controllerDataBuilder', () => {
           query: 'some query',
         },
         endpointPath: '',
+        headers: {},
       };
       const controllerData = await controllerDataBuilder.routeData(testRouteData).build();
       expect(controllerData.currentAPIUser).to.deep.equal({
