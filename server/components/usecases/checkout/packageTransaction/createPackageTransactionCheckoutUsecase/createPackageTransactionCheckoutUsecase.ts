@@ -134,7 +134,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const item = await this._getItemData(props);
     const processedPaymentHandlerParams = {
       item,
-      successRedirectUrl: 'https://manabu.sg/dashboard',
+      successRedirectUrl: `https://manabu.sg/dashboard`,
       cancelRedirectUrl: 'https://manabu.sg/cancel',
       currency: this._defaultCurrency,
     };

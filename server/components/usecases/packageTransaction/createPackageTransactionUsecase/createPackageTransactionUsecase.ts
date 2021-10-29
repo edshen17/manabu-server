@@ -23,7 +23,6 @@
 //     props: MakeRequestTemplateParams
 //   ): Promise<CreatePackageTransactionUsecaseResponse> => {
 //     const { query, dbServiceAccessOptions, currentAPIUser } = props;
-//     const { token } = query;
 //     const packageTransactionBody = await this.
 //     if (isValidToken) {
 //       const packageTransaction = await this._createPackageTransaction({
