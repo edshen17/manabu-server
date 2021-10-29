@@ -33,7 +33,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   makeCacheDbService: Promise<CacheDbService>;
-  makeJwtHandler: JwtHandler;
+  makeJwtHandler: Promise<JwtHandler>;
   makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: ConvertStringToObjectId;
@@ -232,7 +232,15 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   };
 
   public splitLoginCookies = (user: JoinedUserDoc): CookieData[] => {
-    const token = this._jwtHandler.sign({ toTokenObj: user, expiresIn: '7d' });
+    const { _id, role } = user;
+    const toTokenObj = {
+      _id,
+      role,
+      teacherData: {
+        _id: user.teacherData?._id,
+      },
+    };
+    const token = this._jwtHandler.sign({ toTokenObj, expiresIn: '7d' });
     const tokenArr: string[] = token.split('.');
     const options = this._setCookieOptions();
     const hpCookie = {
@@ -287,7 +295,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._cacheDbService = await makeCacheDbService;
-    this._jwtHandler = makeJwtHandler;
+    this._jwtHandler = await makeJwtHandler;
     this._emailHandler = await makeEmailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;

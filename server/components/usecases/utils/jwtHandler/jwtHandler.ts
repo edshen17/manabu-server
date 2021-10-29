@@ -1,7 +1,13 @@
 import { StringKeyObject } from '../../../../types/custom';
+import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+
+enum CACHE_DB_HASH_KEY {
+  BLACKLIST = 'jwtblacklist',
+}
 
 class JwtHandler {
   private _jwt!: any;
+  private _cacheDbService!: CacheDbService;
   private _secret: string = process.env.JWT_SECRET!;
 
   public sign = (props: { toTokenObj: StringKeyObject; expiresIn: string | number }): string => {
@@ -12,14 +18,36 @@ class JwtHandler {
     return token;
   };
 
-  public verify = (token: string): any => {
-    const decodedToken = this._jwt.verify(token, this._secret);
-    return decodedToken;
+  public verify = async (token: string): Promise<any> => {
+    const blacklistValue = await this._cacheDbService.get({
+      hashKey: CACHE_DB_HASH_KEY.BLACKLIST,
+      key: token,
+    });
+    if (!blacklistValue) {
+      const decodedToken = this._jwt.verify(token, this._secret);
+      return decodedToken;
+    } else {
+      throw new Error('You cannot verify a blacklisted token.');
+    }
   };
 
-  public init = (initParams: { jwt: any }): this => {
-    const { jwt } = initParams;
+  public blacklist = async (token: string): Promise<void> => {
+    const blacklistedToken = await this._cacheDbService.set({
+      hashKey: CACHE_DB_HASH_KEY.BLACKLIST,
+      key: token,
+      value: token,
+      ttlMs: 60 * 1000,
+    });
+    return blacklistedToken;
+  };
+
+  public init = async (initParams: {
+    jwt: any;
+    makeCacheDbService: Promise<CacheDbService>;
+  }): Promise<this> => {
+    const { jwt, makeCacheDbService } = initParams;
     this._jwt = jwt;
+    this._cacheDbService = await makeCacheDbService;
     return this;
   };
 }

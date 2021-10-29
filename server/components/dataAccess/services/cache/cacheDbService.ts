@@ -69,7 +69,7 @@ class CacheDbService {
   public set = async (props: {
     hashKey: string;
     key: string;
-    value: StringKeyObject;
+    value: any;
     ttlMs: number;
   }): Promise<any> => {
     const { hashKey, key, value, ttlMs } = props;

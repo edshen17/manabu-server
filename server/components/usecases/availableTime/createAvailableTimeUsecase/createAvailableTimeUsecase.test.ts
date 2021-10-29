@@ -72,14 +72,7 @@ describe('createAvailableTimeUsecase', () => {
           await testAvailableTimeError();
         });
         it('should throw an error when creating an invalid availableTime', async () => {
-          let err;
-          try {
-            await createAvailableTime();
-            err = await createAvailableTime();
-          } catch (err) {
-            return;
-          }
-          expect(err).to.be.an('error');
+          await testAvailableTimeError();
         });
       });
       context('valid inputs', () => {

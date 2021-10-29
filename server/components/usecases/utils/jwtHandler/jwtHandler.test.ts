@@ -8,11 +8,11 @@ let toTokenObj: StringKeyObject;
 let token: string;
 let decodedToken: StringKeyObject;
 
-before(() => {
-  jwtHandler = makeJwtHandler;
+before(async () => {
+  jwtHandler = await makeJwtHandler;
 });
 
-beforeEach(() => {
+beforeEach(async () => {
   toTokenObj = {
     test: 'test',
   };
@@ -20,18 +20,42 @@ beforeEach(() => {
     toTokenObj,
     expiresIn: '1d',
   });
-  decodedToken = jwtHandler.verify(token);
+  try {
+    decodedToken = await jwtHandler.verify(token);
+  } catch (err) {
+    return;
+  }
 });
 
 describe('jwtHandler', () => {
   describe('sign', () => {
-    it('should convert the given object to a signed jwt', async () => {
+    it('should convert the given object to a signed jwt', () => {
       expect(token).to.be.a('string');
     });
   });
   describe('verify', () => {
-    it('should decode the token into an object', async () => {
-      expect(decodedToken.test).to.equal('test');
+    context('valid token', () => {
+      it('should decode the token into an object', () => {
+        expect(decodedToken.test).to.equal('test');
+      });
+    });
+    context('invalid token', () => {
+      it('should throw an error', async () => {
+        await jwtHandler.blacklist(token);
+        let error;
+        try {
+          await jwtHandler.verify(token);
+        } catch (err) {
+          error = err;
+        }
+        expect(error).to.be.an('error');
+      });
+    });
+  });
+  describe('blacklist', () => {
+    it('should blacklist the token', async () => {
+      const blacklistedToken = await jwtHandler.blacklist(token);
+      expect(blacklistedToken).to.equal(token);
     });
   });
 });

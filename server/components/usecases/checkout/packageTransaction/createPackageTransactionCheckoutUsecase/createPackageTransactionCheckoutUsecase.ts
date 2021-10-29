@@ -17,12 +17,14 @@ import { AbstractCreateUsecase } from '../../../abstractions/AbstractCreateUseca
 import { MakeRequestTemplateParams } from '../../../abstractions/AbstractUsecase';
 import { ConvertToTitlecase } from '../../../utils/convertToTitlecase';
 import { ExchangeRateHandler } from '../../../utils/exchangeRateHandler/exchangeRateHandler';
+import { JwtHandler } from '../../../utils/jwtHandler/jwtHandler';
 
 type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePaypalPaymentHandler: Promise<PaypalPaymentHandler>;
   makeStripePaymentHandler: Promise<StripePaymentHandler>;
   makePaynowPaymentHandler: Promise<PaynowPaymentHandler>;
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
+  makeJwtHandler: Promise<JwtHandler>;
   makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
   convertStringToObjectId: ConvertStringToObjectId;
   convertToTitlecase: ConvertToTitlecase;
@@ -53,9 +55,11 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _stripePaymentHandler!: StripePaymentHandler;
   private _paynowPaymentHandler!: PaynowPaymentHandler;
   private _exchangeRateHandler!: ExchangeRateHandler;
+  private _jwtHandler!: JwtHandler;
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
+  private _defaultCurrency: string = process.env.DEFAULT_CURRENCY!;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -130,13 +134,25 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
+    const { body } = props;
+    const item = await this._getItemData(props);
+    const token = this._jwtHandler.sign({ toTokenObj: body, expiresIn: '1d' });
+    const processedPaymentHandlerParams = {
+      item,
+      successRedirectUrl: `https://manabu.sg/.../checkout/packageTransaction?token=${token}`,
+      cancelRedirectUrl: 'https://manabu.sg/cancel',
+      currency: this._defaultCurrency,
+    };
+    return processedPaymentHandlerParams;
+  };
+
+  private _getItemData = async (props: GetRedirectUrlParams) => {
     const { teacher, teacherData, teacherPackage, currentAPIUser, query, body } = props;
     const { lessonDuration, lessonLanguage } = body;
     const { paymentGateway } = query;
-    const DEFAULT_CURRENCY = 'SGD';
     const { hourlyRate, currency } = teacherData!.priceData;
     const paymentMethodRate: StringKeyObject = {
-      paypal: 0.025,
+      paypal: 0.03,
       stripe: 0.01,
       paynow: 0.01,
     };
@@ -152,17 +168,11 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       price: await this._exchangeRateHandler.convert({
         amount: packageTransactionTotal,
         fromCurrency: currency,
-        toCurrency: DEFAULT_CURRENCY,
+        toCurrency: this._defaultCurrency,
       }),
       quantity: 1,
     };
-    const processedPaymentHandlerParams = {
-      item,
-      successRedirectUrl: 'https://manabu.sg/success',
-      cancelRedirectUrl: 'https://manabu.sg/cancel',
-      currency: DEFAULT_CURRENCY,
-    };
-    return processedPaymentHandlerParams;
+    return item;
   };
 
   private _getPaypalRedirectUrl = async (
@@ -262,6 +272,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       makeStripePaymentHandler,
       makePaynowPaymentHandler,
       makeExchangeRateHandler,
+      makeJwtHandler,
       makePackageTransactionCheckoutEntityValidator,
       convertStringToObjectId,
       convertToTitlecase,
@@ -270,6 +281,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     this._stripePaymentHandler = await makeStripePaymentHandler;
     this._paynowPaymentHandler = await makePaynowPaymentHandler;
     this._exchangeRateHandler = await makeExchangeRateHandler;
+    this._jwtHandler = await makeJwtHandler;
     this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
     this._convertStringToObjectId = convertStringToObjectId;
     this._convertToTitlecase = convertToTitlecase;

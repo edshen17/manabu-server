@@ -1,25 +1,29 @@
 // import { expect } from 'chai';
-// import { sign as signJwt } from 'jsonwebtoken';
 // import { JoinedUserDoc } from '../../../../models/User';
+// import { StringKeyObject } from '../../../../types/custom';
 // import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 // import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 // import { RouteData } from '../../abstractions/IUsecase';
 // import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 // import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
+// import { makeJwtHandler } from '../../utils/jwtHandler';
+// import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 
 // let controllerDataBuilder: ControllerDataBuilder;
 // let fakeDbUserFactory: FakeDbUserFactory;
+// let jwtHandler: JwtHandler;
 // let createPackageTransactionUsecase: CreatePackageTransactionUsecase;
 // let routeData: RouteData;
 // let fakeUser: JoinedUserDoc;
 // let currentAPIUser: CurrentAPIUser;
-// let toTokenObj: string;
+// let toTokenObj: StringKeyObject;
 
 // before(async () => {
 //   controllerDataBuilder = makeControllerDataBuilder;
 //   createPackageTransactionUsecase = await makeCreatePackageTransactionUsecase;
 //   fakeDbUserFactory = await makeFakeDbUserFactory;
+//   jwtHandler = makeJwtHandler;
 // });
 
 // beforeEach(async () => {
@@ -28,13 +32,18 @@
 //     userId: fakeUser._id,
 //     role: fakeUser.role,
 //   };
+//   toTokenObj = {
+//     teacherId: fakeTeacher.teacherData!._id,
+//     packageId: fakeTeacher.teacherData!.packages[0]._id,
+//     lessonDuration: 60,
+//     lessonLanguage: 'ja',
+//     lessonAmount: 5,
+//   };
 //   routeData = {
 //     params: {},
 //     body: {},
 //     query: {
-//       token: signJwt(toTokenObj, process.env.JWT_SECRET!, {
-//         expiresIn: '1d',
-//       }),
+//       token: jwtHandler.sign({ toTokenObj, expiresIn: '1d' }),
 //     },
 //     endpointPath: '',
 //   };
@@ -43,7 +52,6 @@
 // describe('createPackageTransactionUsecase', () => {
 //   describe('makeRequest', () => {
 //     const createPackageTransaction = async () => {
-//       const token = signJwt(toTokenObj, process.env.JWT_SECRET, {});
 //       const controllerData = controllerDataBuilder
 //         .routeData(routeData)
 //         .currentAPIUser(currentAPIUser)
@@ -62,40 +70,29 @@
 //       }
 //       expect(error).to.be.an('error');
 //     };
-
 //     context('db access permitted', () => {
 //       context('invalid inputs', () => {
-//         it('should throw an error if invalid data is passed', async () => {
-//           const routeDataBody = routeData.body;
-//           routeDataBody.hostedById = 'some id';
-//           routeDataBody.createdDate = new Date();
+//         it('should throw an error if invalid token', async () => {
+//           routeData.query.token = 'bad token';
 //           await testPackageTransactionError();
 //         });
-//         it('should throw an error if there is an availableTime overlap', async () => {
-//           let err;
-//           try {
-//             await createPackageTransaction();
-//             err = await createPackageTransaction();
-//           } catch (err) {
-//             return;
-//           }
-//           expect(err).to.be.an('error');
-//         });
-//         it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
-//           routeData.body.hostedById = '507f1f77bcf86cd799439011';
+//         it('should throw an error if token has been used more than once', async () => {
+//           await createPackageTransaction();
 //           await testPackageTransactionError();
 //         });
 //       });
 //       context('valid inputs', () => {
-//         const validResOutput = (createAvailableTimeRes: CreateAvailableTimeUsecaseResponse) => {
-//           const availableTime = createAvailableTimeRes.availableTime;
-//           expect(availableTime).to.have.property('hostedById');
-//           expect(availableTime).to.have.property('startDate');
-//           expect(availableTime).to.have.property('endDate');
+//         const validResOutput = (
+//           createPackageTransactionRes: CreatePackageTransactionUsecaseResponse
+//         ) => {
+//           const packageTransaction = createPackageTransactionRes.packageTransaction;
+//           expect(packageTransaction).to.have.property('hostedById');
+//           expect(packageTransaction).to.have.property('reservedById');
+//           expect(packageTransaction).to.have.property('packageId');
 //         };
-//         it('should return a new available time', async () => {
-//           const createAvailableTimeRes = await createPackageTransaction();
-//           validResOutput(createAvailableTimeRes);
+//         it('should return a new packageTransaction', async () => {
+//           const createPackageTransactionRes = await createPackageTransaction();
+//           validResOutput(createPackageTransactionRes);
 //         });
 //       });
 //     });

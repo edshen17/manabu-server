@@ -17,7 +17,7 @@ class ExchangeRateHandler {
 
   public getRates = async (): Promise<StringKeyObject> => {
     const cacheKeys = {
-      hashKey: 'exchangeRate',
+      hashKey: 'exchangerate',
       key: 'latest',
     };
     const exchangeRateAPIUrl = this._getExchangeRateAPIUrl();
