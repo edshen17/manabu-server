@@ -27,10 +27,11 @@ beforeEach(async () => {
       },
     },
     total: 5000,
+    token: 'some unique jwt',
   };
 });
 
-describe('paypalPaymentHandler', () => {
+describe('paynowPaymentHandler', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
       const executeSinglePaymentRes = await paynowPaymentHandler.executeSinglePayment(

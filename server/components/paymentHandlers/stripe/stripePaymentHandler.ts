@@ -14,7 +14,7 @@ class StripePaymentHandler extends AbstractPaymentHandler<
   protected _createPaymentJson = (
     props: PaymentHandlerExecuteParams
   ): Stripe.Checkout.SessionCreateParams => {
-    const { successRedirectUrl, cancelRedirectUrl, items } = props;
+    const { successRedirectUrl, cancelRedirectUrl, items, token } = props;
     const createPaymentJson = {
       line_items: items,
       payment_method_types: ['card', 'wechat_pay', 'grabpay', 'alipay'],
@@ -26,6 +26,7 @@ class StripePaymentHandler extends AbstractPaymentHandler<
           client: 'web',
         },
       },
+      metadata: { token },
     } as Stripe.Checkout.SessionCreateParams;
     return createPaymentJson;
   };

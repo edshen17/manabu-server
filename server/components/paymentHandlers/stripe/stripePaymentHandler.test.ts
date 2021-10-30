@@ -26,6 +26,7 @@ beforeEach(async () => {
       },
     ],
     total: 2000,
+    token: 'some unique jwt',
   };
 });
 

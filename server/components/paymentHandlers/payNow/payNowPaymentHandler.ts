@@ -13,16 +13,18 @@ class PaynowPaymentHandler extends AbstractPaymentHandler<
   Omise.IOmise,
   OptionalPaynowPaymentHandlerInitParams
 > {
-  protected _createPaymentJson = (props: PaymentHandlerExecuteParams): OmiseItems => {
-    const { items } = props;
-    const createPaymentJson = items as OmiseItems;
+  protected _createPaymentJson = (
+    props: PaymentHandlerExecuteParams
+  ): PaymentHandlerExecuteParams => {
+    const createPaymentJson = props;
     return createPaymentJson;
   };
 
   protected _executePaymentTemplate = async (
-    createPaymentJson: OmiseItems
+    createPaymentJson: PaymentHandlerExecuteParams
   ): Promise<PaymentHandlerExecutePaymentRes> => {
-    const { source, charge } = createPaymentJson;
+    const { items, token } = createPaymentJson;
+    const { source, charge } = items as OmiseItems;
     const sourceRes = await this._paymentLib.sources.create(source);
     const { id, amount, currency } = sourceRes;
     const chargeRes = await this._paymentLib.charges.create({
@@ -30,6 +32,9 @@ class PaynowPaymentHandler extends AbstractPaymentHandler<
       source: id,
       amount: amount,
       currency: currency,
+      metadata: {
+        token,
+      },
     });
     const executePaymentRes = {
       redirectUrl: (chargeRes.source as StringKeyObject).scannable_code.image.download_uri,

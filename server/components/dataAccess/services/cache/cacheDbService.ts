@@ -75,8 +75,9 @@ class CacheDbService {
     const { hashKey, key, value, ttlMs } = props;
     const isValueString = typeof value === 'string';
     const valueToStore = isValueString ? value : JSON.stringify(value);
-    await this._redisClient.hset(hashKey, key, valueToStore);
-    this._redisClient.expire(hashKey, ttlMs);
+    const lowercaseHashkey = hashKey.toLowerCase();
+    await this._redisClient.hset(lowercaseHashkey, key, valueToStore);
+    this._redisClient.expire(lowercaseHashkey, ttlMs);
     return value;
   };
 

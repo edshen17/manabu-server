@@ -25,6 +25,7 @@ beforeEach(async () => {
     ],
     currency: 'SGD',
     total: '100',
+    token: 'some unique jwt',
   };
 });
 

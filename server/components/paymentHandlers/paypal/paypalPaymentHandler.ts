@@ -14,7 +14,7 @@ class PaypalPaymentHandler extends AbstractPaymentHandler<
   OptionalPaypalPaymentHandlerInitParams
 > {
   protected _createPaymentJson = (props: PaymentHandlerExecuteParams): Payment => {
-    const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total } =
+    const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total, token } =
       props as PaymentHandlerExecuteParams & { items: Item[] };
     const createPaymentJson: Payment = {
       intent: 'sale',
@@ -35,6 +35,7 @@ class PaypalPaymentHandler extends AbstractPaymentHandler<
             total: <string>total!,
           },
           description,
+          custom: token,
         },
       ],
     };

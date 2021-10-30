@@ -24,6 +24,7 @@ type PaymentHandlerExecuteParams = {
   description?: string;
   total: string | number;
   subscription?: boolean;
+  token: string;
 };
 
 type PaymentHandlerExecutePaymentRes = {

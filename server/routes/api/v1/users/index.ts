@@ -27,6 +27,10 @@ users.post('/', makeJSONCookieExpressCallback.consume(makeCreateUserController))
 
 users.use('/auth', auth);
 
+// get meta data, if packageTransaction, create
+// if other thing, do not create
+// pass token and make webhook omni/independent -- create then invalidate... so refactor paymenthandler
+// meta data,
 users.post('/webhook', async (req, res) => {
   let data;
   let eventType;
