@@ -27,30 +27,45 @@ users.post('/', makeJSONCookieExpressCallback.consume(makeCreateUserController))
 
 users.use('/auth', auth);
 
-users.post('/test', express.raw({ type: '*/*' }), (request, response, next) => {
-  console.log('webhook');
-  const endpointSecret = 'whsec_nW0MnkJsgCrwa55x42FRdYZaZEAfwTPz';
-  const sig = request.headers['stripe-signature'];
+users.post('/webhook', async (req, res) => {
+  let data;
+  let eventType;
+  // change to dev secret if not production
+  const webhookSecret = 'whsec_CB0N6A02vhjNDHLqJBaQFhJfMENy6nkG';
 
-  let event;
+  if (webhookSecret) {
+    // Retrieve the event by verifying the signature using the raw body and secret.
+    let event;
+    const signature = req.headers['stripe-signature'];
 
-  try {
-    event = stripe.webhooks.constructEvent((request as any).rawBody, sig, endpointSecret);
-  } catch (err: any) {
-    response.status(400).send(`Webhook Error: ${err.message}`);
-    return;
+    try {
+      event = stripe.webhooks.constructEvent((req as any)['rawBody'], signature, webhookSecret);
+    } catch (err) {
+      console.log(`⚠️  Webhook signature verification failed.`);
+      return res.sendStatus(400);
+    }
+    // Extract the object from the event.
+    data = event.data;
+    eventType = event.type;
+  } else {
+    // Webhook signing is recommended, but if the secret is not configured in `config.js`,
+    // retrieve the event data directly from the request body.
+    data = req.body.data;
+    eventType = req.body.type;
   }
 
-  // Handle the event
-  switch (event.type) {
+  switch (eventType) {
     case 'payment_intent.succeeded':
-      console.log(event.data.object);
-      // Then define and call a function to handle the event payment_intent.succeeded
       break;
-    // ... handle other event types
+    case 'invoice.paid':
+      break;
+    case 'invoice.payment_failed':
+      break;
     default:
-      console.log(`Unhandled event type ${event.type}`);
+    // Unhandled event type
   }
+
+  res.sendStatus(200);
 });
 
 export { users };

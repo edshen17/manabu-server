@@ -7,7 +7,6 @@ import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
-import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler';
 import { DbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
@@ -24,7 +23,11 @@ let dbConnectionHandler: DbConnectionHandler;
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buffer) => ((req as any)['rawBody'] = buffer),
+  })
+);
 app.use(hpp());
 app.use(cookieParser());
 app.use(cors(corsConfig));
@@ -59,27 +62,4 @@ const port = process.env.PORT || 5000;
 
 http.createServer(app).listen(port, function () {
   console.log(`Express server listening on port ${port}`);
-});
-
-makeDbConnectionHandler.then(async (dbHandler) => {
-  dbConnectionHandler = dbHandler;
-  await dbConnectionHandler.connect();
-});
-
-const gracefulShutdown = async (msg: string, callback: () => unknown) => {
-  await dbConnectionHandler.stop();
-  console.log(`Mongoose disconnected through ${msg}`);
-  callback();
-};
-
-process.on('SIGINT', async () => {
-  gracefulShutdown('app termination', function () {
-    process.exit(0);
-  });
-});
-
-process.on('SIGTERM', async () => {
-  gracefulShutdown('Heroku app termination', function () {
-    process.exit(0);
-  });
 });
