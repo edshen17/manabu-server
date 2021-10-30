@@ -27,7 +27,8 @@ users.post('/', makeJSONCookieExpressCallback.consume(makeCreateUserController))
 
 users.use('/auth', auth);
 
-users.post('/test', express.json({ type: 'application/json' }), (request, response, next) => {
+users.post('/test', express.raw({ type: '*/*' }), (request, response, next) => {
+  console.log('webhook');
   const endpointSecret = 'whsec_nW0MnkJsgCrwa55x42FRdYZaZEAfwTPz';
   const sig = request.headers['stripe-signature'];
 

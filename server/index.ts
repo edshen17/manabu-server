@@ -66,25 +66,19 @@ makeDbConnectionHandler.then(async (dbHandler) => {
   await dbConnectionHandler.connect();
 });
 
-const gracefulShutdown = (msg: string, callback: () => unknown) => {
-  dbConnectionHandler.stop();
+const gracefulShutdown = async (msg: string, callback: () => unknown) => {
+  await dbConnectionHandler.stop();
   console.log(`Mongoose disconnected through ${msg}`);
   callback();
 };
 
-process.once('SIGUSR2', () => {
-  gracefulShutdown('nodemon restart', function () {
-    process.kill(process.pid, 'SIGUSR2');
-  });
-});
-
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   gracefulShutdown('app termination', function () {
     process.exit(0);
   });
 });
 
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   gracefulShutdown('Heroku app termination', function () {
     process.exit(0);
   });

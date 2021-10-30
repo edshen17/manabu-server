@@ -5,7 +5,7 @@
   "author": "",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "server": "nodemon server/index.ts",
+    "server": "ts-node server/index.ts",
     "start": "node server/dist/index.js",
     "test": "mocha --timeout 50000 --parallel --exit -r ts-node/register --require fixtures.ts server/**/*.test.ts",
     "madge": "madge --circular --extensions ts ./",
@@ -24,6 +24,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/mongoose-unique-validator": "^1.0.5",
     "@types/nodemailer": "^6.4.4",
+    "@types/nodemon": "^1.19.1",
     "@types/paypal-rest-sdk": "^1.7.6",
     "@types/sanitize-html": "^2.3.1",
     "@typescript-eslint/eslint-plugin": "^4.25.0",

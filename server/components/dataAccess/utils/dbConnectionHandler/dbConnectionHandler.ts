@@ -47,15 +47,14 @@ class DbConnectionHandler {
 
   public stop = async (): Promise<void> => {
     const isDbConnected = this._mongoose.connection.readyState != 0;
-    try {
-      if (isDbConnected) {
-        await this._mongoose.disconnect();
-      }
-      for (const replicaSet of this._replicaSets) {
+    if (isDbConnected) {
+      await this._mongoose.disconnect();
+    }
+    for (const replicaSet of this._replicaSets) {
+      const isReplicaSetConnected = replicaSet.state != 'stopped';
+      if (isReplicaSetConnected) {
         await replicaSet.stop();
       }
-    } catch (err) {
-      return;
     }
   };
 
