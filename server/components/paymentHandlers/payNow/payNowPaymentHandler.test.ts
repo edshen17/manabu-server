@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makePaynowPaymentHandler } from '.';
-import { PaymentHandlerExecuteParams } from '../abstractions/IPaymentHandler';
+import { PaymentHandlerExecuteParams, PAYMENT_GATEWAY_NAME } from '../abstractions/IPaymentHandler';
 import { PaynowPaymentHandler } from './paynowPaymentHandler';
 
 let paynowPaymentHandler: PaynowPaymentHandler;
@@ -16,7 +16,7 @@ beforeEach(async () => {
     cancelRedirectUrl: 'https://manabu.sg/cancel',
     items: {
       source: {
-        type: 'paynow',
+        type: PAYMENT_GATEWAY_NAME.PAYNOW,
         amount: 5000,
         currency: 'sgd',
       },

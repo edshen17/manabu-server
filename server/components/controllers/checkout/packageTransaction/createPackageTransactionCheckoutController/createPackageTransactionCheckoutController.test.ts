@@ -37,7 +37,6 @@ beforeEach(async () => {
     packageId: fakeTeacher.teacherData!.packages[0]._id,
     lessonDuration: 60,
     lessonLanguage: 'ja',
-    lessonAmount: 5,
   };
   queryToEncode = {
     paymentGateway: 'paypal',
@@ -48,7 +47,7 @@ beforeEach(async () => {
   };
 });
 
-describe('createAppointmentsController', () => {
+describe('createPackageTransactionCheckoutController', () => {
   describe('makeRequest', () => {
     const createPackageTransactionCheckout = async () => {
       const encodedQuery = queryStringHandler.encodeQueryStringObj(queryToEncode);

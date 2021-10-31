@@ -1,11 +1,16 @@
+import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../../dataAccess/abstractions/IDbService';
 import { CacheDbService, TTL_MS } from '../../../../dataAccess/services/cache/cacheDbService';
 import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
+import { PackageTransactionEntityBuildParams } from '../../../../entities/packageTransaction/packageTransactionEntity';
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
-import { PaymentHandlerExecuteParams } from '../../../../paymentHandlers/abstractions/IPaymentHandler';
+import {
+  PaymentHandlerExecuteParams,
+  PAYMENT_GATEWAY_NAME,
+} from '../../../../paymentHandlers/abstractions/IPaymentHandler';
 import { PaynowPaymentHandler } from '../../../../paymentHandlers/paynow/paynowPaymentHandler';
 import { PaypalPaymentHandler } from '../../../../paymentHandlers/paypal/paypalPaymentHandler';
 import { StripePaymentHandler } from '../../../../paymentHandlers/stripe/stripePaymentHandler';
@@ -36,9 +41,7 @@ type CreatePackageTransactionCheckoutUsecaseResponse = {
   redirectUrl: string;
 };
 
-type GetPaymentHandlerRedirectUrlParams = Await<
-  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerParams']>
->;
+type GetRedirectUrlParams = MakeRequestTemplateParams & TestBodyResponse;
 
 type TestBodyResponse = {
   teacher: JoinedUserDoc;
@@ -46,7 +49,21 @@ type TestBodyResponse = {
   teacherPackage: PackageDoc;
 };
 
-type GetRedirectUrlParams = MakeRequestTemplateParams & TestBodyResponse;
+type GetPaymentHandlerRedirectUrlParams = Await<
+  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerParams']>
+>;
+
+type SetPackageTransactionJwtParams = {
+  teacherPackage: PackageDoc;
+  body: StringKeyObject;
+  userId: ObjectId | undefined;
+  teacher: JoinedUserDoc;
+  processedPaymentHandlerData: Await<
+    ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerData']>
+  >;
+};
+
+const CHECKOUT_TOKEN_HASH_KEY = 'usercheckouttoken';
 
 class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   OptionalCreatePackageTransactionCheckoutUsecaseInitParams,
@@ -67,12 +84,10 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionCheckoutUsecaseResponse> => {
-    const { teacher, teacherData, teacherPackage } = await this._testBody(props);
+    const testBodyRes = await this._testBody(props);
     const redirectUrl = await this._getRedirectUrl({
       ...props,
-      teacher,
-      teacherData,
-      teacherPackage,
+      ...testBodyRes,
     });
     const usecaseRes = {
       redirectUrl,
@@ -90,7 +105,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
       userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
     });
-    const { teacherId, packageId, lessonDuration, lessonLanguage, lessonAmount } = validatedBody;
+    const { teacherId, packageId, lessonDuration, lessonLanguage } = validatedBody;
     const teacher = <JoinedUserDoc>await this._dbService.findById({
       _id: this._convertStringToObjectId(teacherId),
       dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
@@ -105,9 +120,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       teacherData.teachingLanguages.findIndex((teachingLanguage) => {
         return teachingLanguage.language == lessonLanguage;
       }) != -1;
-    const isValidLessonAmount = teacherPackage.lessonAmount == lessonAmount;
-    const isValidBody =
-      isTeacherApproved && isValidLessonDuration && isValidLessonLanguage && isValidLessonAmount;
+    const isValidBody = isTeacherApproved && isValidLessonDuration && isValidLessonLanguage;
 
     if (!isValidBody) {
       throw new Error('Invalid body.');
@@ -121,13 +134,13 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const processedPaymentHandlerParams = await this._getProcessedPaymentHandlerParams(props);
     let redirectUrl = '';
     switch (paymentGateway) {
-      case 'paypal':
+      case PAYMENT_GATEWAY_NAME.PAYPAL:
         redirectUrl = await this._getPaypalRedirectUrl(processedPaymentHandlerParams);
         break;
-      case 'stripe':
+      case PAYMENT_GATEWAY_NAME.STRIPE:
         redirectUrl = await this._getStripeRedirectUrl(processedPaymentHandlerParams);
         break;
-      case 'paynow':
+      case PAYMENT_GATEWAY_NAME.PAYNOW:
         redirectUrl = await this._getPaynowRedirectUrl(processedPaymentHandlerParams);
         break;
       default:
@@ -137,57 +150,97 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
-    const { body, currentAPIUser } = props;
+    const { body, currentAPIUser, teacher, teacherPackage } = props;
     const { userId } = currentAPIUser;
-    const item = await this._getItemData(props);
-    const jwt = this._jwtHandler.sign({
-      toTokenObj: { ...body, resourceName: 'packageTransaction' },
-      expiresIn: '1d',
-    });
-    const userIdToken = userId!.toString();
-    await this._cacheDbService.set({
-      hashKey: 'usercheckouttoken',
-      key: userIdToken,
-      value: jwt,
-      ttlMs: TTL_MS.DAY,
+    const processedPaymentHandlerData = await this._getProcessedPaymentHandlerData(props);
+    const { item } = processedPaymentHandlerData;
+    await this._setPackageTransactionJwt({
+      body,
+      teacherPackage,
+      teacher,
+      userId,
+      processedPaymentHandlerData,
     });
     const processedPaymentHandlerParams = {
       item,
       successRedirectUrl: 'https://manabu.sg/dashboard',
       cancelRedirectUrl: 'https://manabu.sg/cancel',
       currency: this._defaultCurrency,
-      token: userIdToken,
+      token: userId!.toString(),
     };
     return processedPaymentHandlerParams;
   };
 
-  private _getItemData = async (props: GetRedirectUrlParams) => {
+  private _getProcessedPaymentHandlerData = async (props: GetRedirectUrlParams) => {
     const { teacher, teacherData, teacherPackage, currentAPIUser, query, body } = props;
     const { lessonDuration, lessonLanguage } = body;
     const { paymentGateway } = query;
     const { hourlyRate, currency } = teacherData!.priceData;
-    const paymentMethodRate: StringKeyObject = {
+    const PAYMENT_GATEWAY_RATE: StringKeyObject = {
       paypal: 0.03,
       stripe: 0.01,
       paynow: 0.01,
     };
-    const packageTransactionSubtotal =
-      hourlyRate * (lessonDuration / 60) * teacherPackage.lessonAmount;
-    const packageTransactionTotal =
-      packageTransactionSubtotal * (1 + paymentMethodRate[paymentGateway]);
+    const subTotal = hourlyRate * (lessonDuration / 60) * teacherPackage.lessonAmount;
+    const total = subTotal * (1 + PAYMENT_GATEWAY_RATE[paymentGateway]);
+    const priceData = { currency, subTotal, total };
     const item = {
       id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
       name: this._convertToTitlecase(
         `Minato Manabu - ${teacherPackage.packageName} / ${teacher.name}`
       ),
       price: await this._exchangeRateHandler.convert({
-        amount: packageTransactionTotal,
+        amount: priceData.total,
         fromCurrency: currency,
         toCurrency: this._defaultCurrency,
       }),
       quantity: 1,
     };
-    return item;
+    const paymentData = {
+      id: '',
+      gateway: paymentGateway,
+    };
+    return { item, priceData, paymentData };
+  };
+
+  private _setPackageTransactionJwt = async (
+    setPackageTransactionJwtParams: SetPackageTransactionJwtParams
+  ): Promise<void> => {
+    const { userId } = setPackageTransactionJwtParams;
+    const packageTransactionEntityBuildParams =
+      this._convertBodyToPackageTransactionEntityBuildParams(setPackageTransactionJwtParams);
+    const jwt = this._jwtHandler.sign({
+      toTokenObj: { packageTransactionEntityBuildParams, resourceName: 'packageTransaction' },
+      expiresIn: '1d',
+    });
+    await this._cacheDbService.set({
+      hashKey: CHECKOUT_TOKEN_HASH_KEY,
+      key: userId!.toString(),
+      value: jwt,
+      ttlMs: TTL_MS.DAY,
+    });
+  };
+
+  private _convertBodyToPackageTransactionEntityBuildParams = (
+    setPackageTransactionJwtParams: SetPackageTransactionJwtParams
+  ) => {
+    const { body, userId, teacher, processedPaymentHandlerData, teacherPackage } =
+      setPackageTransactionJwtParams;
+    const { packageId, lessonLanguage, lessonDuration } = body;
+    const { priceData, paymentData } = processedPaymentHandlerData;
+    const { lessonAmount } = teacherPackage;
+    const packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams = {
+      hostedById: teacher._id,
+      reservedById: userId!,
+      packageId,
+      lessonDuration,
+      lessonLanguage,
+      priceData,
+      remainingAppointments: lessonAmount,
+      paymentData,
+      isSubscription: false,
+    };
+    return packageTransactionEntityBuildParams;
   };
 
   private _getPaypalRedirectUrl = async (
@@ -308,4 +361,8 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 }
 
-export { CreatePackageTransactionCheckoutUsecase, CreatePackageTransactionCheckoutUsecaseResponse };
+export {
+  CreatePackageTransactionCheckoutUsecase,
+  CreatePackageTransactionCheckoutUsecaseResponse,
+  CHECKOUT_TOKEN_HASH_KEY,
+};

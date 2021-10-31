@@ -1,6 +1,8 @@
 // import { expect } from 'chai';
 // import { JoinedUserDoc } from '../../../../models/User';
 // import { StringKeyObject } from '../../../../types/custom';
+// import { makeCacheDbService } from '../../../dataAccess/services/cache';
+// import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 // import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 // import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -15,6 +17,7 @@
 // let fakeTeacher: JoinedUserDoc;
 // let jwtHandler: JwtHandler;
 // let createPackageTransactionUsecase: CreatePackageTransactionUsecase;
+// let cacheDbService: CacheDbService;
 // let routeData: RouteData;
 // let fakeUser: JoinedUserDoc;
 // let currentAPIUser: CurrentAPIUser;
@@ -25,6 +28,7 @@
 //   createPackageTransactionUsecase = await makeCreatePackageTransactionUsecase;
 //   fakeDbUserFactory = await makeFakeDbUserFactory;
 //   jwtHandler = await makeJwtHandler;
+//   cacheDbService = await makeCacheDbService;
 // });
 
 // beforeEach(async () => {
@@ -34,6 +38,16 @@
 //     userId: fakeUser._id,
 //     role: fakeUser.role,
 //   };
+//   const userIdToken = fakeUser._id.toString();
+//   routeData = {
+//     params: {},
+//     body: {},
+//     query: {
+//       token: userIdToken,
+//     },
+//     endpointPath: '',
+//     headers: {},
+//   };
 //   toTokenObj = {
 //     teacherId: fakeTeacher.teacherData!._id,
 //     packageId: fakeTeacher.teacherData!.packages[0]._id,
@@ -41,15 +55,16 @@
 //     lessonLanguage: 'ja',
 //     lessonAmount: 5,
 //   };
-//   routeData = {
-//     params: {},
-//     body: {},
-//     query: {
-//       token: jwtHandler.sign({ toTokenObj, expiresIn: '1d' }),
-//     },
-//     endpointPath: '',
-//     headers: {},
-//   };
+//   const jwt = jwtHandler.sign({
+//     toTokenObj: { toTokenObj, resourceName: 'packageTransaction' },
+//     expiresIn: '1d',
+//   });
+//   await cacheDbService.set({
+//     hashKey: 'usercheckouttoken',
+//     key: userIdToken,
+//     value: jwt,
+//     ttlMs: TTL_MS.DAY,
+//   });
 // });
 
 // describe('createPackageTransactionUsecase', () => {

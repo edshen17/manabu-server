@@ -27,7 +27,7 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
       packageId: fakeTeacher.teacherData!.packages[0]._id,
       lessonDuration: 60,
       priceData: { currency: 'SGD', subTotal: 0, total: 0 },
-      remainingAppointments: 0,
+      remainingAppointments: 12,
       lessonLanguage: 'ja',
       isSubscription: false,
       paymentData: {

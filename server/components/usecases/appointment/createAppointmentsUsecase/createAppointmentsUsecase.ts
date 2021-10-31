@@ -193,6 +193,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     const dbServiceAccessOptions =
       this._packageTransactionDbService.getBaseDbServiceAccessOptions();
     const appointmentsToSubtract = appointments.length * -1;
+    // check if remainingAppointments > 0
     await this._packageTransactionDbService.findOneAndUpdate({
       searchQuery: { _id: packageTransactionId },
       updateQuery: {

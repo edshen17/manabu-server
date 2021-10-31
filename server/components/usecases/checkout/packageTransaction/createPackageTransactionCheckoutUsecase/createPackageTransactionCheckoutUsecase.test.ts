@@ -38,7 +38,6 @@ beforeEach(async () => {
       packageId: fakeTeacher.teacherData!.packages[0]._id,
       lessonDuration: 60,
       lessonLanguage: 'ja',
-      lessonAmount: 5,
     },
     query: {
       paymentGateway: 'paypal',

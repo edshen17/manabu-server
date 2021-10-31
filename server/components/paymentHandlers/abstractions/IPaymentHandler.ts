@@ -16,6 +16,12 @@ type OmiseItems = {
   charge: Omise.Charges.IRequest;
 };
 
+enum PAYMENT_GATEWAY_NAME {
+  PAYPAL = 'paypal',
+  STRIPE = 'stripe',
+  PAYNOW = 'paynow',
+}
+
 type PaymentHandlerExecuteParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
@@ -51,4 +57,5 @@ export {
   PaypalItems,
   StripeItems,
   OmiseItems,
+  PAYMENT_GATEWAY_NAME,
 };

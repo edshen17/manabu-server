@@ -4,6 +4,7 @@ import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
 import {
   PaymentHandlerExecuteParams,
   PaymentHandlerExecutePaymentRes,
+  PAYMENT_GATEWAY_NAME,
 } from '../abstractions/IPaymentHandler';
 
 type Paypal = typeof paypal;
@@ -19,7 +20,7 @@ class PaypalPaymentHandler extends AbstractPaymentHandler<
     const createPaymentJson: Payment = {
       intent: 'sale',
       payer: {
-        payment_method: 'paypal',
+        payment_method: PAYMENT_GATEWAY_NAME.PAYPAL,
       },
       redirect_urls: {
         return_url: successRedirectUrl,
