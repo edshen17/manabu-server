@@ -21,7 +21,7 @@ before(async () => {
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
 });
 
 describe('editTeacherController', () => {

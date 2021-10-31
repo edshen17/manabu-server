@@ -14,8 +14,8 @@ class TeacherQueryValidator extends AbstractQueryValidator {
       contactMethodName: this._joi.array().items(this._joi.string()),
       contactMethodType: this._joi.array().items(this._joi.string()),
       name: this._joi.string(),
-      page: this._joi.number(),
-      limit: this._joi.number(),
+      page: this._joi.number().max(1000),
+      limit: this._joi.number().max(1000),
     });
   };
 }

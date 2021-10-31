@@ -27,7 +27,7 @@ before(async () => {
 describe('getTeachersController', () => {
   describe('makeRequest', () => {
     it('should get teachers from the filter', async () => {
-      const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+      const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
       const dbServiceAccessOptions = userDbService.getBaseDbServiceAccessOptions();
       await userDbService.findOneAndUpdate({
         searchQuery: { _id: fakeTeacher._id },

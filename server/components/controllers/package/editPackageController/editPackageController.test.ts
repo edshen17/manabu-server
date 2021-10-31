@@ -27,7 +27,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   params = {
     packageId: fakeTeacher.teacherData!.packages[0]._id,

@@ -20,7 +20,7 @@ describe('fakeDbPackageTransaction', () => {
     });
     it('should create a fake package transaction using data from the given fake users', async () => {
       const fakeUser = await fakeDbUserFactory.createFakeDbUser();
-      const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+      const fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
       const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
         hostedById: fakeTeacher._id,
         reservedById: fakeUser._id,

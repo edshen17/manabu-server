@@ -1,8 +1,8 @@
 import express from 'express';
-import { packageTransaction } from './packageTransaction';
+import { packageTransactions } from './packageTransactions';
 
 const checkout = express.Router();
 
-checkout.use('/packageTransaction', packageTransaction);
+checkout.use('/packageTransactions', packageTransactions);
 
 export { checkout };

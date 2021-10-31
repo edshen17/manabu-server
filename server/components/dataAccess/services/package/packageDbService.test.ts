@@ -46,7 +46,7 @@ before(async () => {
 beforeEach(async () => {
   dbServiceAccessOptions = packageDbService.getBaseDbServiceAccessOptions();
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   fakePackage = fakeTeacher.teacherData!.packages[0];
   fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
     hostedById: fakeTeacher._id,

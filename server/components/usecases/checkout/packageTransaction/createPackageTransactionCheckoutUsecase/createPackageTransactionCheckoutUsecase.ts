@@ -140,7 +140,10 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const { body, currentAPIUser } = props;
     const { userId } = currentAPIUser;
     const item = await this._getItemData(props);
-    const jwt = this._jwtHandler.sign({ toTokenObj: body, expiresIn: '1d' });
+    const jwt = this._jwtHandler.sign({
+      toTokenObj: { ...body, resourceName: 'packageTransaction' },
+      expiresIn: '1d',
+    });
     const userIdToken = userId!.toString();
     await this._cacheDbService.set({
       hashKey: 'usercheckouttoken',

@@ -31,7 +31,7 @@ before(async () => {
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   body = {
     teacherId: fakeTeacher.teacherData!._id,
     packageId: fakeTeacher.teacherData!.packages[0]._id,

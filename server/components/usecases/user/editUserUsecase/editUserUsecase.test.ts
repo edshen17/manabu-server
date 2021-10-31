@@ -20,7 +20,7 @@ before(async () => {
   editUserUsecase = await makeEditUserUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   controllerDataBuilder = makeControllerDataBuilder;
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
 });
 
 beforeEach(() => {
@@ -97,7 +97,7 @@ describe('editUserUsecase', () => {
           context('updating other', () => {
             it('should update the user and return a less restricted view', async () => {
               const updaterUser = fakeTeacher;
-              const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+              const updateeUser = await fakeDbUserFactory.createFakeDbTeacher();
               const { body, params } = routeData;
               expect(updateeUser.profileBio).to.equal('');
               body.profileBio = 'new profile bio';
@@ -115,7 +115,7 @@ describe('editUserUsecase', () => {
     context('db access denied', () => {
       it('should throw an error when updating another user', async () => {
         const updaterUser = fakeTeacher;
-        const updateeUser = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+        const updateeUser = await fakeDbUserFactory.createFakeDbTeacher();
         const { body, params } = routeData;
         body.profileBio = 'new profile bio';
         params.userId = updateeUser._id;

@@ -60,8 +60,8 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       isSubscription: this._joi.boolean().forbidden(),
       paymentData: this._joi
         .object({
-          gatewayName: this._joi.string().max(256),
-          gatewayTransactionId: this._joi.string().alphanum().max(256),
+          gatewayName: this._joi.string().max(2048),
+          gatewayTransactionId: this._joi.string().alphanum().max(2048),
         })
         .forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),

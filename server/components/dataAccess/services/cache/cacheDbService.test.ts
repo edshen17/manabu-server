@@ -13,7 +13,7 @@ beforeEach(async () => {
   hashKey = 'someHashKey';
   await cacheDbService.set({
     hashKey,
-    key: 'storedItem',
+    key: 'storeditem',
     value: { _id: 5 },
     ttlMs: 60 * 1000,
   });
@@ -22,7 +22,7 @@ beforeEach(async () => {
 describe('cacheDbService', () => {
   describe('get', () => {
     it('should get the item in the cache', async () => {
-      const storedItem = await cacheDbService.get({ hashKey, key: 'storedItem' });
+      const storedItem = await cacheDbService.get({ hashKey, key: 'storeditem' });
       expect(storedItem).to.deep.equal({ _id: 5 });
     });
   });
@@ -30,7 +30,7 @@ describe('cacheDbService', () => {
     it('should set an item in the cache', async () => {
       const storedItem = await cacheDbService.set({
         hashKey,
-        key: 'otherItem',
+        key: 'otheritem',
         value: { _id: 10 },
         ttlMs: 60 * 1000,
       });
@@ -39,22 +39,22 @@ describe('cacheDbService', () => {
   });
   describe('clearKey', () => {
     it("should clear the given key's value", async () => {
-      await cacheDbService.clearKey({ hashKey, key: 'storedItem' });
-      const storedItem = await cacheDbService.get({ hashKey, key: 'storedItem' });
+      await cacheDbService.clearKey({ hashKey, key: 'storeditem' });
+      const storedItem = await cacheDbService.get({ hashKey, key: 'storeditem' });
       expect(storedItem).to.equal(null);
     });
   });
   describe('clearHashKey', () => {
     it("should clear the given hashKey's value", async () => {
       await cacheDbService.clearHashKey(hashKey);
-      const storedItem = await cacheDbService.get({ hashKey, key: 'storedItem' });
+      const storedItem = await cacheDbService.get({ hashKey, key: 'storeditem' });
       expect(storedItem).to.equal(null);
     });
   });
   describe('clearAll', () => {
     it('should clear everything in the cache', async () => {
       await cacheDbService.clearAll();
-      const storedItem = await cacheDbService.get({ hashKey, key: 'storedItem' });
+      const storedItem = await cacheDbService.get({ hashKey, key: 'storeditem' });
       expect(storedItem).to.equal(null);
     });
   });

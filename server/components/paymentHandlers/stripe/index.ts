@@ -12,4 +12,4 @@ const stripe = new Stripe(stripeKey, {
 
 const makeStripePaymentHandler = new StripePaymentHandler().init({ paymentLib: stripe });
 
-export { makeStripePaymentHandler };
+export { makeStripePaymentHandler, stripe };

@@ -19,7 +19,7 @@ class FakeDbMinuteBankFactory extends AbstractFakeDbDataFactory<
   private _fakeDbUserFactory!: FakeDbUserFactory;
 
   protected _createFakeBuildParams = async (): Promise<MinuteBankEntityBuildParams> => {
-    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacherWithPackages();
+    const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacher();
     const fakeUser = await this._fakeDbUserFactory.createFakeDbUser();
     const fakeBuildParams = {
       hostedById: fakeTeacher._id,

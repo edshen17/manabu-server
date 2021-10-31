@@ -24,7 +24,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   currentAPIUser = {
     userId: fakeTeacher._id,
     teacherId: fakeTeacher.teacherData!._id,

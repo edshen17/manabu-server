@@ -12,6 +12,7 @@
 
 // let controllerDataBuilder: ControllerDataBuilder;
 // let fakeDbUserFactory: FakeDbUserFactory;
+// let fakeTeacher: JoinedUserDoc;
 // let jwtHandler: JwtHandler;
 // let createPackageTransactionUsecase: CreatePackageTransactionUsecase;
 // let routeData: RouteData;
@@ -23,11 +24,12 @@
 //   controllerDataBuilder = makeControllerDataBuilder;
 //   createPackageTransactionUsecase = await makeCreatePackageTransactionUsecase;
 //   fakeDbUserFactory = await makeFakeDbUserFactory;
-//   jwtHandler = makeJwtHandler;
+//   jwtHandler = await makeJwtHandler;
 // });
 
 // beforeEach(async () => {
 //   fakeUser = await fakeDbUserFactory.createFakeDbUser();
+//   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
 //   currentAPIUser = {
 //     userId: fakeUser._id,
 //     role: fakeUser.role,
@@ -46,6 +48,7 @@
 //       token: jwtHandler.sign({ toTokenObj, expiresIn: '1d' }),
 //     },
 //     endpointPath: '',
+//     headers: {},
 //   };
 // });
 

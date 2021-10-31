@@ -27,8 +27,8 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         currency: this._joi.string().max(5),
       }),
       tags: this._joi.array().items(this._joi.string().max(100)).unique(),
-      lessonCount: this._joi.number(),
-      studentCount: this._joi.number(),
+      lessonCount: this._joi.number().min(0),
+      studentCount: this._joi.number().min(0),
       createdDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
     });

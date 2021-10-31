@@ -28,7 +28,7 @@ before(async () => {
 });
 
 beforeEach(async () => {
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   body = {
     hostedById: fakeTeacher._id,
     startDate: dayjs().minute(0).toDate(),

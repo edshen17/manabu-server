@@ -11,7 +11,7 @@ class PackageTransactionCheckoutEntityValidator extends AbstractEntityValidator 
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       lessonDuration: this._joi.number().valid(30, 60, 90, 120),
       lessonLanguage: this._joi.string().max(5),
-      lessonAmount: this._joi.number(),
+      lessonAmount: this._joi.number().max(60),
     });
     this._editValidationSchema = this._createValidationSchema;
     this._deleteValidationSchema = this._createValidationSchema;

@@ -10,7 +10,7 @@ class UserParamsValidator extends AbstractParamsValidator {
           this._joi.objectId(),
           this._joi.string().valid('self')
         ),
-      verificationToken: this._joi.string(),
+      verificationToken: this._joi.string().max(2048),
     });
   };
 }

@@ -31,7 +31,7 @@ beforeEach(async () => {
     _id: fakeUser._id,
     dbServiceAccessOptions,
   });
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   overrideFakeTeacher = await userDbService.findById({
     _id: fakeTeacher._id,
     dbServiceAccessOptions,

@@ -20,7 +20,7 @@ describe('appointmentEntity', () => {
   describe('build', () => {
     context('valid inputs', () => {
       it('should build an appointment that has the given inputs as well as additional information from the db', async () => {
-        const fakeHostedBy = await fakeDbUserFactory.createFakeDbTeacherWithPackages();
+        const fakeHostedBy = await fakeDbUserFactory.createFakeDbTeacher();
         const fakeReservedBy = await fakeDbUserFactory.createFakeDbUser();
         const fakePackageTransaction = await fakeDbPackageTransactionFactory.createFakeDbData({
           hostedById: fakeHostedBy._id,
