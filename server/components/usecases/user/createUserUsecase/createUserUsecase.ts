@@ -118,12 +118,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
-    await this._createUserNode(user);
+    await this._cacheDbService.createUserNode(user);
     return user;
-  };
-
-  private _createUserNode = async (user: JoinedUserDoc): Promise<void> => {
-    await this._cacheDbService.graphQuery(`CREATE (user: User { _id: "${user._id}" })`);
   };
 
   public handleTeacherCreation = async (props: {

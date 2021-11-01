@@ -67,11 +67,21 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const packageTransactionEntity = await this._packageTransactionEntity.build(
       packageTransactionEntityBuildParams
     );
-    const packageTransaction = this._dbService.insert({
+    const packageTransaction = await this._dbService.insert({
       modelToInsert: packageTransactionEntity,
       dbServiceAccessOptions,
     });
+    await this._createStudentTeacherEdge(packageTransaction);
     return packageTransaction;
+  };
+
+  private _createStudentTeacherEdge = async (
+    packageTransaction: PackageTransactionDoc
+  ): Promise<void> => {
+    await this._cacheDbService.graphQuery(
+      `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" }), 
+      (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:TEACHES]->(student)`
+    );
   };
 
   protected _initTemplate = async (

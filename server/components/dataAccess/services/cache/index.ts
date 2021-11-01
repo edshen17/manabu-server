@@ -15,7 +15,7 @@ const clientOptions: StringKeyObject = {
 };
 
 const redisClient = new Redis(clientOptions);
-const redisGraph = new Graph('social-network', redisClient);
+const redisGraph = new Graph('socialnetwork', redisClient);
 
 const makeCacheDbService = new CacheDbService().init({
   redisClient,

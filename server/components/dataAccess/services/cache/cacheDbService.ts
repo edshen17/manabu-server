@@ -1,3 +1,4 @@
+import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
 
 type CacheDbServiceInitParams = {
@@ -98,6 +99,10 @@ class CacheDbService {
   public graphQuery = async (query: string): Promise<any> => {
     const graphRes = await this._redisGraph.query(query);
     return graphRes;
+  };
+
+  public createUserNode = async (user: JoinedUserDoc): Promise<void> => {
+    await this.graphQuery(`CREATE (user: User { _id: "${user._id}" })`);
   };
 
   public init = async (initParams: CacheDbServiceInitParams): Promise<this> => {
