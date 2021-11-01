@@ -1,3 +1,4 @@
+import { PAYMENT_GATEWAY_NAME } from '../../../paymentHandlers/abstractions/IPaymentHandler';
 import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
 
 class PackageTransactionEntityValidator extends AbstractEntityValidator {
@@ -25,8 +26,15 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       lessonLanguage: this._joi.string().max(5),
       isSubscription: this._joi.boolean(),
       paymentData: this._joi.object({
-        gateway: this._joi.string().max(256),
-        id: this._joi.string().max(256),
+        gateway: this._joi
+          .string()
+          .max(256)
+          .valid(
+            PAYMENT_GATEWAY_NAME.PAYNOW,
+            PAYMENT_GATEWAY_NAME.PAYPAL,
+            PAYMENT_GATEWAY_NAME.STRIPE
+          ),
+        id: this._joi.string().max(256).allow(''),
       }),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       lastModifiedDate: this._joi.date(),

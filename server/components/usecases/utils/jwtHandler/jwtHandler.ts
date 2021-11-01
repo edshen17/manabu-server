@@ -1,5 +1,5 @@
 import { StringKeyObject } from '../../../../types/custom';
-import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 
 enum CACHE_DB_HASH_KEY {
   BLACKLIST = 'jwtblacklist',
@@ -36,7 +36,7 @@ class JwtHandler {
       hashKey: CACHE_DB_HASH_KEY.BLACKLIST,
       key: token,
       value: token,
-      ttlMs: 60 * 1000,
+      ttlMs: TTL_MS.DAY,
     });
     return blacklistedToken;
   };
