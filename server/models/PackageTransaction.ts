@@ -19,10 +19,9 @@ const PackageTransactionSchema = createSchema({
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
   paymentData: Type.object({ required: false }).of({
-    gateway: Type.string({ required: true }),
+    gateway: Type.string({ required: false, enum: ['paypal', 'stripe', 'paynow'] }),
     id: Type.string({
-      required: true,
-      enum: ['paypal', 'stripe', 'paynow'],
+      required: false,
     }),
   }),
   status: Type.string({

@@ -112,7 +112,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     });
     const teacherData = teacher.teacherData!;
     const teacherPackage = <PackageDoc>teacherData.packages.find((pkg) => {
-      return this._deepEqual(this._convertStringToObjectId(packageId), pkg._id);
+      return pkg._id.equals(this._convertStringToObjectId(packageId));
     });
     const isTeacherApproved = teacherData.applicationStatus == 'approved';
     const isValidLessonDuration = teacherPackage.lessonDurations.includes(lessonDuration);

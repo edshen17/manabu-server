@@ -113,14 +113,8 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       _id: appointment.packageTransactionId,
       dbServiceAccessOptions,
     });
-    const isHostedByIdEqual = this._deepEqual(
-      packageTransaction.hostedById,
-      appointment.hostedById
-    );
-    const isReservedByIdEqual = this._deepEqual(
-      packageTransaction.reservedById,
-      currentAPIUser.userId
-    );
+    const isHostedByIdEqual = packageTransaction.hostedById.equals(appointment.hostedById);
+    const isReservedByIdEqual = packageTransaction.reservedById.equals(currentAPIUser.userId);
     const hasResourceAccess = isHostedByIdEqual && isReservedByIdEqual;
     const timeDifference = this._dayjs(appointment.endDate).diff(appointment.startDate, 'minute');
     const isCorrectDuration = timeDifference == packageTransaction.lessonDuration;
@@ -193,14 +187,23 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     const dbServiceAccessOptions =
       this._packageTransactionDbService.getBaseDbServiceAccessOptions();
     const appointmentsToSubtract = appointments.length * -1;
-    // check if remainingAppointments > 0
-    await this._packageTransactionDbService.findOneAndUpdate({
+    const packageTransaction = await this._packageTransactionDbService.findOne({
       searchQuery: { _id: packageTransactionId },
-      updateQuery: {
-        $inc: { remainingAppointments: appointmentsToSubtract },
-      },
       dbServiceAccessOptions,
     });
+    const hasAppointmentsRemaining =
+      packageTransaction.remainingAppointments + appointmentsToSubtract > 0;
+    if (hasAppointmentsRemaining) {
+      await this._packageTransactionDbService.findOneAndUpdate({
+        searchQuery: { _id: packageTransactionId },
+        updateQuery: {
+          $inc: { remainingAppointments: appointmentsToSubtract },
+        },
+        dbServiceAccessOptions,
+      });
+    } else {
+      throw new Error('You do not have enough remaining lessons!');
+    }
   };
 
   private _splitAvailableTimeBrancher = async (appointments: AppointmentDoc[]): Promise<void> => {

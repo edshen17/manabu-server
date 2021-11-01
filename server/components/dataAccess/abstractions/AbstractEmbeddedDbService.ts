@@ -113,13 +113,22 @@ abstract class AbstractEmbeddedDbService<
     const { dbQueryResult, searchQuery } = props;
     const isResultArray = Array.isArray(dbQueryResult);
     if (isResultArray) {
-      const dbDoc = dbQueryResult.find((childDbDoc: any) => {
+      let dbDoc;
+      dbQueryResult.forEach((childDbDoc: any) => {
         let isMatchedEmbeddedDoc = true;
         for (const property in searchQuery) {
-          isMatchedEmbeddedDoc =
-            isMatchedEmbeddedDoc && this._deepEqual(childDbDoc[property], searchQuery[property]);
+          const endsWithIdRegex = /id$/i;
+          const isObjectId = endsWithIdRegex.test(property);
+          if (isObjectId) {
+            isMatchedEmbeddedDoc =
+              childDbDoc[property].toString() == searchQuery[property].toString();
+          } else {
+            isMatchedEmbeddedDoc = this._deepEqual(childDbDoc[property], searchQuery[property]);
+          }
         }
-        return isMatchedEmbeddedDoc;
+        if (isMatchedEmbeddedDoc) {
+          dbDoc = childDbDoc;
+        }
       });
       return dbDoc || dbQueryResult;
     } else {

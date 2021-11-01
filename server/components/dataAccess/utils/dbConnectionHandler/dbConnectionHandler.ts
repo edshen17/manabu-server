@@ -1,5 +1,5 @@
 import { MongoMemoryReplSet } from 'mongodb-memory-server-core';
-import { Mongoose } from 'mongoose';
+import { Mongoose, ObjectId } from 'mongoose';
 import { StringKeyObject } from '../../../../types/custom';
 
 class DbConnectionHandler {
@@ -9,6 +9,7 @@ class DbConnectionHandler {
 
   public connect = async (): Promise<void> => {
     const isDbConnected = this._mongoose.connection.readyState != 0;
+    (this._mongoose as any).ObjectId.get((v: ObjectId) => v.toString());
     if (!isDbConnected) {
       const dbUri = await this._getDbUri();
       const mongoDbOptions = this._getMongoDbOptions();
@@ -32,11 +33,7 @@ class DbConnectionHandler {
 
   private _getMongoDbOptions = (): StringKeyObject => {
     const mongoDbOptions = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
       ignoreUndefined: true,
-      useCreateIndex: true,
       readPreference: 'primary',
     };
     if (process.env.NODE_ENV == 'production') {

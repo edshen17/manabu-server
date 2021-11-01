@@ -141,7 +141,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
             this._processResourceOwnership({ resourceData: embeddedObj, userId });
         });
       } else {
-        isResourceOwner = isResourceOwner || this._deepEqual(value, userId);
+        isResourceOwner = isResourceOwner || value.toString() == userId;
       }
     }
     return isResourceOwner;

@@ -47,7 +47,7 @@ class CacheDbService {
         });
       } else {
         const endsWithIdRegex = /id$/i;
-        const isObjectId = property.match(endsWithIdRegex) && value.length === 24;
+        const isObjectId = endsWithIdRegex.test(property) && value.length === 24;
         const isDateProperty = property.includes('Date');
         const isDateStr = this._isDateStr(value) && isDateProperty;
         if (isObjectId) {

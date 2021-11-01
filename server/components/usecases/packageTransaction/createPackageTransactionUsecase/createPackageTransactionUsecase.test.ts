@@ -1,34 +1,34 @@
 // import { expect } from 'chai';
+// import { makeCreatePackageTransactionUsecase } from '.';
 // import { JoinedUserDoc } from '../../../../models/User';
-// import { StringKeyObject } from '../../../../types/custom';
-// import { makeCacheDbService } from '../../../dataAccess/services/cache';
-// import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 // import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 // import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 // import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 // import { RouteData } from '../../abstractions/IUsecase';
+// import { makeCreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase';
+// import { CreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
 // import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 // import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
-// import { makeJwtHandler } from '../../utils/jwtHandler';
-// import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
+// import {
+//   CreatePackageTransactionUsecase,
+//   CreatePackageTransactionUsecaseResponse,
+// } from './createPackageTransactionUsecase';
 
 // let controllerDataBuilder: ControllerDataBuilder;
 // let fakeDbUserFactory: FakeDbUserFactory;
 // let fakeTeacher: JoinedUserDoc;
-// let jwtHandler: JwtHandler;
 // let createPackageTransactionUsecase: CreatePackageTransactionUsecase;
-// let cacheDbService: CacheDbService;
-// let routeData: RouteData;
+// let createPackageTransactionCheckoutUsecase: CreatePackageTransactionCheckoutUsecase;
+// let createPackageTransactionUsecaseRouteData: RouteData;
+// let createPackageTransactionCheckoutRouteData: RouteData;
 // let fakeUser: JoinedUserDoc;
 // let currentAPIUser: CurrentAPIUser;
-// let toTokenObj: StringKeyObject;
 
 // before(async () => {
 //   controllerDataBuilder = makeControllerDataBuilder;
 //   createPackageTransactionUsecase = await makeCreatePackageTransactionUsecase;
+//   createPackageTransactionCheckoutUsecase = await makeCreatePackageTransactionCheckoutUsecase;
 //   fakeDbUserFactory = await makeFakeDbUserFactory;
-//   jwtHandler = await makeJwtHandler;
-//   cacheDbService = await makeCacheDbService;
 // });
 
 // beforeEach(async () => {
@@ -38,44 +38,47 @@
 //     userId: fakeUser._id,
 //     role: fakeUser.role,
 //   };
-//   const userIdToken = fakeUser._id.toString();
-//   routeData = {
+//   createPackageTransactionCheckoutRouteData = {
+//     headers: {},
+//     params: {},
+//     body: {
+//       teacherId: fakeTeacher.teacherData!._id,
+//       packageId: fakeTeacher.teacherData!.packages[0]._id,
+//       lessonDuration: 60,
+//       lessonLanguage: 'ja',
+//     },
+//     query: {
+//       paymentGateway: 'paypal',
+//     },
+//     endpointPath: '',
+//   };
+//   createPackageTransactionUsecaseRouteData = {
 //     params: {},
 //     body: {},
 //     query: {
-//       token: userIdToken,
+//       token: fakeUser._id.toString(),
 //     },
 //     endpointPath: '',
 //     headers: {},
 //   };
-//   toTokenObj = {
-//     teacherId: fakeTeacher.teacherData!._id,
-//     packageId: fakeTeacher.teacherData!.packages[0]._id,
-//     lessonDuration: 60,
-//     lessonLanguage: 'ja',
-//     lessonAmount: 5,
-//   };
-//   const jwt = jwtHandler.sign({
-//     toTokenObj: { toTokenObj, resourceName: 'packageTransaction' },
-//     expiresIn: '1d',
-//   });
-//   await cacheDbService.set({
-//     hashKey: 'usercheckouttoken',
-//     key: userIdToken,
-//     value: jwt,
-//     ttlMs: TTL_MS.DAY,
-//   });
 // });
 
 // describe('createPackageTransactionUsecase', () => {
 //   describe('makeRequest', () => {
 //     const createPackageTransaction = async () => {
-//       const controllerData = controllerDataBuilder
-//         .routeData(routeData)
+//       const createPackageTransactionCheckoutControllerData = controllerDataBuilder
+//         .routeData(createPackageTransactionUsecaseRouteData)
+//         .currentAPIUser(currentAPIUser)
+//         .build();
+//       await createPackageTransactionCheckoutUsecase.makeRequest(
+//         createPackageTransactionCheckoutControllerData
+//       );
+//       const createPackageTransactionControllerData = controllerDataBuilder
+//         .routeData(createPackageTransactionUsecaseRouteData)
 //         .currentAPIUser(currentAPIUser)
 //         .build();
 //       const createPackageTransactionRes = await createPackageTransactionUsecase.makeRequest(
-//         controllerData
+//         createPackageTransactionControllerData
 //       );
 //       return createPackageTransactionRes;
 //     };
@@ -91,7 +94,7 @@
 //     context('db access permitted', () => {
 //       context('invalid inputs', () => {
 //         it('should throw an error if invalid token', async () => {
-//           routeData.query.token = 'bad token';
+//           createPackageTransactionUsecaseRouteData.query.token = 'bad token';
 //           await testPackageTransactionError();
 //         });
 //         it('should throw an error if token has been used more than once', async () => {
