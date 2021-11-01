@@ -3,49 +3,28 @@ import { stripe } from '../../../../components/paymentHandlers/stripe';
 
 const packageTransactions = express.Router();
 
-packageTransactions.post('/', () => {
-  // do webhook stuff here
-});
-
 // get meta data, if packageTransaction, create
 // if other thing, do not create
-// pass token and make webhook omni/independent -- create then invalidate...
 
 // function _handleStripeWebhook, etc...
-packageTransactions.post('/webhook', async (req, res) => {
-  let data;
-  let eventType;
-  // change to dev secret if not production
+packageTransactions.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const sig: any = req.headers['stripe-signature'];
   const webhookSecret = 'whsec_CB0N6A02vhjNDHLqJBaQFhJfMENy6nkG';
+  let event;
 
-  if (webhookSecret) {
-    // Retrieve the event by verifying the signature using the raw body and secret.
-    let event;
-    const signature = req.headers['stripe-signature'];
-
-    try {
-      event = stripe.webhooks.constructEvent((req as any)['rawBody'], signature!, webhookSecret);
-    } catch (err) {
-      console.log(`⚠️  Webhook signature verification failed.`);
-      return res.sendStatus(400);
-    }
-    // Extract the object from the event.
-    data = event.data;
-    eventType = event.type;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err: any) {
+    // On error, log and return the error message
+    console.log(`❌ Error message: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  switch (eventType) {
-    case 'payment_intent.succeeded':
-      // create package transaction if meta data is package transaction, createPackageusecase
-      break;
-    case 'invoice.paid':
-      break;
-    case 'invoice.payment_failed':
-      break;
-    default:
-    // Unhandled event type
-  }
-  res.sendStatus(200);
+  // Successfully constructed event
+  console.log('✅ Success:', event.id);
+
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
 });
 
 export { packageTransactions };

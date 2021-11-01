@@ -23,11 +23,6 @@ let dbConnectionHandler: DbConnectionHandler;
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  express.json({
-    verify: (req, res, buffer) => ((req as any)['rawBody'] = buffer),
-  })
-);
 app.use(hpp());
 app.use(cookieParser());
 app.use(cors(corsConfig));
@@ -37,9 +32,17 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
+
 app.use(compression());
 app.use(mongoSanitize());
 app.all('*', verifyToken);
+app.use((req, res, next) => {
+  if (req.originalUrl.includes('/webhook')) {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 app.use('/api/', v1);
 
 if (process.env.NODE_ENV == 'production') {

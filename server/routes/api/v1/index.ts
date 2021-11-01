@@ -2,6 +2,7 @@ import express from 'express';
 import { appointments } from './appointments';
 import { availableTimes } from './availableTimes';
 import { packages } from './packages';
+import { packageTransactions } from './packageTransactions';
 import { teachers } from './teachers/index';
 import { users } from './users/index';
 import { utils } from './utils';
@@ -13,5 +14,6 @@ api.use('/packages', packages);
 api.use('/teachers', teachers);
 api.use('/users', users);
 api.use('/utils', utils);
+api.use('/packageTransactions', packageTransactions);
 
 export { api };
