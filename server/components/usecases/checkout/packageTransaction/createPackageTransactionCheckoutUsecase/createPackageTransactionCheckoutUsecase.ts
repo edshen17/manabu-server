@@ -2,7 +2,10 @@ import { ObjectId } from 'mongoose';
 import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
-import { DbServiceAccessOptions } from '../../../../dataAccess/abstractions/IDbService';
+import {
+  DbServiceAccessOptions,
+  DB_SERVICE_COLLECTIONS,
+} from '../../../../dataAccess/abstractions/IDbService';
 import { CacheDbService, TTL_MS } from '../../../../dataAccess/services/cache/cacheDbService';
 import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
 import { PackageTransactionEntityBuildParams } from '../../../../entities/packageTransaction/packageTransactionEntity';
@@ -56,7 +59,8 @@ type GetPaymentHandlerRedirectUrlParams = Await<
 type SetPackageTransactionJwtParams = {
   teacherPackage: PackageDoc;
   body: StringKeyObject;
-  userId: ObjectId | undefined;
+  userId?: ObjectId;
+  userToken: string;
   teacher: JoinedUserDoc;
   processedPaymentHandlerData: Await<
     ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerData']>
@@ -152,12 +156,14 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
     const { body, currentAPIUser, teacher, teacherPackage } = props;
     const { userId } = currentAPIUser;
+    const userToken = `${userId}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`;
     const processedPaymentHandlerData = await this._getProcessedPaymentHandlerData(props);
     const { item } = processedPaymentHandlerData;
     await this._setPackageTransactionJwt({
       body,
       teacherPackage,
       teacher,
+      userToken,
       userId,
       processedPaymentHandlerData,
     });
@@ -166,7 +172,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       successRedirectUrl: 'https://manabu.sg/dashboard',
       cancelRedirectUrl: 'https://manabu.sg/cancel',
       currency: this._defaultCurrency,
-      token: userId!.toString(),
+      token: userToken,
     };
     return processedPaymentHandlerParams;
   };
@@ -206,16 +212,16 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _setPackageTransactionJwt = async (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
-    const { userId } = setPackageTransactionJwtParams;
+    const { userToken } = setPackageTransactionJwtParams;
     const packageTransactionEntityBuildParams =
       this._convertBodyToPackageTransactionEntityBuildParams(setPackageTransactionJwtParams);
     const jwt = this._jwtHandler.sign({
-      toTokenObj: { packageTransactionEntityBuildParams, resourceName: 'packageTransaction' },
+      toTokenObj: { packageTransactionEntityBuildParams },
       expiresIn: '1d',
     });
     await this._cacheDbService.set({
       hashKey: CHECKOUT_TOKEN_HASH_KEY,
-      key: userId!.toString(),
+      key: userToken,
       value: jwt,
       ttlMs: TTL_MS.DAY,
     });

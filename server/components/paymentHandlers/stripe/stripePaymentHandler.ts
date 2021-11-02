@@ -26,7 +26,9 @@ class StripePaymentHandler extends AbstractPaymentHandler<
           client: 'web',
         },
       },
-      metadata: { token },
+      payment_intent_data: {
+        metadata: { token },
+      },
     } as Stripe.Checkout.SessionCreateParams;
     return createPaymentJson;
   };

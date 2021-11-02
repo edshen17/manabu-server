@@ -67,13 +67,13 @@ enum DB_SERVICE_CACHE_CLIENT {
 }
 
 // does not follow snake case because of mongo collection names
-enum DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS {
+enum DB_SERVICE_COLLECTIONS {
   APPOINTMENTS = 'appointments',
-  MINUTE_BANKS = 'minutebanks',
-  PACKAGE_TRANSACTIONS = 'packagetransactions',
+  AVAILABLE_TIMES = 'availabletimes',
   PACKAGES = 'packages',
-  USERS = 'users',
+  PACKAGE_TRANSACTIONS = 'packagetransactions',
   TEACHERS = 'teachers',
+  USERS = 'users',
 }
 
 type DbServiceFindByIdParams = BaseDbServiceParams & SearchIdDbServiceParams;
@@ -111,7 +111,7 @@ export {
   DB_SERVICE_JOIN_TYPE,
   DB_SERVICE_MODEL_VIEW,
   DB_SERVICE_CACHE_CLIENT,
-  DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
+  DB_SERVICE_COLLECTIONS,
   DbServiceFindByIdParams,
   DbServiceFindOneParams,
   DbServiceFindParams,

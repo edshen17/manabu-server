@@ -9,19 +9,15 @@ const packageTransactions = express.Router();
 // function _handleStripeWebhook, etc...
 packageTransactions.post('/webhook', express.raw({ type: 'application/json' }), (req, res) => {
   const sig: any = req.headers['stripe-signature'];
-  const webhookSecret = 'whsec_CB0N6A02vhjNDHLqJBaQFhJfMENy6nkG';
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECREY_KEY_DEV!;
   let event;
-
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
   } catch (err: any) {
-    // On error, log and return the error message
-    console.log(`❌ Error message: ${err.message}`);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Successfully constructed event
-  console.log('✅ Success:', event.id);
+  console.dir(event, { depth: null });
 
   // Return a response to acknowledge receipt of the event
   res.json({ received: true });

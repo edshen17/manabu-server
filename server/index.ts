@@ -38,6 +38,7 @@ app.use(mongoSanitize());
 app.all('*', verifyToken);
 app.use((req, res, next) => {
   if (req.originalUrl.includes('/webhook')) {
+    // change to /webhooks/stripe
     next();
   } else {
     express.json()(req, res, next);

@@ -36,6 +36,7 @@ describe('stripePaymentHandler', () => {
       const executeSinglePaymentRes = await stripePaymentHandler.executeSinglePayment(
         paymentHandlerExecuteParams
       );
+      // console.log(executeSinglePaymentRes.redirectUrl);
       expect(executeSinglePaymentRes).to.have.property('redirectUrl');
     });
   });

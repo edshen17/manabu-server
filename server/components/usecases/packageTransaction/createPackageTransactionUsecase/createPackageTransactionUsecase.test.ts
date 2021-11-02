@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { makeCreatePackageTransactionUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { DB_SERVICE_COLLECTIONS } from '../../../dataAccess/abstractions/IDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -56,7 +57,7 @@ beforeEach(async () => {
     params: {},
     body: {},
     query: {
-      token: fakeUser._id.toString(),
+      token: `${fakeUser._id}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`,
     },
     endpointPath: '',
     headers: {},

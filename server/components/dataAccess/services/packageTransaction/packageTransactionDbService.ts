@@ -3,7 +3,7 @@ import { StringKeyObject } from '../../../../types/custom';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
 import {
   DbServiceAccessOptions,
-  DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS,
+  DB_SERVICE_COLLECTIONS,
   DB_SERVICE_JOIN_TYPE,
 } from '../../abstractions/IDbService';
 import { PackageDbService } from '../package/packageDbService';
@@ -53,7 +53,7 @@ class PackageTransactionDbService extends AbstractDbService<
   };
 
   protected _getCacheDependencies = (): string[] => {
-    return [DB_SERVICE_CACHE_DEPENDENCY_COLLECTIONS.APPOINTMENTS];
+    return [DB_SERVICE_COLLECTIONS.APPOINTMENTS];
   };
 
   protected _initTemplate = async (

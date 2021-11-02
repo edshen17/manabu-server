@@ -1,23 +1,18 @@
 import { expect } from 'chai';
 import { makeTeacherDbService } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { MinuteBankDoc } from '../../../../models/MinuteBank';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { TeacherDoc } from '../../../../models/Teacher';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { makeFakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory';
 import { FakeDbAppointmentFactory } from '../../testFixtures/fakeDbAppointmentFactory/fakeDbAppointmentFactory';
-import { makeFakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory';
-import { FakeDbMinuteBankFactory } from '../../testFixtures/fakeDbMinuteBankFactory/fakeDbMinuteBankFactory';
 import { makeFakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
 import { makeFakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { makeAppointmentDbService } from '../appointment';
 import { AppointmentDbService } from '../appointment/appointmentDbService';
-import { makeMinuteBankDbService } from '../minuteBank';
-import { MinuteBankDbService } from '../minuteBank/minuteBankDbService';
 import { makePackageTransactionDbService } from '../packageTransaction';
 import { PackageTransactionDbService } from '../packageTransaction/packageTransactionDbService';
 import { makeUserDbService } from '../user';
@@ -28,28 +23,23 @@ let userDbService: UserDbService;
 let teacherDbService: TeacherDbService;
 let packageTransactionDbService: PackageTransactionDbService;
 let appointmentDbService: AppointmentDbService;
-let minuteBankDbService: MinuteBankDbService;
 let dbServiceAccessOptions: DbServiceAccessOptions;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeDbPackageTransactionFactory: FakeDbPackageTransactionFactory;
 let fakeDbAppointmentFactory: FakeDbAppointmentFactory;
-let fakeDbMinuteBankFactory: FakeDbMinuteBankFactory;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
 let fakePackageTransaction: PackageTransactionDoc;
 let fakeAppointment: AppointmentDoc;
-let fakeMinuteBank: MinuteBankDoc;
 
 before(async () => {
   userDbService = await makeUserDbService;
   teacherDbService = await makeTeacherDbService;
   packageTransactionDbService = await makePackageTransactionDbService;
   appointmentDbService = await makeAppointmentDbService;
-  minuteBankDbService = await makeMinuteBankDbService;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
   fakeDbAppointmentFactory = await makeFakeDbAppointmentFactory;
-  fakeDbMinuteBankFactory = await makeFakeDbMinuteBankFactory;
 });
 
 beforeEach(async () => {
@@ -75,10 +65,6 @@ beforeEach(async () => {
     packageTransactionId: fakePackageTransaction._id,
     startDate: new Date(),
     endDate,
-  });
-  fakeMinuteBank = await fakeDbMinuteBankFactory.createFakeDbData({
-    hostedById: fakeTeacher._id,
-    reservedById: fakeUser._id,
   });
 });
 
