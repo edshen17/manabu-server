@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { makeCreatePackageTransactionUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
-import { DB_SERVICE_COLLECTIONS } from '../../../dataAccess/abstractions/IDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -56,9 +55,7 @@ beforeEach(async () => {
   createPackageTransactionUsecaseRouteData = {
     params: {},
     body: {},
-    query: {
-      token: `${fakeUser._id}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`,
-    },
+    query: {},
     endpointPath: '',
     headers: {},
   };
@@ -71,9 +68,15 @@ describe('createPackageTransactionUsecase', () => {
         .routeData(createPackageTransactionCheckoutRouteData)
         .currentAPIUser(currentAPIUser)
         .build();
-      await createPackageTransactionCheckoutUsecase.makeRequest(
-        createPackageTransactionCheckoutControllerData
-      );
+      const createPackageTransactionCheckoutRes =
+        await createPackageTransactionCheckoutUsecase.makeRequest(
+          createPackageTransactionCheckoutControllerData
+        );
+      const { token } = createPackageTransactionCheckoutRes;
+      createPackageTransactionUsecaseRouteData.query = {
+        token,
+        paymentId: 'some payment id',
+      };
       const createPackageTransactionControllerData = controllerDataBuilder
         .routeData(createPackageTransactionUsecaseRouteData)
         .currentAPIUser(currentAPIUser)
@@ -94,10 +97,6 @@ describe('createPackageTransactionUsecase', () => {
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
-        it('should throw an error if invalid token', async () => {
-          createPackageTransactionUsecaseRouteData.query.token = 'bad token';
-          await testPackageTransactionError();
-        });
         it('should throw an error if token has been used more than once', async () => {
           await createPackageTransaction();
           let error;

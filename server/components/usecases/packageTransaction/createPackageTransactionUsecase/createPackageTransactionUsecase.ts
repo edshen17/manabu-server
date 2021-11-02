@@ -1,4 +1,5 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 import { PackageTransactionDbServiceResponse } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
@@ -34,9 +35,8 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionUsecaseResponse> => {
     const { query, dbServiceAccessOptions } = props;
-    const { token } = query;
     const packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams =
-      await this._getPackageTransactionEntityBuildParams(token);
+      await this._getPackageTransactionEntityBuildParams(<StringKeyObject>query);
     const packageTransaction = await this._createPackageTransaction({
       packageTransactionEntityBuildParams,
       dbServiceAccessOptions,
@@ -48,13 +48,15 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   };
 
   private _getPackageTransactionEntityBuildParams = async (
-    token: string
+    query: StringKeyObject
   ): Promise<PackageTransactionEntityBuildParams> => {
+    const { token, paymentId } = query;
     const jwt = await this._cacheDbService.get({
       hashKey: CHECKOUT_TOKEN_HASH_KEY,
       key: token,
     });
     const { packageTransactionEntityBuildParams } = await this._jwtHandler.verify(jwt);
+    packageTransactionEntityBuildParams.paymentData.id = paymentId || '';
     await this._jwtHandler.blacklist(jwt);
     return packageTransactionEntityBuildParams;
   };

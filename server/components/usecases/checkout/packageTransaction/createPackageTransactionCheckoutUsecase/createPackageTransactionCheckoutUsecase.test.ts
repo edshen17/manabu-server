@@ -88,6 +88,7 @@ describe('createPackageTransactionCheckoutUsecase', () => {
         const validResOutput = async () => {
           const createPackageTransactionCheckoutRes = await createPackageTransactionCheckout();
           expect(createPackageTransactionCheckoutRes).to.have.property('redirectUrl');
+          expect(createPackageTransactionCheckoutRes).to.have.property('token');
         };
         context('one-time payment', () => {
           context('paypal', () => {

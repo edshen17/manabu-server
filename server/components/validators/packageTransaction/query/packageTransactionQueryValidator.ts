@@ -10,6 +10,7 @@ class PackageTransactionQueryValidator extends AbstractQueryValidator {
           this._joi.objectId(),
           this._joi.string().max(2048)
         ),
+      paymentId: this._joi.string().max(2048).allow(''),
     });
   };
 }

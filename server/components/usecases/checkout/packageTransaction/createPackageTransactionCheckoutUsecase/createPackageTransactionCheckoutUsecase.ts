@@ -42,6 +42,7 @@ type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
 
 type CreatePackageTransactionCheckoutUsecaseResponse = {
   redirectUrl: string;
+  token: string;
 };
 
 type GetRedirectUrlParams = MakeRequestTemplateParams & TestBodyResponse;
@@ -89,14 +90,11 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionCheckoutUsecaseResponse> => {
     const testBodyRes = await this._testBody(props);
-    const redirectUrl = await this._getRedirectUrl({
+    const packageTransactionCheckoutRes = await this._getPackageTransactionCheckoutResponse({
       ...props,
       ...testBodyRes,
     });
-    const usecaseRes = {
-      redirectUrl,
-    };
-    return usecaseRes;
+    return packageTransactionCheckoutRes;
   };
 
   private _testBody = async (props: {
@@ -132,10 +130,13 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return { teacher, teacherData, teacherPackage };
   };
 
-  private _getRedirectUrl = async (props: GetRedirectUrlParams): Promise<string> => {
+  private _getPackageTransactionCheckoutResponse = async (
+    props: GetRedirectUrlParams
+  ): Promise<CreatePackageTransactionCheckoutUsecaseResponse> => {
     const { query } = props;
     const { paymentGateway } = query;
     const processedPaymentHandlerParams = await this._getProcessedPaymentHandlerParams(props);
+    const { token } = processedPaymentHandlerParams;
     let redirectUrl = '';
     switch (paymentGateway) {
       case PAYMENT_GATEWAY_NAME.PAYPAL:
@@ -150,7 +151,8 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       default:
         throw new Error('Invalid payment handler query.');
     }
-    return redirectUrl;
+    const packageTransactionCheckoutUsecaseRes = { redirectUrl, token };
+    return packageTransactionCheckoutUsecaseRes;
   };
 
   private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
