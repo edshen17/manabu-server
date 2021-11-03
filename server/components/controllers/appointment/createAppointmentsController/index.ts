@@ -6,7 +6,7 @@ import { CreateAppointmentsController } from './createAppointmentsController';
 
 const makeCreateAppointmentsController = new CreateAppointmentsController({
   successStatusCode: StatusCodes.CREATED,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.CONFLICT,
 }).init({
   makeUsecase: makeCreateAppointmentsUsecase,
   makeQueryStringHandler,

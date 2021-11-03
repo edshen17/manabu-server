@@ -6,8 +6,8 @@ import { CreatePackageTransactionCheckoutController } from './createPackageTrans
 
 const makeCreatePackageTransactionCheckoutController =
   new CreatePackageTransactionCheckoutController({
-    successStatusCode: StatusCodes.OK,
-    errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+    successStatusCode: StatusCodes.CREATED,
+    errorStatusCode: StatusCodes.CONFLICT,
   }).init({
     makeUsecase: makeCreatePackageTransactionCheckoutUsecase,
     makeQueryStringHandler,

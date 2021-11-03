@@ -72,13 +72,13 @@ describe('createAvailableTimeController', () => {
       it('should throw an error if user input is invalid', async () => {
         body = {};
         const createAvailableTimeRes = await createAvailableTime();
-        expect(createAvailableTimeRes.statusCode).to.equal(500);
+        expect(createAvailableTimeRes.statusCode).to.equal(409);
       });
       it('should throw an error if the user is not logged in', async () => {
         currentAPIUser.userId = undefined;
         currentAPIUser.teacherId = undefined;
         const createAvailableTimeRes = await createAvailableTime();
-        expect(createAvailableTimeRes.statusCode).to.equal(500);
+        expect(createAvailableTimeRes.statusCode).to.equal(409);
       });
     });
   });

@@ -6,7 +6,7 @@ import { CreateUserController } from './createUserController';
 
 const makeCreateUserController = new CreateUserController({
   successStatusCode: StatusCodes.CREATED,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.CONFLICT,
 }).init({ makeUsecase: makeCreateUserUsecase, makeQueryStringHandler, convertStringToObjectId });
 
 export { makeCreateUserController };

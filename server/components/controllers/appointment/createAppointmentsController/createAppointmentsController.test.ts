@@ -97,52 +97,52 @@ describe('createAppointmentsController', () => {
       it('should throw an error if user input is invalid', async () => {
         firstAppointment.startDate = new Date();
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if there is an appointment overlap', async () => {
         await createAppointments();
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
 
       it('should throw an error if body contains an hostedById other than the currentAPIUser id', async () => {
         firstAppointment.hostedById = convertStringToObjectId('507f1f77bcf86cd799439011');
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if body contains an foreign keys that do not exist', async () => {
         firstAppointment.hostedById = convertStringToObjectId('507f1f77bcf86cd799439011');
         firstAppointment.reservedById = convertStringToObjectId('507f1f77bcf86cd799439011');
         firstAppointment.packageTransactionId = convertStringToObjectId('507f1f77bcf86cd799439011');
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if the lesson duration is wrong', async () => {
         firstAppointment.endDate = dayjs(firstAppointment.endDate).add(1, 'hour').toDate();
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if no corresponding available time exists', async () => {
         firstAppointment.startDate = dayjs().add(5, 'hour').toDate();
         firstAppointment.endDate = dayjs().add(6, 'hour').toDate();
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if appointment goes over available time', async () => {
         firstAppointment.startDate = dayjs(firstAppointment.startDate).add(3, 'hour').toDate();
         firstAppointment.endDate = dayjs(firstAppointment.startDate).add(4, 'hour').toDate();
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if one of the appointments is not of the same type', async () => {
         secondAppointment.packageTransactionId = secondFakePackageTransaction._id;
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if the user is not logged in', async () => {
         currentAPIUser.userId = undefined;
         const createAppointmentsRes = await createAppointments();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
     });
   });

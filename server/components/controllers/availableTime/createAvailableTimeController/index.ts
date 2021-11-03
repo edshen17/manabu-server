@@ -6,7 +6,7 @@ import { CreateAvailableTimeController } from './createAvailableTimeController';
 
 const makeCreateAvailableTimeController = new CreateAvailableTimeController({
   successStatusCode: StatusCodes.CREATED,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.CONFLICT,
 }).init({
   makeUsecase: makeCreateAvailableTimeUsecase,
   makeQueryStringHandler,

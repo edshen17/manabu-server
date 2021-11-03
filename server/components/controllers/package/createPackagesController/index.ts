@@ -6,7 +6,7 @@ import { CreatePackagesController } from './createPackagesController';
 
 const makeCreatePackagesController = new CreatePackagesController({
   successStatusCode: StatusCodes.CREATED,
-  errorStatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+  errorStatusCode: StatusCodes.CONFLICT,
 }).init({
   makeUsecase: makeCreatePackagesUsecase,
   makeQueryStringHandler,

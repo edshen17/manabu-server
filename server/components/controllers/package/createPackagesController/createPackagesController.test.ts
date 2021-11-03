@@ -69,13 +69,13 @@ describe('createPackagesController', () => {
       it('should throw an error if user input is invalid', async () => {
         body.packages[0].hostedById = 'some id';
         const createAppointmentsRes = await createPackages();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
       it('should throw an error if the user is not a teacher', async () => {
         currentAPIUser.userId = fakeUser._id;
         currentAPIUser.teacherId = undefined;
         const createAppointmentsRes = await createPackages();
-        expect(createAppointmentsRes.statusCode).to.equal(500);
+        expect(createAppointmentsRes.statusCode).to.equal(409);
       });
     });
   });

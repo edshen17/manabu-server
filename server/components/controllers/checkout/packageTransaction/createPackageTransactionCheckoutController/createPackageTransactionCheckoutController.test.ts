@@ -65,12 +65,12 @@ describe('createPackageTransactionCheckoutController', () => {
     };
     const testValidPackageTransactionCheckout = async () => {
       const createPackageTransactionCheckoutRes = await createPackageTransactionCheckout();
-      expect(createPackageTransactionCheckoutRes.statusCode).to.equal(200);
+      expect(createPackageTransactionCheckoutRes.statusCode).to.equal(201);
       expect(createPackageTransactionCheckoutRes.body).to.have.property('redirectUrl');
     };
     const testInvalidPackageTransactionCheckout = async () => {
       const createPackageTransactionCheckoutRes = await createPackageTransactionCheckout();
-      expect(createPackageTransactionCheckoutRes.statusCode).to.equal(500);
+      expect(createPackageTransactionCheckoutRes.statusCode).to.equal(409);
     };
     context('valid inputs', () => {
       context('paypal', () => {

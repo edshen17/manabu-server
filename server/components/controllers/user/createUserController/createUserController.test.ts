@@ -60,5 +60,19 @@ describe('createUserController', () => {
         }
       });
     });
+    context('invalid inputs', () => {
+      it('should return an error if user creation fails', async () => {
+        const createUserHttpRequest = iHttpRequestBuilder
+          .body({
+            name: faker.name.findName(),
+            password: '',
+            email: faker.internet.email(),
+          })
+          .path('/register')
+          .build();
+        const createUserRes = await createUserController.makeRequest(createUserHttpRequest);
+        expect(createUserRes.statusCode).to.equal(409);
+      });
+    });
   });
 });
