@@ -63,7 +63,7 @@ class IHttpRequestBuilder {
       query: this._query,
       params: this._params,
       currentAPIUser: this._currentAPIUser,
-      headers: this._params,
+      headers: this._headers,
     };
     this._setDefaultProperties();
     return iHttpRequest;

@@ -5,8 +5,8 @@ import { makeCreateStripeWebhookUsecase } from '../../../../usecases/webhooks/st
 import { CreateStripeWebhookController } from './createStripeWebhookController';
 
 const makeCreateStripeWebhookController = new CreateStripeWebhookController({
-  successStatusCode: StatusCodes.OK,
-  errorStatusCode: StatusCodes.UNAUTHORIZED,
+  successStatusCode: StatusCodes.CREATED,
+  errorStatusCode: StatusCodes.CONFLICT,
 }).init({
   makeUsecase: makeCreateStripeWebhookUsecase,
   makeQueryStringHandler,
