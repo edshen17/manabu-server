@@ -99,7 +99,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
       .endpoint('/dashboard')
-      .stringifyQueryStringObj(query)
+      .encodeQueryStringObj(query)
       .build();
     const usecaseRes = {
       user,
@@ -180,7 +180,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _createGraphAdminTeacherEdge = async (user: JoinedUserDoc): Promise<void> => {
     await this._cacheDbService.graphQuery(
       `MATCH (teacher: User {_id: "${user._id}"}), (admin: User {_id:"${process.env
-        .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date()}"}]->(teacher)`
+        .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date().toISOString()}"}]->(teacher)`
     );
   };
 

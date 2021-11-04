@@ -50,13 +50,6 @@ class RedirectUrlBuilder {
     return this;
   };
 
-  public stringifyQueryStringObj = (toStringifyObj: {}) => {
-    const stringifiedQueryStrings =
-      this._queryStringHandler.stringifyQueryStringObj(toStringifyObj);
-    this._redirectExpressCallbackOptions.queryStrings = stringifiedQueryStrings;
-    return this;
-  };
-
   public build = (): string => {
     const { host, endpoint, queryStrings } = this._redirectExpressCallbackOptions || {};
     this._setDefaultProperties();

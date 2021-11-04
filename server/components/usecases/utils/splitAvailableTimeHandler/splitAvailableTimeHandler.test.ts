@@ -82,14 +82,18 @@ describe('splitAvailableTimeHandler', () => {
           appointmentEndDate: dayjs().add(1, 'hour').toDate(),
         };
         const updatedAvailableTime = await splitAvailableTime(splitAvailableTimeParams);
-
         expect(
-          dayjs(updatedAvailableTime.startDate).isSame(dayjs(fakeAvailableTime.startDate))
+          dayjs(updatedAvailableTime.startDate).isSame(dayjs(fakeAvailableTime.startDate), 'minute')
         ).to.equal(false);
-        expect(updatedAvailableTime.endDate).to.deep.equal(fakeAvailableTime.endDate);
-        expect(updatedAvailableTime.startDate).to.deep.equal(
-          splitAvailableTimeParams.appointmentEndDate
-        );
+        expect(
+          dayjs(updatedAvailableTime.endDate).isSame(dayjs(fakeAvailableTime.endDate), 'minute')
+        ).to.equal(true);
+        expect(
+          dayjs(updatedAvailableTime.startDate).isSame(
+            dayjs(splitAvailableTimeParams.appointmentEndDate),
+            'minute'
+          )
+        ).to.equal(true);
       });
     });
     context(
