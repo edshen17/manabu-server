@@ -15,4 +15,6 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 1. `git clone https://github.com/edshen17/manabu-server.git --branch ts-refactor --single-branch --config core.autocrlf=false`
 2. `npm install`
-3. Create a .env file in the root directory and add the secret keys. Please ask the project manager for them.
+3. Create a .env file in the root directory to add secret API keys. Please ask the project manager for them.
+
+When running tests, avoid closing them mid-way thru ctrl + c because stops cleanup. If you stop it, and use windows, check your /users/temp files and make sure to empty them

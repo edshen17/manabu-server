@@ -1,0 +1,19 @@
+diff --git a/node_modules/ts-mongoose/Type.d.ts b/node_modules/ts-mongoose/Type.d.ts
+index a5a83f8..076b49d 100644
+--- a/node_modules/ts-mongoose/Type.d.ts
++++ b/node_modules/ts-mongoose/Type.d.ts
+@@ -1,12 +1,12 @@
+ /// <reference path="plugin.d.ts" />
+-import { Types } from 'mongoose';
++import { ObjectId, Types } from 'mongoose';
+ import { Convert, EnumOrString, Extract, GetType, TypeOptions, GetSubDocument, ArrElement } from './types';
+ export declare const Type: {
+     number: <O extends TypeOptions<number>>(options?: O | undefined) => GetType<O, number>;
+     boolean: <O_1 extends TypeOptions<boolean>>(options?: O_1 | undefined) => GetType<O_1, boolean>;
+     date: <O_2 extends TypeOptions<Date>>(options?: O_2 | undefined) => GetType<O_2, Date>;
+     mixed: <O_3 extends TypeOptions<any>>(options?: O_3 | undefined) => GetType<O_3, any>;
+-    objectId: <O_4 extends TypeOptions<Types.ObjectId>>(options?: O_4 | undefined) => GetType<O_4, Types.ObjectId>;
++    objectId: <O_4 extends TypeOptions<Types.ObjectId>>(options?: O_4 | undefined) => Schema.Types.ObjectId;
+     string: <O_5 extends Pick<import("mongoose").SchemaTypeOpts<string>, string | number> & Partial<Record<"required", boolean> & Record<"select", boolean>> & {
+         enum?: readonly string[] | undefined;
+     }>(options?: O_5 | undefined) => GetType<O_5, EnumOrString<O_5>>;
