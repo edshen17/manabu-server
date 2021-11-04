@@ -19,6 +19,7 @@ class ControllerDataBuilder {
       query: {},
       endpointPath: '',
       headers: {},
+      rawBody: {},
     };
   };
 

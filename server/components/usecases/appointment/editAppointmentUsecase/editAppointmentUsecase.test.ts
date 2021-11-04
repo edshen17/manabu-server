@@ -47,6 +47,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     headers: {},
+    rawBody: {},
   };
   currentAPIUser = {
     role: 'teacher',

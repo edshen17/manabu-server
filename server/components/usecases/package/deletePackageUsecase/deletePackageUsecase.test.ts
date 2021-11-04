@@ -30,6 +30,7 @@ beforeEach(async () => {
     role: fakeTeacher.role,
   };
   routeData = {
+    rawBody: {},
     headers: {},
     params: {
       packageId: fakeTeacher.teacherData!.packages[3]._id,

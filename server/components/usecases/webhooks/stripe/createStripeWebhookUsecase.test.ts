@@ -36,6 +36,7 @@ beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   createPackageTransactionCheckoutRouteData = {
+    rawBody: {},
     headers: {},
     params: {},
     body: {
@@ -88,10 +89,11 @@ beforeEach(async () => {
     secret,
   });
   routeData = {
-    params: {},
-    body: {
+    rawBody: {
       payloadString,
     },
+    params: {},
+    body: {},
     query: {},
     endpointPath: '',
     headers: {

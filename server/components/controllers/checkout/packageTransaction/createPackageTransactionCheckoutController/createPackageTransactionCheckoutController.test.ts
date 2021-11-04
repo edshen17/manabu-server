@@ -67,6 +67,10 @@ describe('createPackageTransactionCheckoutController', () => {
       const createPackageTransactionCheckoutRes = await createPackageTransactionCheckout();
       expect(createPackageTransactionCheckoutRes.statusCode).to.equal(201);
       expect(createPackageTransactionCheckoutRes.body).to.have.property('redirectUrl');
+      console.log(
+        (createPackageTransactionCheckoutRes.body as any).redirectUrl,
+        'checkoutcontroller'
+      );
     };
     const testInvalidPackageTransactionCheckout = async () => {
       const createPackageTransactionCheckoutRes = await createPackageTransactionCheckout();

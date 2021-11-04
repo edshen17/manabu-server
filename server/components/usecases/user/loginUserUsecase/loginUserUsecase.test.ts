@@ -29,6 +29,7 @@ describe('loginUserUsecase', () => {
         const fakeUser = await fakeDbUserFactory.createFakeDbData(fakeUserEntityData);
         const buildLoginUserControllerData = controllerDataBuilder
           .routeData({
+            rawBody: {},
             body: fakeUserEntityData,
             params: {},
             query: {},

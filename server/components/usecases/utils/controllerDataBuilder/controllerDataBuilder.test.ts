@@ -27,6 +27,7 @@ describe('controllerDataBuilder', () => {
         headers: {},
         query: {},
         endpointPath: '',
+        rawBody: {},
       });
     });
     it('should build a valid ControllerData object with an empty current API user and a non-empty routeData object', async () => {
@@ -42,6 +43,7 @@ describe('controllerDataBuilder', () => {
         },
         endpointPath: '',
         headers: {},
+        rawBody: {},
       };
       const controllerData = await controllerDataBuilder.routeData(testRouteData).build();
       expect(controllerData.currentAPIUser).to.deep.equal({

@@ -31,6 +31,7 @@ beforeEach(async () => {
     role: fakeUser.role,
   };
   routeData = {
+    rawBody: {},
     headers: {},
     params: {},
     body: {

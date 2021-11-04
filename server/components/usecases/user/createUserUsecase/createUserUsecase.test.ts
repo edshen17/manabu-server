@@ -17,6 +17,7 @@ before(async () => {
 
 beforeEach(() => {
   routeData = {
+    rawBody: {},
     headers: {},
     params: {},
     body: {

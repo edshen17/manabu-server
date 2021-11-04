@@ -15,6 +15,7 @@ type RouteData = {
   query: StringKeyObject;
   endpointPath: string;
   headers: StringKeyObject;
+  rawBody: StringKeyObject;
 };
 
 type UsecaseInitParams<OptionalUsecaseInitParams, DbServiceResponse> =

@@ -41,6 +41,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     headers: {},
+    rawBody: {},
   };
 });
 

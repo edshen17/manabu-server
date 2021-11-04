@@ -1,5 +1,6 @@
 import { IController } from '../../controllers/abstractions/IController';
 import { IExpressCallback } from './IExpressCallback';
+import { IHttpRequest } from './IHttpRequest';
 abstract class AbstractExpressCallback implements IExpressCallback {
   public abstract consumeTemplate(res: any, body: any): void;
 
@@ -27,24 +28,23 @@ abstract class AbstractExpressCallback implements IExpressCallback {
     };
   };
 
-  private _createHttpRequest = (req: any) => {
+  private _createHttpRequest = (req: any): IHttpRequest => {
+    const { body, query, params, ip, method, path, userId, role, teacherId, headers, rawBody } =
+      req;
     const httpRequest = {
-      body: req.body,
-      query: req.query,
-      params: req.params,
-      ip: req.ip,
-      method: req.method,
-      path: req.path,
+      body,
+      rawBody,
+      query,
+      params,
+      ip,
+      method,
+      path,
       currentAPIUser: {
-        userId: req.userId,
-        role: req.role || 'user',
-        teacherId: req.teacherId,
+        userId: userId,
+        role: role || 'user',
+        teacherId: teacherId,
       },
-      headers: {
-        'Content-Type': req.get('Content-Type'),
-        Referer: req.get('referer'),
-        'User-Agent': req.get('User-Agent'),
-      },
+      headers,
     };
     return httpRequest;
   };

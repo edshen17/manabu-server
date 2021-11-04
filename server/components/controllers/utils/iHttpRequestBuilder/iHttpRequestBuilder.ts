@@ -1,3 +1,4 @@
+import { StringKeyObject } from '../../../../types/custom';
 import {
   CurrentAPIUser,
   IHttpRequest,
@@ -10,6 +11,8 @@ class IHttpRequestBuilder {
   private _params!: {};
   private _currentAPIUser!: CurrentAPIUser;
   private _headers!: {};
+  private _rawBody!: {};
+
   constructor() {
     this._setDefaultProperties();
   }
@@ -24,6 +27,7 @@ class IHttpRequestBuilder {
       role: 'user',
     };
     this._headers = {};
+    this._rawBody = {};
   };
 
   public body = (body: {}): this => {
@@ -56,6 +60,11 @@ class IHttpRequestBuilder {
     return this;
   };
 
+  public rawBody = (rawBody: StringKeyObject): this => {
+    this._rawBody = rawBody;
+    return this;
+  };
+
   public build = (): IHttpRequest => {
     const iHttpRequest: IHttpRequest = {
       body: this._body,
@@ -64,6 +73,7 @@ class IHttpRequestBuilder {
       params: this._params,
       currentAPIUser: this._currentAPIUser,
       headers: this._headers,
+      rawBody: this._rawBody,
     };
     this._setDefaultProperties();
     return iHttpRequest;

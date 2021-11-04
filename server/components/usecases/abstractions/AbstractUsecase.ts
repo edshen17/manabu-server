@@ -9,6 +9,7 @@ import { ControllerData, IUsecase, UsecaseInitParams } from './IUsecase';
 type MakeRequestTemplateParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
   body: any;
+  rawBody: any;
   isValidRequest: boolean;
   isCurrentAPIUserPermitted: boolean;
   params: any;
@@ -38,7 +39,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     controllerData: ControllerData
   ): Promise<MakeRequestTemplateParams> => {
     const { routeData, currentAPIUser } = controllerData;
-    const { body, params, query, endpointPath, headers } = routeData;
+    const { body, params, query, endpointPath, headers, rawBody } = routeData;
     const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       isSelf,
@@ -52,6 +53,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     });
     const makeRequestTemplateParams = {
       dbServiceAccessOptions,
+      rawBody,
       body,
       isValidRequest,
       isCurrentAPIUserPermitted,

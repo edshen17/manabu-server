@@ -40,6 +40,7 @@ beforeEach(async () => {
     dbServiceAccessOptions,
   });
   routeData = {
+    rawBody: {},
     headers: {},
     params: {},
     body: {},

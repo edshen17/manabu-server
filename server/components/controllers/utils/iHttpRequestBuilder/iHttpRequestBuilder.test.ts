@@ -29,6 +29,7 @@ describe('IHttpRequestBuilder', () => {
           role: 'user',
         },
         headers: {},
+        rawBody: {},
       });
     });
     it('should build a valid httpRequest from the given inputs', () => {
@@ -57,6 +58,7 @@ describe('IHttpRequestBuilder', () => {
           role: 'some role',
         },
         headers: {},
+        rawBody: {},
       });
     });
   });

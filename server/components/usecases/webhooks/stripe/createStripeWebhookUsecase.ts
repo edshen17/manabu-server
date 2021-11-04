@@ -43,8 +43,8 @@ class CreateStripeWebhookUsecase extends AbstractCreateUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateStripeWebhookUsecaseResponse> => {
-    const { body, headers, currentAPIUser } = props;
-    const stripeEvent = this._getStripeEvent({ body, headers });
+    const { rawBody, headers, currentAPIUser } = props;
+    const stripeEvent = this._getStripeEvent({ rawBody, headers });
     const stripeEventType = stripeEvent.type;
     const stripeEventObj = (stripeEvent as StringKeyObject).data.object;
     const userToken: string = stripeEventObj.charges.data[0].metadata.token;
@@ -64,15 +64,18 @@ class CreateStripeWebhookUsecase extends AbstractCreateUsecase<
     return usecaseRes;
   };
 
-  private _getStripeEvent = (props: { body: any; headers: StringKeyObject }): Stripe.Event => {
-    const { headers, body } = props;
-    const { payloadString } = body;
+  private _getStripeEvent = (props: {
+    rawBody?: StringKeyObject;
+    headers: StringKeyObject;
+  }): Stripe.Event => {
+    const { headers, rawBody } = props;
+    const { payloadString } = rawBody || {};
     const sig = headers['stripe-signature'];
     let webhookSecret = process.env.STRIPE_WEBHOOK_SECREY_KEY_DEV!;
-    let constructEventBody = payloadString;
+    let constructEventBody = payloadString || rawBody;
     if (process.env.NODE_ENV == 'production') {
       webhookSecret = process.env.STRIPE_WEBHOOK_SECREY_KEY!;
-      constructEventBody = body;
+      constructEventBody = rawBody;
     }
     const event = this._stripe.webhooks.constructEvent(constructEventBody, sig, webhookSecret);
     return event;
@@ -112,6 +115,7 @@ class CreateStripeWebhookUsecase extends AbstractCreateUsecase<
         body: {},
         params: {},
         endpointPath: '',
+        rawBody: {},
       })
       .build();
     const packageTransactionUsecaseRes = await this._createPackageTransactionUsecase.makeRequest(

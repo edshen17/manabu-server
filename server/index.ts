@@ -7,6 +7,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
+import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler';
 import { DbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
@@ -36,14 +37,11 @@ app.use(
 app.use(compression());
 app.use(mongoSanitize());
 app.all('*', verifyToken);
-app.use((req, res, next) => {
-  if (req.originalUrl.includes('/webhook')) {
-    // change to /webhooks/stripe
-    next();
-  } else {
-    express.json()(req, res, next);
-  }
-});
+app.use(
+  express.json({
+    verify: (req, res, buffer) => ((req as any)['rawBody'] = buffer),
+  })
+);
 app.use('/api/', v1);
 
 if (process.env.NODE_ENV == 'production') {
@@ -63,6 +61,29 @@ if (process.env.NODE_ENV == 'production') {
 
 app.use(express.static('public'));
 const port = process.env.PORT || 5000;
+
+makeDbConnectionHandler.then(async (dbHandler) => {
+  dbConnectionHandler = dbHandler;
+  await dbConnectionHandler.connect();
+});
+
+const gracefulShutdown = async (msg: string, callback: () => unknown) => {
+  await dbConnectionHandler.stop();
+  console.log(`Mongoose disconnected through ${msg}`);
+  callback();
+};
+
+process.on('SIGINT', async () => {
+  gracefulShutdown('app termination', function () {
+    process.exit(0);
+  });
+});
+
+process.on('SIGTERM', async () => {
+  gracefulShutdown('Heroku app termination', function () {
+    process.exit(0);
+  });
+});
 
 http.createServer(app).listen(port, function () {
   console.log(`Express server listening on port ${port}`);

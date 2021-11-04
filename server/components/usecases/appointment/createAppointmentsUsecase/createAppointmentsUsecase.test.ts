@@ -73,6 +73,7 @@ beforeEach(async () => {
         },
       ],
     },
+    rawBody: {},
     query: {},
     endpointPath: '',
     headers: {},

@@ -39,6 +39,7 @@ beforeEach(async () => {
     role: fakeUser.role,
   };
   createPackageTransactionCheckoutRouteData = {
+    rawBody: {},
     headers: {},
     params: {},
     body: {
@@ -53,6 +54,7 @@ beforeEach(async () => {
     endpointPath: '',
   };
   createPackageTransactionUsecaseRouteData = {
+    rawBody: {},
     params: {},
     body: {},
     query: {},

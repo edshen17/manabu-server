@@ -19,7 +19,7 @@ let fakeDbUserFactory: FakeDbUserFactory;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
 let currentAPIUser: CurrentAPIUser;
-let body: StringKeyObject;
+let rawBody: StringKeyObject;
 let queryToEncode: StringKeyObject;
 let query: StringKeyObject;
 let queryStringHandler: QueryStringHandler;
@@ -95,13 +95,13 @@ describe('createStripeWebhookController', () => {
         payload: payloadString,
         secret,
       });
-      body = {
+      rawBody = {
         payloadString,
       };
       const encodedQuery = queryStringHandler.encodeQueryStringObj(queryToEncode);
       query = queryStringHandler.parseQueryString(encodedQuery);
       const createStripeWebhookHttpRequest = iHttpRequestBuilder
-        .body(body)
+        .rawBody(rawBody)
         .currentAPIUser(currentAPIUser)
         .headers({
           'stripe-signature': stripeHeader,
