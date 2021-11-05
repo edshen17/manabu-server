@@ -1,4 +1,4 @@
-import { CreateStripeWebhookUsecaseResponse } from '../../../../usecases/webhooks/stripe/createStripeWebhookUsecase';
+import { CreateStripeWebhookUsecaseResponse } from '../../../../usecases/webhook/stripe/createStripeWebhookUsecase';
 import { AbstractController, ControllerParams } from '../../../abstractions/AbstractController';
 
 class CreateStripeWebhookController extends AbstractController<CreateStripeWebhookUsecaseResponse> {

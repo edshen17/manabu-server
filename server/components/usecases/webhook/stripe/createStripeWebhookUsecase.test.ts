@@ -46,7 +46,7 @@ beforeEach(async () => {
       lessonLanguage: 'ja',
     },
     query: {
-      paymentGateway: 'paypal',
+      paymentGateway: 'stripe',
     },
     endpointPath: '',
   };
