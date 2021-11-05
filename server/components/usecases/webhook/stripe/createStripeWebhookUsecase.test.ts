@@ -134,6 +134,12 @@ describe('createStripeWebhookUsecase', () => {
           validResOutput(createStripeWebhookRes);
         });
       });
+      context('invalid payment', () => {
+        it('should throw an error', async () => {
+          routeData.rawBody.payloadString = 'bad payload';
+          await testStripeWebhookError();
+        });
+      });
     });
   });
 });
