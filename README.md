@@ -20,11 +20,14 @@ These instructions will help you get a copy of the project up and running for de
 ### Tests
 To run the test suite, run `npm t`.
 
+### Starting the server
+To start the backend server, type `npm run server`. Please refer to `package.json` for additional commands.
+
 NOTE: 
 When running tests, avoid stopping them mid-way through commands like CTRL + C because it stops data cleanup. When this happens (and you use Windows), a data dump will be created in your `\Users\~\AppData\Local\Temp` folder so make sure to occasionally check and clear it. Also, the tests are quite CPU intensive and may cause lag spikes since they run concurrently.
 
 ### Project Structure
-This project revolves heavily around the concept of dependency injection and the single-responsibility principle. Please refer to [this diagram](https://blog.cleancoder.com/uncle-bob/images/2012-08-13-the-clean-architecture/CleanArchitecture.jpg).
+This project revolves heavily around the concepts of dependency injection and the single-responsibility principle. Please refer to [this diagram](https://blog.cleancoder.com/uncle-bob/images/2012-08-13-the-clean-architecture/CleanArchitecture.jpg).
 
 As you can see, entities, or core business logic, is at the very center of the circle. Thus, even if we change the frameworks or technology we use, our logic will not change. This enables us to easily change our code as our stack evolves. Furthermore, by using dependency injection, we can quickly prototype but and also throw away code that is no longer needed (eg. when business rules/strategy change). For more information on this clean architecture, refer to [this video](https://www.youtube.com/watch?v=fy6-LSE_zjI).
 

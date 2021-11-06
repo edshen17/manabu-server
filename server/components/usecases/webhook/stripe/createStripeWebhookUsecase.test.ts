@@ -1,68 +1,33 @@
 import { expect } from 'chai';
 import { makeCreateStripeWebhookUsecase } from '.';
-import { JoinedUserDoc } from '../../../../models/User';
-import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
-import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { stripe } from '../../../paymentHandlers/stripe';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
-import { makeCreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase';
-import { CreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
+import { makeFakePackageTransactionCheckoutTokenHandler } from '../../utils/fakePackageTransactionCheckoutTokenHandler';
+import { FakePackageTransactionCheckoutTokenHandler } from '../../utils/fakePackageTransactionCheckoutTokenHandler/fakePackageTransactionCheckoutTokenHandler';
 import {
   CreateStripeWebhookUsecase,
   CreateStripeWebhookUsecaseResponse,
 } from './createStripeWebhookUsecase';
 
 let controllerDataBuilder: ControllerDataBuilder;
-let fakeDbUserFactory: FakeDbUserFactory;
 let createStripeWebhookUsecase: CreateStripeWebhookUsecase;
 let routeData: RouteData;
-let fakeUser: JoinedUserDoc;
-let fakeTeacher: JoinedUserDoc;
 let currentAPIUser: CurrentAPIUser;
-let createPackageTransactionCheckoutRouteData: RouteData;
-let createPackageTransactionCheckoutUsecase: CreatePackageTransactionCheckoutUsecase;
+let fakePackageTransactionCheckoutTokenHandler: FakePackageTransactionCheckoutTokenHandler;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   createStripeWebhookUsecase = await makeCreateStripeWebhookUsecase;
-  fakeDbUserFactory = await makeFakeDbUserFactory;
-  createPackageTransactionCheckoutUsecase = await makeCreatePackageTransactionCheckoutUsecase;
+  fakePackageTransactionCheckoutTokenHandler = await makeFakePackageTransactionCheckoutTokenHandler;
 });
 
 beforeEach(async () => {
-  fakeUser = await fakeDbUserFactory.createFakeDbUser();
-  fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
-  createPackageTransactionCheckoutRouteData = {
-    rawBody: {},
-    headers: {},
-    params: {},
-    body: {
-      teacherId: fakeTeacher.teacherData!._id,
-      packageId: fakeTeacher.teacherData!.packages[0]._id,
-      lessonDuration: 60,
-      lessonLanguage: 'ja',
-    },
-    query: {
-      paymentGateway: 'stripe',
-    },
-    endpointPath: '',
-  };
-  currentAPIUser = {
-    userId: fakeUser._id,
-    role: fakeUser.role,
-  };
-  const createPackageTransactionCheckoutControllerData = controllerDataBuilder
-    .routeData(createPackageTransactionCheckoutRouteData)
-    .currentAPIUser(currentAPIUser)
-    .build();
-  const createPackageTransactionCheckoutRes =
-    await createPackageTransactionCheckoutUsecase.makeRequest(
-      createPackageTransactionCheckoutControllerData
-    );
-  const { token } = createPackageTransactionCheckoutRes;
+  const tokenData = await fakePackageTransactionCheckoutTokenHandler.createTokenData();
+  const { token } = tokenData;
+  currentAPIUser = tokenData.currentAPIUser;
   const payload = {
     id: 'evt_test_webhook',
     object: 'event',
