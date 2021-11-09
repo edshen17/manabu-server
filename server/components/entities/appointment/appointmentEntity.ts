@@ -17,7 +17,6 @@ type AppointmentEntityBuildResponse = {
   packageTransactionId: ObjectId;
   startDate: Date;
   endDate: Date;
-  isPast: boolean;
   status: string;
   cancellationReason?: string;
   createdDate: Date;
@@ -39,7 +38,6 @@ class AppointmentEntity extends AbstractEntity<
       packageTransactionId,
       startDate,
       endDate,
-      isPast: false,
       status: 'pending',
       createdDate: new Date(),
       lastModifiedDate: new Date(),

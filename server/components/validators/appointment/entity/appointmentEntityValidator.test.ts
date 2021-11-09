@@ -85,7 +85,6 @@ describe('appointmentEntityValidator', () => {
           it('should throw an error', () => {
             buildParams = {
               hostedById: 'some id',
-              isPast: true,
             };
             testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
           });
