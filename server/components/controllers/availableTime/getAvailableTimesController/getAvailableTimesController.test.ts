@@ -29,11 +29,11 @@ before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
   getAvailableTimesController = await makeGetAvailableTimesController;
   fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
-  fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData();
   queryStringHandler = makeQueryStringHandler;
 });
 
 beforeEach(async () => {
+  fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData();
   params = {};
   body = {};
   currentAPIUser = {
