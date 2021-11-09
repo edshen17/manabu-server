@@ -61,7 +61,7 @@ type SetPackageTransactionJwtParams = {
   teacherPackage: PackageDoc;
   body: StringKeyObject;
   userId?: ObjectId;
-  userToken: string;
+  token: string;
   teacher: JoinedUserDoc;
   processedPaymentHandlerData: Await<
     ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerData']>
@@ -158,14 +158,14 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
     const { body, currentAPIUser, teacher, teacherPackage } = props;
     const { userId } = currentAPIUser;
-    const userToken = `${userId}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`;
+    const token = `${userId}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`;
     const processedPaymentHandlerData = await this._getProcessedPaymentHandlerData(props);
     const { item } = processedPaymentHandlerData;
     await this._setPackageTransactionJwt({
       body,
       teacherPackage,
       teacher,
-      userToken,
+      token,
       userId,
       processedPaymentHandlerData,
     });
@@ -174,7 +174,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       successRedirectUrl: 'https://manabu.sg/dashboard',
       cancelRedirectUrl: 'https://manabu.sg/cancel',
       currency: this._defaultCurrency,
-      token: userToken,
+      token: token,
     };
     return processedPaymentHandlerParams;
   };
@@ -214,7 +214,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _setPackageTransactionJwt = async (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
-    const { userToken } = setPackageTransactionJwtParams;
+    const { token } = setPackageTransactionJwtParams;
     const packageTransactionEntityBuildParams =
       this._convertBodyToPackageTransactionEntityBuildParams(setPackageTransactionJwtParams);
     const jwt = this._jwtHandler.sign({
@@ -223,7 +223,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     });
     await this._cacheDbService.set({
       hashKey: CHECKOUT_TOKEN_HASH_KEY,
-      key: userToken,
+      key: token,
       value: jwt,
       ttlMs: TTL_MS.DAY,
     });
