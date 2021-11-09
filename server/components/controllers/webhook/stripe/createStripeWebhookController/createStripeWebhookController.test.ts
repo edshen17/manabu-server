@@ -76,10 +76,6 @@ describe('createStripeWebhookController', () => {
       expect(stripeWebhookRes.statusCode).to.equal(201);
       expect(stripeWebhookRes.body).to.have.property('packageTransaction');
     };
-    const testInvalidStripeWebhook = async () => {
-      const stripeWebhookRes = await createStripeWebhook();
-      expect(stripeWebhookRes.statusCode).to.equal(409);
-    };
     context('valid inputs', () => {
       it('should create a package transaction', async () => {
         await testValidStripeWebhook();
@@ -87,8 +83,14 @@ describe('createStripeWebhookController', () => {
     });
     context('invalid inputs', () => {
       it('should throw an error if http request is invalid', async () => {
-        rawBody = {};
-        await testInvalidStripeWebhook();
+        const createStripeWebhookHttpRequest = iHttpRequestBuilder
+          .rawBody(rawBody)
+          .currentAPIUser(currentAPIUser)
+          .build();
+        const createStripeWebhookRes = await createStripeWebhookController.makeRequest(
+          createStripeWebhookHttpRequest
+        );
+        expect(createStripeWebhookRes.statusCode).to.equal(409);
       });
     });
   });

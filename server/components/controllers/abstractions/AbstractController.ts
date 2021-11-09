@@ -1,4 +1,5 @@
 import { StringKeyObject } from '../../../types/custom';
+import { ConvertStringToObjectId } from '../../entities/utils/convertStringToObjectId';
 import { IUsecase } from '../../usecases/abstractions/IUsecase';
 import { QueryStringHandler } from '../../usecases/utils/queryStringHandler/queryStringHandler';
 import { IHttpRequest } from '../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -11,7 +12,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   protected _queryStringHandler!: QueryStringHandler;
   protected _successStatusCode!: number;
   protected _errorStatusCode!: number;
-  protected _convertStringToObjectId!: any;
+  protected _convertStringToObjectId!: ConvertStringToObjectId;
 
   constructor(props: ControllerParams) {
     const { successStatusCode, errorStatusCode } = props;
