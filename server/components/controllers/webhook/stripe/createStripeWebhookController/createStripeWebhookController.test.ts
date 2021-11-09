@@ -4,8 +4,6 @@ import { StringKeyObject } from '../../../../../types/custom';
 import { stripe } from '../../../../paymentHandlers/stripe';
 import { makeFakePackageTransactionCheckoutTokenHandler } from '../../../../usecases/utils/fakePackageTransactionCheckoutTokenHandler';
 import { FakePackageTransactionCheckoutTokenHandler } from '../../../../usecases/utils/fakePackageTransactionCheckoutTokenHandler/fakePackageTransactionCheckoutTokenHandler';
-import { makeQueryStringHandler } from '../../../../usecases/utils/queryStringHandler';
-import { QueryStringHandler } from '../../../../usecases/utils/queryStringHandler/queryStringHandler';
 import { CurrentAPIUser } from '../../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { makeIHttpRequestBuilder } from '../../../utils/iHttpRequestBuilder';
 import { IHttpRequestBuilder } from '../../../utils/iHttpRequestBuilder/iHttpRequestBuilder';
@@ -14,15 +12,11 @@ import { CreateStripeWebhookController } from './createStripeWebhookController';
 let iHttpRequestBuilder: IHttpRequestBuilder;
 let currentAPIUser: CurrentAPIUser;
 let rawBody: StringKeyObject;
-let queryToEncode: StringKeyObject;
-let query: StringKeyObject;
-let queryStringHandler: QueryStringHandler;
 let token: string;
 let createStripeWebhookController: CreateStripeWebhookController;
 let fakePackageTransactionCheckoutTokenHandler: FakePackageTransactionCheckoutTokenHandler;
 
 before(async () => {
-  queryStringHandler = makeQueryStringHandler;
   createStripeWebhookController = await makeCreateStripeWebhookController;
   fakePackageTransactionCheckoutTokenHandler = await makeFakePackageTransactionCheckoutTokenHandler;
   iHttpRequestBuilder = makeIHttpRequestBuilder;
@@ -65,15 +59,12 @@ describe('createStripeWebhookController', () => {
       rawBody = {
         payloadString,
       };
-      const encodedQuery = queryStringHandler.encodeQueryStringObj(queryToEncode);
-      query = queryStringHandler.parseQueryString(encodedQuery);
       const createStripeWebhookHttpRequest = iHttpRequestBuilder
         .rawBody(rawBody)
         .currentAPIUser(currentAPIUser)
         .headers({
           'stripe-signature': stripeHeader,
         })
-        .query(query)
         .build();
       const createStripeWebhookRes = await createStripeWebhookController.makeRequest(
         createStripeWebhookHttpRequest
@@ -96,7 +87,7 @@ describe('createStripeWebhookController', () => {
     });
     context('invalid inputs', () => {
       it('should throw an error if http request is invalid', async () => {
-        queryToEncode = { query: 'some unsupported query' };
+        rawBody = {};
         await testInvalidStripeWebhook();
       });
     });
