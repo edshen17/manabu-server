@@ -14,7 +14,7 @@ const AppointmentSchema = createSchema({
   endDate: Type.date({ required: true }),
   status: Type.string({
     required: true,
-    enum: ['pending', 'confirmed', 'cancelled'],
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
   }),
   cancellationReason: Type.string({ required: false }),
   createdDate: Type.date({ required: true }),

@@ -14,7 +14,7 @@ class AppointmentEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       startDate: this._joi.date(),
       endDate: this._joi.date(),
-      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
+      status: this._joi.string().valid('pending', 'confirmed', 'cancelled', 'completed'),
       cancellationReason: this._joi.string().max(2048),
       createdDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
