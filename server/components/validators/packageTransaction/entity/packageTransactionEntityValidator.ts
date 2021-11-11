@@ -38,7 +38,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       }),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
       lastModifiedDate: this._joi.date(),
-      createdDate: this._joi.date(),
+      creationDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi
@@ -73,7 +73,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
         })
         .forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
-      createdDate: this._joi.date().forbidden(),
+      creationDate: this._joi.date().forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

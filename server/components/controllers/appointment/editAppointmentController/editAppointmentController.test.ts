@@ -34,7 +34,7 @@ before(async () => {
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
-    startDate: fakePackageTransaction.createdDate,
+    startDate: fakePackageTransaction.creationDate,
     endDate: fakePackageTransaction.terminationDate,
   });
 });

@@ -70,7 +70,7 @@ describe('createAvailableTimeUsecase', () => {
         it('should throw an error if restricted fields found in body', async () => {
           const routeDataBody = routeData.body;
           routeDataBody.hostedById = 'some id';
-          routeDataBody.createdDate = new Date();
+          routeDataBody.creationDate = new Date();
           await testAvailableTimeError();
         });
         it('should throw an error when creating an invalid availableTime', async () => {

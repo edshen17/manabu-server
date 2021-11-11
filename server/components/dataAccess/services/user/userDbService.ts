@@ -41,11 +41,7 @@ class UserDbService extends AbstractDbService<
         nameNGrams: 0,
         namePrefixNGrams: 0,
       },
-      overrideView: {
-        verificationToken: 0,
-        nameNGrams: 0,
-        namePrefixNGrams: 0,
-      },
+      overrideView: {},
     };
   };
 

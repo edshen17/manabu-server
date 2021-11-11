@@ -3,7 +3,7 @@ import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 const RevenueSchema = createSchema({
   revenue: Type.object({ required: true }),
   date: Type.string({ required: true }),
-  createdDate: Type.date({ required: true }),
+  creationDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });
 

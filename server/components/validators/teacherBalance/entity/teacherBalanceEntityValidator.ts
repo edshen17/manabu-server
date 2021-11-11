@@ -8,7 +8,7 @@ class TeacherBalanceEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       balance: this._joi.number().min(0),
       currency: this._joi.string().max(5),
-      createdDate: this._joi.date(),
+      creationDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
@@ -16,7 +16,7 @@ class TeacherBalanceEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
-      createdDate: this._joi.date().forbidden(),
+      creationDate: this._joi.date().forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
       balance: this._joi.object().forbidden(),
       currency: this._joi.object().forbidden(),

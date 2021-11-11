@@ -16,7 +16,7 @@ type PackageEntityBuildResponse = {
   packageType: string;
   packageName: string;
   lessonDurations: number[];
-  createdDate: Date;
+  creationDate: Date;
   lastModifiedDate: Date;
 };
 
@@ -47,7 +47,7 @@ class PackageEntity extends AbstractEntity<
       packageType,
       packageName,
       lessonDurations,
-      createdDate: new Date(),
+      creationDate: new Date(),
       lastModifiedDate: new Date(),
     };
     return packageEntity;

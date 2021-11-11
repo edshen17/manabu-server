@@ -29,7 +29,7 @@ const PackageTransactionSchema = createSchema({
     enum: ['pending', 'confirmed', 'cancelled'],
   }),
   lastModifiedDate: Type.date({ required: true }),
-  createdDate: Type.date({ required: true }),
+  creationDate: Type.date({ required: true }),
 });
 
 const PackageTransaction = typedModel('PackageTransaction', PackageTransactionSchema);

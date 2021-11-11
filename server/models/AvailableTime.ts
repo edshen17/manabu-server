@@ -5,7 +5,7 @@ const AvailableTimeSchema = createSchema({
   hostedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   startDate: Type.date({ required: true }),
   endDate: Type.date({ required: true }),
-  createdDate: Type.date({ required: true }),
+  creationDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });
 

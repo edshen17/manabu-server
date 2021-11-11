@@ -35,7 +35,7 @@ const TeacherSchema = createSchema({
   lessonCount: Type.number({ required: true }),
   studentCount: Type.number({ required: true }),
   packages: Type.array({ required: true }).of(PackageSchema),
-  createdDate: Type.date({ required: true }),
+  creationDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });
 

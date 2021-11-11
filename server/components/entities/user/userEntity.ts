@@ -35,7 +35,7 @@ type UserEntityBuildResponse = {
   password?: string;
   profileImageUrl: string;
   profileBio: string;
-  createdDate: Date;
+  creationDate: Date;
   languages?: { level: string; language: string }[];
   region: string;
   timezone: string;
@@ -58,7 +58,7 @@ type UserEntityBuildResponse = {
   nameNGrams: string;
   namePrefixNGrams: string;
   balance: {
-    amount: number;
+    total: number;
     currency: string;
   };
   teacherData?: TeacherEntityBuildResponse;
@@ -111,7 +111,7 @@ class UserEntity extends AbstractEntity<
       password: encryptedPassword,
       profileImageUrl: profileImageUrl || `https://avatars.dicebear.com/api/initials/${name}.svg`,
       profileBio: '',
-      createdDate: new Date(),
+      creationDate: new Date(),
       languages: [],
       region: '',
       timezone: '',
@@ -135,7 +135,7 @@ class UserEntity extends AbstractEntity<
       nameNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false }),
       namePrefixNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: true }),
       balance: {
-        amount: 0,
+        total: 0,
         currency: 'SGD',
       },
     };

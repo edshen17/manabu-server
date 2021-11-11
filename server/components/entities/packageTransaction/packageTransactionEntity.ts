@@ -36,7 +36,7 @@ type PackageTransactionEntityBuildResponse = {
   isTerminated: boolean;
   paymentData: PaymentData;
   status: string;
-  createdDate: Date;
+  creationDate: Date;
   lastModifiedDate: Date;
 };
 
@@ -69,7 +69,7 @@ class PackageTransactionEntity extends AbstractEntity<
       transactionDate: new Date(),
       lessonDuration,
       priceData,
-      terminationDate: this._dayjs().add(2, 'month').toDate(),
+      terminationDate: this._dayjs().add(3, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       remainingReschedules: 5,
@@ -77,7 +77,7 @@ class PackageTransactionEntity extends AbstractEntity<
       isSubscription,
       paymentData,
       status: 'confirmed',
-      createdDate: new Date(),
+      creationDate: new Date(),
       lastModifiedDate: new Date(),
     };
     return packageTransactionEntity;
