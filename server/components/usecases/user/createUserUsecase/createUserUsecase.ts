@@ -1,17 +1,14 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { TeacherBalanceDoc } from '../../../../models/TeacherBalance';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 import { PackageDbService } from '../../../dataAccess/services/package/packageDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
-import { TeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance/teacherBalanceDbService';
 import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
 import { PackageEntity } from '../../../entities/package/packageEntity';
 import { PackageTransactionEntity } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TeacherEntity } from '../../../entities/teacher/teacherEntity';
-import { TeacherBalanceEntity } from '../../../entities/teacherBalance/teacherBalanceEntity';
 import { UserEntity, UserEntityBuildResponse } from '../../../entities/user/userEntity';
 import { ConvertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -26,12 +23,10 @@ type OptionalCreateUserUsecaseInitParams = {
   makeUserEntity: Promise<UserEntity>;
   makePackageEntity: Promise<PackageEntity>;
   makePackageTransactionEntity: Promise<PackageTransactionEntity>;
-  makeTeacherBalanceEntity: Promise<TeacherBalanceEntity>;
   makeTeacherEntity: Promise<TeacherEntity>;
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-  makeTeacherBalanceDbService: Promise<TeacherBalanceDbService>;
   makeCacheDbService: Promise<CacheDbService>;
   makeJwtHandler: Promise<JwtHandler>;
   makeEmailHandler: Promise<EmailHandler>;
@@ -62,10 +57,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
 > {
   private _userEntity!: UserEntity;
   private _packageTransactionEntity!: PackageTransactionEntity;
-  private _teacherBalanceEntity!: TeacherBalanceEntity;
   private _teacherEntity!: TeacherEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;
-  private _teacherBalanceDbService!: TeacherBalanceDbService;
   private _jwtHandler!: JwtHandler;
   private _emailHandler!: EmailHandler;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
@@ -130,7 +123,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const joinedUserData = await this._createTeacherData({ user, dbServiceAccessOptions });
     await this._createDbAdminPackageTransaction({ user, dbServiceAccessOptions });
     await this._createGraphAdminTeacherEdge(user);
-    await this._createDbTeacherBalance({ user, dbServiceAccessOptions });
     return joinedUserData;
   };
 
@@ -182,21 +174,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       `MATCH (teacher: User {_id: "${user._id}"}), (admin: User {_id:"${process.env
         .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date().toISOString()}"}]->(teacher)`
     );
-  };
-
-  private _createDbTeacherBalance = async (props: {
-    user: JoinedUserDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<TeacherBalanceDoc> => {
-    const { user, dbServiceAccessOptions } = props;
-    const modelToInsert = await this._teacherBalanceEntity.build({
-      userId: user._id,
-    });
-    const newTeacherBalance = await this._teacherBalanceDbService.insert({
-      modelToInsert,
-      dbServiceAccessOptions,
-    });
-    return newTeacherBalance;
   };
 
   private _sendVerificationEmail = (userEntity: any): void => {
@@ -274,10 +251,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const {
       makeUserEntity,
       makePackageTransactionEntity,
-      makeTeacherBalanceEntity,
       makeTeacherEntity,
       makePackageTransactionDbService,
-      makeTeacherBalanceDbService,
       makeCacheDbService,
       makeJwtHandler,
       makeEmailHandler,
@@ -286,10 +261,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     } = optionalInitParams;
     this._userEntity = await makeUserEntity;
     this._packageTransactionEntity = await makePackageTransactionEntity;
-    this._teacherBalanceEntity = await makeTeacherBalanceEntity;
     this._teacherEntity = await makeTeacherEntity;
     this._packageTransactionDbService = await makePackageTransactionDbService;
-    this._teacherBalanceDbService = await makeTeacherBalanceDbService;
     this._cacheDbService = await makeCacheDbService;
     this._jwtHandler = await makeJwtHandler;
     this._emailHandler = await makeEmailHandler;

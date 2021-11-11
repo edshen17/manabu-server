@@ -4,12 +4,10 @@ import { makeCacheDbService } from '../../../dataAccess/services/cache';
 import { makePackageDbService } from '../../../dataAccess/services/package';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
-import { makeTeacherBalanceDbService } from '../../../dataAccess/services/teacherBalance';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makePackageEntity } from '../../../entities/package';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
 import { makeTeacherEntity } from '../../../entities/teacher';
-import { makeTeacherBalanceEntity } from '../../../entities/teacherBalance';
 import { makeUserEntity } from '../../../entities/user';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
@@ -24,12 +22,10 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makePackageEntity,
   makePackageTransactionEntity,
   makeTeacherEntity,
-  makeTeacherBalanceEntity,
   makeDbService: makeUserDbService,
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,
-  makeTeacherBalanceDbService,
   makeCacheDbService,
   makeJwtHandler,
   makeEmailHandler,
