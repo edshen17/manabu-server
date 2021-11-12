@@ -36,7 +36,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
           ),
         id: this._joi.string().max(256).allow(''),
       }),
-      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
+      status: this._joi.string().valid('pending', 'confirmed', 'cancelled', 'completed'),
       lastModifiedDate: this._joi.date(),
       creationDate: this._joi.date(),
     });

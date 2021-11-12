@@ -58,7 +58,9 @@ type UserEntityBuildResponse = {
   nameNGrams: string;
   namePrefixNGrams: string;
   balance: {
-    total: number;
+    totalAvailable: number;
+    totalPending: number;
+    totalClosing: number;
     currency: string;
   };
   teacherData?: TeacherEntityBuildResponse;
@@ -135,7 +137,9 @@ class UserEntity extends AbstractEntity<
       nameNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false }),
       namePrefixNGrams: this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: true }),
       balance: {
-        total: 0,
+        totalAvailable: 0,
+        totalPending: 0,
+        totalClosing: 0,
         currency: 'SGD',
       },
     };

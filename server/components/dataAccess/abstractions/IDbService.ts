@@ -70,6 +70,7 @@ enum DB_SERVICE_CACHE_CLIENT {
 enum DB_SERVICE_COLLECTIONS {
   APPOINTMENTS = 'appointments',
   AVAILABLE_TIMES = 'availabletimes',
+  BALANCE_TRANSACTIONS = 'balancetransactions',
   PACKAGES = 'packages',
   PACKAGE_TRANSACTIONS = 'packagetransactions',
   TEACHERS = 'teachers',

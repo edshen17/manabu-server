@@ -61,7 +61,6 @@ class PackageTransactionEntity extends AbstractEntity<
       isSubscription,
       paymentData,
     } = buildParams;
-
     const packageTransactionEntity = {
       hostedById,
       reservedById,

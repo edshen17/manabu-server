@@ -34,7 +34,9 @@ context('packageTransaction entity', () => {
     context('given invalid inputs', () => {
       it('should throw an error', async () => {
         try {
-          const entityData: any = {};
+          const entityData: any = {
+            hostedById: 'bad id',
+          };
           const fakePackageTransaction = await packageTransactionEntity.build(entityData);
         } catch (err) {
           expect(err).to.be.an('error');
