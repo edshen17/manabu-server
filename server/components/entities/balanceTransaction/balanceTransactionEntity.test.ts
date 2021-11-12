@@ -32,7 +32,7 @@ context('balanceTransactionEntity', () => {
           description: 'some description',
           currency: 'SGD',
           amount: 100,
-          type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_SALE,
+          type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
           runningBalance: {
             currency: 'SGD',
             totalAvailable: 0,

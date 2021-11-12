@@ -38,7 +38,7 @@ enum BALANCE_TRANSACTION_ENTITY_STATUS {
 }
 
 enum BALANCE_TRANSACTION_ENTITY_TYPE {
-  PACKAGE_SALE = 'packageSale',
+  PACKAGE_TRANSACTION = 'packageTransaction',
 }
 
 class BalanceTransactionEntity extends AbstractEntity<

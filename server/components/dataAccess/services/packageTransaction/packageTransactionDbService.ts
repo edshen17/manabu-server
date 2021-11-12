@@ -53,12 +53,12 @@ class PackageTransactionDbService extends AbstractDbService<
   };
 
   protected _getCacheDependencies = (): string[] => {
-    return [DB_SERVICE_COLLECTIONS.APPOINTMENTS];
+    return [DB_SERVICE_COLLECTIONS.APPOINTMENTS, DB_SERVICE_COLLECTIONS.BALANCE_TRANSACTIONS];
   };
 
   protected _initTemplate = async (
     optionalDbServiceInitParams: OptionalPackageTransactionDbServiceInitParams
-  ) => {
+  ): Promise<void> => {
     const { makeUserDbService, makePackageDbService } = optionalDbServiceInitParams;
     this._userDbService = await makeUserDbService;
     this._packageDbService = await makePackageDbService;

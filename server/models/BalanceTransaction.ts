@@ -1,4 +1,5 @@
 import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
+import { PackageTransactionDoc, PackageTransactionSchema } from './PackageTransaction';
 import { UserSchema } from './User';
 
 const BalanceTransactionSchema = createSchema({
@@ -7,8 +8,11 @@ const BalanceTransactionSchema = createSchema({
   description: Type.string({ required: true }),
   currency: Type.string({ required: true }),
   amount: Type.number({ required: true }),
-  type: Type.string({ required: true, enum: ['packageSale'] }),
-  packageTransactionId: Type.string({ required: false }),
+  type: Type.string({ required: true, enum: ['packageTransaction'] }),
+  packageTransactionId: Type.ref(Type.objectId({ required: true, index: true })).to(
+    'PackageTransaction',
+    PackageTransactionSchema
+  ),
   runningBalance: Type.object({ required: false }).of({
     totalAvailable: Type.number(),
     currency: Type.string(),
@@ -18,6 +22,8 @@ const BalanceTransactionSchema = createSchema({
 });
 
 const BalanceTransaction = typedModel('BalanceTransaction', BalanceTransactionSchema);
-type BalanceTransactionDoc = ExtractDoc<typeof BalanceTransactionSchema>;
+type BalanceTransactionDoc = ExtractDoc<typeof BalanceTransactionSchema> & {
+  packageTransactionData: PackageTransactionDoc;
+};
 
 export { BalanceTransaction, BalanceTransactionSchema, BalanceTransactionDoc };

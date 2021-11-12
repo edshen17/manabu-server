@@ -10,7 +10,7 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
       description: this._joi.string().max(2048),
       currency: this._joi.string().max(5),
       amount: this._joi.number(),
-      type: this._joi.string().valid('packageSale'),
+      type: this._joi.string().valid('packageTransaction'),
       packageTransactionId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),

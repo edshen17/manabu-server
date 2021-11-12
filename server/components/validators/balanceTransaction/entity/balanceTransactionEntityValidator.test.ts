@@ -20,7 +20,7 @@ beforeEach(() => {
     description: 'some description',
     currency: 'SGD',
     amount: -60,
-    type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_SALE,
+    type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
     packageTransactionId: undefined,
     runningBalance: {
       totalAvailable: 10,
