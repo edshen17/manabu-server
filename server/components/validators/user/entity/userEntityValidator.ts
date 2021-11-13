@@ -43,9 +43,9 @@ class UserEntityValidator extends AbstractEntityValidator {
       lastModifiedDate: this._joi.date(),
       balance: this._joi.object({
         currency: this._joi.string().max(5),
-        totalAvailable: this._joi.number().min(0),
+        totalCurrent: this._joi.number().min(0),
         totalPending: this._joi.number().min(0),
-        totalClosing: this._joi.number().min(0),
+        totalAvailable: this._joi.number().min(0),
       }),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
@@ -67,9 +67,9 @@ class UserEntityValidator extends AbstractEntityValidator {
       balance: this._joi
         .object({
           currency: this._joi.string().max(5),
-          totalAvailable: this._joi.number().min(0),
+          totalCurrent: this._joi.number().min(0),
           totalPending: this._joi.number().min(0),
-          totalClosing: this._joi.number().min(0),
+          totalAvailable: this._joi.number().min(0),
         })
         .forbidden(),
     });

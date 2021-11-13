@@ -49,9 +49,9 @@ const UserSchema = createSchema({
   lastModifiedDate: Type.date({ required: true }),
   lastOnlineDate: Type.date({ required: true }),
   balance: Type.object({ required: true }).of({
-    totalAvailable: Type.number(),
+    totalCurrent: Type.number(),
     totalPending: Type.number(),
-    totalClosing: Type.number(),
+    totalAvailable: Type.number(),
     currency: Type.string(),
   }),
 });

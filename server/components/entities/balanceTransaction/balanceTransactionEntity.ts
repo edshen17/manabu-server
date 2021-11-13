@@ -39,6 +39,7 @@ enum BALANCE_TRANSACTION_ENTITY_STATUS {
 
 enum BALANCE_TRANSACTION_ENTITY_TYPE {
   PACKAGE_TRANSACTION = 'packageTransaction',
+  CREDIT_SALE = 'creditSale',
 }
 
 class BalanceTransactionEntity extends AbstractEntity<
@@ -81,4 +82,5 @@ export {
   BalanceTransactionEntityBuildResponse,
   BALANCE_TRANSACTION_ENTITY_STATUS,
   BALANCE_TRANSACTION_ENTITY_TYPE,
+  RunningBalance,
 };
