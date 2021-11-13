@@ -17,17 +17,21 @@ beforeEach(() => {
   buildParams = {
     userId: '5d6ede6a0ba62570afcedd3a',
     status: BALANCE_TRANSACTION_ENTITY_STATUS.PENDING,
-    description: 'some description',
     currency: 'SGD',
-    amount: -60,
     type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
     packageTransactionId: undefined,
+    amount: 100,
+    processingFee: 5,
+    tax: 0.2,
+    total: 105.2,
     runningBalance: {
-      totalAvailable: 10,
       currency: 'SGD',
+      totalAvailable: 0,
     },
-    creationDate: new Date(),
-    lastModifiedDate: new Date(),
+    paymentData: {
+      gateway: 'paypal',
+      id: 'some id',
+    },
   };
 });
 

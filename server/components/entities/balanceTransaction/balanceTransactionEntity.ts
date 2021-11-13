@@ -6,12 +6,18 @@ type OptionalBalanceTransactionEntityInitParams = {};
 type BalanceTransactionEntityBuildParams = {
   userId: ObjectId;
   status: string;
-  description: string;
   currency: string;
-  amount: number;
   type: string;
   packageTransactionId?: ObjectId;
+  amount: number;
+  processingFee: number;
+  tax: number;
+  total: number;
   runningBalance?: RunningBalance;
+  paymentData: {
+    gateway: string;
+    id: string;
+  };
 };
 
 type RunningBalance = {
@@ -19,15 +25,7 @@ type RunningBalance = {
   currency: string;
 };
 
-type BalanceTransactionEntityBuildResponse = {
-  userId: ObjectId;
-  status: string;
-  description: string;
-  currency: string;
-  amount: number;
-  type: string;
-  packageTransactionId?: ObjectId;
-  runningBalance?: RunningBalance;
+type BalanceTransactionEntityBuildResponse = BalanceTransactionEntityBuildParams & {
   creationDate: Date;
   lastModifiedDate: Date;
 };
@@ -53,22 +51,28 @@ class BalanceTransactionEntity extends AbstractEntity<
     const {
       userId,
       status,
-      description,
       currency,
-      amount,
       type,
       packageTransactionId,
+      amount,
+      processingFee,
+      tax,
+      total,
       runningBalance,
+      paymentData,
     } = buildParams;
     const balanceTransactionEntity = {
       userId,
       status,
-      description,
       currency,
-      amount,
       type,
       packageTransactionId,
+      amount,
+      processingFee,
+      tax,
+      total,
       runningBalance,
+      paymentData,
       creationDate: new Date(),
       lastModifiedDate: new Date(),
     };

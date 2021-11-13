@@ -29,15 +29,21 @@ context('balanceTransactionEntity', () => {
         const fakeBalanceTransaction = await balanceTransactionEntity.build({
           userId: fakePackageTransaction.hostedById,
           status: BALANCE_TRANSACTION_ENTITY_STATUS.PENDING,
-          description: 'some description',
           currency: 'SGD',
-          amount: 100,
           type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
+          packageTransactionId: fakePackageTransaction._id,
+          amount: 100,
+          processingFee: 5,
+          tax: 0.2,
+          total: 105.2,
           runningBalance: {
             currency: 'SGD',
             totalAvailable: 0,
           },
-          packageTransactionId: fakePackageTransaction._id,
+          paymentData: {
+            gateway: 'paypal',
+            id: 'some id',
+          },
         });
         expect(fakeBalanceTransaction).to.have.property('userId');
       });

@@ -1,3 +1,4 @@
+import { PAYMENT_GATEWAY_NAME } from '../../../paymentHandlers/abstractions/IPaymentHandler';
 import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
 
 class BalanceTransactionEntityValidator extends AbstractEntityValidator {
@@ -7,16 +8,29 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
-      description: this._joi.string().max(2048),
       currency: this._joi.string().max(5),
-      amount: this._joi.number(),
       type: this._joi.string().valid('packageTransaction'),
       packageTransactionId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
+      amount: this._joi.number(),
+      processingFee: this._joi.number(),
+      tax: this._joi.number(),
+      total: this._joi.number(),
       runningBalance: this._joi.object({
         totalAvailable: this._joi.number().min(0),
         currency: this._joi.string().max(5),
+      }),
+      paymentData: this._joi.object({
+        gateway: this._joi
+          .string()
+          .max(256)
+          .valid(
+            PAYMENT_GATEWAY_NAME.PAYNOW,
+            PAYMENT_GATEWAY_NAME.PAYPAL,
+            PAYMENT_GATEWAY_NAME.STRIPE
+          ),
+        id: this._joi.string().max(256).allow(''),
       }),
       lastModifiedDate: this._joi.date(),
       creationDate: this._joi.date(),
@@ -27,20 +41,34 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled').forbidden(),
-      description: this._joi.string().max(2048).forbidden(),
       currency: this._joi.string().max(5).forbidden(),
-      amount: this._joi.number().min(0).forbidden(),
-      type: this._joi.string().valid('packageSale').forbidden(),
+      type: this._joi.string().valid('packageTransaction').forbidden(),
       packageTransactionId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
+      amount: this._joi.number().forbidden(),
+      processingFee: this._joi.number().forbidden(),
+      tax: this._joi.number().forbidden(),
+      total: this._joi.number().forbidden(),
       runningBalance: this._joi
         .object({
-          totalAvailable: this._joi.string().max(5),
+          totalAvailable: this._joi.number().min(0),
           currency: this._joi.string().max(5),
         })
         .forbidden(),
+      paymentData: this._joi.object({
+        gateway: this._joi
+          .string()
+          .max(256)
+          .valid(
+            PAYMENT_GATEWAY_NAME.PAYNOW,
+            PAYMENT_GATEWAY_NAME.PAYPAL,
+            PAYMENT_GATEWAY_NAME.STRIPE
+          )
+          .forbidden(),
+        id: this._joi.string().max(256).allow('').forbidden(),
+      }),
       lastModifiedDate: this._joi.date().forbidden(),
       creationDate: this._joi.date().forbidden(),
     });

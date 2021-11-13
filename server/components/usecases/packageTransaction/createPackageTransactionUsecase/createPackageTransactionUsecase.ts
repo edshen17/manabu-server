@@ -129,12 +129,21 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const balanceTransactionEntity = await this._balanceTransactionEntity.build({
       userId,
       status: BALANCE_TRANSACTION_ENTITY_STATUS.PENDING,
-      description,
       currency: 'SGD',
-      amount,
       type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
-      runningBalance,
-      packageTransactionId,
+      packageTransactionId: packageTransactionId,
+      amount: 100,
+      processingFee: 5,
+      tax: 0.2,
+      total: 105.2,
+      runningBalance: {
+        currency: 'SGD',
+        totalAvailable: 0,
+      },
+      paymentData: {
+        gateway: 'paypal',
+        id: 'some id',
+      },
     });
     return balanceTransactionEntity;
   };
