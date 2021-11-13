@@ -27,11 +27,9 @@ describe('appointmentEntity', () => {
           reservedById: fakeReservedBy._id,
           packageId: fakeHostedBy.teacherData!.packages[0]._id,
           lessonDuration: 60,
-          priceData: { currency: 'SGD', subTotal: 0, total: 0 },
           remainingAppointments: 0,
           lessonLanguage: 'ja',
           isSubscription: false,
-          paymentData: {},
         });
         const endDate = new Date();
         endDate.setMinutes(endDate.getMinutes() + 30);

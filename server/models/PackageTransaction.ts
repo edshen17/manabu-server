@@ -7,26 +7,15 @@ const PackageTransactionSchema = createSchema({
   reservedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   packageId: Type.ref(Type.objectId({ required: true, index: true })).to('Package', PackageSchema),
   lessonDuration: Type.number({ required: true }),
-  priceData: Type.object({ required: true }).of({
-    currency: Type.string(),
-    subTotal: Type.number(),
-    total: Type.number(),
-  }),
   terminationDate: Type.date({ required: true }),
   isTerminated: Type.boolean({ required: true }),
   remainingAppointments: Type.number({ required: true }),
   remainingReschedules: Type.number({ required: true }),
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
-  paymentData: Type.object({ required: false }).of({
-    gateway: Type.string({ required: false, enum: ['paypal', 'stripe', 'paynow'] }),
-    id: Type.string({
-      required: false,
-    }),
-  }),
   status: Type.string({
     required: true,
-    enum: ['pending', 'confirmed', 'cancelled'],
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
   }),
   lastModifiedDate: Type.date({ required: true }),
   creationDate: Type.date({ required: true }),

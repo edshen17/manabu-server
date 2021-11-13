@@ -26,14 +26,9 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
       reservedById: fakeUser._id,
       packageId: fakeTeacher.teacherData!.packages[0]._id,
       lessonDuration: 60,
-      priceData: { currency: 'SGD', subTotal: 0, total: 0 },
       remainingAppointments: 12,
       lessonLanguage: 'ja',
       isSubscription: false,
-      paymentData: {
-        id: 'some valid payment id',
-        gateway: 'paypal',
-      },
     };
     return fakeBuildParams;
   };

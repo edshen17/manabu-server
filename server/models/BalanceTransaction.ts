@@ -21,6 +21,17 @@ const BalanceTransactionSchema = createSchema({
   lastModifiedDate: Type.date({ required: true }),
 });
 
+// priceData: Type.object({ required: true }).of({
+//   currency: Type.string(),
+//   subTotal: Type.number(),
+//   total: Type.number(),
+// }),
+// paymentData: Type.object({ required: false }).of({
+//   gateway: Type.string({ required: false, enum: ['paypal', 'stripe', 'paynow'] }),
+//   id: Type.string({
+//     required: false,
+//   }),
+// }),
 const BalanceTransaction = typedModel('BalanceTransaction', BalanceTransactionSchema);
 type BalanceTransactionDoc = ExtractDoc<typeof BalanceTransactionSchema> & {
   packageTransactionData: PackageTransactionDoc;

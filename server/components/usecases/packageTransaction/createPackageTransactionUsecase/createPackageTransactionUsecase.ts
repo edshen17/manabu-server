@@ -73,7 +73,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       key: token,
     });
     const { packageTransactionEntityBuildParams } = await this._jwtHandler.verify(jwt);
-    packageTransactionEntityBuildParams.paymentData.id = paymentId || '';
     await this._jwtHandler.blacklist(jwt);
     return packageTransactionEntityBuildParams;
   };

@@ -215,8 +215,9 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
     const { token } = setPackageTransactionJwtParams;
-    const packageTransactionEntityBuildParams =
-      this._convertBodyToPackageTransactionEntityBuildParams(setPackageTransactionJwtParams);
+    const packageTransactionEntityBuildParams = this._getPackageTransactionEntityBuildParams(
+      setPackageTransactionJwtParams
+    );
     const jwt = this._jwtHandler.sign({
       toTokenObj: { packageTransactionEntityBuildParams },
       expiresIn: '1d',
@@ -229,7 +230,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     });
   };
 
-  private _convertBodyToPackageTransactionEntityBuildParams = (
+  private _getPackageTransactionEntityBuildParams = (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ) => {
     const { body, userId, teacher, processedPaymentHandlerData, teacherPackage } =
@@ -243,11 +244,10 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       packageId,
       lessonDuration,
       lessonLanguage,
-      priceData,
       remainingAppointments: lessonAmount,
-      paymentData,
       isSubscription: false,
     };
+    //create balance transaction entity?
     return packageTransactionEntityBuildParams;
   };
 

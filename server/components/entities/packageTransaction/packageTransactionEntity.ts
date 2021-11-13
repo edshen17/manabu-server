@@ -11,15 +11,10 @@ type PackageTransactionEntityBuildParams = {
   reservedById: ObjectId;
   packageId: ObjectId;
   lessonDuration: number;
-  priceData: PriceData;
   remainingAppointments: number;
   lessonLanguage: string;
   isSubscription: boolean;
-  paymentData: PaymentData;
 };
-
-type PriceData = { currency: string; subTotal: number; total: number };
-type PaymentData = { gateway: string; id: string } | {};
 
 type PackageTransactionEntityBuildResponse = {
   hostedById: ObjectId;
@@ -27,14 +22,12 @@ type PackageTransactionEntityBuildResponse = {
   packageId: ObjectId;
   lessonDuration: number;
   terminationDate: Date;
-  priceData: PriceData;
   remainingAppointments: number;
   lessonLanguage: string;
   isSubscription: boolean;
   transactionDate: Date;
   remainingReschedules: number;
   isTerminated: boolean;
-  paymentData: PaymentData;
   status: string;
   creationDate: Date;
   lastModifiedDate: Date;
@@ -55,11 +48,9 @@ class PackageTransactionEntity extends AbstractEntity<
       reservedById,
       packageId,
       lessonDuration,
-      priceData,
       remainingAppointments,
       lessonLanguage,
       isSubscription,
-      paymentData,
     } = buildParams;
     const packageTransactionEntity = {
       hostedById,
@@ -67,14 +58,12 @@ class PackageTransactionEntity extends AbstractEntity<
       packageId,
       transactionDate: new Date(),
       lessonDuration,
-      priceData,
       terminationDate: this._dayjs().add(3, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       remainingReschedules: 5,
       lessonLanguage,
       isSubscription,
-      paymentData,
       status: 'confirmed',
       creationDate: new Date(),
       lastModifiedDate: new Date(),

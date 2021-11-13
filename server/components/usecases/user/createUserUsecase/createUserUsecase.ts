@@ -153,14 +153,8 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       packageId: this._convertStringToObjectId(process.env.MANABU_ADMIN_PKG_ID!),
       lessonDuration: 60,
       remainingAppointments: 1,
-      priceData: {
-        currency: 'SGD',
-        subTotal: 0,
-        total: 0,
-      },
       lessonLanguage: 'ja',
       isSubscription: false,
-      paymentData: {},
     });
     const newPackageTransaction = await this._packageTransactionDbService.insert({
       modelToInsert,

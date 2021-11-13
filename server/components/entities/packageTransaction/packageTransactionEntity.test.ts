@@ -22,10 +22,8 @@ context('packageTransaction entity', () => {
           packageId: fakeTeacher.teacherData!.packages[0]._id,
           lessonDuration: 60,
           remainingAppointments: 5,
-          priceData: { currency: 'SGD', subTotal: 0, total: 0 },
           lessonLanguage: 'ja',
           isSubscription: false,
-          paymentData: {},
         });
         expect(fakePackageTransaction.lessonLanguage).to.equal('ja');
         expect(fakePackageTransaction.isSubscription).to.equal(false);
