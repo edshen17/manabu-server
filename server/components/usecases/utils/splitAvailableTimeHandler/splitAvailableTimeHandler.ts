@@ -20,7 +20,6 @@ class SplitAvailableTimeHandler {
       await session.commitTransaction();
     } catch (err) {
       await session.abortTransaction();
-      throw err;
     } finally {
       session.endSession();
     }

@@ -30,9 +30,9 @@ const UserSchema = createSchema({
     emailAlerts: Type.object({
       required: true,
     }).of({
-      appointmentCreation: Type.boolean(),
-      appointmentUpdate: Type.boolean(),
-      appointmentStartReminder: Type.boolean(),
+      appointmentCreation: Type.boolean({ required: true }),
+      appointmentUpdate: Type.boolean({ required: true }),
+      appointmentStartReminder: Type.boolean({ required: true }),
     }),
   }),
   memberships: Type.array({ required: true }).of({
@@ -49,10 +49,10 @@ const UserSchema = createSchema({
   lastModifiedDate: Type.date({ required: true }),
   lastOnlineDate: Type.date({ required: true }),
   balance: Type.object({ required: true }).of({
-    totalCurrent: Type.number(),
-    totalPending: Type.number(),
-    totalAvailable: Type.number(),
-    currency: Type.string(),
+    totalCurrent: Type.number({ required: true }),
+    totalPending: Type.number({ required: true }),
+    totalAvailable: Type.number({ required: true }),
+    currency: Type.string({ required: true }),
   }),
 });
 

@@ -32,10 +32,10 @@ context('balanceTransactionEntity', () => {
           currency: 'SGD',
           type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
           packageTransactionId: fakePackageTransaction._id,
-          amount: 100,
+          balanceChange: 100,
           processingFee: 5,
           tax: 0.2,
-          total: 105.2,
+          totalPaid: 105.2,
           runningBalance: {
             currency: 'SGD',
             totalAvailable: 0,

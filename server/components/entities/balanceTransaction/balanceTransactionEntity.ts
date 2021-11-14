@@ -9,11 +9,11 @@ type BalanceTransactionEntityBuildParams = {
   currency: string;
   type: string;
   packageTransactionId?: ObjectId;
-  amount: number;
+  balanceChange: number;
   processingFee: number;
   tax: number;
-  total: number;
-  runningBalance?: RunningBalance;
+  totalPaid: number;
+  runningBalance: RunningBalance;
   paymentData: {
     gateway: string;
     id: string;
@@ -33,6 +33,7 @@ type BalanceTransactionEntityBuildResponse = BalanceTransactionEntityBuildParams
 enum BALANCE_TRANSACTION_ENTITY_STATUS {
   PENDING = 'pending',
   COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
 }
 
 enum BALANCE_TRANSACTION_ENTITY_TYPE {
@@ -54,10 +55,10 @@ class BalanceTransactionEntity extends AbstractEntity<
       currency,
       type,
       packageTransactionId,
-      amount,
+      balanceChange,
       processingFee,
       tax,
-      total,
+      totalPaid,
       runningBalance,
       paymentData,
     } = buildParams;
@@ -67,10 +68,10 @@ class BalanceTransactionEntity extends AbstractEntity<
       currency,
       type,
       packageTransactionId,
-      amount,
+      balanceChange,
       processingFee,
       tax,
-      total,
+      totalPaid,
       runningBalance,
       paymentData,
       creationDate: new Date(),

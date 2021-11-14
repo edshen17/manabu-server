@@ -7,16 +7,16 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
       userId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
-      status: this._joi.string().valid('pending', 'confirmed', 'cancelled'),
+      status: this._joi.string().valid('pending', 'completed', 'cancelled'),
       currency: this._joi.string().max(5),
       type: this._joi.string().valid('packageTransaction'),
       packageTransactionId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
-      amount: this._joi.number(),
+      balanceChange: this._joi.number(),
       processingFee: this._joi.number(),
       tax: this._joi.number(),
-      total: this._joi.number(),
+      totalPaid: this._joi.number(),
       runningBalance: this._joi.object({
         totalAvailable: this._joi.number().min(0),
         currency: this._joi.string().max(5),
@@ -47,10 +47,10 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
         .forbidden(),
-      amount: this._joi.number().forbidden(),
+      balanceChange: this._joi.number().forbidden(),
       processingFee: this._joi.number().forbidden(),
       tax: this._joi.number().forbidden(),
-      total: this._joi.number().forbidden(),
+      totalPaid: this._joi.number().forbidden(),
       runningBalance: this._joi
         .object({
           totalAvailable: this._joi.number().min(0),

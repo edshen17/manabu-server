@@ -11,11 +11,11 @@ const BalanceTransactionSchema = createSchema({
     'PackageTransaction',
     PackageTransactionSchema
   ),
-  amount: Type.number({ required: true }),
+  balanceChange: Type.number({ required: true }),
   processingFee: Type.number({ required: true }),
   tax: Type.number({ required: true }),
-  total: Type.number({ required: true }),
-  runningBalance: Type.object({ required: false }).of({
+  totalPaid: Type.number({ required: true }),
+  runningBalance: Type.object({ required: true }).of({
     totalAvailable: Type.number(),
     currency: Type.string(),
   }),

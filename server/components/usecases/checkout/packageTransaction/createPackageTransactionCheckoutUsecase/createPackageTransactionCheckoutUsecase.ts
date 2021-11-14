@@ -8,6 +8,11 @@ import {
 } from '../../../../dataAccess/abstractions/IDbService';
 import { CacheDbService, TTL_MS } from '../../../../dataAccess/services/cache/cacheDbService';
 import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
+import {
+  BalanceTransactionEntityBuildParams,
+  BALANCE_TRANSACTION_ENTITY_STATUS,
+  BALANCE_TRANSACTION_ENTITY_TYPE,
+} from '../../../../entities/balanceTransaction/balanceTransactionEntity';
 import { PackageTransactionEntityBuildParams } from '../../../../entities/packageTransaction/packageTransactionEntity';
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
 import {
@@ -63,10 +68,12 @@ type SetPackageTransactionJwtParams = {
   userId?: ObjectId;
   token: string;
   teacher: JoinedUserDoc;
-  processedPaymentHandlerData: Await<
-    ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerData']>
-  >;
+  processedPaymentHandlerData: ProcessedPaymentHandlerData;
 };
+
+type ProcessedPaymentHandlerData = Await<
+  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerData']>
+>;
 
 const CHECKOUT_TOKEN_HASH_KEY = 'usercheckouttoken';
 
@@ -161,7 +168,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const token = `${userId}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`;
     const processedPaymentHandlerData = await this._getProcessedPaymentHandlerData(props);
     const { item } = processedPaymentHandlerData;
-    await this._setPackageTransactionJwt({
+    await this._setTransactionJwt({
       body,
       teacherPackage,
       teacher,
@@ -211,15 +218,19 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return { item, priceData, paymentData };
   };
 
-  private _setPackageTransactionJwt = async (
+  private _setTransactionJwt = async (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
-    const { token } = setPackageTransactionJwtParams;
+    const { token, processedPaymentHandlerData, userId } = setPackageTransactionJwtParams;
     const packageTransactionEntityBuildParams = this._getPackageTransactionEntityBuildParams(
       setPackageTransactionJwtParams
     );
+    const balanceTransactionEntityBuildParams = this._getBalanceTransactionEntityBuildParams({
+      processedPaymentHandlerData,
+      userId: userId!,
+    });
     const jwt = this._jwtHandler.sign({
-      toTokenObj: { packageTransactionEntityBuildParams },
+      toTokenObj: { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams },
       expiresIn: '1d',
     });
     await this._cacheDbService.set({
@@ -232,11 +243,9 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
 
   private _getPackageTransactionEntityBuildParams = (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
-  ) => {
-    const { body, userId, teacher, processedPaymentHandlerData, teacherPackage } =
-      setPackageTransactionJwtParams;
+  ): PackageTransactionEntityBuildParams => {
+    const { body, userId, teacher, teacherPackage } = setPackageTransactionJwtParams;
     const { packageId, lessonLanguage, lessonDuration } = body;
-    const { priceData, paymentData } = processedPaymentHandlerData;
     const { lessonAmount } = teacherPackage;
     const packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams = {
       hostedById: teacher._id,
@@ -247,8 +256,34 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       remainingAppointments: lessonAmount,
       isSubscription: false,
     };
-    //create balance transaction entity?
     return packageTransactionEntityBuildParams;
+  };
+
+  private _getBalanceTransactionEntityBuildParams = (props: {
+    processedPaymentHandlerData: ProcessedPaymentHandlerData;
+    userId: ObjectId;
+  }): BalanceTransactionEntityBuildParams => {
+    const { processedPaymentHandlerData, userId } = props;
+    const { priceData, paymentData } = processedPaymentHandlerData;
+    const { currency, subTotal, total } = priceData;
+    const processingFee = total - subTotal;
+    const balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams = {
+      userId,
+      status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
+      currency,
+      type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
+      packageTransactionId: undefined,
+      balanceChange: subTotal,
+      processingFee,
+      tax: 0,
+      totalPaid: total,
+      runningBalance: {
+        currency,
+        totalAvailable: 0, // set when actually building to reduce response time
+      },
+      paymentData,
+    };
+    return balanceTransactionEntityBuildParams;
   };
 
   private _getPaypalRedirectUrl = async (

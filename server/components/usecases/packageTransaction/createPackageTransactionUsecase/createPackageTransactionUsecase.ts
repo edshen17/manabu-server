@@ -1,5 +1,7 @@
-import { ObjectId } from 'mongoose';
+import { ClientSession } from 'mongoose';
+import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
+import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { BalanceTransactionDbService } from '../../../dataAccess/services/balanceTransaction/balanceTransactionDbService';
@@ -8,10 +10,7 @@ import { PackageTransactionDbServiceResponse } from '../../../dataAccess/service
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import {
   BalanceTransactionEntity,
-  BalanceTransactionEntityBuildResponse,
-  BALANCE_TRANSACTION_ENTITY_STATUS,
-  BALANCE_TRANSACTION_ENTITY_TYPE,
-  RunningBalance,
+  BalanceTransactionEntityBuildParams,
 } from '../../../entities/balanceTransaction/balanceTransactionEntity';
 import {
   PackageTransactionEntity,
@@ -33,6 +32,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
 
 type CreatePackageTransactionUsecaseResponse = {
   packageTransaction: PackageTransactionDoc;
+  balanceTransactions: BalanceTransactionDoc[];
 };
 
 class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
@@ -51,30 +51,35 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionUsecaseResponse> => {
     const { query, dbServiceAccessOptions } = props;
-    const packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams =
-      await this._getPackageTransactionEntityBuildParams(query);
+    const { token, paymentId } = query;
+    const verifiedJwt = await this._getVerifiedJwt(token);
+    const { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams } =
+      verifiedJwt;
     const packageTransaction = await this._createPackageTransaction({
       packageTransactionEntityBuildParams,
       dbServiceAccessOptions,
     });
-    // await this._createBalanceTransaction(packageTransaction);
+    const balanceTransactions = await this._createBalanceTransactions({
+      packageTransaction,
+      balanceTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      paymentId,
+    });
     const usecaseRes = {
       packageTransaction,
+      balanceTransactions,
     };
     return usecaseRes;
   };
 
-  private _getPackageTransactionEntityBuildParams = async (
-    query: StringKeyObject
-  ): Promise<PackageTransactionEntityBuildParams> => {
-    const { token, paymentId } = query;
+  private _getVerifiedJwt = async (token: string): Promise<StringKeyObject> => {
     const jwt = await this._cacheDbService.get({
       hashKey: CHECKOUT_TOKEN_HASH_KEY,
       key: token,
     });
-    const { packageTransactionEntityBuildParams } = await this._jwtHandler.verify(jwt);
+    const verifiedJwt = await this._jwtHandler.verify(jwt);
     await this._jwtHandler.blacklist(jwt);
-    return packageTransactionEntityBuildParams;
+    return verifiedJwt;
   };
 
   private _createPackageTransaction = async (props: {
@@ -102,50 +107,145 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     );
   };
 
-  // private _createBalanceTransaction = async (
-  //   packageTransaction: PackageTransactionDoc
-  // ): Promise<BalanceTransactionDoc[]> => {
-  //   const session = await this._balanceTransactionDbService.startSession();
-  //   const dbServiceAccessOptions =
-  //     this._balanceTransactionDbService.getOverrideDbServiceAccessOptions();
-  //   const user = await this._userDbService.findById({
-  //     _id: packageTransaction.reservedById,
-  //     dbServiceAccessOptions,
-  //   });
-  //   const creditPurchaseBalanceTransaction = await this._createBalanceTransactionEntity({ userId: user._id, description: '', amount:  })
-  //   // create 2 balance transactions - 1 for credit purchase +, 1 for package transaction -
-  //   // running balance?? - compute by getting current user's balance
-  //   // userBalanceHandler.add({ amount: 60, userId, session, desc });
-  // };
-
-  private _createBalanceTransactionEntity = async (props: {
-    userId: ObjectId;
-    description: string;
-    amount: number;
-    packageTransactionId: ObjectId;
-    runningBalance: RunningBalance;
-  }): Promise<BalanceTransactionEntityBuildResponse> => {
-    const { userId, description, amount, packageTransactionId, runningBalance } = props;
-    const balanceTransactionEntity = await this._balanceTransactionEntity.build({
-      userId,
-      status: BALANCE_TRANSACTION_ENTITY_STATUS.PENDING,
-      currency: 'SGD',
-      type: BALANCE_TRANSACTION_ENTITY_TYPE.PACKAGE_TRANSACTION,
-      packageTransactionId: packageTransactionId,
-      amount: 100,
-      processingFee: 5,
-      tax: 0.2,
-      total: 105.2,
-      runningBalance: {
-        currency: 'SGD',
-        totalAvailable: 0,
-      },
-      paymentData: {
-        gateway: 'paypal',
-        id: 'some id',
-      },
+  private _createBalanceTransactions = async (props: {
+    packageTransaction: PackageTransactionDoc;
+    balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+    paymentId: string;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<BalanceTransactionDoc[]> => {
+    const {
+      packageTransaction,
+      dbServiceAccessOptions,
+      balanceTransactionEntityBuildParams,
+      paymentId,
+    } = props;
+    const session = await this._balanceTransactionDbService.startSession();
+    const user = await this._userDbService.findById({
+      _id: packageTransaction.reservedById,
+      dbServiceAccessOptions,
+      session,
     });
-    return balanceTransactionEntity;
+    const teacher = await this._userDbService.findById({
+      _id: packageTransaction.hostedById,
+      dbServiceAccessOptions,
+      session,
+    });
+    balanceTransactionEntityBuildParams.packageTransactionId = packageTransaction._id;
+    balanceTransactionEntityBuildParams.paymentData.id = paymentId;
+    const debitBalanceTransaction = await this._createDebitBalanceTransaction({
+      balanceTransactionEntityBuildParams,
+      user,
+      dbServiceAccessOptions,
+      session,
+    });
+    const creditBalanceTransaction = await this._createCreditBalanceTransaction({
+      balanceTransactionEntityBuildParams,
+      debitBalanceTransaction,
+      user,
+      dbServiceAccessOptions,
+      session,
+    });
+    const teacherPayoutBalanceTransaction = await this._createTeacherPayoutBalanceTransaction({
+      balanceTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      session,
+      teacher,
+    });
+    const balanceTransactions = [
+      debitBalanceTransaction,
+      creditBalanceTransaction,
+      // teacherPayoutBalanceTransaction,
+    ];
+    return balanceTransactions;
+    // use and end session!!! try catch finally
+  };
+
+  private _createDebitBalanceTransaction = async (props: {
+    balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+    user: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+  }): Promise<BalanceTransactionDoc> => {
+    const { balanceTransactionEntityBuildParams, user, dbServiceAccessOptions, session } = props;
+    const debitBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
+      this._cloneDeep(balanceTransactionEntityBuildParams);
+    debitBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
+      debitBalanceTransactionEntityBuildParams.balanceChange + user.balance.totalAvailable;
+    const debitBalanceTransaction = await this._createBalanceTransaction({
+      balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      session,
+    });
+    return debitBalanceTransaction;
+  };
+
+  private _createBalanceTransaction = async (props: {
+    balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+  }): Promise<BalanceTransactionDoc> => {
+    const { balanceTransactionEntityBuildParams, dbServiceAccessOptions, session } = props;
+    const balanceTransactionEntity = await this._balanceTransactionEntity.build({
+      ...balanceTransactionEntityBuildParams,
+    });
+    const balanceTransaction = await this._balanceTransactionDbService.insert({
+      modelToInsert: balanceTransactionEntity,
+      dbServiceAccessOptions,
+      session,
+    });
+    return balanceTransaction;
+  };
+
+  private _createCreditBalanceTransaction = async (props: {
+    balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+    debitBalanceTransaction: BalanceTransactionDoc;
+    user: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+  }): Promise<BalanceTransactionDoc> => {
+    const {
+      balanceTransactionEntityBuildParams,
+      debitBalanceTransaction,
+      user,
+      dbServiceAccessOptions,
+      session,
+    } = props;
+    const creditBalanceTransactionEntityBuildParams = this._cloneDeep(
+      balanceTransactionEntityBuildParams
+    );
+    creditBalanceTransactionEntityBuildParams.balanceChange =
+      debitBalanceTransaction.balanceChange * -1;
+    creditBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
+      user.balance.totalAvailable;
+    creditBalanceTransactionEntityBuildParams.processingFee = 0;
+    creditBalanceTransactionEntityBuildParams.totalPaid =
+      creditBalanceTransactionEntityBuildParams.balanceChange;
+    const creditBalanceTransaction = await this._createBalanceTransaction({
+      balanceTransactionEntityBuildParams: creditBalanceTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      session,
+    });
+    return creditBalanceTransaction;
+  };
+
+  private _createTeacherPayoutBalanceTransaction = async (props: {
+    balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+    teacher: JoinedUserDoc;
+  }): Promise<void> => {
+    const { balanceTransactionEntityBuildParams, dbServiceAccessOptions, session, teacher } = props;
+    const teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
+      this._cloneDeep(balanceTransactionEntityBuildParams);
+    teacherPayoutBalanceTransactionEntityBuildParams.userId = teacher._id;
+    teacherPayoutBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
+      teacherPayoutBalanceTransactionEntityBuildParams.balanceChange +
+      teacher.balance.totalAvailable;
+    teacherPayoutBalanceTransactionEntityBuildParams.processingFee =
+      -1 * balanceTransactionEntityBuildParams.balanceChange;
+    //change process fee, total paid
+
+    // teacher id, credit + 175 - 16%... paymentdata empty
   };
 
   protected _initTemplate = async (
