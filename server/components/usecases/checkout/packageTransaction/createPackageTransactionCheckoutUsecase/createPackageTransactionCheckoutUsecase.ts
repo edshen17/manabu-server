@@ -91,6 +91,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
+  private _currency!: any;
   private _defaultCurrency: string = process.env.DEFAULT_CURRENCY!;
 
   protected _makeRequestTemplate = async (
