@@ -13,9 +13,9 @@ These instructions will help you get a copy of the project up and running for de
 * [Redis](https://redis.io/download) + [RedisInsight](https://redis.com/redis-enterprise/redis-insight/)
 
 ### Installation
-1. `git clone https://github.com/edshen17/manabu-server.git --branch ts-refactor --single-branch --config core.autocrlf=false`
-2. `npm install`
-3. Create a .env file in the root directory to add secret API keys. Please ask the project manager for them
+1. `git clone https://github.com/edshen17/manabu-server.git --branch ts-refactor --single-branch --config core.autocrlf=false`.
+2. `npm install`.
+3. Create a .env file in the root directory to add secret API keys. Please ask the project manager for them.
 
 ### Tests
 To run the test suite, run `npm t`.
@@ -36,6 +36,6 @@ We should strive to write code that is as clean as possible. However, first impl
 
 ### Deployment
 To deploy on Heroku, follow the following steps:
-1. Run `npm build` on the client code (cd to client folder)
-2. Run `npm build` for the server code
+1. Run `npm build` on the client code (cd to client folder).
+2. Run `npm build` for the server code.
 3. Push the code and merge the development branch with the `master` branch.

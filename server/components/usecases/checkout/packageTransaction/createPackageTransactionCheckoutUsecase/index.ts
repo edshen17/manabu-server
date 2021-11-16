@@ -13,6 +13,7 @@ import { convertToTitlecase } from '../../../utils/convertToTitlecase';
 import { makeExchangeRateHandler } from '../../../utils/exchangeRateHandler';
 import { makeJwtHandler } from '../../../utils/jwtHandler';
 import { CreatePackageTransactionCheckoutUsecase } from './createPackageTransactionCheckoutUsecase';
+const currency = require('currency.js');
 
 const makeCreatePackageTransactionCheckoutUsecase =
   new CreatePackageTransactionCheckoutUsecase().init({
@@ -30,6 +31,7 @@ const makeCreatePackageTransactionCheckoutUsecase =
     makePaynowPaymentHandler,
     makeJwtHandler,
     makeCacheDbService,
+    currency,
   });
 
 export { makeCreatePackageTransactionCheckoutUsecase };

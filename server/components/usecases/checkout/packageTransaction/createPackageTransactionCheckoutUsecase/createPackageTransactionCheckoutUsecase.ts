@@ -43,6 +43,7 @@ type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
   convertStringToObjectId: ConvertStringToObjectId;
   convertToTitlecase: ConvertToTitlecase;
+  currency: any;
 };
 
 type CreatePackageTransactionCheckoutUsecaseResponse = {
@@ -392,6 +393,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       makePackageTransactionCheckoutEntityValidator,
       convertStringToObjectId,
       convertToTitlecase,
+      currency,
     } = optionalInitParams;
     this._paypalPaymentHandler = await makePaypalPaymentHandler;
     this._stripePaymentHandler = await makeStripePaymentHandler;
@@ -402,6 +404,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
     this._convertStringToObjectId = convertStringToObjectId;
     this._convertToTitlecase = convertToTitlecase;
+    this._currency = currency;
   };
 }
 
