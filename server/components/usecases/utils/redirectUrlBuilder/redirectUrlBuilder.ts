@@ -1,3 +1,4 @@
+import { NODE_ENV } from '../../../../constants';
 import { QueryStringHandler } from '../queryStringHandler/queryStringHandler';
 
 class RedirectUrlBuilder {
@@ -35,7 +36,7 @@ class RedirectUrlBuilder {
         development: 'http://localhost:5000/api/v1',
       },
     };
-    return hostOptions[host][process.env.NODE_ENV!];
+    return hostOptions[host][NODE_ENV];
   };
 
   // NOTE: endpoint string should start with / (eg. /users/someUserId)

@@ -1,3 +1,4 @@
+import { JWT_SECRET } from '../../../constants';
 import { UserContactMethodEmbed } from '../../../models/User';
 import {
   ENTITY_VALIDATOR_VALIDATE_MODES,
@@ -156,7 +157,7 @@ class UserEntity extends AbstractEntity<
 
   private _createVerificationToken = (name: string, email: string): string => {
     const randToken = this._cryptoRandomString({ length: 15 });
-    const secret = process.env.JWT_SECRET;
+    const secret = JWT_SECRET;
     const TOKEN_EXPIRY_DATE = 24 * 60 * 60 * 7;
     const verificationToken = this._signJwt({ randToken, name, email }, secret, {
       expiresIn: TOKEN_EXPIRY_DATE,

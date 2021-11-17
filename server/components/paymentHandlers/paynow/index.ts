@@ -1,8 +1,9 @@
+import { PAYNOW_PUBLIC_KEY_DEV, PAYNOW_SECRET_KEY_DEV } from '../../../constants';
 import { PaynowPaymentHandler } from './paynowPaymentHandler';
 
 // add production keys
-const publicKey = process.env.PAYNOW_PUBLIC_KEY_DEV!;
-const secretKey = process.env.PAYNOW_SECRET_KEY_DEV!;
+const publicKey = PAYNOW_PUBLIC_KEY_DEV;
+const secretKey = PAYNOW_SECRET_KEY_DEV;
 
 const omise = require('omise')({
   publicKey,

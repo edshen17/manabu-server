@@ -1,9 +1,10 @@
 import { Stripe } from 'stripe';
+import { IS_PRODUCTION, STRIPE_SECRET_KEY, STRIPE_SECRET_KEY_DEV } from '../../../constants';
 import { StripePaymentHandler } from './stripePaymentHandler';
 
-let stripeKey = process.env.STRIPE_SECRET_KEY!;
-if (process.env.NODE_ENV != 'production') {
-  stripeKey = process.env.STRIPE_SECRET_KEY_DEV!;
+let stripeKey = STRIPE_SECRET_KEY;
+if (!IS_PRODUCTION) {
+  stripeKey = STRIPE_SECRET_KEY_DEV;
 }
 const stripe = new Stripe(stripeKey, {
   apiVersion: '2020-08-27',

@@ -9,6 +9,7 @@ import hpp from 'hpp';
 import http from 'http';
 import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler';
 import { DbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
+import { IS_PRODUCTION } from './constants';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
 
@@ -44,7 +45,7 @@ app.use(
 );
 app.use('/api/', v1);
 
-if (process.env.NODE_ENV == 'production') {
+if (IS_PRODUCTION) {
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.header('x-forwarded-proto') !== 'https') {
       res.redirect(`https://${req.header('host')}${req.url}`);
@@ -60,7 +61,7 @@ if (process.env.NODE_ENV == 'production') {
 }
 
 app.use(express.static('public'));
-const port = process.env.PORT || 5000;
+const port = 5000;
 
 makeDbConnectionHandler.then(async (dbHandler) => {
   dbConnectionHandler = dbHandler;

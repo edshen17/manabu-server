@@ -1,3 +1,9 @@
+import { Axios } from 'axios';
+import {
+  IS_PRODUCTION,
+  OPEN_EXCHANGE_RATE_API_KEY,
+  OPEN_EXCHANGE_RATE_API_KEY_DEV,
+} from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 
@@ -10,7 +16,7 @@ type OpenExchangeRateResponse = {
 };
 
 class ExchangeRateHandler {
-  private _axios!: any;
+  private _axios!: Axios;
   private _cacheDbService!: CacheDbService;
   private _fx!: any;
   private _currency!: any;
@@ -36,9 +42,9 @@ class ExchangeRateHandler {
   };
 
   private _getExchangeRateAPIUrl = () => {
-    let apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY_DEV;
-    if (process.env.NODE_ENV == 'production') {
-      apiKey = process.env.OPEN_EXCHANGE_RATE_API_KEY;
+    let apiKey = OPEN_EXCHANGE_RATE_API_KEY_DEV;
+    if (IS_PRODUCTION) {
+      apiKey = OPEN_EXCHANGE_RATE_API_KEY;
     }
     return `https://openexchangerates.org/api/latest.json?app_id=${apiKey}`;
   };
@@ -59,7 +65,7 @@ class ExchangeRateHandler {
   };
 
   public init = async (props: {
-    axios: any;
+    axios: Axios;
     makeCacheDbService: Promise<CacheDbService>;
     money: any;
     currency: any;

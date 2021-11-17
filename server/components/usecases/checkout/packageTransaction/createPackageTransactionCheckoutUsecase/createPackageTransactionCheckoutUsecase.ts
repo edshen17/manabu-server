@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongoose';
+import { DEFAULT_CURRENCY } from '../../../../../constants';
 import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
@@ -93,7 +94,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
   private _currency!: any;
-  private _defaultCurrency: string = process.env.DEFAULT_CURRENCY!;
+  private _defaultCurrency: string = DEFAULT_CURRENCY;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams

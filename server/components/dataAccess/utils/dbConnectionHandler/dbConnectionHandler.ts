@@ -1,5 +1,6 @@
 import { MongoMemoryReplSet } from 'mongodb-memory-server-core';
 import { Mongoose, ObjectId } from 'mongoose';
+import { IS_PRODUCTION, MONGO_HOST, MONGO_PASS } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 
 class DbConnectionHandler {
@@ -20,8 +21,8 @@ class DbConnectionHandler {
   private _getDbUri = async (): Promise<string> => {
     const dbHost = 'staging'; // change to users
     const uriOptions = 'retryWrites=false&w=majority';
-    let dbUri = `mongodb+srv://manabu:${process.env.MONGO_PASS}@${process.env.MONGO_HOST}/${dbHost}?${uriOptions}`;
-    if (process.env.NODE_ENV != 'production') {
+    let dbUri = `mongodb+srv://manabu:${MONGO_PASS}@${MONGO_HOST}/${dbHost}?${uriOptions}`;
+    if (!IS_PRODUCTION) {
       const mongod = await this._mongoMemoryReplSet.create({
         replSet: { count: 1, storageEngine: 'wiredTiger' },
       });
@@ -36,7 +37,7 @@ class DbConnectionHandler {
       ignoreUndefined: true,
       readPreference: 'primary',
     };
-    if (process.env.NODE_ENV == 'production') {
+    if (IS_PRODUCTION) {
       mongoDbOptions.readPreference = 'nearest';
     }
     return mongoDbOptions;

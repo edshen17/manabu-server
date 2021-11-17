@@ -1,3 +1,4 @@
+import { JWT_SECRET } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 
@@ -8,7 +9,7 @@ enum CACHE_DB_HASH_KEY {
 class JwtHandler {
   private _jwt!: any;
   private _cacheDbService!: CacheDbService;
-  private _secret: string = process.env.JWT_SECRET!;
+  private _secret: string = JWT_SECRET;
 
   public sign = (props: { toTokenObj: StringKeyObject; expiresIn: string | number }): string => {
     const { toTokenObj, expiresIn } = props;

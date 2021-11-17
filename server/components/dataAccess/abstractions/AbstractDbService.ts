@@ -1,4 +1,5 @@
 import { ClientSession, Mongoose, ObjectId } from 'mongoose';
+import { IS_PRODUCTION } from '../../../constants';
 import { StringKeyObject } from '../../../types/custom';
 import { CacheDbService, TTL_MS } from '../services/cache/cacheDbService';
 import {
@@ -359,8 +360,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
   };
 
   private _clearCacheBrancher = async (): Promise<void> => {
-    const isAsync = process.env.NODE_ENV != 'production';
-    if (isAsync) {
+    if (!IS_PRODUCTION) {
       await this._clearCacheDependencies();
     } else {
       this._clearCacheDependencies();

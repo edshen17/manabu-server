@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { makeCreateStripeWebhookController } from '.';
+import { STRIPE_WEBHOOK_SECREY_KEY_DEV } from '../../../../../constants';
 import { StringKeyObject } from '../../../../../types/custom';
 import { stripe } from '../../../../paymentHandlers/stripe';
 import { makeFakePackageTransactionCheckoutTokenHandler } from '../../../../usecases/utils/fakePackageTransactionCheckoutTokenHandler';
@@ -51,7 +52,7 @@ describe('createStripeWebhookController', () => {
         },
       };
       const payloadString = JSON.stringify(payload, null, 2);
-      const secret = process.env.STRIPE_WEBHOOK_SECREY_KEY_DEV!;
+      const secret = STRIPE_WEBHOOK_SECREY_KEY_DEV;
       const stripeHeader = stripe.webhooks.generateTestHeaderString({
         payload: payloadString,
         secret,

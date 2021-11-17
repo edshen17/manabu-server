@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongoose';
+import { IS_PRODUCTION } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -207,8 +208,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
   };
 
   private _splitAvailableTimeBrancher = async (appointments: AppointmentDoc[]): Promise<void> => {
-    const isAsync = process.env.NODE_ENV != 'production';
-    if (isAsync) {
+    if (!IS_PRODUCTION) {
       await this._splitAvailableTimeHandler.split(appointments);
     } else {
       this._splitAvailableTimeHandler.split(appointments);

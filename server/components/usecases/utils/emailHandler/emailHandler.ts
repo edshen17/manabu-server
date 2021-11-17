@@ -1,4 +1,9 @@
 import { ObjectId } from 'mongoose';
+import {
+  IS_PRODUCTION,
+  MANABU_EMAIL_NOREPLY_PASS,
+  MANABU_EMAIL_SUPPORT_PASS,
+} from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
@@ -24,12 +29,12 @@ class EmailHandler {
     SUPPORT: {
       emailName: 'manabu.sg <support@manabu.sg>',
       user: 'support@manabu.sg',
-      pass: process.env.MANABU_EMAIL_SUPPORT_PASS!,
+      pass: MANABU_EMAIL_SUPPORT_PASS,
     },
     NOREPLY: {
       emailName: 'manabu.sg <no-reply@manabu.sg>',
       user: 'no-reply@manabu.sg',
-      pass: process.env.MANABU_EMAIL_NOREPLY_PASS!,
+      pass: MANABU_EMAIL_NOREPLY_PASS,
     },
   };
   private _nodemailer!: any;
@@ -69,10 +74,9 @@ class EmailHandler {
     subjectLine: string;
     mjmlFileName: string;
     data: StringKeyObject;
-  }) => {
+  }): Promise<void> => {
     const { recipientEmails, sendFrom, subjectLine, mjmlFileName, data } = props;
-    const isProduction = process.env.NODE_ENV == 'production';
-    if (isProduction) {
+    if (IS_PRODUCTION) {
       const nodeMailerOptions: any = {
         ...this._NODE_MAILER_OPTIONS,
       };

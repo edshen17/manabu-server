@@ -17,6 +17,8 @@ These instructions will help you get a copy of the project up and running for de
 2. `npm install`.
 3. Create a .env file in the root directory to add secret API keys. Please ask the project manager for them.
 
+Note: Refer to [this](https://stackoverflow.com/a/33424884) if you get any CRLF lint errors.
+
 ### Tests
 To run the test suite, run `npm t`.
 

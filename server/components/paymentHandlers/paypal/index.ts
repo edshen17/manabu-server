@@ -1,16 +1,23 @@
 import paypal from 'paypal-rest-sdk';
+import {
+  IS_PRODUCTION,
+  PAYPAL_CLIENT_ID,
+  PAYPAL_CLIENT_ID_DEV,
+  PAYPAL_CLIENT_SECRET,
+  PAYPAL_CLIENT_SECRET_DEV,
+} from '../../../constants';
 import { PaypalPaymentHandler } from './paypalPaymentHandler';
 
 const paypalConfig = {
   mode: 'sandbox',
-  client_id: process.env.PAYPAL_CLIENT_ID_DEV!,
-  client_secret: process.env.PAYPAL_CLIENT_SECRET_DEV!,
+  client_id: PAYPAL_CLIENT_ID_DEV,
+  client_secret: PAYPAL_CLIENT_SECRET_DEV,
 };
 
-if (process.env.NODE_ENV == 'production') {
+if (IS_PRODUCTION) {
   paypalConfig.mode = 'live';
-  paypalConfig.client_id = process.env.PAYPAL_CLIENT_ID!;
-  paypalConfig.client_secret = process.env.PAYPAL_CLIENT_SECRET!;
+  paypalConfig.client_id = PAYPAL_CLIENT_ID;
+  paypalConfig.client_secret = PAYPAL_CLIENT_SECRET;
 }
 
 paypal.configure(paypalConfig);

@@ -1,3 +1,4 @@
+import { IS_PRODUCTION, MANABU_ADMIN_ID, MANABU_ADMIN_PKG_ID } from '../../../../constants';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
@@ -148,9 +149,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   }): Promise<PackageTransactionDoc> => {
     const { user, dbServiceAccessOptions } = props;
     const modelToInsert = await this._packageTransactionEntity.build({
-      hostedById: this._convertStringToObjectId(process.env.MANABU_ADMIN_ID!),
+      hostedById: this._convertStringToObjectId(MANABU_ADMIN_ID),
       reservedById: user._id,
-      packageId: this._convertStringToObjectId(process.env.MANABU_ADMIN_PKG_ID!),
+      packageId: this._convertStringToObjectId(MANABU_ADMIN_PKG_ID),
       lessonDuration: 60,
       remainingAppointments: 1,
       lessonLanguage: 'ja',
@@ -165,8 +166,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
 
   private _createGraphAdminTeacherEdge = async (user: JoinedUserDoc): Promise<void> => {
     await this._cacheDbService.graphQuery(
-      `MATCH (teacher: User {_id: "${user._id}"}), (admin: User {_id:"${process.env
-        .MANABU_ADMIN_ID!}"}) MERGE (admin)-[r: MANAGES {since: "${new Date().toISOString()}"}]->(teacher)`
+      `MATCH (teacher: User {_id: "${
+        user._id
+      }"}), (admin: User {_id:"${MANABU_ADMIN_ID}"}) MERGE (admin)-[r: MANAGES {since: "${new Date().toISOString()}"}]->(teacher)`
     );
   };
 
@@ -231,8 +233,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       httpOnly: true,
       secure: true,
     };
-
-    if (process.env.NODE_ENV != 'production') {
+    if (!IS_PRODUCTION) {
       cookieOptions.httpOnly = false;
       cookieOptions.secure = false;
     }
