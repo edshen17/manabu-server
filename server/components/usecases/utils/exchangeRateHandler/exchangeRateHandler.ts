@@ -15,6 +15,11 @@ type OpenExchangeRateResponse = {
   rates: StringKeyObject;
 };
 
+type ArithmeticCurrencyObj = {
+  amount: number;
+  sourceCurrency: string;
+};
+
 class ExchangeRateHandler {
   private _axios!: Axios;
   private _cacheDbService!: CacheDbService;
@@ -51,17 +56,82 @@ class ExchangeRateHandler {
 
   public convert = async (props: {
     amount: number;
-    fromCurrency: string;
-    toCurrency: string;
+    sourceCurrency: string;
+    targetCurrency: string;
   }): Promise<number> => {
-    const { amount, fromCurrency, toCurrency } = props;
+    const { amount, sourceCurrency, targetCurrency } = props;
     this._fx.base = 'SGD';
     this._fx.rates = await this.getRates();
     const convertedAmount = this._fx(amount)
-      .from(fromCurrency.toUpperCase())
-      .to(toCurrency.toUpperCase());
-    const formattedAmount = this._currency(convertedAmount).value;
+      .from(sourceCurrency.toUpperCase())
+      .to(targetCurrency.toUpperCase());
+    const formattedAmount = this.toCurrency(convertedAmount);
     return formattedAmount;
+  };
+
+  public add = async (props: {
+    addend1: ArithmeticCurrencyObj;
+    addend2: ArithmeticCurrencyObj;
+    targetCurrency: string;
+  }): Promise<number> => {
+    const { addend1, addend2, targetCurrency } = props;
+    const convertedAddend1 = await this.convert({
+      amount: addend1.amount,
+      sourceCurrency: addend1.sourceCurrency,
+      targetCurrency,
+    });
+    const convertedAddend2 = await this.convert({
+      amount: addend2.amount,
+      sourceCurrency: addend2.sourceCurrency,
+      targetCurrency,
+    });
+    const convertedSum = this._currency(convertedAddend1).add(convertedAddend2).value;
+    return convertedSum;
+  };
+
+  public subtract = async (props: {
+    minuend: ArithmeticCurrencyObj;
+    subtrahend: ArithmeticCurrencyObj;
+    targetCurrency: string;
+  }): Promise<number> => {
+    const { minuend, subtrahend, targetCurrency } = props;
+    const convertedMinuend = await this.convert({
+      amount: minuend.amount,
+      sourceCurrency: minuend.sourceCurrency,
+      targetCurrency,
+    });
+    const convertedSubtrahend = await this.convert({
+      amount: subtrahend.amount,
+      sourceCurrency: subtrahend.sourceCurrency,
+      targetCurrency,
+    });
+    const convertedDiff = this._currency(convertedMinuend).subtract(convertedSubtrahend).value;
+    return convertedDiff;
+  };
+
+  public multiply = async (props: {
+    multiplicand: ArithmeticCurrencyObj;
+    multiplier: ArithmeticCurrencyObj;
+    targetCurrency: string;
+  }): Promise<number> => {
+    const { multiplicand, multiplier, targetCurrency } = props;
+    const convertedMultiplicand = await this.convert({
+      amount: multiplicand.amount,
+      sourceCurrency: multiplicand.sourceCurrency,
+      targetCurrency,
+    });
+    const convertedMultiplier = await this.convert({
+      amount: multiplier.amount,
+      sourceCurrency: multiplier.sourceCurrency,
+      targetCurrency,
+    });
+    const convertedDiff = this._currency(convertedMultiplicand).multiply(convertedMultiplier).value;
+    return convertedDiff;
+  };
+
+  public toCurrency = (num: number): number => {
+    const convertedNum = this._currency(num).value;
+    return convertedNum;
   };
 
   public init = async (props: {

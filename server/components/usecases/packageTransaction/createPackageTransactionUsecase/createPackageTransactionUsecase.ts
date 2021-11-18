@@ -1,4 +1,5 @@
 import { ClientSession } from 'mongoose';
+import { MANABU_PROCESSING_RATE } from '../../../../constants';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
@@ -11,11 +12,13 @@ import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import {
   BalanceTransactionEntity,
   BalanceTransactionEntityBuildParams,
+  BALANCE_TRANSACTION_ENTITY_STATUS,
 } from '../../../entities/balanceTransaction/balanceTransactionEntity';
 import {
   PackageTransactionEntity,
   PackageTransactionEntityBuildParams,
 } from '../../../entities/packageTransaction/packageTransactionEntity';
+import { PAYMENT_GATEWAY_NAME } from '../../../paymentHandlers/abstractions/IPaymentHandler';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { CHECKOUT_TOKEN_HASH_KEY } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
@@ -28,6 +31,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeBalanceTransactionEntity: Promise<BalanceTransactionEntity>;
   makeBalanceTransactionDbService: Promise<BalanceTransactionDbService>;
   makeUserDbService: Promise<UserDbService>;
+  currency: any;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
@@ -46,6 +50,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _balanceTransactionEntity!: BalanceTransactionEntity;
   private _balanceTransactionDbService!: BalanceTransactionDbService;
   private _userDbService!: UserDbService;
+  private _currency!: any;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -154,7 +159,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const balanceTransactions = [
       debitBalanceTransaction,
       creditBalanceTransaction,
-      // teacherPayoutBalanceTransaction,
+      teacherPayoutBalanceTransaction,
     ];
     return balanceTransactions;
     // use and end session!!! try catch finally
@@ -169,8 +174,9 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const { balanceTransactionEntityBuildParams, user, dbServiceAccessOptions, session } = props;
     const debitBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
       this._cloneDeep(balanceTransactionEntityBuildParams);
-    debitBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
-      debitBalanceTransactionEntityBuildParams.balanceChange + user.balance.totalAvailable;
+    debitBalanceTransactionEntityBuildParams.runningBalance.totalAvailable = this._currency(
+      debitBalanceTransactionEntityBuildParams.balanceChange
+    ).add(user.balance.totalAvailable).value;
     const debitBalanceTransaction = await this._createBalanceTransaction({
       balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
       dbServiceAccessOptions,
@@ -213,13 +219,16 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const creditBalanceTransactionEntityBuildParams = this._cloneDeep(
       balanceTransactionEntityBuildParams
     );
-    creditBalanceTransactionEntityBuildParams.balanceChange =
-      debitBalanceTransaction.balanceChange * -1;
-    creditBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
-      user.balance.totalAvailable;
+    creditBalanceTransactionEntityBuildParams.balanceChange = this._currency(
+      debitBalanceTransaction.balanceChange
+    ).multiply(-1).value;
+    creditBalanceTransactionEntityBuildParams.runningBalance.totalAvailable = this._currency(
+      user.balance.totalAvailable
+    ).value;
     creditBalanceTransactionEntityBuildParams.processingFee = 0;
-    creditBalanceTransactionEntityBuildParams.totalPaid =
-      creditBalanceTransactionEntityBuildParams.balanceChange;
+    creditBalanceTransactionEntityBuildParams.totalPaid = this._currency(
+      creditBalanceTransactionEntityBuildParams.balanceChange
+    ).value;
     const creditBalanceTransaction = await this._createBalanceTransaction({
       balanceTransactionEntityBuildParams: creditBalanceTransactionEntityBuildParams,
       dbServiceAccessOptions,
@@ -233,19 +242,33 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
     teacher: JoinedUserDoc;
-  }): Promise<void> => {
+  }): Promise<BalanceTransactionDoc> => {
     const { balanceTransactionEntityBuildParams, dbServiceAccessOptions, session, teacher } = props;
     const teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
       this._cloneDeep(balanceTransactionEntityBuildParams);
     teacherPayoutBalanceTransactionEntityBuildParams.userId = teacher._id;
-    teacherPayoutBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
-      teacherPayoutBalanceTransactionEntityBuildParams.balanceChange +
-      teacher.balance.totalAvailable;
-    teacherPayoutBalanceTransactionEntityBuildParams.processingFee =
-      -1 * balanceTransactionEntityBuildParams.balanceChange;
-    //change process fee, total paid
-
-    // teacher id, credit + 175 - 16%... paymentdata empty
+    teacherPayoutBalanceTransactionEntityBuildParams.processingFee = this._currency(
+      balanceTransactionEntityBuildParams.balanceChange
+    ).multiply(-1 * MANABU_PROCESSING_RATE).value;
+    const totalPaid = this._currency(balanceTransactionEntityBuildParams.balanceChange).add(
+      teacherPayoutBalanceTransactionEntityBuildParams.processingFee
+    ).value;
+    teacherPayoutBalanceTransactionEntityBuildParams.runningBalance.totalAvailable = this._currency(
+      totalPaid
+    ).add(teacher.balance.totalAvailable).value;
+    teacherPayoutBalanceTransactionEntityBuildParams.paymentData = {
+      gateway: PAYMENT_GATEWAY_NAME.NONE,
+      id: '',
+    };
+    teacherPayoutBalanceTransactionEntityBuildParams.status =
+      BALANCE_TRANSACTION_ENTITY_STATUS.PENDING;
+    const teacherPayoutBalanceTransaction = await this._createBalanceTransaction({
+      balanceTransactionEntityBuildParams: teacherPayoutBalanceTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      session,
+    });
+    return teacherPayoutBalanceTransaction;
+    //update teacher's account totalPending balance...
   };
 
   protected _initTemplate = async (
@@ -258,6 +281,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeBalanceTransactionDbService,
       makeBalanceTransactionEntity,
       makeUserDbService,
+      currency,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -265,6 +289,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._balanceTransactionDbService = await makeBalanceTransactionDbService;
     this._balanceTransactionEntity = await makeBalanceTransactionEntity;
     this._userDbService = await makeUserDbService;
+    this._currency = currency;
   };
 }
 

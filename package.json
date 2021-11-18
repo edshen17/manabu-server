@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "server": "nodemon server/index.ts",
     "start": "node server/dist/index.js",
-    "test": "mocha --timeout 50000 --parallel --exit -r ts-node/register --require fixtures.ts server/**/*.test.ts",
+    "test": "mocha --timeout 50000 --parallel --exit -r ts-node/register --require fixtures.ts server/**/exchangeRateHandler.test.ts",
     "madge": "madge --circular --extensions ts ./",
     "ngrok": "ngrok http 5000",
     "kill": "taskkill /F /IM node.exe",

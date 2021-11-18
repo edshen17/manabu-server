@@ -9,6 +9,11 @@ type AbstractEditUsecaseInitParams<OptionalUsecaseInitParams> = {
   makeEditEntityValidator: AbstractEntityValidator;
 } & OptionalUsecaseInitParams;
 
+type AbstractEditUsecaseInitTemplateParams<OptionalUsecaseInitParams> = Omit<
+  AbstractEditUsecaseInitParams<OptionalUsecaseInitParams>,
+  'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
+>;
+
 abstract class AbstractEditUsecase<
   OptionalUsecaseInitParams,
   UsecaseResponse,
@@ -32,14 +37,15 @@ abstract class AbstractEditUsecase<
   };
 
   protected _initTemplate = async (
-    optionalInitParams: Omit<
-      AbstractEditUsecaseInitParams<OptionalUsecaseInitParams>,
-      'makeQueryValidator' | 'makeParamsValidator' | 'cloneDeep' | 'makeDbService' | 'deepEqual'
-    >
+    optionalInitParams: AbstractEditUsecaseInitTemplateParams<OptionalUsecaseInitParams>
   ): Promise<void> => {
     const { makeEditEntityValidator } = optionalInitParams;
     this._editEntityValidator = makeEditEntityValidator;
   };
 }
 
-export { AbstractEditUsecase, AbstractEditUsecaseInitParams };
+export {
+  AbstractEditUsecase,
+  AbstractEditUsecaseInitParams,
+  AbstractEditUsecaseInitTemplateParams,
+};

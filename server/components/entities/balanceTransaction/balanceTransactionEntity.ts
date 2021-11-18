@@ -1,7 +1,9 @@
 import { ObjectId } from 'mongoose';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 
-type OptionalBalanceTransactionEntityInitParams = {};
+type OptionalBalanceTransactionEntityInitParams = {
+  currency: any;
+};
 
 type BalanceTransactionEntityBuildParams = {
   userId: ObjectId;
@@ -12,7 +14,6 @@ type BalanceTransactionEntityBuildParams = {
   balanceChange: number;
   processingFee: number;
   tax: number;
-  totalPaid: number;
   runningBalance: RunningBalance;
   paymentData: {
     gateway: string;
@@ -26,6 +27,7 @@ type RunningBalance = {
 };
 
 type BalanceTransactionEntityBuildResponse = BalanceTransactionEntityBuildParams & {
+  totalPaid: number;
   creationDate: Date;
   lastModifiedDate: Date;
 };
@@ -46,6 +48,8 @@ class BalanceTransactionEntity extends AbstractEntity<
   BalanceTransactionEntityBuildParams,
   BalanceTransactionEntityBuildResponse
 > {
+  private _currency!: any;
+
   protected _buildTemplate = async (
     buildParams: BalanceTransactionEntityBuildParams
   ): Promise<BalanceTransactionEntityBuildResponse> => {
@@ -58,19 +62,25 @@ class BalanceTransactionEntity extends AbstractEntity<
       balanceChange,
       processingFee,
       tax,
-      totalPaid,
       runningBalance,
       paymentData,
     } = buildParams;
+    runningBalance.totalAvailable = this._currency(runningBalance.totalAvailable).value;
+    const convertedBalanceChange = this._currency(balanceChange).value;
+    const convertedProcessingFee = this._currency(processingFee).value;
+    const convertedTax = this._currency(tax).value;
+    const totalPaidPreTax =
+      this._currency(convertedBalanceChange).add(convertedProcessingFee).value;
+    const totalPaid = this._currency(totalPaidPreTax).add(convertedTax).value;
     const balanceTransactionEntity = {
       userId,
       status,
       currency,
       type,
       packageTransactionId,
-      balanceChange,
-      processingFee,
-      tax,
+      balanceChange: convertedBalanceChange,
+      processingFee: convertedProcessingFee,
+      tax: convertedTax,
       totalPaid,
       runningBalance,
       paymentData,
@@ -78,6 +88,13 @@ class BalanceTransactionEntity extends AbstractEntity<
       lastModifiedDate: new Date(),
     };
     return balanceTransactionEntity;
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalBalanceTransactionEntityInitParams
+  ): Promise<void> => {
+    const { currency } = optionalInitParams;
+    this._currency = currency;
   };
 }
 

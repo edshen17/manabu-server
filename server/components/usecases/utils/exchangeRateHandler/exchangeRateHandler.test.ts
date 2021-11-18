@@ -19,10 +19,64 @@ describe('exchangeRateHandler', () => {
     it('should convert the currencies', async () => {
       const convertedRate = await exchangeRateHandler.convert({
         amount: 10,
-        fromCurrency: 'usd',
-        toCurrency: 'jpy',
+        sourceCurrency: 'usd',
+        targetCurrency: 'jpy',
       });
       expect(convertedRate > 10).to.equal(true);
+    });
+  });
+  describe('add', () => {
+    it('should add the currencies', async () => {
+      const currencySum = await exchangeRateHandler.add({
+        addend1: {
+          amount: 10000,
+          sourceCurrency: 'JPY',
+        },
+        addend2: {
+          amount: 1000,
+          sourceCurrency: 'SGD',
+        },
+        targetCurrency: 'SGD',
+      });
+      expect(currencySum < 10000).to.equal(true);
+    });
+  });
+  describe('subtract', () => {
+    it('should subtract the currencies', async () => {
+      const currencyDiff = await exchangeRateHandler.subtract({
+        minuend: {
+          amount: 1000,
+          sourceCurrency: 'SGD',
+        },
+        subtrahend: {
+          amount: 1000,
+          sourceCurrency: 'JPY',
+        },
+        targetCurrency: 'SGD',
+      });
+      expect(currencyDiff < 2000).to.equal(true);
+    });
+  });
+  describe('multiply', () => {
+    it('should multiply the currencies', async () => {
+      const currencyProduct = await exchangeRateHandler.multiply({
+        multiplicand: {
+          amount: 1000,
+          sourceCurrency: 'JPY',
+        },
+        multiplier: {
+          amount: 1000,
+          sourceCurrency: 'SGD',
+        },
+        targetCurrency: 'SGD',
+      });
+      expect(currencyProduct < 10000).to.equal(true);
+    });
+  });
+  describe('toCurrency', () => {
+    it('should turn the given number into a currency', async () => {
+      const convertedCurrency = await exchangeRateHandler.toCurrency(11.111);
+      expect(convertedCurrency).to.equal(11.11);
     });
   });
 });

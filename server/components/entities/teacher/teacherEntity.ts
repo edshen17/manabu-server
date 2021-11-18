@@ -46,7 +46,7 @@ class TeacherEntity extends AbstractEntity<
       settings: { isHidden: false, emailAlerts: { packageTransactionCreation: true } },
       teacherType: 'unlicensed',
       licensePathUrl: '',
-      priceData: { hourlyRate: 35, currency: 'SGD' },
+      priceData: { hourlyRate: 30, currency: 'SGD' },
       tags: [],
       lessonCount: 0,
       studentCount: 0,

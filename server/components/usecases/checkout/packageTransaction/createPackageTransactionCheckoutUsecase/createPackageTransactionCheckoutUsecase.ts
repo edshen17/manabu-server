@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongoose';
-import { DEFAULT_CURRENCY } from '../../../../../constants';
+import { DEFAULT_CURRENCY, PAYMENT_GATEWAY_RATE } from '../../../../../constants';
 import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
@@ -194,13 +194,10 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const { lessonDuration, lessonLanguage } = body;
     const { paymentGateway } = query;
     const { hourlyRate, currency } = teacherData!.priceData;
-    const PAYMENT_GATEWAY_RATE: StringKeyObject = {
-      paypal: 0.03,
-      stripe: 0.01,
-      paynow: 0.01,
-    };
-    const subTotal = hourlyRate * (lessonDuration / 60) * teacherPackage.lessonAmount;
-    const total = subTotal * (1 + PAYMENT_GATEWAY_RATE[paymentGateway]);
+    const subTotal = this._currency(hourlyRate).multiply(
+      (lessonDuration / 60) * teacherPackage.lessonAmount
+    ).value;
+    const total = this._currency(subTotal).multiply(1 + PAYMENT_GATEWAY_RATE[paymentGateway]).value;
     const priceData = { currency, subTotal, total };
     const item = {
       id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
@@ -208,9 +205,9 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
         `Minato Manabu - ${teacherPackage.packageName} / ${teacher.name}`
       ),
       price: await this._exchangeRateHandler.convert({
-        amount: priceData.total,
-        fromCurrency: currency,
-        toCurrency: this._defaultCurrency,
+        amount: total,
+        sourceCurrency: currency,
+        targetCurrency: this._defaultCurrency,
       }),
       quantity: 1,
     };
@@ -279,7 +276,6 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       balanceChange: subTotal,
       processingFee,
       tax: 0,
-      totalPaid: total,
       runningBalance: {
         currency,
         totalAvailable: 0, // set when actually building to reduce response time
@@ -322,7 +318,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name, quantity } = item;
-    const stripePrice = price * 100;
+    const stripePrice = this._currency(price).multiply(100).value;
     const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
@@ -354,7 +350,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name } = item;
-    const paynowPrice = price * 100;
+    const paynowPrice = this._currency(price).multiply(100).value;
     const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,

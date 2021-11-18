@@ -1,8 +1,16 @@
+import { StringKeyObject } from '../types/custom';
+
 const DEFAULT_CURRENCY = 'SGD';
-const NODE_ENV = process.env.NODE_ENV!;
-const IS_PRODUCTION = NODE_ENV == 'production';
 const MANABU_ADMIN_ID = '60538825a36b9c57a8b19978';
 const MANABU_ADMIN_PKG_ID = '605388cca36b9c57a8b1997a';
+const PAYMENT_GATEWAY_RATE: StringKeyObject = {
+  paypal: 0.03,
+  stripe: 0.01,
+  paynow: 0.01,
+};
+const MANABU_PROCESSING_RATE = 0.16;
+const NODE_ENV = process.env.NODE_ENV!;
+const IS_PRODUCTION = NODE_ENV == 'production';
 const G_CLIENTID = process.env.G_CLIENTID!;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!;
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -35,6 +43,7 @@ export {
   IS_PRODUCTION,
   MANABU_ADMIN_ID,
   MANABU_ADMIN_PKG_ID,
+  MANABU_PROCESSING_RATE,
   G_CLIENTID,
   GOOGLE_CLIENT_SECRET,
   JWT_SECRET,
@@ -51,6 +60,7 @@ export {
   REDIS_PASS,
   REDIS_PORT,
   NODE_ENV,
+  PAYMENT_GATEWAY_RATE,
   STRIPE_WEBHOOK_SECREY_KEY,
   OPEN_EXCHANGE_RATE_API_KEY_DEV,
   PAYPAL_CLIENT_ID_DEV,

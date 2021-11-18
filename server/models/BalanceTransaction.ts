@@ -20,7 +20,7 @@ const BalanceTransactionSchema = createSchema({
     currency: Type.string(),
   }),
   paymentData: Type.object({ required: false }).of({
-    gateway: Type.string({ required: false, enum: ['paypal', 'stripe', 'paynow'] }),
+    gateway: Type.string({ required: false, enum: ['paypal', 'stripe', 'paynow', ''] }),
     id: Type.string({
       required: false,
     }),

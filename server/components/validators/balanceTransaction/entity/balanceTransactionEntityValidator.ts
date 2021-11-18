@@ -28,7 +28,8 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
           .valid(
             PAYMENT_GATEWAY_NAME.PAYNOW,
             PAYMENT_GATEWAY_NAME.PAYPAL,
-            PAYMENT_GATEWAY_NAME.STRIPE
+            PAYMENT_GATEWAY_NAME.STRIPE,
+            PAYMENT_GATEWAY_NAME.NONE
           ),
         id: this._joi.string().max(256).allow(''),
       }),

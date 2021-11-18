@@ -20,6 +20,7 @@ enum PAYMENT_GATEWAY_NAME {
   PAYPAL = 'paypal',
   STRIPE = 'stripe',
   PAYNOW = 'paynow',
+  NONE = '',
 }
 
 type PaymentHandlerExecuteParams = {

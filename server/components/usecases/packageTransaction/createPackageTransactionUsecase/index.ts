@@ -10,6 +10,7 @@ import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makePackageTransactionQueryValidator } from '../../../validators/packageTransaction/query';
 import { makeJwtHandler } from '../../utils/jwtHandler';
 import { CreatePackageTransactionUsecase } from './createPackageTransactionUsecase';
+const currency = require('currency.js');
 
 const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase().init({
   makeDbService: makePackageTransactionDbService,
@@ -23,6 +24,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeBalanceTransactionDbService,
   makeBalanceTransactionEntity,
   makeUserDbService,
+  currency,
 });
 
 export { makeCreatePackageTransactionUsecase };
