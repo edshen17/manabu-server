@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { makeCreateStripeWebhookController } from '.';
 import { STRIPE_WEBHOOK_SECREY_KEY_DEV } from '../../../../../constants';
 import { StringKeyObject } from '../../../../../types/custom';
-import { stripe } from '../../../../paymentHandlers/stripe';
+import { stripe } from '../../../../payment/services/stripe';
 import { makeFakePackageTransactionCheckoutTokenHandler } from '../../../../usecases/utils/fakePackageTransactionCheckoutTokenHandler';
 import { FakePackageTransactionCheckoutTokenHandler } from '../../../../usecases/utils/fakePackageTransactionCheckoutTokenHandler/fakePackageTransactionCheckoutTokenHandler';
 import { CurrentAPIUser } from '../../../../webFrameworkCallbacks/abstractions/IHttpRequest';

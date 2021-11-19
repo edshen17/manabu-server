@@ -1,28 +1,28 @@
 import Omise from 'omise';
-import { StringKeyObject } from '../../../types/custom';
-import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
+import { StringKeyObject } from '../../../../types/custom';
+import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
   OmiseItems,
-  PaymentHandlerExecuteParams,
-  PaymentHandlerExecutePaymentRes,
-} from '../abstractions/IPaymentHandler';
+  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentRes,
+} from '../../abstractions/IPaymentService';
 
-type OptionalPaynowPaymentHandlerInitParams = {};
+type OptionalPaynowPaymentServiceInitParams = {};
 
-class PaynowPaymentHandler extends AbstractPaymentHandler<
+class PaynowPaymentService extends AbstractPaymentService<
   Omise.IOmise,
-  OptionalPaynowPaymentHandlerInitParams
+  OptionalPaynowPaymentServiceInitParams
 > {
   protected _createPaymentJson = (
-    props: PaymentHandlerExecuteParams
-  ): PaymentHandlerExecuteParams => {
+    props: PaymentServiceExecuteParams
+  ): PaymentServiceExecuteParams => {
     const createPaymentJson = props;
     return createPaymentJson;
   };
 
   protected _executePaymentTemplate = async (
-    createPaymentJson: PaymentHandlerExecuteParams
-  ): Promise<PaymentHandlerExecutePaymentRes> => {
+    createPaymentJson: PaymentServiceExecuteParams
+  ): Promise<PaymentServiceExecutePaymentRes> => {
     const { items, token } = createPaymentJson;
     const { source, charge } = items as OmiseItems;
     const sourceRes = await this._paymentLib.sources.create(source);
@@ -43,4 +43,4 @@ class PaynowPaymentHandler extends AbstractPaymentHandler<
   };
 }
 
-export { PaynowPaymentHandler };
+export { PaynowPaymentService };

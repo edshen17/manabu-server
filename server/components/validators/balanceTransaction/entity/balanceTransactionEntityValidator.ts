@@ -1,4 +1,4 @@
-import { PAYMENT_GATEWAY_NAME } from '../../../paymentHandlers/abstractions/IPaymentHandler';
+import { PAYMENT_GATEWAY_NAME } from '../../../payment/abstractions/IPaymentService';
 import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
 
 class BalanceTransactionEntityValidator extends AbstractEntityValidator {

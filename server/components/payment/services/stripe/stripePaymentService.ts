@@ -1,18 +1,18 @@
 import { Stripe } from 'stripe';
-import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
+import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
-  PaymentHandlerExecuteParams,
-  PaymentHandlerExecutePaymentRes,
-} from '../abstractions/IPaymentHandler';
+  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentRes,
+} from '../../abstractions/IPaymentService';
 
-type OptionalStripePaymentHandlerInitParams = {};
+type OptionalStripePaymentServiceInitParams = {};
 
-class StripePaymentHandler extends AbstractPaymentHandler<
+class StripePaymentService extends AbstractPaymentService<
   Stripe,
-  OptionalStripePaymentHandlerInitParams
+  OptionalStripePaymentServiceInitParams
 > {
   protected _createPaymentJson = (
-    props: PaymentHandlerExecuteParams
+    props: PaymentServiceExecuteParams
   ): Stripe.Checkout.SessionCreateParams => {
     const { successRedirectUrl, cancelRedirectUrl, items, token } = props;
     const createPaymentJson = {
@@ -35,11 +35,11 @@ class StripePaymentHandler extends AbstractPaymentHandler<
 
   protected _executePaymentTemplate = async (
     createPaymentJson: Stripe.Checkout.SessionCreateParams
-  ): Promise<PaymentHandlerExecutePaymentRes> => {
+  ): Promise<PaymentServiceExecutePaymentRes> => {
     const session = await this._paymentLib.checkout.sessions.create(createPaymentJson);
     const executePaymentRes = { redirectUrl: <string>session.url };
     return executePaymentRes;
   };
 }
 
-export { StripePaymentHandler };
+export { StripePaymentService };

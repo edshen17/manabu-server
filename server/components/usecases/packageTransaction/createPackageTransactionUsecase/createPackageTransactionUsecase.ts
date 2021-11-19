@@ -18,7 +18,7 @@ import {
   PackageTransactionEntity,
   PackageTransactionEntityBuildParams,
 } from '../../../entities/packageTransaction/packageTransactionEntity';
-import { PAYMENT_GATEWAY_NAME } from '../../../paymentHandlers/abstractions/IPaymentHandler';
+import { PAYMENT_GATEWAY_NAME } from '../../../payment/abstractions/IPaymentService';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { CHECKOUT_TOKEN_HASH_KEY } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';

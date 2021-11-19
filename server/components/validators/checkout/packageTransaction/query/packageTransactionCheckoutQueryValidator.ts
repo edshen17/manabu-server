@@ -1,4 +1,4 @@
-import { PAYMENT_GATEWAY_NAME } from '../../../../paymentHandlers/abstractions/IPaymentHandler';
+import { PAYMENT_GATEWAY_NAME } from '../../../../payment/abstractions/IPaymentService';
 import { AbstractQueryValidator } from '../../../abstractions/AbstractQueryValidator';
 
 class PackageTransactionCheckoutQueryValidator extends AbstractQueryValidator {

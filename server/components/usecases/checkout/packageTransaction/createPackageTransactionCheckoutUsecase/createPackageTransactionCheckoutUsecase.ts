@@ -17,12 +17,12 @@ import {
 import { PackageTransactionEntityBuildParams } from '../../../../entities/packageTransaction/packageTransactionEntity';
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
 import {
-  PaymentHandlerExecuteParams,
+  PaymentServiceExecuteParams,
   PAYMENT_GATEWAY_NAME,
-} from '../../../../paymentHandlers/abstractions/IPaymentHandler';
-import { PaynowPaymentHandler } from '../../../../paymentHandlers/paynow/paynowPaymentHandler';
-import { PaypalPaymentHandler } from '../../../../paymentHandlers/paypal/paypalPaymentHandler';
-import { StripePaymentHandler } from '../../../../paymentHandlers/stripe/stripePaymentHandler';
+} from '../../../../payment/abstractions/IPaymentService';
+import { PaynowPaymentService } from '../../../../payment/services/paynow/paynowPaymentService';
+import { PaypalPaymentService } from '../../../../payment/services/paypal/paypalPaymentService';
+import { StripePaymentService } from '../../../../payment/services/stripe/stripePaymentService';
 import {
   ENTITY_VALIDATOR_VALIDATE_MODES,
   ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
@@ -35,9 +35,9 @@ import { ExchangeRateHandler } from '../../../utils/exchangeRateHandler/exchange
 import { JwtHandler } from '../../../utils/jwtHandler/jwtHandler';
 
 type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
-  makePaypalPaymentHandler: Promise<PaypalPaymentHandler>;
-  makeStripePaymentHandler: Promise<StripePaymentHandler>;
-  makePaynowPaymentHandler: Promise<PaynowPaymentHandler>;
+  makePaypalPaymentService: Promise<PaypalPaymentService>;
+  makeStripePaymentService: Promise<StripePaymentService>;
+  makePaynowPaymentService: Promise<PaynowPaymentService>;
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
   makeJwtHandler: Promise<JwtHandler>;
   makeCacheDbService: Promise<CacheDbService>;
@@ -59,8 +59,8 @@ type TestBodyResponse = {
   teacherPackage: PackageDoc;
 };
 
-type GetPaymentHandlerRedirectUrlParams = Await<
-  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerParams']>
+type GetPaymentServiceRedirectUrlParams = Await<
+  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentServiceParams']>
 >;
 
 type SetPackageTransactionJwtParams = {
@@ -69,11 +69,11 @@ type SetPackageTransactionJwtParams = {
   userId?: ObjectId;
   token: string;
   teacher: JoinedUserDoc;
-  processedPaymentHandlerData: ProcessedPaymentHandlerData;
+  processedPaymentServiceData: ProcessedPaymentServiceData;
 };
 
-type ProcessedPaymentHandlerData = Await<
-  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentHandlerData']>
+type ProcessedPaymentServiceData = Await<
+  ReturnType<CreatePackageTransactionCheckoutUsecase['_getProcessedPaymentServiceData']>
 >;
 
 const CHECKOUT_TOKEN_HASH_KEY = 'usercheckouttoken';
@@ -83,9 +83,9 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   CreatePackageTransactionCheckoutUsecaseResponse,
   TeacherDbServiceResponse
 > {
-  private _paypalPaymentHandler!: PaypalPaymentHandler;
-  private _stripePaymentHandler!: StripePaymentHandler;
-  private _paynowPaymentHandler!: PaynowPaymentHandler;
+  private _paypalPaymentService!: PaypalPaymentService;
+  private _stripePaymentService!: StripePaymentService;
+  private _paynowPaymentService!: PaynowPaymentService;
   private _exchangeRateHandler!: ExchangeRateHandler;
   private _cacheDbService!: CacheDbService;
   private _jwtHandler!: JwtHandler;
@@ -143,18 +143,18 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   ): Promise<CreatePackageTransactionCheckoutUsecaseResponse> => {
     const { query } = props;
     const { paymentGateway } = query;
-    const processedPaymentHandlerParams = await this._getProcessedPaymentHandlerParams(props);
-    const { token } = processedPaymentHandlerParams;
+    const processedPaymentServiceParams = await this._getProcessedPaymentServiceParams(props);
+    const { token } = processedPaymentServiceParams;
     let redirectUrl = '';
     switch (paymentGateway) {
       case PAYMENT_GATEWAY_NAME.PAYPAL:
-        redirectUrl = await this._getPaypalRedirectUrl(processedPaymentHandlerParams);
+        redirectUrl = await this._getPaypalRedirectUrl(processedPaymentServiceParams);
         break;
       case PAYMENT_GATEWAY_NAME.STRIPE:
-        redirectUrl = await this._getStripeRedirectUrl(processedPaymentHandlerParams);
+        redirectUrl = await this._getStripeRedirectUrl(processedPaymentServiceParams);
         break;
       case PAYMENT_GATEWAY_NAME.PAYNOW:
-        redirectUrl = await this._getPaynowRedirectUrl(processedPaymentHandlerParams);
+        redirectUrl = await this._getPaynowRedirectUrl(processedPaymentServiceParams);
         break;
       default:
         throw new Error('Invalid payment handler query.');
@@ -163,31 +163,31 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return packageTransactionCheckoutUsecaseRes;
   };
 
-  private _getProcessedPaymentHandlerParams = async (props: GetRedirectUrlParams) => {
+  private _getProcessedPaymentServiceParams = async (props: GetRedirectUrlParams) => {
     const { body, currentAPIUser, teacher, teacherPackage } = props;
     const { userId } = currentAPIUser;
     const token = `${userId}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`;
-    const processedPaymentHandlerData = await this._getProcessedPaymentHandlerData(props);
-    const { item } = processedPaymentHandlerData;
+    const processedPaymentServiceData = await this._getProcessedPaymentServiceData(props);
+    const { item } = processedPaymentServiceData;
     await this._setTransactionJwt({
       body,
       teacherPackage,
       teacher,
       token,
       userId,
-      processedPaymentHandlerData,
+      processedPaymentServiceData,
     });
-    const processedPaymentHandlerParams = {
+    const processedPaymentServiceParams = {
       item,
       successRedirectUrl: 'https://manabu.sg/dashboard',
       cancelRedirectUrl: 'https://manabu.sg/cancel',
       currency: this._defaultCurrency,
       token: token,
     };
-    return processedPaymentHandlerParams;
+    return processedPaymentServiceParams;
   };
 
-  private _getProcessedPaymentHandlerData = async (props: GetRedirectUrlParams) => {
+  private _getProcessedPaymentServiceData = async (props: GetRedirectUrlParams) => {
     const { teacher, teacherData, teacherPackage, currentAPIUser, query, body } = props;
     const { lessonDuration, lessonLanguage } = body;
     const { paymentGateway } = query;
@@ -230,12 +230,12 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _setTransactionJwt = async (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
-    const { token, processedPaymentHandlerData, userId } = setPackageTransactionJwtParams;
+    const { token, processedPaymentServiceData, userId } = setPackageTransactionJwtParams;
     const packageTransactionEntityBuildParams = this._getPackageTransactionEntityBuildParams(
       setPackageTransactionJwtParams
     );
     const balanceTransactionEntityBuildParams = this._getBalanceTransactionEntityBuildParams({
-      processedPaymentHandlerData,
+      processedPaymentServiceData,
       userId: userId!,
     });
     const jwt = this._jwtHandler.sign({
@@ -269,11 +269,11 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getBalanceTransactionEntityBuildParams = (props: {
-    processedPaymentHandlerData: ProcessedPaymentHandlerData;
+    processedPaymentServiceData: ProcessedPaymentServiceData;
     userId: ObjectId;
   }): BalanceTransactionEntityBuildParams => {
-    const { processedPaymentHandlerData, userId } = props;
-    const { priceData, paymentData } = processedPaymentHandlerData;
+    const { processedPaymentServiceData, userId } = props;
+    const { priceData, paymentData } = processedPaymentServiceData;
     const { currency, subTotal, total } = priceData;
     const processingFee = total - subTotal;
     const balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams = {
@@ -295,11 +295,11 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getPaypalRedirectUrl = async (
-    props: GetPaymentHandlerRedirectUrlParams
+    props: GetPaymentServiceRedirectUrlParams
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name, id, quantity } = item;
-    const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
+    const paymentHandlerExecuteParams: PaymentServiceExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: [
@@ -315,7 +315,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       total: price,
       token,
     };
-    const paypalCheckoutRes = await this._paypalPaymentHandler.executeSinglePayment(
+    const paypalCheckoutRes = await this._paypalPaymentService.executeSinglePayment(
       paymentHandlerExecuteParams
     );
     const { redirectUrl } = paypalCheckoutRes;
@@ -323,7 +323,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getStripeRedirectUrl = async (
-    props: GetPaymentHandlerRedirectUrlParams
+    props: GetPaymentServiceRedirectUrlParams
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name, quantity } = item;
@@ -336,7 +336,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       targetCurrency: '',
     });
-    const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
+    const paymentHandlerExecuteParams: PaymentServiceExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: [
@@ -355,7 +355,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       total: stripePrice,
       token,
     };
-    const stripeCheckoutRes = await this._stripePaymentHandler.executeSinglePayment(
+    const stripeCheckoutRes = await this._stripePaymentService.executeSinglePayment(
       paymentHandlerExecuteParams
     );
     const { redirectUrl } = stripeCheckoutRes;
@@ -363,7 +363,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getPaynowRedirectUrl = async (
-    props: GetPaymentHandlerRedirectUrlParams
+    props: GetPaymentServiceRedirectUrlParams
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name } = item;
@@ -376,7 +376,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       targetCurrency: '',
     });
-    const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
+    const paymentHandlerExecuteParams: PaymentServiceExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: {
@@ -395,7 +395,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       total: price,
       token,
     };
-    const paynowCheckoutRes = await this._paynowPaymentHandler.executeSinglePayment(
+    const paynowCheckoutRes = await this._paynowPaymentService.executeSinglePayment(
       paymentHandlerExecuteParams
     );
     const { redirectUrl } = paynowCheckoutRes;
@@ -406,9 +406,9 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     optionalInitParams: OptionalCreatePackageTransactionCheckoutUsecaseInitParams
   ): Promise<void> => {
     const {
-      makePaypalPaymentHandler,
-      makeStripePaymentHandler,
-      makePaynowPaymentHandler,
+      makePaypalPaymentService,
+      makeStripePaymentService,
+      makePaynowPaymentService,
       makeExchangeRateHandler,
       makeJwtHandler,
       makeCacheDbService,
@@ -416,9 +416,9 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       convertStringToObjectId,
       convertToTitlecase,
     } = optionalInitParams;
-    this._paypalPaymentHandler = await makePaypalPaymentHandler;
-    this._stripePaymentHandler = await makeStripePaymentHandler;
-    this._paynowPaymentHandler = await makePaynowPaymentHandler;
+    this._paypalPaymentService = await makePaypalPaymentService;
+    this._stripePaymentService = await makeStripePaymentService;
+    this._paynowPaymentService = await makePaynowPaymentService;
     this._exchangeRateHandler = await makeExchangeRateHandler;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;

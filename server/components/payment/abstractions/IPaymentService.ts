@@ -2,10 +2,10 @@ import Omise from 'omise';
 import { Item } from 'paypal-rest-sdk';
 import Stripe from 'stripe';
 
-type PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams> =
-  RequiredPaymentHandlerInitParams<PaymentLibType> & OptionalPaymentHandlerInitParams;
+type PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams> =
+  RequiredPaymentServiceInitParams<PaymentLibType> & OptionalPaymentServiceInitParams;
 
-type RequiredPaymentHandlerInitParams<PaymentLibType> = {
+type RequiredPaymentServiceInitParams<PaymentLibType> = {
   paymentLib: PaymentLibType;
 };
 
@@ -23,7 +23,7 @@ enum PAYMENT_GATEWAY_NAME {
   NONE = '',
 }
 
-type PaymentHandlerExecuteParams = {
+type PaymentServiceExecuteParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
   items: PaypalItems | StripeItems | OmiseItems;
@@ -34,27 +34,27 @@ type PaymentHandlerExecuteParams = {
   token: string;
 };
 
-type PaymentHandlerExecutePaymentRes = {
+type PaymentServiceExecutePaymentRes = {
   redirectUrl: string;
 };
 
-interface IPaymentHandler<PaymentLibType, OptionalPaymentHandlerInitParams> {
+interface IPaymentService<PaymentLibType, OptionalPaymentServiceInitParams> {
   executeSinglePayment: (
-    props: PaymentHandlerExecuteParams
-  ) => Promise<PaymentHandlerExecutePaymentRes>;
+    props: PaymentServiceExecuteParams
+  ) => Promise<PaymentServiceExecutePaymentRes>;
   executeSubscription: (
-    props: PaymentHandlerExecuteParams
-  ) => Promise<PaymentHandlerExecutePaymentRes>;
+    props: PaymentServiceExecuteParams
+  ) => Promise<PaymentServiceExecutePaymentRes>;
   init: (
-    initParams: PaymentHandlerInitParams<PaymentLibType, OptionalPaymentHandlerInitParams>
+    initParams: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>
   ) => Promise<this>;
 }
 
 export {
-  IPaymentHandler,
-  PaymentHandlerInitParams,
-  PaymentHandlerExecuteParams,
-  PaymentHandlerExecutePaymentRes,
+  IPaymentService,
+  PaymentServiceInitParams,
+  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentRes,
   PaypalItems,
   StripeItems,
   OmiseItems,

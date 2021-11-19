@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { makeCreateStripeWebhookUsecase } from '.';
 import { STRIPE_WEBHOOK_SECREY_KEY_DEV } from '../../../../constants';
-import { stripe } from '../../../paymentHandlers/stripe';
+import { stripe } from '../../../payment/services/stripe';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';

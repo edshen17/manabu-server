@@ -5,8 +5,8 @@ import {
   PAYPAL_CLIENT_ID_DEV,
   PAYPAL_CLIENT_SECRET,
   PAYPAL_CLIENT_SECRET_DEV,
-} from '../../../constants';
-import { PaypalPaymentHandler } from './paypalPaymentHandler';
+} from '../../../../constants';
+import { PaypalPaymentService } from './paypalPaymentService';
 
 const paypalConfig = {
   mode: 'sandbox',
@@ -22,6 +22,6 @@ if (IS_PRODUCTION) {
 
 paypal.configure(paypalConfig);
 
-const makePaypalPaymentHandler = new PaypalPaymentHandler().init({ paymentLib: paypal });
+const makePaypalPaymentService = new PaypalPaymentService().init({ paymentLib: paypal });
 
-export { makePaypalPaymentHandler };
+export { makePaypalPaymentService };

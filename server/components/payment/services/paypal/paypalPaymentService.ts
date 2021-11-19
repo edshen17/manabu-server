@@ -1,22 +1,22 @@
 import paypal, { Item, Payment, SDKError } from 'paypal-rest-sdk';
-import { StringKeyObject } from '../../../types/custom';
-import { AbstractPaymentHandler } from '../abstractions/AbstractPaymentHandler';
+import { StringKeyObject } from '../../../../types/custom';
+import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
-  PaymentHandlerExecuteParams,
-  PaymentHandlerExecutePaymentRes,
+  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentRes,
   PAYMENT_GATEWAY_NAME,
-} from '../abstractions/IPaymentHandler';
+} from '../../abstractions/IPaymentService';
 
 type Paypal = typeof paypal;
-type OptionalPaypalPaymentHandlerInitParams = {};
+type OptionalPaypalPaymentServiceInitParams = {};
 
-class PaypalPaymentHandler extends AbstractPaymentHandler<
+class PaypalPaymentService extends AbstractPaymentService<
   Paypal,
-  OptionalPaypalPaymentHandlerInitParams
+  OptionalPaypalPaymentServiceInitParams
 > {
-  protected _createPaymentJson = (props: PaymentHandlerExecuteParams): Payment => {
+  protected _createPaymentJson = (props: PaymentServiceExecuteParams): Payment => {
     const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total, token } =
-      props as PaymentHandlerExecuteParams & { items: Item[] };
+      props as PaymentServiceExecuteParams & { items: Item[] };
     const createPaymentJson: Payment = {
       intent: 'sale',
       payer: {
@@ -45,7 +45,7 @@ class PaypalPaymentHandler extends AbstractPaymentHandler<
 
   protected _executePaymentTemplate = async (
     createPaymentJson: Payment
-  ): Promise<PaymentHandlerExecutePaymentRes> => {
+  ): Promise<PaymentServiceExecutePaymentRes> => {
     return new Promise((resolve, reject) => {
       this._paymentLib.payment.create(
         createPaymentJson,
@@ -64,4 +64,4 @@ class PaypalPaymentHandler extends AbstractPaymentHandler<
   };
 }
 
-export { PaypalPaymentHandler };
+export { PaypalPaymentService };

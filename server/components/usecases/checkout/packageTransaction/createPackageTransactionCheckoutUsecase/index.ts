@@ -3,9 +3,9 @@ import deepEqual from 'deep-equal';
 import { makeCacheDbService } from '../../../../dataAccess/services/cache';
 import { makeTeacherDbService } from '../../../../dataAccess/services/teacher';
 import { convertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
-import { makePaynowPaymentHandler } from '../../../../paymentHandlers/paynow';
-import { makePaypalPaymentHandler } from '../../../../paymentHandlers/paypal';
-import { makeStripePaymentHandler } from '../../../../paymentHandlers/stripe';
+import { makePaynowPaymentService } from '../../../../payment/services/paynow';
+import { makePaypalPaymentService } from '../../../../payment/services/paypal';
+import { makeStripePaymentService } from '../../../../payment/services/stripe';
 import { makeBaseParamsValidator } from '../../../../validators/base/params';
 import { makePackageTransactionCheckoutEntityValidator } from '../../../../validators/checkout/packageTransaction/entity';
 import { makePackageTransactionCheckoutQueryValidator } from '../../../../validators/checkout/packageTransaction/query';
@@ -22,12 +22,12 @@ const makeCreatePackageTransactionCheckoutUsecase =
     makePackageTransactionCheckoutEntityValidator,
     cloneDeep,
     deepEqual,
-    makePaypalPaymentHandler,
-    makeStripePaymentHandler,
+    makePaypalPaymentService,
+    makeStripePaymentService,
     convertStringToObjectId,
     convertToTitlecase,
     makeExchangeRateHandler,
-    makePaynowPaymentHandler,
+    makePaynowPaymentService,
     makeJwtHandler,
     makeCacheDbService,
   });
