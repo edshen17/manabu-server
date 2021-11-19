@@ -44,7 +44,6 @@ type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
   convertStringToObjectId: ConvertStringToObjectId;
   convertToTitlecase: ConvertToTitlecase;
-  currency: any;
 };
 
 type CreatePackageTransactionCheckoutUsecaseResponse = {
@@ -93,7 +92,6 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
-  private _currency!: any;
   private _defaultCurrency: string = DEFAULT_CURRENCY;
 
   protected _makeRequestTemplate = async (
@@ -194,21 +192,32 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const { lessonDuration, lessonLanguage } = body;
     const { paymentGateway } = query;
     const { hourlyRate, currency } = teacherData!.priceData;
-    const subTotal = this._currency(hourlyRate).multiply(
-      (lessonDuration / 60) * teacherPackage.lessonAmount
-    ).value;
-    const total = this._currency(subTotal).multiply(1 + PAYMENT_GATEWAY_RATE[paymentGateway]).value;
-    const priceData = { currency, subTotal, total };
+    const subTotal = await this._exchangeRateHandler.multiply({
+      multiplicand: {
+        sourceCurrency: currency,
+        amount: hourlyRate,
+      },
+      multiplier: {
+        amount: (lessonDuration / 60) * teacherPackage.lessonAmount,
+      },
+      targetCurrency: this._defaultCurrency,
+    });
+    const total = await this._exchangeRateHandler.multiply({
+      multiplicand: {
+        amount: subTotal,
+      },
+      multiplier: {
+        amount: 1 + PAYMENT_GATEWAY_RATE[paymentGateway],
+      },
+      targetCurrency: '',
+    });
+    const priceData = { currency: this._defaultCurrency, subTotal, total };
     const item = {
       id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
       name: this._convertToTitlecase(
         `Minato Manabu - ${teacherPackage.packageName} / ${teacher.name}`
       ),
-      price: await this._exchangeRateHandler.convert({
-        amount: total,
-        sourceCurrency: currency,
-        targetCurrency: this._defaultCurrency,
-      }),
+      price: total,
       quantity: 1,
     };
     const paymentData = {
@@ -318,7 +327,15 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name, quantity } = item;
-    const stripePrice = this._currency(price).multiply(100).value;
+    const stripePrice = await this._exchangeRateHandler.multiply({
+      multiplicand: {
+        amount: price,
+      },
+      multiplier: {
+        amount: 100,
+      },
+      targetCurrency: '',
+    });
     const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
@@ -350,7 +367,15 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name } = item;
-    const paynowPrice = this._currency(price).multiply(100).value;
+    const paynowPrice = await this._exchangeRateHandler.multiply({
+      multiplicand: {
+        amount: price,
+      },
+      multiplier: {
+        amount: 100,
+      },
+      targetCurrency: '',
+    });
     const paymentHandlerExecuteParams: PaymentHandlerExecuteParams = {
       successRedirectUrl,
       cancelRedirectUrl,
@@ -390,7 +415,6 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       makePackageTransactionCheckoutEntityValidator,
       convertStringToObjectId,
       convertToTitlecase,
-      currency,
     } = optionalInitParams;
     this._paypalPaymentHandler = await makePaypalPaymentHandler;
     this._stripePaymentHandler = await makeStripePaymentHandler;
@@ -401,7 +425,6 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
     this._convertStringToObjectId = convertStringToObjectId;
     this._convertToTitlecase = convertToTitlecase;
-    this._currency = currency;
   };
 }
 

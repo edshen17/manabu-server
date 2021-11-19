@@ -17,7 +17,7 @@ type OpenExchangeRateResponse = {
 
 type ArithmeticCurrencyObj = {
   amount: number;
-  sourceCurrency: string;
+  sourceCurrency?: string;
 };
 
 class ExchangeRateHandler {
@@ -60,7 +60,7 @@ class ExchangeRateHandler {
     targetCurrency: string;
   }): Promise<number> => {
     const { amount, sourceCurrency, targetCurrency } = props;
-    this._fx.base = 'SGD';
+    this._fx.base = 'USD'; // default open exchange rate base
     this._fx.rates = await this.getRates();
     const convertedAmount = this._fx(amount)
       .from(sourceCurrency.toUpperCase())
@@ -75,16 +75,20 @@ class ExchangeRateHandler {
     targetCurrency: string;
   }): Promise<number> => {
     const { addend1, addend2, targetCurrency } = props;
-    const convertedAddend1 = await this.convert({
-      amount: addend1.amount,
-      sourceCurrency: addend1.sourceCurrency,
-      targetCurrency,
-    });
-    const convertedAddend2 = await this.convert({
-      amount: addend2.amount,
-      sourceCurrency: addend2.sourceCurrency,
-      targetCurrency,
-    });
+    const convertedAddend1 = addend1.sourceCurrency
+      ? await this.convert({
+          amount: addend1.amount,
+          sourceCurrency: addend1.sourceCurrency,
+          targetCurrency,
+        })
+      : addend1.amount;
+    const convertedAddend2 = addend2.sourceCurrency
+      ? await this.convert({
+          amount: addend2.amount,
+          sourceCurrency: addend2.sourceCurrency,
+          targetCurrency,
+        })
+      : addend2.amount;
     const convertedSum = this._currency(convertedAddend1).add(convertedAddend2).value;
     return convertedSum;
   };
@@ -95,16 +99,20 @@ class ExchangeRateHandler {
     targetCurrency: string;
   }): Promise<number> => {
     const { minuend, subtrahend, targetCurrency } = props;
-    const convertedMinuend = await this.convert({
-      amount: minuend.amount,
-      sourceCurrency: minuend.sourceCurrency,
-      targetCurrency,
-    });
-    const convertedSubtrahend = await this.convert({
-      amount: subtrahend.amount,
-      sourceCurrency: subtrahend.sourceCurrency,
-      targetCurrency,
-    });
+    const convertedMinuend = minuend.sourceCurrency
+      ? await this.convert({
+          amount: minuend.amount,
+          sourceCurrency: minuend.sourceCurrency,
+          targetCurrency,
+        })
+      : minuend.amount;
+    const convertedSubtrahend = subtrahend.sourceCurrency
+      ? await this.convert({
+          amount: subtrahend.amount,
+          sourceCurrency: subtrahend.sourceCurrency,
+          targetCurrency,
+        })
+      : subtrahend.amount;
     const convertedDiff = this._currency(convertedMinuend).subtract(convertedSubtrahend).value;
     return convertedDiff;
   };
@@ -115,18 +123,23 @@ class ExchangeRateHandler {
     targetCurrency: string;
   }): Promise<number> => {
     const { multiplicand, multiplier, targetCurrency } = props;
-    const convertedMultiplicand = await this.convert({
-      amount: multiplicand.amount,
-      sourceCurrency: multiplicand.sourceCurrency,
-      targetCurrency,
-    });
-    const convertedMultiplier = await this.convert({
-      amount: multiplier.amount,
-      sourceCurrency: multiplier.sourceCurrency,
-      targetCurrency,
-    });
-    const convertedDiff = this._currency(convertedMultiplicand).multiply(convertedMultiplier).value;
-    return convertedDiff;
+    const convertedMultiplicand = multiplicand.sourceCurrency
+      ? await this.convert({
+          amount: multiplicand.amount,
+          sourceCurrency: multiplicand.sourceCurrency,
+          targetCurrency,
+        })
+      : multiplicand.amount;
+    const convertedMultiplier = multiplier.sourceCurrency
+      ? await this.convert({
+          amount: multiplier.amount,
+          sourceCurrency: multiplier.sourceCurrency,
+          targetCurrency,
+        })
+      : multiplier.amount;
+    const convertedProduct =
+      this._currency(convertedMultiplicand).multiply(convertedMultiplier).value;
+    return convertedProduct;
   };
 
   public toCurrency = (num: number): number => {

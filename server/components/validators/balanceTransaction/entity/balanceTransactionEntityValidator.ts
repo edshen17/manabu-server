@@ -16,7 +16,7 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
       balanceChange: this._joi.number(),
       processingFee: this._joi.number(),
       tax: this._joi.number(),
-      totalPaid: this._joi.number(),
+      totalPayment: this._joi.number(),
       runningBalance: this._joi.object({
         totalAvailable: this._joi.number().min(0),
         currency: this._joi.string().max(5),
@@ -51,7 +51,7 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
       balanceChange: this._joi.number().forbidden(),
       processingFee: this._joi.number().forbidden(),
       tax: this._joi.number().forbidden(),
-      totalPaid: this._joi.number().forbidden(),
+      totalPayment: this._joi.number().forbidden(),
       runningBalance: this._joi
         .object({
           totalAvailable: this._joi.number().min(0),

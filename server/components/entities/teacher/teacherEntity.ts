@@ -1,3 +1,4 @@
+import { DEFAULT_CURRENCY } from '../../../constants';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import {
   PackageEntity,
@@ -46,7 +47,7 @@ class TeacherEntity extends AbstractEntity<
       settings: { isHidden: false, emailAlerts: { packageTransactionCreation: true } },
       teacherType: 'unlicensed',
       licensePathUrl: '',
-      priceData: { hourlyRate: 30, currency: 'SGD' },
+      priceData: { hourlyRate: 30, currency: DEFAULT_CURRENCY },
       tags: [],
       lessonCount: 0,
       studentCount: 0,

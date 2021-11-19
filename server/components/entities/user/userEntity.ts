@@ -1,4 +1,4 @@
-import { JWT_SECRET } from '../../../constants';
+import { DEFAULT_CURRENCY, JWT_SECRET } from '../../../constants';
 import { UserContactMethodEmbed } from '../../../models/User';
 import {
   ENTITY_VALIDATOR_VALIDATE_MODES,
@@ -141,7 +141,7 @@ class UserEntity extends AbstractEntity<
         totalCurrent: 0,
         totalPending: 0,
         totalAvailable: 0,
-        currency: 'SGD',
+        currency: DEFAULT_CURRENCY,
       },
     };
     return userEntity;

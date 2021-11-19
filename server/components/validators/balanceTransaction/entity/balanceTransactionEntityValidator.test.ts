@@ -23,7 +23,7 @@ beforeEach(() => {
     balanceChange: 100,
     processingFee: 5,
     tax: 0.2,
-    totalPaid: 105.2,
+    totalPayment: 105.2,
     runningBalance: {
       currency: 'SGD',
       totalAvailable: 0,

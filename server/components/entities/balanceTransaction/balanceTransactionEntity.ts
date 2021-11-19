@@ -27,7 +27,7 @@ type RunningBalance = {
 };
 
 type BalanceTransactionEntityBuildResponse = BalanceTransactionEntityBuildParams & {
-  totalPaid: number;
+  totalPayment: number;
   creationDate: Date;
   lastModifiedDate: Date;
 };
@@ -69,9 +69,10 @@ class BalanceTransactionEntity extends AbstractEntity<
     const convertedBalanceChange = this._currency(balanceChange).value;
     const convertedProcessingFee = this._currency(processingFee).value;
     const convertedTax = this._currency(tax).value;
-    const totalPaidPreTax =
+    const totalPaymentPreTax =
       this._currency(convertedBalanceChange).add(convertedProcessingFee).value;
-    const totalPaid = this._currency(totalPaidPreTax).add(convertedTax).value;
+    let totalPayment = this._currency(totalPaymentPreTax).add(convertedTax).value;
+    totalPayment = totalPayment > 0 ? totalPayment : 0;
     const balanceTransactionEntity = {
       userId,
       status,
@@ -81,7 +82,7 @@ class BalanceTransactionEntity extends AbstractEntity<
       balanceChange: convertedBalanceChange,
       processingFee: convertedProcessingFee,
       tax: convertedTax,
-      totalPaid,
+      totalPayment,
       runningBalance,
       paymentData,
       creationDate: new Date(),

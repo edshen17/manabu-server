@@ -8,9 +8,9 @@ import { makeBalanceTransactionEntity } from '../../../entities/balanceTransacti
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makePackageTransactionQueryValidator } from '../../../validators/packageTransaction/query';
+import { makeExchangeRateHandler } from '../../utils/exchangeRateHandler';
 import { makeJwtHandler } from '../../utils/jwtHandler';
 import { CreatePackageTransactionUsecase } from './createPackageTransactionUsecase';
-const currency = require('currency.js');
 
 const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase().init({
   makeDbService: makePackageTransactionDbService,
@@ -24,7 +24,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeBalanceTransactionDbService,
   makeBalanceTransactionEntity,
   makeUserDbService,
-  currency,
+  makeExchangeRateHandler,
 });
 
 export { makeCreatePackageTransactionUsecase };

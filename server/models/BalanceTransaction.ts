@@ -14,7 +14,7 @@ const BalanceTransactionSchema = createSchema({
   balanceChange: Type.number({ required: true }),
   processingFee: Type.number({ required: true }),
   tax: Type.number({ required: true }),
-  totalPaid: Type.number({ required: true }),
+  totalPayment: Type.number({ required: true }),
   runningBalance: Type.object({ required: true }).of({
     totalAvailable: Type.number(),
     currency: Type.string(),

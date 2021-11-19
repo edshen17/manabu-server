@@ -18,11 +18,11 @@ describe('exchangeRateHandler', () => {
   describe('convert', () => {
     it('should convert the currencies', async () => {
       const convertedRate = await exchangeRateHandler.convert({
-        amount: 10,
-        sourceCurrency: 'usd',
-        targetCurrency: 'jpy',
+        amount: 1000,
+        sourceCurrency: 'jpy',
+        targetCurrency: 'usd',
       });
-      expect(convertedRate > 10).to.equal(true);
+      expect(convertedRate < 1000).to.equal(true);
     });
   });
   describe('add', () => {
@@ -70,12 +70,20 @@ describe('exchangeRateHandler', () => {
         },
         targetCurrency: 'SGD',
       });
-      expect(currencyProduct < 10000).to.equal(true);
+      expect(currencyProduct > 10000).to.equal(true);
+    });
+    it('should multiply the currencies', async () => {
+      const currencyProduct = await exchangeRateHandler.multiply({
+        multiplicand: { sourceCurrency: 'USD', amount: 30 },
+        multiplier: { amount: 5 },
+        targetCurrency: 'SGD',
+      });
+      expect(currencyProduct > 150).to.equal(true);
     });
   });
   describe('toCurrency', () => {
-    it('should turn the given number into a currency', async () => {
-      const convertedCurrency = await exchangeRateHandler.toCurrency(11.111);
+    it('should turn the given number into a currency', () => {
+      const convertedCurrency = exchangeRateHandler.toCurrency(11.111);
       expect(convertedCurrency).to.equal(11.11);
     });
   });
