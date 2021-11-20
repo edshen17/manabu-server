@@ -2,8 +2,10 @@ import paypal, { Item, Payment, SDKError } from 'paypal-rest-sdk';
 import { StringKeyObject } from '../../../../types/custom';
 import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
-  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePayoutParams,
+  PaymentServiceExecutePayoutRes,
   PAYMENT_GATEWAY_NAME,
 } from '../../abstractions/IPaymentService';
 
@@ -14,9 +16,9 @@ class PaypalPaymentService extends AbstractPaymentService<
   Paypal,
   OptionalPaypalPaymentServiceInitParams
 > {
-  protected _createPaymentJson = (props: PaymentServiceExecuteParams): Payment => {
+  protected _createPaymentJson = (props: PaymentServiceExecutePaymentParams): Payment => {
     const { successRedirectUrl, cancelRedirectUrl, items, currency, description, total, token } =
-      props as PaymentServiceExecuteParams & { items: Item[] };
+      props as PaymentServiceExecutePaymentParams & { items: Item[] };
     const createPaymentJson: Payment = {
       intent: 'sale',
       payer: {
@@ -60,6 +62,38 @@ class PaypalPaymentService extends AbstractPaymentService<
           resolve(executePaymentRes);
         }
       );
+    });
+  };
+
+  protected _createPayoutJson = (props: PaymentServiceExecutePayoutParams) => {
+    const { type, emailData, id, recipients } = props;
+    const { subject, message } = emailData;
+    const createPayoutJson = {
+      sender_batch_header: {
+        recipient_type: type.toUpperCase(),
+        email_message: message,
+        note: message,
+        sender_batch_id: id,
+        email_subject: subject,
+      },
+      items: recipients,
+    };
+    return createPayoutJson;
+  };
+
+  protected _executePayoutTemplate = (
+    createPayoutJson: ReturnType<PaypalPaymentService['_createPayoutJson']>
+  ): Promise<PaymentServiceExecutePayoutRes> => {
+    return new Promise((resolve, reject) => {
+      this._paymentLib.payout.create(createPayoutJson, (err: SDKError, payout: StringKeyObject) => {
+        if (err) {
+          reject(err);
+        }
+        const { batch_header } = payout;
+        const { payout_batch_id } = batch_header;
+        const executePayoutRes = { id: payout_batch_id };
+        resolve(executePayoutRes);
+      });
     });
   };
 }

@@ -18,7 +18,6 @@ import {
   PackageTransactionEntity,
   PackageTransactionEntityBuildParams,
 } from '../../../entities/packageTransaction/packageTransactionEntity';
-import { PAYMENT_GATEWAY_NAME } from '../../../payment/abstractions/IPaymentService';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { CHECKOUT_TOKEN_HASH_KEY } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
@@ -158,7 +157,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       session,
     });
     balanceTransactionEntityBuildParams.packageTransactionId = packageTransaction._id;
-    balanceTransactionEntityBuildParams.paymentData.id = paymentId;
+    balanceTransactionEntityBuildParams.paymentData!.id = paymentId;
     const debitBalanceTransaction = await this._createDebitBalanceTransaction({
       balanceTransactionEntityBuildParams,
       user,
@@ -195,6 +194,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const { balanceTransactionEntityBuildParams, user, dbServiceAccessOptions, session } = props;
     const debitBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
       this._cloneDeep(balanceTransactionEntityBuildParams);
+    debitBalanceTransactionEntityBuildParams.paymentData = undefined;
     debitBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
       await this._exchangeRateHandler.add({
         addend1: {
@@ -282,6 +282,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
       this._cloneDeep(balanceTransactionEntityBuildParams);
     teacherPayoutBalanceTransactionEntityBuildParams.userId = teacher._id;
+    teacherPayoutBalanceTransactionEntityBuildParams.paymentData = undefined;
     teacherPayoutBalanceTransactionEntityBuildParams.processingFee =
       await this._exchangeRateHandler.multiply({
         multiplicand: {
@@ -315,10 +316,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         },
         targetCurrency: teacher.balance.currency,
       });
-    teacherPayoutBalanceTransactionEntityBuildParams.paymentData = {
-      gateway: PAYMENT_GATEWAY_NAME.NONE,
-      id: '',
-    };
     teacherPayoutBalanceTransactionEntityBuildParams.status =
       BALANCE_TRANSACTION_ENTITY_STATUS.PENDING;
     const teacherPayoutBalanceTransaction = await this._createBalanceTransaction({

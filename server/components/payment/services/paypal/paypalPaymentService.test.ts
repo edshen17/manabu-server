@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { makePaypalPaymentService } from '.';
-import { PaymentServiceExecuteParams } from '../../abstractions/IPaymentService';
+import { PaymentServiceExecutePaymentParams } from '../../abstractions/IPaymentService';
 import { PaypalPaymentService } from './paypalPaymentService';
 
 let paypalPaymentService: PaypalPaymentService;
-let paymentHandlerExecuteParams: PaymentServiceExecuteParams;
+let paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams;
 
 before(async () => {
   paypalPaymentService = await makePaypalPaymentService;
@@ -30,13 +30,39 @@ beforeEach(async () => {
 });
 
 describe('paypalPaymentService', () => {
-  describe('executeSinglePayment', () => {
+  describe('executePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await paypalPaymentService.executeSinglePayment(
+      const executePaymentRes = await paypalPaymentService.executePayment(
         paymentHandlerExecuteParams
       );
-      expect(executeSinglePaymentRes).to.have.property('redirectUrl');
+      expect(executePaymentRes).to.have.property('redirectUrl');
     });
   });
   //   describe('executeSubscription', () => {})
+  describe('executePayout', () => {
+    it('should return a successful payout response', async () => {
+      const senderBatchId = 'Test_sdk_s' + Math.random().toString(36).substring(7);
+      const executePayoutRes = await paypalPaymentService.executePayout({
+        type: 'email',
+        emailData: {
+          subject: 'test payout subject',
+          message: 'test payout message',
+        },
+        id: senderBatchId,
+        recipients: [
+          {
+            note: 'Your 1$ Payout!',
+            amount: {
+              currency: 'SGD',
+              value: '1.00',
+            },
+            receiver: 'payout-sdk-2@paypal.com',
+            sender_item_id: 'Test_txn_1',
+          },
+        ],
+      });
+      expect(executePayoutRes).to.have.property('id');
+      expect(executePayoutRes.id.length > 0).to.equal(true);
+    });
+  });
 });

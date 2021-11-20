@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import { makePaynowPaymentService } from '.';
 import {
-  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentParams,
   PAYMENT_GATEWAY_NAME,
 } from '../../abstractions/IPaymentService';
 import { PaynowPaymentService } from './paynowPaymentService';
 
 let paynowPaymentService: PaynowPaymentService;
-let paymentHandlerExecuteParams: PaymentServiceExecuteParams;
+let paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams;
 
 before(async () => {
   paynowPaymentService = await makePaynowPaymentService;
@@ -37,7 +37,7 @@ beforeEach(async () => {
 describe('paynowPaymentService', () => {
   describe('executeSinglePayment', () => {
     it('should return a successful transaction response', async () => {
-      const executeSinglePaymentRes = await paynowPaymentService.executeSinglePayment(
+      const executeSinglePaymentRes = await paynowPaymentService.executePayment(
         paymentHandlerExecuteParams
       );
       expect(executeSinglePaymentRes).to.have.property('redirectUrl');

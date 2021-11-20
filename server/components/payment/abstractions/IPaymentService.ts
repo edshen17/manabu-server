@@ -1,6 +1,7 @@
 import Omise from 'omise';
 import { Item } from 'paypal-rest-sdk';
 import Stripe from 'stripe';
+import { StringKeyObject } from '../../../types/custom';
 
 type PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams> =
   RequiredPaymentServiceInitParams<PaymentLibType> & OptionalPaymentServiceInitParams;
@@ -20,10 +21,9 @@ enum PAYMENT_GATEWAY_NAME {
   PAYPAL = 'paypal',
   STRIPE = 'stripe',
   PAYNOW = 'paynow',
-  NONE = '',
 }
 
-type PaymentServiceExecuteParams = {
+type PaymentServiceExecutePaymentParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
   items: PaypalItems | StripeItems | OmiseItems;
@@ -38,13 +38,30 @@ type PaymentServiceExecutePaymentRes = {
   redirectUrl: string;
 };
 
+type PaymentServiceExecutePayoutParams = {
+  type: 'email';
+  emailData: {
+    subject: string;
+    message: string;
+  };
+  id: string;
+  recipients: StringKeyObject[];
+};
+
+type PaymentServiceExecutePayoutRes = {
+  id: string;
+};
+
 interface IPaymentService<PaymentLibType, OptionalPaymentServiceInitParams> {
-  executeSinglePayment: (
-    props: PaymentServiceExecuteParams
+  executePayment: (
+    props: PaymentServiceExecutePaymentParams
   ) => Promise<PaymentServiceExecutePaymentRes>;
   executeSubscription: (
-    props: PaymentServiceExecuteParams
+    props: PaymentServiceExecutePaymentParams
   ) => Promise<PaymentServiceExecutePaymentRes>;
+  executePayout: (
+    props: PaymentServiceExecutePayoutParams
+  ) => Promise<PaymentServiceExecutePayoutRes>;
   init: (
     initParams: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>
   ) => Promise<this>;
@@ -53,8 +70,10 @@ interface IPaymentService<PaymentLibType, OptionalPaymentServiceInitParams> {
 export {
   IPaymentService,
   PaymentServiceInitParams,
-  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePayoutParams,
+  PaymentServiceExecutePayoutRes,
   PaypalItems,
   StripeItems,
   OmiseItems,

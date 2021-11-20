@@ -1,8 +1,10 @@
 import { StringKeyObject } from '../../../types/custom';
 import {
   IPaymentService,
-  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePayoutParams,
+  PaymentServiceExecutePayoutRes,
   PaymentServiceInitParams,
 } from './IPaymentService';
 
@@ -11,15 +13,15 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
 {
   protected _paymentLib!: PaymentLibType;
 
-  public executeSinglePayment = async (
-    props: PaymentServiceExecuteParams
+  public executePayment = async (
+    props: PaymentServiceExecutePaymentParams
   ): Promise<PaymentServiceExecutePaymentRes> => {
     const createPaymentJson = this._createPaymentJson(props);
     const executePaymentRes = await this._executePaymentTemplate(createPaymentJson);
     return executePaymentRes;
   };
 
-  protected abstract _createPaymentJson(props: PaymentServiceExecuteParams): StringKeyObject;
+  protected abstract _createPaymentJson(props: PaymentServiceExecutePaymentParams): StringKeyObject;
 
   protected abstract _executePaymentTemplate(
     createPaymentJson: StringKeyObject
@@ -30,6 +32,20 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
       redirectUrl: '',
     };
   };
+
+  public executePayout = async (
+    props: PaymentServiceExecutePayoutParams
+  ): Promise<PaymentServiceExecutePayoutRes> => {
+    const createPayoutJson = this._createPayoutJson(props);
+    const executePayoutRes = await this._executePayoutTemplate(createPayoutJson);
+    return executePayoutRes;
+  };
+
+  protected abstract _createPayoutJson(props: PaymentServiceExecutePayoutParams): StringKeyObject;
+
+  protected abstract _executePayoutTemplate(
+    createPayoutJson: StringKeyObject
+  ): Promise<PaymentServiceExecutePayoutRes>;
 
   public init = async (
     initParams: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>

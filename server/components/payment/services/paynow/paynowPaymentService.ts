@@ -3,8 +3,10 @@ import { StringKeyObject } from '../../../../types/custom';
 import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
   OmiseItems,
-  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePayoutParams,
+  PaymentServiceExecutePayoutRes,
 } from '../../abstractions/IPaymentService';
 
 type OptionalPaynowPaymentServiceInitParams = {};
@@ -14,14 +16,14 @@ class PaynowPaymentService extends AbstractPaymentService<
   OptionalPaynowPaymentServiceInitParams
 > {
   protected _createPaymentJson = (
-    props: PaymentServiceExecuteParams
-  ): PaymentServiceExecuteParams => {
+    props: PaymentServiceExecutePaymentParams
+  ): PaymentServiceExecutePaymentParams => {
     const createPaymentJson = props;
     return createPaymentJson;
   };
 
   protected _executePaymentTemplate = async (
-    createPaymentJson: PaymentServiceExecuteParams
+    createPaymentJson: PaymentServiceExecutePaymentParams
   ): Promise<PaymentServiceExecutePaymentRes> => {
     const { items, token } = createPaymentJson;
     const { source, charge } = items as OmiseItems;
@@ -40,6 +42,18 @@ class PaynowPaymentService extends AbstractPaymentService<
       redirectUrl: (chargeRes.source as StringKeyObject).scannable_code.image.download_uri,
     };
     return executePaymentRes;
+  };
+
+  protected _createPayoutJson = (props: PaymentServiceExecutePayoutParams): StringKeyObject => {
+    return {};
+  };
+
+  protected _executePayoutTemplate = async (
+    createPayoutJson: StringKeyObject
+  ): Promise<PaymentServiceExecutePayoutRes> => {
+    return {
+      id: '',
+    };
   };
 }
 

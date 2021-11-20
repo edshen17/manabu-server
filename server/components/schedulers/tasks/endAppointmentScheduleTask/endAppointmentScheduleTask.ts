@@ -23,6 +23,14 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<OptionalEndAppoint
   public execute = async (): Promise<void> => {
     const now = this._dayjs();
     const dbServiceAccessOptions = this._appointmentDbService.getBaseDbServiceAccessOptions();
+    await this._endAppointments({ now, dbServiceAccessOptions });
+  };
+
+  private _endAppointments = async (props: {
+    now: Dayjs;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<void> => {
+    const { now, dbServiceAccessOptions } = props;
     const confirmedAppointments = await this._getConfirmedAppointments({
       now,
       dbServiceAccessOptions,

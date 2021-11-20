@@ -17,7 +17,7 @@ import {
 import { PackageTransactionEntityBuildParams } from '../../../../entities/packageTransaction/packageTransactionEntity';
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
 import {
-  PaymentServiceExecuteParams,
+  PaymentServiceExecutePaymentParams,
   PAYMENT_GATEWAY_NAME,
 } from '../../../../payment/abstractions/IPaymentService';
 import { PaynowPaymentService } from '../../../../payment/services/paynow/paynowPaymentService';
@@ -299,7 +299,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   ): Promise<string> => {
     const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
     const { price, name, id, quantity } = item;
-    const paymentHandlerExecuteParams: PaymentServiceExecuteParams = {
+    const paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: [
@@ -315,7 +315,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       total: price,
       token,
     };
-    const paypalCheckoutRes = await this._paypalPaymentService.executeSinglePayment(
+    const paypalCheckoutRes = await this._paypalPaymentService.executePayment(
       paymentHandlerExecuteParams
     );
     const { redirectUrl } = paypalCheckoutRes;
@@ -336,7 +336,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       targetCurrency: '',
     });
-    const paymentHandlerExecuteParams: PaymentServiceExecuteParams = {
+    const paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: [
@@ -355,7 +355,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       total: stripePrice,
       token,
     };
-    const stripeCheckoutRes = await this._stripePaymentService.executeSinglePayment(
+    const stripeCheckoutRes = await this._stripePaymentService.executePayment(
       paymentHandlerExecuteParams
     );
     const { redirectUrl } = stripeCheckoutRes;
@@ -376,7 +376,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       targetCurrency: '',
     });
-    const paymentHandlerExecuteParams: PaymentServiceExecuteParams = {
+    const paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams = {
       successRedirectUrl,
       cancelRedirectUrl,
       items: {
@@ -395,7 +395,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       total: price,
       token,
     };
-    const paynowCheckoutRes = await this._paynowPaymentService.executeSinglePayment(
+    const paynowCheckoutRes = await this._paynowPaymentService.executePayment(
       paymentHandlerExecuteParams
     );
     const { redirectUrl } = paynowCheckoutRes;

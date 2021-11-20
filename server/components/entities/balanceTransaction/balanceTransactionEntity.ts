@@ -15,7 +15,7 @@ type BalanceTransactionEntityBuildParams = {
   processingFee: number;
   tax: number;
   runningBalance: RunningBalance;
-  paymentData: {
+  paymentData?: {
     gateway: string;
     id: string;
   };
@@ -41,6 +41,7 @@ enum BALANCE_TRANSACTION_ENTITY_STATUS {
 enum BALANCE_TRANSACTION_ENTITY_TYPE {
   PACKAGE_TRANSACTION = 'packageTransaction',
   CREDIT_SALE = 'creditSale',
+  PAYOUT = 'payout',
 }
 
 class BalanceTransactionEntity extends AbstractEntity<
