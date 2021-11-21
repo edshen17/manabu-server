@@ -51,47 +51,50 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _balanceTransactionDbService!: BalanceTransactionDbService;
   private _userDbService!: UserDbService;
   private _exchangeRateHandler!: ExchangeRateHandler;
-  private _defaultCurrency: string = DEFAULT_CURRENCY;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionUsecaseResponse> => {
     const { query, dbServiceAccessOptions } = props;
-    const { token, paymentId } = query;
-    const verifiedJwt = await this._getVerifiedJwt(token);
-    const { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams } =
-      verifiedJwt;
     const session = await this._balanceTransactionDbService.startSession();
     session.startTransaction();
     let usecaseRes!: CreatePackageTransactionUsecaseResponse;
     try {
-      const packageTransaction = await this._createPackageTransaction({
-        packageTransactionEntityBuildParams,
-        dbServiceAccessOptions,
-        session,
-      });
-      const balanceTransactions = await this._createBalanceTransactions({
-        packageTransaction,
-        balanceTransactionEntityBuildParams,
-        dbServiceAccessOptions,
-        paymentId,
-        session,
-      });
-      await this._editTeacherPendingBalance({
-        teacherPayoutBalanceTransaction: balanceTransactions[2],
-        dbServiceAccessOptions,
-        session,
-      });
-      usecaseRes = {
-        packageTransaction,
-        balanceTransactions,
-      };
+      usecaseRes = await this._getUsesecaseRes({ query, dbServiceAccessOptions, session });
+      await this._editTeacherPendingBalance({ usecaseRes, dbServiceAccessOptions, session });
       await session.commitTransaction();
     } catch (err) {
       await session.abortTransaction();
+      throw err;
     } finally {
       session.endSession();
     }
+    return usecaseRes;
+  };
+
+  private _getUsesecaseRes = async (props: {
+    query: StringKeyObject;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+  }): Promise<CreatePackageTransactionUsecaseResponse> => {
+    const { query, dbServiceAccessOptions, session } = props;
+    const { token, paymentId } = query;
+    const verifiedJwt = await this._getVerifiedJwt(token);
+    const { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams } =
+      verifiedJwt;
+    const packageTransaction = await this._createPackageTransaction({
+      packageTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      session,
+    });
+    const balanceTransactions = await this._createBalanceTransactions({
+      packageTransaction,
+      balanceTransactionEntityBuildParams,
+      dbServiceAccessOptions,
+      paymentId,
+      session,
+    });
+    const usecaseRes = { packageTransaction, balanceTransactions };
     return usecaseRes;
   };
 
@@ -146,13 +149,8 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       paymentId,
       session,
     } = props;
-    const user = await this._userDbService.findById({
-      _id: packageTransaction.reservedById,
-      dbServiceAccessOptions,
-      session,
-    });
-    const teacher = await this._userDbService.findById({
-      _id: packageTransaction.hostedById,
+    const { user, teacher } = await this._getUserDataFromPackageTransaction({
+      packageTransaction,
       dbServiceAccessOptions,
       session,
     });
@@ -185,6 +183,28 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     return balanceTransactions;
   };
 
+  private _getUserDataFromPackageTransaction = async (props: {
+    packageTransaction: PackageTransactionDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+  }): Promise<{
+    user: JoinedUserDoc;
+    teacher: JoinedUserDoc;
+  }> => {
+    const { packageTransaction, dbServiceAccessOptions, session } = props;
+    const user = await this._userDbService.findById({
+      _id: packageTransaction.reservedById,
+      dbServiceAccessOptions,
+      session,
+    });
+    const teacher = await this._userDbService.findById({
+      _id: packageTransaction.hostedById,
+      dbServiceAccessOptions,
+      session,
+    });
+    return { user, teacher };
+  };
+
   private _createDebitBalanceTransaction = async (props: {
     balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
     user: JoinedUserDoc;
@@ -205,7 +225,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
           amount: user.balance.totalAvailable,
           sourceCurrency: user.balance.currency,
         },
-        targetCurrency: this._defaultCurrency,
+        targetCurrency: DEFAULT_CURRENCY,
       });
     const debitBalanceTransaction = await this._createBalanceTransaction({
       balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
@@ -257,7 +277,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         multiplier: {
           amount: -1,
         },
-        targetCurrency: this._defaultCurrency,
+        targetCurrency: DEFAULT_CURRENCY,
       });
     creditBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
       user.balance.totalAvailable;
@@ -284,37 +304,11 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     teacherPayoutBalanceTransactionEntityBuildParams.userId = teacher._id;
     teacherPayoutBalanceTransactionEntityBuildParams.paymentData = undefined;
     teacherPayoutBalanceTransactionEntityBuildParams.processingFee =
-      await this._exchangeRateHandler.multiply({
-        multiplicand: {
-          amount: balanceTransactionEntityBuildParams.balanceChange,
-        },
-        multiplier: {
-          amount: -1 * MANABU_PROCESSING_RATE,
-        },
-        targetCurrency: this._defaultCurrency,
-      });
-    const totalPayment = await this._exchangeRateHandler.add({
-      addend1: {
-        amount: balanceTransactionEntityBuildParams.balanceChange,
-        sourceCurrency: balanceTransactionEntityBuildParams.currency,
-      },
-      addend2: {
-        amount: teacherPayoutBalanceTransactionEntityBuildParams.processingFee,
-        sourceCurrency: teacherPayoutBalanceTransactionEntityBuildParams.currency,
-      },
-      targetCurrency: this._defaultCurrency,
-    });
+      await this._getTeacherPayoutProcessingFee(teacherPayoutBalanceTransactionEntityBuildParams);
     teacherPayoutBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
-      await this._exchangeRateHandler.add({
-        addend1: {
-          amount: totalPayment,
-          sourceCurrency: this._defaultCurrency,
-        },
-        addend2: {
-          amount: teacher.balance.totalAvailable,
-          sourceCurrency: teacher.balance.currency,
-        },
-        targetCurrency: teacher.balance.currency,
+      await this._getTeacherPayoutTotalAvailableBalance({
+        teacherPayoutBalanceTransactionEntityBuildParams,
+        teacher,
       });
     teacherPayoutBalanceTransactionEntityBuildParams.status =
       BALANCE_TRANSACTION_ENTITY_STATUS.PENDING;
@@ -326,12 +320,59 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     return teacherPayoutBalanceTransaction;
   };
 
+  private _getTeacherPayoutProcessingFee = async (
+    teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams
+  ): Promise<number> => {
+    const processingFee = await this._exchangeRateHandler.multiply({
+      multiplicand: {
+        amount: teacherPayoutBalanceTransactionEntityBuildParams.balanceChange,
+      },
+      multiplier: {
+        amount: -1 * MANABU_PROCESSING_RATE, // change to 16% if pro, 1250 yen if community
+      },
+      targetCurrency: DEFAULT_CURRENCY,
+    });
+    return processingFee;
+  };
+
+  private _getTeacherPayoutTotalAvailableBalance = async (props: {
+    teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+    teacher: JoinedUserDoc;
+  }): Promise<number> => {
+    const { teacherPayoutBalanceTransactionEntityBuildParams, teacher } = props;
+    const totalPayment = await this._exchangeRateHandler.add({
+      addend1: {
+        amount: teacherPayoutBalanceTransactionEntityBuildParams.balanceChange,
+        sourceCurrency: teacherPayoutBalanceTransactionEntityBuildParams.currency,
+      },
+      addend2: {
+        amount: teacherPayoutBalanceTransactionEntityBuildParams.processingFee,
+        sourceCurrency: teacherPayoutBalanceTransactionEntityBuildParams.currency,
+      },
+      targetCurrency: DEFAULT_CURRENCY,
+    });
+    const totalAvailableBalance = await this._exchangeRateHandler.add({
+      addend1: {
+        amount: totalPayment,
+        sourceCurrency: DEFAULT_CURRENCY,
+      },
+      addend2: {
+        amount: teacher.balance.totalAvailable,
+        sourceCurrency: teacher.balance.currency,
+      },
+      targetCurrency: teacher.balance.currency,
+    });
+    return totalAvailableBalance;
+  };
+
   private _editTeacherPendingBalance = async (props: {
-    teacherPayoutBalanceTransaction: BalanceTransactionDoc;
+    usecaseRes: CreatePackageTransactionUsecaseResponse;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
   }): Promise<void> => {
-    const { teacherPayoutBalanceTransaction, dbServiceAccessOptions, session } = props;
+    const { usecaseRes, dbServiceAccessOptions, session } = props;
+    const { balanceTransactions } = usecaseRes;
+    const teacherPayoutBalanceTransaction = balanceTransactions[2];
     const teacherTotalPayment = teacherPayoutBalanceTransaction.totalPayment;
     const updatedTeacher = await this._userDbService.findOneAndUpdate({
       searchQuery: {

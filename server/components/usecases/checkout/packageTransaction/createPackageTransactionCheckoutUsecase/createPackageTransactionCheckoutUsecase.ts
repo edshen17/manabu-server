@@ -92,7 +92,6 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
-  private _defaultCurrency: string = DEFAULT_CURRENCY;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -131,7 +130,6 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
         return teachingLanguage.language == lessonLanguage;
       }) != -1;
     const isValidBody = isTeacherApproved && isValidLessonDuration && isValidLessonLanguage;
-
     if (!isValidBody) {
       throw new Error('Invalid body.');
     }
@@ -181,7 +179,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       item,
       successRedirectUrl: 'https://manabu.sg/dashboard',
       cancelRedirectUrl: 'https://manabu.sg/cancel',
-      currency: this._defaultCurrency,
+      currency: DEFAULT_CURRENCY,
       token: token,
     };
     return processedPaymentServiceParams;
@@ -200,7 +198,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       multiplier: {
         amount: (lessonDuration / 60) * teacherPackage.lessonAmount,
       },
-      targetCurrency: this._defaultCurrency,
+      targetCurrency: DEFAULT_CURRENCY,
     });
     const total = await this._exchangeRateHandler.multiply({
       multiplicand: {
@@ -211,7 +209,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       targetCurrency: '',
     });
-    const priceData = { currency: this._defaultCurrency, subTotal, total };
+    const priceData = { currency: DEFAULT_CURRENCY, subTotal, total };
     const item = {
       id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
       name: this._convertToTitlecase(
