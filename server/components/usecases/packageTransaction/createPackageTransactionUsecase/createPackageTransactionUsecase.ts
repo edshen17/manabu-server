@@ -343,21 +343,24 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const processingRateObj = MANABU_PROCESSING_RATE[teacherType.toUpperCase()];
     const processingRateAmount = processingRateObj.amount;
     const isProTeacher = teacherType == TEACHER_ENTITY_TYPE.LICENSED;
-    const proTeacherProcessingFee = await this._exchangeRateHandler.multiply({
-      multiplicand: {
-        amount: teacherPayoutBalanceTransactionEntityBuildParams.balanceChange,
-      },
-      multiplier: {
+    let processingFee;
+    if (isProTeacher) {
+      processingFee = await this._exchangeRateHandler.multiply({
+        multiplicand: {
+          amount: teacherPayoutBalanceTransactionEntityBuildParams.balanceChange,
+        },
+        multiplier: {
+          amount: processingRateAmount,
+        },
+        targetCurrency: DEFAULT_CURRENCY,
+      });
+    } else {
+      processingFee = await this._exchangeRateHandler.convert({
         amount: processingRateAmount,
-      },
-      targetCurrency: DEFAULT_CURRENCY,
-    });
-    const communityTeacherProcessingFee = await this._exchangeRateHandler.convert({
-      amount: processingRateAmount,
-      sourceCurrency: processingRateObj.currency,
-      targetCurrency: DEFAULT_CURRENCY,
-    });
-    const processingFee = isProTeacher ? proTeacherProcessingFee : communityTeacherProcessingFee;
+        sourceCurrency: processingRateObj.currency,
+        targetCurrency: DEFAULT_CURRENCY,
+      });
+    }
     return processingFee * -1;
   };
 

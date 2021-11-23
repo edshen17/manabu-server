@@ -1,8 +1,11 @@
 import { expect } from 'chai';
 import { makeCreatePackageTransactionUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
+import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { TEACHER_ENTITY_TYPE } from '../../../entities/teacher/teacherEntity';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeCreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase';
@@ -23,12 +26,14 @@ let createPackageTransactionUsecaseRouteData: RouteData;
 let createPackageTransactionCheckoutRouteData: RouteData;
 let fakeUser: JoinedUserDoc;
 let currentAPIUser: CurrentAPIUser;
+let teacherDbService: TeacherDbService;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   createPackageTransactionUsecase = await makeCreatePackageTransactionUsecase;
   createPackageTransactionCheckoutUsecase = await makeCreatePackageTransactionCheckoutUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
+  teacherDbService = await makeTeacherDbService;
 });
 
 beforeEach(async () => {
@@ -145,6 +150,20 @@ describe('createPackageTransactionUsecase', () => {
           expect(teacherPayoutBalanceTransaction.processingFee < 0).to.equal(true);
         };
         it('should create a packageTransaction and 3 balanceTransactions', async () => {
+          const createPackageTransactionRes = await createPackageTransaction();
+          validResOutput(createPackageTransactionRes);
+        });
+        it('should return correct balance transaction rates if pro teacher', async () => {
+          const dbServiceAccessOptions = teacherDbService.getBaseDbServiceAccessOptions();
+          await teacherDbService.findOneAndUpdate({
+            searchQuery: {
+              _id: fakeTeacher.teacherData!._id,
+            },
+            updateQuery: {
+              teacherType: TEACHER_ENTITY_TYPE.LICENSED,
+            },
+            dbServiceAccessOptions,
+          });
           const createPackageTransactionRes = await createPackageTransaction();
           validResOutput(createPackageTransactionRes);
         });
