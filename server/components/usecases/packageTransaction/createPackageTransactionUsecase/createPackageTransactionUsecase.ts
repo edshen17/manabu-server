@@ -60,7 +60,11 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     session.startTransaction();
     let usecaseRes!: CreatePackageTransactionUsecaseResponse;
     try {
-      usecaseRes = await this._getUsesecaseRes({ query, dbServiceAccessOptions, session });
+      usecaseRes = await this._getCreatePackageTransactionUsecaseRes({
+        query,
+        dbServiceAccessOptions,
+        session,
+      });
       await this._editTeacherPendingBalance({ usecaseRes, dbServiceAccessOptions, session });
       await session.commitTransaction();
     } catch (err) {
@@ -72,7 +76,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     return usecaseRes;
   };
 
-  private _getUsesecaseRes = async (props: {
+  private _getCreatePackageTransactionUsecaseRes = async (props: {
     query: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;

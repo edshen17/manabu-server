@@ -29,7 +29,11 @@ before(async () => {
 beforeEach(async () => {
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
   params = {};
-  body = {};
+  body = {
+    hostedById: fakeTeacher._id,
+    startDate: dayjs().minute(0).toDate(),
+    endDate: dayjs().minute(30).toDate(),
+  };
   currentAPIUser = {
     role: 'user',
     userId: fakeTeacher._id,
@@ -54,11 +58,6 @@ describe('createAvailableTimeController', () => {
     };
     context('valid inputs', () => {
       it('should create a new available time document', async () => {
-        body = {
-          hostedById: fakeTeacher._id,
-          startDate: dayjs().minute(0).toDate(),
-          endDate: dayjs().minute(30).toDate(),
-        };
         const createAvailableTimeRes = await createAvailableTime();
         expect(createAvailableTimeRes.statusCode).to.equal(201);
         if ('availableTime' in createAvailableTimeRes.body) {

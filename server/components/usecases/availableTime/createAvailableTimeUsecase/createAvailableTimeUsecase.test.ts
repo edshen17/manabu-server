@@ -35,8 +35,8 @@ beforeEach(async () => {
   routeData = {
     params: {},
     body: {
-      startDate: dayjs().minute(1).toDate(),
-      endDate: dayjs().minute(2).toDate(),
+      startDate: dayjs().hour(7).minute(0).toDate(),
+      endDate: dayjs().hour(7).minute(30).toDate(),
     },
     query: {},
     endpointPath: '',
@@ -74,6 +74,7 @@ describe('createAvailableTimeUsecase', () => {
           await testAvailableTimeError();
         });
         it('should throw an error when creating an invalid availableTime', async () => {
+          routeData.body.startDate = dayjs().hour(7).minute(29).toDate();
           await testAvailableTimeError();
         });
       });
@@ -85,8 +86,6 @@ describe('createAvailableTimeUsecase', () => {
           expect(availableTime).to.have.property('endDate');
         };
         it('should return a new available time', async () => {
-          routeData.body.startDate = dayjs().hour(7).minute(0).toDate();
-          routeData.body.endDate = dayjs().hour(7).minute(30).toDate();
           const createAvailableTimeRes = await createAvailableTime();
           validResOutput(createAvailableTimeRes);
         });
