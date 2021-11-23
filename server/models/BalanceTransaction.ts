@@ -6,7 +6,10 @@ const BalanceTransactionSchema = createSchema({
   userId: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   status: Type.string({ required: true }),
   currency: Type.string({ required: true }),
-  type: Type.string({ required: true, enum: ['packageTransaction'] }),
+  type: Type.string({
+    required: true,
+    enum: ['packageTransaction', 'creditTransaction', 'payout'],
+  }),
   packageTransactionId: Type.ref(Type.objectId({ required: true, index: true })).to(
     'PackageTransaction',
     PackageTransactionSchema

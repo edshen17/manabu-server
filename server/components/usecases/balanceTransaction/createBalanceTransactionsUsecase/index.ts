@@ -6,7 +6,7 @@ import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { CreateBalanceTransactionsUsecase } from './createBalanceTransactionsUsecase';
 
-const makeBalanceTransactionsUsecase = new CreateBalanceTransactionsUsecase().init({
+const makeCreateBalanceTransactionsUsecase = new CreateBalanceTransactionsUsecase().init({
   makeDbService: makeBalanceTransactionDbService,
   makeParamsValidator: makeBaseParamsValidator,
   makeQueryValidator: makeBaseQueryValidator,
@@ -15,4 +15,4 @@ const makeBalanceTransactionsUsecase = new CreateBalanceTransactionsUsecase().in
   makeBalanceTransactionEntity,
 });
 
-export { makeBalanceTransactionsUsecase };
+export { makeCreateBalanceTransactionsUsecase };

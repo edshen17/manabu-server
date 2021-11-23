@@ -205,7 +205,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
         amount: subTotal,
       },
       multiplier: {
-        amount: 1 + PAYMENT_GATEWAY_RATE[paymentGateway],
+        amount: 1 + PAYMENT_GATEWAY_RATE[paymentGateway.toUpperCase()],
       },
       targetCurrency: '',
     });

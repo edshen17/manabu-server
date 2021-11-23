@@ -116,17 +116,35 @@ describe('createPackageTransactionUsecase', () => {
           }
           expect(error).to.be.an('error');
         });
+        it('should throw an error if body is invalid', async () => {
+          createPackageTransactionCheckoutRouteData.body = {};
+          await testPackageTransactionError();
+        });
       });
       context('valid inputs', () => {
         const validResOutput = (
           createPackageTransactionRes: CreatePackageTransactionUsecaseResponse
         ) => {
           const packageTransaction = createPackageTransactionRes.packageTransaction;
+          const balanceTransactions = createPackageTransactionRes.balanceTransactions;
+          const studentDebitBalanceTransaction = balanceTransactions[0];
+          const studentCreditBalanceTransaction = balanceTransactions[1];
+          const teacherPayoutBalanceTransaction = balanceTransactions[2];
           expect(packageTransaction).to.have.property('hostedById');
           expect(packageTransaction).to.have.property('reservedById');
           expect(packageTransaction).to.have.property('packageId');
+          expect(balanceTransactions.length == 3).to.equal(true);
+          expect(
+            studentDebitBalanceTransaction.balanceChange +
+              studentDebitBalanceTransaction.processingFee
+          ).to.equal(studentDebitBalanceTransaction.totalPayment);
+          expect(
+            studentCreditBalanceTransaction.balanceChange < 0 &&
+              studentCreditBalanceTransaction.totalPayment == 0
+          ).to.equal(true);
+          expect(teacherPayoutBalanceTransaction.processingFee < 0).to.equal(true);
         };
-        it('should return a new packageTransaction', async () => {
+        it('should create a packageTransaction and 3 balanceTransactions', async () => {
           const createPackageTransactionRes = await createPackageTransaction();
           validResOutput(createPackageTransactionRes);
         });

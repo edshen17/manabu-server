@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { makeBalanceTransactionsUsecase } from '.';
+import { makeCreateBalanceTransactionsUsecase } from '.';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { makeFakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory';
 import { FakeDbPackageTransactionFactory } from '../../../dataAccess/testFixtures/fakeDbPackageTransactionFactory/fakeDbPackageTransactionFactory';
@@ -22,7 +22,7 @@ let createBalanceTransactionsUsecase: CreateBalanceTransactionsUsecase;
 
 before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
-  createBalanceTransactionsUsecase = await makeBalanceTransactionsUsecase;
+  createBalanceTransactionsUsecase = await makeCreateBalanceTransactionsUsecase;
   fakeDbPackageTransactionFactory = await makeFakeDbPackageTransactionFactory;
 });
 

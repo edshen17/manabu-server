@@ -11,7 +11,7 @@ type OptionalTeacherEntityInitParams = {
   makePackageEntity: Promise<PackageEntity>;
 };
 
-type TeacherEntityBuildParams = {};
+type TeacherEntityBuildParams = {}; // add type here
 
 type TeacherEntityBuildResponse = {
   teachingLanguages: { language: string; level: string }[];
@@ -29,6 +29,11 @@ type TeacherEntityBuildResponse = {
   packages: PackageEntityBuildResponse[];
 };
 
+enum TEACHER_ENTITY_TYPE {
+  LICENSED = 'licensed',
+  UNLICENSED = 'unlicensed',
+}
+
 class TeacherEntity extends AbstractEntity<
   OptionalTeacherEntityInitParams,
   TeacherEntityBuildParams,
@@ -45,7 +50,7 @@ class TeacherEntity extends AbstractEntity<
       introductionVideoUrl: '',
       applicationStatus: 'pending',
       settings: { isHidden: false, emailAlerts: { packageTransactionCreation: true } },
-      teacherType: 'unlicensed',
+      teacherType: TEACHER_ENTITY_TYPE.UNLICENSED,
       licensePathUrl: '',
       priceData: { hourlyRate: 30, currency: DEFAULT_CURRENCY },
       tags: [],
@@ -98,4 +103,4 @@ class TeacherEntity extends AbstractEntity<
   };
 }
 
-export { TeacherEntity, TeacherEntityBuildParams, TeacherEntityBuildResponse };
+export { TeacherEntity, TeacherEntityBuildParams, TeacherEntityBuildResponse, TEACHER_ENTITY_TYPE };

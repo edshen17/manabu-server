@@ -40,7 +40,7 @@ enum BALANCE_TRANSACTION_ENTITY_STATUS {
 
 enum BALANCE_TRANSACTION_ENTITY_TYPE {
   PACKAGE_TRANSACTION = 'packageTransaction',
-  CREDIT_SALE = 'creditSale',
+  CREDIT_TRANSACTION = 'creditTransaction',
   PAYOUT = 'payout',
 }
 
