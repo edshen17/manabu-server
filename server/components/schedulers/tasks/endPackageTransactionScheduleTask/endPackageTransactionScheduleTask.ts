@@ -46,16 +46,14 @@ type EndPackageTransactionScheduleTaskResponse = {
   endedTeacherBalanceResponses: EndTeacherBalanceTransactionRes[];
 };
 
-type SendTeacherPayoutRes = {
-  executePayoutRes: PaymentServiceExecutePayoutRes;
-  creditTeacherPayoutBalanceTransaction: BalanceTransactionDoc;
-};
+type SendTeacherPayoutRes = PaymentServiceExecutePayoutRes;
 
 type EndTeacherBalanceTransactionRes = {
   debitTeacherBalanceTransaction: BalanceTransactionDoc;
   teacher: JoinedUserDoc;
-} & SendTeacherPayoutRes;
-
+  executePayoutRes: PaymentServiceExecutePayoutRes;
+  creditTeacherPayoutBalanceTransaction: BalanceTransactionDoc;
+};
 class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   OptionalEndPackageTransactionScheduleTaskInitParams,
   EndPackageTransactionScheduleTaskResponse
@@ -177,24 +175,24 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       dbServiceAccessOptions,
       session,
     });
+    const executePayoutRes = await this._executePayout({
+      debitTeacherBalanceTransaction,
+      teacher,
+      dbServiceAccessOptions,
+      session,
+    });
     const creditTeacherPayoutBalanceTransaction =
       await this._createCreditTeacherPayoutBalanceTransaction({
         debitTeacherBalanceTransaction,
         dbServiceAccessOptions,
         session,
+        executePayoutRes,
       });
-    const sendTeacherPayoutRes = await this._sendTeacherPayout({
-      creditTeacherPayoutBalanceTransaction,
-      teacher,
-      dbServiceAccessOptions,
-      session,
-    });
     const endTeacherBalanceTransactionRes = {
       debitTeacherBalanceTransaction,
       teacher,
-      executePayoutRes: sendTeacherPayoutRes.executePayoutRes,
-      creditTeacherPayoutBalanceTransaction:
-        sendTeacherPayoutRes.creditTeacherPayoutBalanceTransaction,
+      executePayoutRes,
+      creditTeacherPayoutBalanceTransaction,
     };
     return endTeacherBalanceTransactionRes;
   };
@@ -225,11 +223,14 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
+    executePayoutRes: SendTeacherPayoutRes;
   }): Promise<BalanceTransactionDoc> => {
-    const { dbServiceAccessOptions, session, debitTeacherBalanceTransaction } = props;
+    const { dbServiceAccessOptions, session, debitTeacherBalanceTransaction, executePayoutRes } =
+      props;
     const balanceChange = debitTeacherBalanceTransaction.totalPayment * -1;
     const { userId, currency, packageTransactionId, runningBalance } =
       debitTeacherBalanceTransaction;
+    const { id } = executePayoutRes;
     const creditTeacherPayoutBalanceTransactionEntity = await this._balanceTransactionEntity.build({
       userId,
       status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
@@ -242,6 +243,10 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       runningBalance: {
         currency: runningBalance.currency,
         totalAvailable: runningBalance.totalAvailable + balanceChange,
+      },
+      paymentData: {
+        gateway: PAYMENT_GATEWAY_NAME.PAYPAL,
+        id,
       },
     });
     const creditTeacherPayoutBalanceTransaction = await this._balanceTransactionDbService.insert({
@@ -275,45 +280,14 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     return updatedTeacher;
   };
 
-  private _sendTeacherPayout = async (props: {
-    creditTeacherPayoutBalanceTransaction: BalanceTransactionDoc;
+  private _executePayout = async (props: {
+    debitTeacherBalanceTransaction: BalanceTransactionDoc;
     teacher: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
-  }): Promise<SendTeacherPayoutRes> => {
-    const { creditTeacherPayoutBalanceTransaction, teacher, dbServiceAccessOptions, session } =
-      props;
-    const executePayoutRes = await this._getExecutePayoutRes({
-      creditTeacherPayoutBalanceTransaction,
-      teacher,
-    });
-    const updatedCreditTeacherPayoutBalanceTransaction =
-      await this._balanceTransactionDbService.findOneAndUpdate({
-        searchQuery: {
-          _id: creditTeacherPayoutBalanceTransaction._id,
-        },
-        updateQuery: {
-          paymentData: {
-            gateway: PAYMENT_GATEWAY_NAME.PAYPAL,
-            id: executePayoutRes.id,
-          },
-        },
-        dbServiceAccessOptions,
-        session,
-      });
-    const sendTeacherPayoutRes = {
-      executePayoutRes,
-      creditTeacherPayoutBalanceTransaction: updatedCreditTeacherPayoutBalanceTransaction,
-    };
-    return sendTeacherPayoutRes;
-  };
-
-  private _getExecutePayoutRes = async (props: {
-    teacher: JoinedUserDoc;
-    creditTeacherPayoutBalanceTransaction: BalanceTransactionDoc;
   }): Promise<PaymentServiceExecutePayoutRes> => {
-    const { teacher, creditTeacherPayoutBalanceTransaction } = props;
-    const payoutAmount = creditTeacherPayoutBalanceTransaction.balanceChange * -1;
+    const { debitTeacherBalanceTransaction, teacher } = props;
+    const payoutAmount = debitTeacherBalanceTransaction.totalPayment;
     const payoutMessage = `Minato Manabu has sent you ${payoutAmount} ${DEFAULT_CURRENCY} to your PayPal account.`;
     const executePayoutRes = await this._paypalPaymentService.executePayout({
       type: 'email',
@@ -321,16 +295,16 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         subject: `${payoutAmount} Lesson Payout - Minato Manabu`,
         message: payoutMessage,
       },
-      id: creditTeacherPayoutBalanceTransaction._id,
+      id: debitTeacherBalanceTransaction._id,
       recipients: [
         {
           note: payoutMessage,
           amount: {
-            currency: creditTeacherPayoutBalanceTransaction.currency,
+            currency: debitTeacherBalanceTransaction.currency,
             value: payoutAmount,
           },
           receiver: teacher.teacherData!.settings.payoutData.email,
-          sender_item_id: creditTeacherPayoutBalanceTransaction.packageTransactionId,
+          sender_item_id: debitTeacherBalanceTransaction.packageTransactionId,
         },
       ],
     });
