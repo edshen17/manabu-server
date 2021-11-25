@@ -327,7 +327,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
           note: payoutMessage,
           amount: {
             currency: creditTeacherPayoutBalanceTransaction.currency,
-            value: creditTeacherPayoutBalanceTransaction.totalPayment,
+            value: payoutAmount,
           },
           receiver: teacher.teacherData!.settings.payoutData.email,
           sender_item_id: creditTeacherPayoutBalanceTransaction.packageTransactionId,
