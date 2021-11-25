@@ -19,6 +19,9 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         emailAlerts: {
           packageTransactionCreation: this._joi.boolean(),
         },
+        payoutData: this._joi.object({
+          email: this._joi.string().email().max(256).allow(''),
+        }),
       }),
       teacherType: this._joi.string().valid('unlicensed', 'licensed').allow(''),
       licensePathUrl: this._joi.string().uri().allow('').max(2048),

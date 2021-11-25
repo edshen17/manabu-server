@@ -5,9 +5,9 @@ type RequiredScheduleTaskInitParams = {
   dayjs: any;
 };
 
-interface IScheduleTask<OptionalSchedulerInitParams> {
+interface IScheduleTask<OptionalSchedulerInitParams, ScheduleTaskResponse> {
   init: (initParams: ScheduleTaskInitParams<OptionalSchedulerInitParams>) => Promise<this>;
-  execute: () => Promise<void>;
+  execute: () => Promise<ScheduleTaskResponse>;
 }
 
 export { IScheduleTask, ScheduleTaskInitParams };

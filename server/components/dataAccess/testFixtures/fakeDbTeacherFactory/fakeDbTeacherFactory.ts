@@ -17,6 +17,7 @@ class FakeDbTeacherFactory extends AbstractFakeDbEmbeddedDataFactory<
     fakeData.applicationStatus = 'approved';
     fakeData.teachingLanguages.push({ language: 'ja', level: 'C2' });
     fakeData.alsoSpeaks.push({ language: 'en', level: 'C2' });
+    fakeData.settings.payoutData.email = 'payout-sdk-2@paypal.com';
     return fakeData;
   };
 

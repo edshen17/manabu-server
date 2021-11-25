@@ -1,11 +1,11 @@
 import { IScheduleTask, ScheduleTaskInitParams } from './IScheduleTask';
 
-abstract class AbstractScheduleTask<OptionalScheduleTaskInitParams>
-  implements IScheduleTask<OptionalScheduleTaskInitParams>
+abstract class AbstractScheduleTask<OptionalScheduleTaskInitParams, ScheduleTaskResponse>
+  implements IScheduleTask<OptionalScheduleTaskInitParams, ScheduleTaskResponse>
 {
   protected _dayjs!: any;
 
-  public abstract execute(): Promise<void>;
+  public abstract execute(): Promise<ScheduleTaskResponse>;
 
   public init = async (
     initParams: ScheduleTaskInitParams<OptionalScheduleTaskInitParams>

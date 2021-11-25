@@ -10,7 +10,7 @@ const BalanceTransactionSchema = createSchema({
     required: true,
     enum: ['packageTransaction', 'creditTransaction', 'payout'],
   }),
-  packageTransactionId: Type.ref(Type.objectId({ required: true, index: true })).to(
+  packageTransactionId: Type.ref(Type.objectId({ required: false, index: true })).to(
     'PackageTransaction',
     PackageTransactionSchema
   ),
@@ -19,8 +19,8 @@ const BalanceTransactionSchema = createSchema({
   tax: Type.number({ required: true }),
   totalPayment: Type.number({ required: true }),
   runningBalance: Type.object({ required: true }).of({
-    totalAvailable: Type.number(),
-    currency: Type.string(),
+    totalAvailable: Type.number({ required: true }),
+    currency: Type.string({ required: true }),
   }),
   paymentData: Type.object({ required: false }).of({
     gateway: Type.string({ required: false, enum: ['paypal', 'stripe', 'paynow', ''] }),

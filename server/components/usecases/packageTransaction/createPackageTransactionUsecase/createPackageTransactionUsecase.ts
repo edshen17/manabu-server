@@ -248,15 +248,15 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         debitBalanceTransactionBuildParams: debitBalanceTransactionEntityBuildParams,
         user,
       });
-    const teacherPayoutBalanceTransactionBuildParams =
-      await this._createTeacherPayoutBalanceTransactionEntityBuildParams({
+    const teacherBalanceTransactionBuildParams =
+      await this._createTeacherBalanceTransactionEntityBuildParams({
         balanceTransactionEntityBuildParams,
         teacher,
       });
     const balanceTransactions = [
       debitBalanceTransactionEntityBuildParams,
       creditBalanceTransactionBuildParams,
-      teacherPayoutBalanceTransactionBuildParams,
+      teacherBalanceTransactionBuildParams,
     ];
     return balanceTransactions;
   };
@@ -310,35 +310,33 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     return creditBalanceTransactionEntityBuildParams;
   };
 
-  private _createTeacherPayoutBalanceTransactionEntityBuildParams = async (props: {
+  private _createTeacherBalanceTransactionEntityBuildParams = async (props: {
     balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
     teacher: JoinedUserDoc;
   }): Promise<BalanceTransactionEntityBuildParams> => {
     const { balanceTransactionEntityBuildParams, teacher } = props;
-    const teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
+    const teacherBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams =
       this._cloneDeep(balanceTransactionEntityBuildParams);
-    teacherPayoutBalanceTransactionEntityBuildParams.userId = teacher._id;
-    teacherPayoutBalanceTransactionEntityBuildParams.paymentData = undefined;
-    teacherPayoutBalanceTransactionEntityBuildParams.processingFee =
-      await this._getTeacherPayoutProcessingFee({
-        teacherPayoutBalanceTransactionEntityBuildParams,
+    teacherBalanceTransactionEntityBuildParams.userId = teacher._id;
+    teacherBalanceTransactionEntityBuildParams.paymentData = undefined;
+    teacherBalanceTransactionEntityBuildParams.processingFee = await this._getTeacherProcessingFee({
+      teacherBalanceTransactionEntityBuildParams,
+      teacher,
+    });
+    teacherBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
+      await this._getTeacherTotalAvailableBalance({
+        teacherBalanceTransactionEntityBuildParams,
         teacher,
       });
-    teacherPayoutBalanceTransactionEntityBuildParams.runningBalance.totalAvailable =
-      await this._getTeacherPayoutTotalAvailableBalance({
-        teacherPayoutBalanceTransactionEntityBuildParams,
-        teacher,
-      });
-    teacherPayoutBalanceTransactionEntityBuildParams.status =
-      BALANCE_TRANSACTION_ENTITY_STATUS.PENDING;
-    return teacherPayoutBalanceTransactionEntityBuildParams;
+    teacherBalanceTransactionEntityBuildParams.status = BALANCE_TRANSACTION_ENTITY_STATUS.PENDING;
+    return teacherBalanceTransactionEntityBuildParams;
   };
 
-  private _getTeacherPayoutProcessingFee = async (props: {
-    teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+  private _getTeacherProcessingFee = async (props: {
+    teacherBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
     teacher: JoinedUserDoc;
   }): Promise<number> => {
-    const { teacherPayoutBalanceTransactionEntityBuildParams, teacher } = props;
+    const { teacherBalanceTransactionEntityBuildParams, teacher } = props;
     const teacherType = teacher.teacherData!.teacherType;
     const processingRateObj = MANABU_PROCESSING_RATE[teacherType.toUpperCase()];
     const processingRateAmount = processingRateObj.amount;
@@ -347,7 +345,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     if (isProTeacher) {
       processingFee = await this._exchangeRateHandler.multiply({
         multiplicand: {
-          amount: teacherPayoutBalanceTransactionEntityBuildParams.balanceChange,
+          amount: teacherBalanceTransactionEntityBuildParams.balanceChange,
         },
         multiplier: {
           amount: processingRateAmount,
@@ -364,19 +362,19 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     return processingFee * -1;
   };
 
-  private _getTeacherPayoutTotalAvailableBalance = async (props: {
-    teacherPayoutBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
+  private _getTeacherTotalAvailableBalance = async (props: {
+    teacherBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
     teacher: JoinedUserDoc;
   }): Promise<number> => {
-    const { teacherPayoutBalanceTransactionEntityBuildParams, teacher } = props;
+    const { teacherBalanceTransactionEntityBuildParams, teacher } = props;
     const totalPayment = await this._exchangeRateHandler.add({
       addend1: {
-        amount: teacherPayoutBalanceTransactionEntityBuildParams.balanceChange,
-        sourceCurrency: teacherPayoutBalanceTransactionEntityBuildParams.currency,
+        amount: teacherBalanceTransactionEntityBuildParams.balanceChange,
+        sourceCurrency: teacherBalanceTransactionEntityBuildParams.currency,
       },
       addend2: {
-        amount: teacherPayoutBalanceTransactionEntityBuildParams.processingFee,
-        sourceCurrency: teacherPayoutBalanceTransactionEntityBuildParams.currency,
+        amount: teacherBalanceTransactionEntityBuildParams.processingFee,
+        sourceCurrency: teacherBalanceTransactionEntityBuildParams.currency,
       },
       targetCurrency: DEFAULT_CURRENCY,
     });
@@ -401,11 +399,11 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   }): Promise<void> => {
     const { usecaseRes, dbServiceAccessOptions, session } = props;
     const { balanceTransactions } = usecaseRes;
-    const teacherPayoutBalanceTransaction = balanceTransactions[2];
-    const teacherTotalPayment = teacherPayoutBalanceTransaction.totalPayment;
+    const teacherBalanceTransaction = balanceTransactions[2];
+    const teacherTotalPayment = teacherBalanceTransaction.totalPayment;
     const updatedTeacher = await this._userDbService.findOneAndUpdate({
       searchQuery: {
-        _id: teacherPayoutBalanceTransaction.userId,
+        _id: teacherBalanceTransaction.userId,
       },
       updateQuery: {
         $inc: {

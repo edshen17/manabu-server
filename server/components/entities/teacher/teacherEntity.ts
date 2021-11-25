@@ -11,7 +11,7 @@ type OptionalTeacherEntityInitParams = {
   makePackageEntity: Promise<PackageEntity>;
 };
 
-type TeacherEntityBuildParams = {}; // add type here
+type TeacherEntityBuildParams = {};
 
 type TeacherEntityBuildResponse = {
   teachingLanguages: { language: string; level: string }[];
@@ -21,7 +21,11 @@ type TeacherEntityBuildResponse = {
   teacherType: string;
   licensePathUrl: string;
   priceData: { hourlyRate: number; currency: string };
-  settings: { isHidden: boolean; emailAlerts: { packageTransactionCreation: boolean } };
+  settings: {
+    isHidden: boolean;
+    emailAlerts: { packageTransactionCreation: boolean };
+    payoutData: { email: string };
+  };
   tags: string[];
   lessonCount: number;
   studentCount: number;
@@ -49,7 +53,11 @@ class TeacherEntity extends AbstractEntity<
       alsoSpeaks: [],
       introductionVideoUrl: '',
       applicationStatus: 'pending',
-      settings: { isHidden: false, emailAlerts: { packageTransactionCreation: true } },
+      settings: {
+        isHidden: false,
+        emailAlerts: { packageTransactionCreation: true },
+        payoutData: { email: '' },
+      },
       teacherType: TEACHER_ENTITY_TYPE.UNLICENSED,
       licensePathUrl: '',
       priceData: { hourlyRate: 30, currency: DEFAULT_CURRENCY },

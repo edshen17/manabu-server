@@ -16,7 +16,12 @@ type GetAppointmentsParams = {
   now: Dayjs;
 };
 
-class EndAppointmentScheduleTask extends AbstractScheduleTask<OptionalEndAppointmentScheduleTaskInitParams> {
+type EndAppointmentScheduleTaskResponse = void;
+
+class EndAppointmentScheduleTask extends AbstractScheduleTask<
+  OptionalEndAppointmentScheduleTaskInitParams,
+  EndAppointmentScheduleTaskResponse
+> {
   private _appointmentDbService!: AppointmentDbService;
   private _emailHandler!: EmailHandler;
 

@@ -68,31 +68,32 @@ beforeEach(async () => {
   };
 });
 
+const createPackageTransaction = async () => {
+  const createPackageTransactionCheckoutControllerData = controllerDataBuilder
+    .routeData(createPackageTransactionCheckoutRouteData)
+    .currentAPIUser(currentAPIUser)
+    .build();
+  const createPackageTransactionCheckoutRes =
+    await createPackageTransactionCheckoutUsecase.makeRequest(
+      createPackageTransactionCheckoutControllerData
+    );
+  const { token } = createPackageTransactionCheckoutRes;
+  createPackageTransactionUsecaseRouteData.query = {
+    token,
+    paymentId: 'some payment id',
+  };
+  const createPackageTransactionControllerData = controllerDataBuilder
+    .routeData(createPackageTransactionUsecaseRouteData)
+    .currentAPIUser(currentAPIUser)
+    .build();
+  const createPackageTransactionRes = await createPackageTransactionUsecase.makeRequest(
+    createPackageTransactionControllerData
+  );
+  return createPackageTransactionRes;
+};
+
 describe('createPackageTransactionUsecase', () => {
   describe('makeRequest', () => {
-    const createPackageTransaction = async () => {
-      const createPackageTransactionCheckoutControllerData = controllerDataBuilder
-        .routeData(createPackageTransactionCheckoutRouteData)
-        .currentAPIUser(currentAPIUser)
-        .build();
-      const createPackageTransactionCheckoutRes =
-        await createPackageTransactionCheckoutUsecase.makeRequest(
-          createPackageTransactionCheckoutControllerData
-        );
-      const { token } = createPackageTransactionCheckoutRes;
-      createPackageTransactionUsecaseRouteData.query = {
-        token,
-        paymentId: 'some payment id',
-      };
-      const createPackageTransactionControllerData = controllerDataBuilder
-        .routeData(createPackageTransactionUsecaseRouteData)
-        .currentAPIUser(currentAPIUser)
-        .build();
-      const createPackageTransactionRes = await createPackageTransactionUsecase.makeRequest(
-        createPackageTransactionControllerData
-      );
-      return createPackageTransactionRes;
-    };
     const testPackageTransactionError = async () => {
       let error;
       try {
@@ -134,7 +135,7 @@ describe('createPackageTransactionUsecase', () => {
           const balanceTransactions = createPackageTransactionRes.balanceTransactions;
           const studentDebitBalanceTransaction = balanceTransactions[0];
           const studentCreditBalanceTransaction = balanceTransactions[1];
-          const teacherPayoutBalanceTransaction = balanceTransactions[2];
+          const teacherBalanceTransaction = balanceTransactions[2];
           expect(packageTransaction).to.have.property('hostedById');
           expect(packageTransaction).to.have.property('reservedById');
           expect(packageTransaction).to.have.property('packageId');
@@ -147,7 +148,7 @@ describe('createPackageTransactionUsecase', () => {
             studentCreditBalanceTransaction.balanceChange < 0 &&
               studentCreditBalanceTransaction.totalPayment == 0
           ).to.equal(true);
-          expect(teacherPayoutBalanceTransaction.processingFee < 0).to.equal(true);
+          expect(teacherBalanceTransaction.processingFee < 0).to.equal(true);
         };
         it('should create a packageTransaction and 3 balanceTransactions', async () => {
           const createPackageTransactionRes = await createPackageTransaction();
@@ -171,3 +172,5 @@ describe('createPackageTransactionUsecase', () => {
     });
   });
 });
+
+export { createPackageTransaction };
