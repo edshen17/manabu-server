@@ -3,9 +3,9 @@ import { StringKeyObject } from '../../../../types/custom';
 import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
   PaymentServiceExecutePaymentParams,
-  PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
-  PaymentServiceExecutePayoutRes,
+  PaymentServiceExecutePayoutResponse,
   PAYMENT_GATEWAY_NAME,
 } from '../../abstractions/IPaymentService';
 
@@ -47,7 +47,7 @@ class PaypalPaymentService extends AbstractPaymentService<
 
   protected _executePaymentTemplate = async (
     createPaymentJson: Payment
-  ): Promise<PaymentServiceExecutePaymentRes> => {
+  ): Promise<PaymentServiceExecutePaymentResponse> => {
     return new Promise((resolve, reject) => {
       this._paymentLib.payment.create(
         createPaymentJson,
@@ -83,7 +83,7 @@ class PaypalPaymentService extends AbstractPaymentService<
 
   protected _executePayoutTemplate = (
     createPayoutJson: ReturnType<PaypalPaymentService['_createPayoutJson']>
-  ): Promise<PaymentServiceExecutePayoutRes> => {
+  ): Promise<PaymentServiceExecutePayoutResponse> => {
     return new Promise((resolve, reject) => {
       this._paymentLib.payout.create(createPayoutJson, (err: SDKError, payout: StringKeyObject) => {
         if (err) {

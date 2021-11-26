@@ -14,7 +14,7 @@ import {
   BALANCE_TRANSACTION_ENTITY_TYPE,
 } from '../../../entities/balanceTransaction/balanceTransactionEntity';
 import {
-  PaymentServiceExecutePayoutRes,
+  PaymentServiceExecutePayoutResponse,
   PAYMENT_GATEWAY_NAME,
 } from '../../../payment/abstractions/IPaymentService';
 import { PaypalPaymentService } from '../../../payment/services/paypal/paypalPaymentService';
@@ -43,15 +43,15 @@ type EndTransactionParams = {
 
 type EndPackageTransactionScheduleTaskResponse = {
   endedPackageTransactions: PackageTransactionDoc[];
-  endedTeacherBalanceResponses: EndTeacherBalanceTransactionRes[];
+  endedTeacherBalanceResponses: EndTeacherBalanceTransactionResponse[];
 };
 
-type SendTeacherPayoutRes = PaymentServiceExecutePayoutRes;
+type SendTeacherPayoutResponse = PaymentServiceExecutePayoutResponse;
 
-type EndTeacherBalanceTransactionRes = {
+type EndTeacherBalanceTransactionResponse = {
   debitTeacherBalanceTransaction: BalanceTransactionDoc;
   teacher: JoinedUserDoc;
-  executePayoutRes: PaymentServiceExecutePayoutRes;
+  executePayoutRes: SendTeacherPayoutResponse;
   creditTeacherPayoutBalanceTransaction: BalanceTransactionDoc;
 };
 class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
@@ -163,7 +163,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
 
   private _endTeacherBalanceTransaction = async (
     props: EndTransactionParams
-  ): Promise<EndTeacherBalanceTransactionRes> => {
+  ): Promise<EndTeacherBalanceTransactionResponse> => {
     const { packageTransaction, dbServiceAccessOptions, session } = props;
     const debitTeacherBalanceTransaction = await this._editDebitTeacherBalanceTransaction({
       packageTransaction,
@@ -223,7 +223,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
-    executePayoutRes: SendTeacherPayoutRes;
+    executePayoutRes: SendTeacherPayoutResponse;
   }): Promise<BalanceTransactionDoc> => {
     const { dbServiceAccessOptions, session, debitTeacherBalanceTransaction, executePayoutRes } =
       props;
@@ -285,7 +285,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     teacher: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
-  }): Promise<PaymentServiceExecutePayoutRes> => {
+  }): Promise<PaymentServiceExecutePayoutResponse> => {
     const { debitTeacherBalanceTransaction, teacher } = props;
     const payoutAmount = debitTeacherBalanceTransaction.totalPayment;
     const payoutMessage = `Minato Manabu has sent you ${payoutAmount} ${DEFAULT_CURRENCY} to your PayPal account.`;

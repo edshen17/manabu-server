@@ -2,9 +2,9 @@ import { StringKeyObject } from '../../../types/custom';
 import {
   IPaymentService,
   PaymentServiceExecutePaymentParams,
-  PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
-  PaymentServiceExecutePayoutRes,
+  PaymentServiceExecutePayoutResponse,
   PaymentServiceInitParams,
 } from './IPaymentService';
 
@@ -15,7 +15,7 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
 
   public executePayment = async (
     props: PaymentServiceExecutePaymentParams
-  ): Promise<PaymentServiceExecutePaymentRes> => {
+  ): Promise<PaymentServiceExecutePaymentResponse> => {
     const createPaymentJson = this._createPaymentJson(props);
     const executePaymentRes = await this._executePaymentTemplate(createPaymentJson);
     return executePaymentRes;
@@ -25,9 +25,9 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
 
   protected abstract _executePaymentTemplate(
     createPaymentJson: StringKeyObject
-  ): Promise<PaymentServiceExecutePaymentRes>;
+  ): Promise<PaymentServiceExecutePaymentResponse>;
 
-  public executeSubscription = async (): Promise<PaymentServiceExecutePaymentRes> => {
+  public executeSubscription = async (): Promise<PaymentServiceExecutePaymentResponse> => {
     return {
       redirectUrl: '',
     };
@@ -35,7 +35,7 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
 
   public executePayout = async (
     props: PaymentServiceExecutePayoutParams
-  ): Promise<PaymentServiceExecutePayoutRes> => {
+  ): Promise<PaymentServiceExecutePayoutResponse> => {
     const createPayoutJson = this._createPayoutJson(props);
     const executePayoutRes = await this._executePayoutTemplate(createPayoutJson);
     return executePayoutRes;
@@ -45,7 +45,7 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
 
   protected abstract _executePayoutTemplate(
     createPayoutJson: StringKeyObject
-  ): Promise<PaymentServiceExecutePayoutRes>;
+  ): Promise<PaymentServiceExecutePayoutResponse>;
 
   public init = async (
     initParams: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>
@@ -66,4 +66,4 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
   };
 }
 
-export { AbstractPaymentService, PaymentServiceExecutePaymentRes };
+export { AbstractPaymentService, PaymentServiceExecutePaymentResponse };

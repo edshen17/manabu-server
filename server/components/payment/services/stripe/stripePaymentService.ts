@@ -3,9 +3,9 @@ import { StringKeyObject } from '../../../../types/custom';
 import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
   PaymentServiceExecutePaymentParams,
-  PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
-  PaymentServiceExecutePayoutRes,
+  PaymentServiceExecutePayoutResponse,
 } from '../../abstractions/IPaymentService';
 
 type OptionalStripePaymentServiceInitParams = {};
@@ -38,7 +38,7 @@ class StripePaymentService extends AbstractPaymentService<
 
   protected _executePaymentTemplate = async (
     createPaymentJson: Stripe.Checkout.SessionCreateParams
-  ): Promise<PaymentServiceExecutePaymentRes> => {
+  ): Promise<PaymentServiceExecutePaymentResponse> => {
     const session = await this._paymentLib.checkout.sessions.create(createPaymentJson);
     const executePaymentRes = { redirectUrl: <string>session.url };
     return executePaymentRes;
@@ -50,7 +50,7 @@ class StripePaymentService extends AbstractPaymentService<
 
   protected _executePayoutTemplate = async (
     createPayoutJson: StringKeyObject
-  ): Promise<PaymentServiceExecutePayoutRes> => {
+  ): Promise<PaymentServiceExecutePayoutResponse> => {
     return {
       id: '',
     };

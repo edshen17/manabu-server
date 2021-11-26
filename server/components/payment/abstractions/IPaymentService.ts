@@ -34,7 +34,7 @@ type PaymentServiceExecutePaymentParams = {
   token: string;
 };
 
-type PaymentServiceExecutePaymentRes = {
+type PaymentServiceExecutePaymentResponse = {
   redirectUrl: string;
 };
 
@@ -48,20 +48,20 @@ type PaymentServiceExecutePayoutParams = {
   recipients: StringKeyObject[];
 };
 
-type PaymentServiceExecutePayoutRes = {
+type PaymentServiceExecutePayoutResponse = {
   id: string;
 };
 
 interface IPaymentService<PaymentLibType, OptionalPaymentServiceInitParams> {
   executePayment: (
     props: PaymentServiceExecutePaymentParams
-  ) => Promise<PaymentServiceExecutePaymentRes>;
+  ) => Promise<PaymentServiceExecutePaymentResponse>;
   executeSubscription: (
     props: PaymentServiceExecutePaymentParams
-  ) => Promise<PaymentServiceExecutePaymentRes>;
+  ) => Promise<PaymentServiceExecutePaymentResponse>;
   executePayout: (
     props: PaymentServiceExecutePayoutParams
-  ) => Promise<PaymentServiceExecutePayoutRes>;
+  ) => Promise<PaymentServiceExecutePayoutResponse>;
   init: (
     initParams: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>
   ) => Promise<this>;
@@ -71,9 +71,9 @@ export {
   IPaymentService,
   PaymentServiceInitParams,
   PaymentServiceExecutePaymentParams,
-  PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
-  PaymentServiceExecutePayoutRes,
+  PaymentServiceExecutePayoutResponse,
   PaypalItems,
   StripeItems,
   OmiseItems,

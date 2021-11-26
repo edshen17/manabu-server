@@ -4,9 +4,9 @@ import { AbstractPaymentService } from '../../abstractions/AbstractPaymentServic
 import {
   OmiseItems,
   PaymentServiceExecutePaymentParams,
-  PaymentServiceExecutePaymentRes,
+  PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
-  PaymentServiceExecutePayoutRes,
+  PaymentServiceExecutePayoutResponse,
 } from '../../abstractions/IPaymentService';
 
 type OptionalPaynowPaymentServiceInitParams = {};
@@ -24,7 +24,7 @@ class PaynowPaymentService extends AbstractPaymentService<
 
   protected _executePaymentTemplate = async (
     createPaymentJson: PaymentServiceExecutePaymentParams
-  ): Promise<PaymentServiceExecutePaymentRes> => {
+  ): Promise<PaymentServiceExecutePaymentResponse> => {
     const { items, token } = createPaymentJson;
     const { source, charge } = items as OmiseItems;
     const sourceRes = await this._paymentLib.sources.create(source);
@@ -50,7 +50,7 @@ class PaynowPaymentService extends AbstractPaymentService<
 
   protected _executePayoutTemplate = async (
     createPayoutJson: StringKeyObject
-  ): Promise<PaymentServiceExecutePayoutRes> => {
+  ): Promise<PaymentServiceExecutePayoutResponse> => {
     return {
       id: '',
     };
