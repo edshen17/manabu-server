@@ -36,14 +36,13 @@ describe('endPackageTransactionScheduleTask', () => {
     expiredPackageTransaction = endedPackageTransactions[0];
     const endedTeacherBalanceRes = endedTeacherBalanceResponses[0];
     expect(endedTeacherBalanceRes.executePayoutRes.id.length > 0).to.equal(true);
-    console.log(endedTeacherBalanceRes.creditTeacherPayoutBalanceTransactions);
-    // expect(endedTeacherBalanceRes.creditTeacherPayoutBalanceTransactions.balanceChange < 0).to.equal(
-    //   true
-    // );
-    // expect(expiredPackageTransaction.remainingAppointments).to.equal(0);
-    // expect(expiredPackageTransaction.remainingReschedules).to.equal(0);
-    // expect(expiredPackageTransaction.isTerminated).to.equal(true);
+    expect(
+      endedTeacherBalanceRes.creditTeacherPayoutBalanceTransactions[0].balanceChange < 0
+    ).to.equal(true);
+    expect(expiredPackageTransaction.remainingAppointments).to.equal(0);
+    expect(expiredPackageTransaction.remainingReschedules).to.equal(0);
+    expect(expiredPackageTransaction.isTerminated).to.equal(true);
+    expect(endedTeacherBalanceRes.teacher.balance.totalAvailable).to.equal(0);
+    expect(endedTeacherBalanceRes.debitTeacherBalanceTransaction.balanceChange > 0).to.equal(true);
   });
 });
-
-// termination when package expired but has remaining lessons

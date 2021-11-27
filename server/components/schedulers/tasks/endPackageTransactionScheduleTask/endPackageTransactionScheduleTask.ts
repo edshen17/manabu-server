@@ -165,6 +165,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       },
       updateQuery: {
         isTerminated: true,
+        remainingAppointments: 0,
         remainingReschedules: 0,
       },
       session,
@@ -345,9 +346,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
           currency: runningBalance.currency,
         },
       });
-    // unearnedCreditTeacherPayoutBalanceTransactionEntity.runningBalance.totalAvailable =
-    //   unearnedCreditTeacherPayoutBalanceTransactionEntity.runningBalance.totalAvailable +
-    //   unearnedCreditTeacherPayoutBalanceTransactionEntity.balanceChange;
     return unearnedCreditTeacherPayoutBalanceTransactionEntity;
   };
 
