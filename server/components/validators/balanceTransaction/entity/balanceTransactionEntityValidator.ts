@@ -9,7 +9,9 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
       status: this._joi.string().valid('pending', 'completed', 'cancelled'),
       currency: this._joi.string().max(5),
-      type: this._joi.string().valid('packageTransaction', 'creditTransaction', 'payout'),
+      type: this._joi
+        .string()
+        .valid('packageTransaction', 'creditTransaction', 'payout', 'expired'),
       packageTransactionId: this._joi
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),

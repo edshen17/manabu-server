@@ -8,7 +8,7 @@ const BalanceTransactionSchema = createSchema({
   currency: Type.string({ required: true }),
   type: Type.string({
     required: true,
-    enum: ['packageTransaction', 'creditTransaction', 'payout'],
+    enum: ['packageTransaction', 'creditTransaction', 'payout', 'expired'],
   }),
   packageTransactionId: Type.ref(Type.objectId({ required: false, index: true })).to(
     'PackageTransaction',

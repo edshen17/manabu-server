@@ -58,7 +58,7 @@ class TeacherEntity extends AbstractEntity<
         emailAlerts: { packageTransactionCreation: true },
         payoutData: { email: '' },
       },
-      teacherType: TEACHER_ENTITY_TYPE.UNLICENSED,
+      teacherType: TEACHER_ENTITY_TYPE.LICENSED,
       licensePathUrl: '',
       priceData: { hourlyRate: 30, currency: DEFAULT_CURRENCY },
       tags: [],

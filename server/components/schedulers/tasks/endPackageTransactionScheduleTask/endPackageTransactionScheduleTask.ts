@@ -10,6 +10,7 @@ import { PackageTransactionDbService } from '../../../dataAccess/services/packag
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import {
   BalanceTransactionEntity,
+  BalanceTransactionEntityBuildResponse,
   BALANCE_TRANSACTION_ENTITY_STATUS,
   BALANCE_TRANSACTION_ENTITY_TYPE,
 } from '../../../entities/balanceTransaction/balanceTransactionEntity';
@@ -27,6 +28,8 @@ type OptionalEndPackageTransactionScheduleTaskInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeBalanceTransactionEntity: Promise<BalanceTransactionEntity>;
   makePaypalPaymentService: Promise<PaypalPaymentService>;
+  cloneDeep: any;
+  currency: any;
 };
 
 type GetExpiredPackageTransactionsParams = {
@@ -52,8 +55,14 @@ type EndTeacherBalanceTransactionResponse = {
   debitTeacherBalanceTransaction: BalanceTransactionDoc;
   teacher: JoinedUserDoc;
   executePayoutRes: SendTeacherPayoutResponse;
-  creditTeacherPayoutBalanceTransaction: BalanceTransactionDoc;
+  creditTeacherPayoutBalanceTransactions: BalanceTransactionDoc[];
 };
+
+type CreateCreditTeacherPayoutBalanceTransactionEntitiesParams = {
+  debitTeacherBalanceTransaction: BalanceTransactionDoc;
+  executePayoutRes: PaymentServiceExecutePayoutResponse;
+};
+
 class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   OptionalEndPackageTransactionScheduleTaskInitParams,
   EndPackageTransactionScheduleTaskResponse
@@ -63,6 +72,8 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _userDbService!: UserDbService;
   private _balanceTransactionEntity!: BalanceTransactionEntity;
   private _paypalPaymentService!: PaypalPaymentService;
+  private _cloneDeep: any;
+  private _currency: any;
 
   public execute = async (): Promise<EndPackageTransactionScheduleTaskResponse> => {
     const now = this._dayjs();
@@ -101,12 +112,12 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     const endedPackageTransactions = [];
     const endedTeacherBalanceResponses = [];
     for (const packageTransaction of expiredPackageTransactions) {
-      const endedPackageTransaction = await this._endPackageTransaction({
+      const endedTeacherBalanceTransactionRes = await this._endTeacherBalanceTransaction({
         packageTransaction,
         dbServiceAccessOptions,
         session,
       });
-      const endedTeacherBalanceTransactionRes = await this._endTeacherBalanceTransaction({
+      const endedPackageTransaction = await this._endPackageTransaction({
         packageTransaction,
         dbServiceAccessOptions,
         session,
@@ -165,13 +176,13 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     props: EndTransactionParams
   ): Promise<EndTeacherBalanceTransactionResponse> => {
     const { packageTransaction, dbServiceAccessOptions, session } = props;
-    const debitTeacherBalanceTransaction = await this._editDebitTeacherBalanceTransaction({
+    const debitTeacherBalanceTransaction = await this._closeDebitTeacherBalanceTransaction({
       packageTransaction,
       dbServiceAccessOptions,
       session,
     });
-    const teacher = await this._editTeacherBalance({
-      debitTeacherBalanceTransaction,
+    let teacher = await this._userDbService.findById({
+      _id: packageTransaction.hostedById,
       dbServiceAccessOptions,
       session,
     });
@@ -181,23 +192,29 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       dbServiceAccessOptions,
       session,
     });
-    const creditTeacherPayoutBalanceTransaction =
-      await this._createCreditTeacherPayoutBalanceTransaction({
+    const creditTeacherPayoutBalanceTransactions =
+      await this._createCreditTeacherPayoutBalanceTransactions({
         debitTeacherBalanceTransaction,
         dbServiceAccessOptions,
         session,
         executePayoutRes,
       });
+    teacher = await this._editTeacherBalance({
+      debitTeacherBalanceTransaction,
+      creditTeacherPayoutBalanceTransactions,
+      dbServiceAccessOptions,
+      session,
+    });
     const endTeacherBalanceTransactionRes = {
       debitTeacherBalanceTransaction,
       teacher,
       executePayoutRes,
-      creditTeacherPayoutBalanceTransaction,
+      creditTeacherPayoutBalanceTransactions,
     };
     return endTeacherBalanceTransactionRes;
   };
 
-  private _editDebitTeacherBalanceTransaction = async (props: {
+  private _closeDebitTeacherBalanceTransaction = async (props: {
     packageTransaction: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
@@ -208,6 +225,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         searchQuery: {
           packageTransactionId: packageTransaction._id,
           userId: packageTransaction.hostedById,
+          status: BALANCE_TRANSACTION_ENTITY_STATUS.PENDING,
         },
         updateQuery: {
           status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
@@ -219,54 +237,158 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     return debitTeacherBalanceTransaction;
   };
 
-  private _createCreditTeacherPayoutBalanceTransaction = async (props: {
+  private _createCreditTeacherPayoutBalanceTransactions = async (props: {
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
     executePayoutRes: SendTeacherPayoutResponse;
-  }): Promise<BalanceTransactionDoc> => {
+  }): Promise<BalanceTransactionDoc[]> => {
     const { dbServiceAccessOptions, session, debitTeacherBalanceTransaction, executePayoutRes } =
       props;
-    const balanceChange = debitTeacherBalanceTransaction.totalPayment * -1;
+    const creditTeacherPayoutBalanceTransactionEntity =
+      await this._createCreditTeacherPayoutBalanceTransactionEntities({
+        debitTeacherBalanceTransaction,
+        executePayoutRes,
+      });
+    const creditTeacherPayoutBalanceTransaction =
+      await this._balanceTransactionDbService.insertMany({
+        modelToInsert: creditTeacherPayoutBalanceTransactionEntity,
+        dbServiceAccessOptions,
+        session,
+      });
+    return creditTeacherPayoutBalanceTransaction;
+  };
+
+  private _createCreditTeacherPayoutBalanceTransactionEntities = async (
+    props: CreateCreditTeacherPayoutBalanceTransactionEntitiesParams
+  ): Promise<BalanceTransactionEntityBuildResponse[]> => {
+    const { debitTeacherBalanceTransaction } = props;
+    const { balanceChange, hasRemainingAppointments } = await this._getTeacherPayoutData(
+      debitTeacherBalanceTransaction
+    );
+    const creditTeacherPayoutBalanceTransactionEntities = [];
+    const earnedCreditTeacherPayoutBalanceTransactionEntity =
+      await this._createEarnedCreditTeacherPayoutBalanceTransactionEntity({
+        ...props,
+        balanceChange,
+      });
+    creditTeacherPayoutBalanceTransactionEntities.push(
+      earnedCreditTeacherPayoutBalanceTransactionEntity
+    );
+    if (hasRemainingAppointments) {
+      const unearnedCreditTeacherPayoutBalanceTransactionEntity =
+        await this._createUnearnedCreditTeacherPayoutBalanceTransactionEntity({
+          debitTeacherBalanceTransaction,
+          earnedCreditTeacherPayoutBalanceTransactionEntity,
+        });
+      creditTeacherPayoutBalanceTransactionEntities.push(
+        unearnedCreditTeacherPayoutBalanceTransactionEntity
+      );
+    }
+    return creditTeacherPayoutBalanceTransactionEntities;
+  };
+
+  private _createEarnedCreditTeacherPayoutBalanceTransactionEntity = async (
+    props: CreateCreditTeacherPayoutBalanceTransactionEntitiesParams & { balanceChange: number }
+  ): Promise<BalanceTransactionEntityBuildResponse> => {
+    const { debitTeacherBalanceTransaction, executePayoutRes, balanceChange } = props;
     const { userId, currency, packageTransactionId, runningBalance } =
       debitTeacherBalanceTransaction;
     const { id } = executePayoutRes;
-    const creditTeacherPayoutBalanceTransactionEntity = await this._balanceTransactionEntity.build({
-      userId,
-      status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
-      currency: currency,
-      type: BALANCE_TRANSACTION_ENTITY_TYPE.PAYOUT,
-      packageTransactionId: packageTransactionId,
-      balanceChange,
-      processingFee: 0,
-      tax: 0,
-      runningBalance: {
-        currency: runningBalance.currency,
-        totalAvailable: runningBalance.totalAvailable + balanceChange,
-      },
-      paymentData: {
-        gateway: PAYMENT_GATEWAY_NAME.PAYPAL,
-        id,
-      },
-    });
-    const creditTeacherPayoutBalanceTransaction = await this._balanceTransactionDbService.insert({
-      modelToInsert: creditTeacherPayoutBalanceTransactionEntity,
-      dbServiceAccessOptions,
-      session,
-    });
-    return creditTeacherPayoutBalanceTransaction;
+    const earnedCreditTeacherPayoutBalanceTransactionEntity =
+      await this._balanceTransactionEntity.build({
+        userId,
+        status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
+        currency,
+        type: BALANCE_TRANSACTION_ENTITY_TYPE.PAYOUT,
+        packageTransactionId: packageTransactionId,
+        balanceChange,
+        processingFee: 0,
+        tax: 0,
+        runningBalance: {
+          totalAvailable: runningBalance.totalAvailable + balanceChange,
+          currency: runningBalance.currency,
+        },
+        paymentData: {
+          gateway: PAYMENT_GATEWAY_NAME.PAYPAL,
+          id,
+        },
+      });
+    return earnedCreditTeacherPayoutBalanceTransactionEntity;
+  };
+
+  private _createUnearnedCreditTeacherPayoutBalanceTransactionEntity = async (props: {
+    debitTeacherBalanceTransaction: BalanceTransactionDoc;
+    earnedCreditTeacherPayoutBalanceTransactionEntity: BalanceTransactionEntityBuildResponse;
+  }): Promise<BalanceTransactionEntityBuildResponse> => {
+    const { debitTeacherBalanceTransaction, earnedCreditTeacherPayoutBalanceTransactionEntity } =
+      props;
+    const { userId, currency, packageTransactionId, runningBalance } =
+      earnedCreditTeacherPayoutBalanceTransactionEntity;
+    let balanceChange =
+      (debitTeacherBalanceTransaction.totalPayment +
+        earnedCreditTeacherPayoutBalanceTransactionEntity.balanceChange) *
+      -1;
+    balanceChange = this._currency(balanceChange).value; // need to convert to currency format, otherwise rounding error/neg totalAvailable
+    const unearnedCreditTeacherPayoutBalanceTransactionEntity =
+      await this._balanceTransactionEntity.build({
+        userId,
+        status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
+        currency,
+        type: BALANCE_TRANSACTION_ENTITY_TYPE.EXPIRED,
+        packageTransactionId,
+        balanceChange,
+        processingFee: 0,
+        tax: 0,
+        runningBalance: {
+          totalAvailable: runningBalance.totalAvailable + balanceChange,
+          currency: runningBalance.currency,
+        },
+      });
+    // unearnedCreditTeacherPayoutBalanceTransactionEntity.runningBalance.totalAvailable =
+    //   unearnedCreditTeacherPayoutBalanceTransactionEntity.runningBalance.totalAvailable +
+    //   unearnedCreditTeacherPayoutBalanceTransactionEntity.balanceChange;
+    return unearnedCreditTeacherPayoutBalanceTransactionEntity;
+  };
+
+  private _getTeacherPayoutData = async (debitTeacherBalanceTransaction: BalanceTransactionDoc) => {
+    const packageTransactionData = debitTeacherBalanceTransaction.packageTransactionData;
+    const packageData = packageTransactionData.packageData;
+    const remainingAppointments = packageTransactionData.remainingAppointments;
+    const hasRemainingAppointments = remainingAppointments > 0;
+    const packageLessonAmount = packageData.lessonAmount;
+    const completedLessons = packageLessonAmount - remainingAppointments;
+    const balanceChange =
+      debitTeacherBalanceTransaction.totalPayment * (completedLessons / packageLessonAmount);
+    const payoutData = {
+      balanceChange: balanceChange * -1,
+      hasRemainingAppointments,
+    };
+    return payoutData;
   };
 
   private _editTeacherBalance = async (props: {
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
+    creditTeacherPayoutBalanceTransactions: BalanceTransactionDoc[];
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
   }): Promise<JoinedUserDoc> => {
-    const { debitTeacherBalanceTransaction, dbServiceAccessOptions, session } = props;
-    const balanceChange = debitTeacherBalanceTransaction.totalPayment * -1;
+    const {
+      debitTeacherBalanceTransaction,
+      creditTeacherPayoutBalanceTransactions,
+      dbServiceAccessOptions,
+      session,
+    } = props;
+    const payoutBalanceTransaction = creditTeacherPayoutBalanceTransactions.find(
+      (balanceTransaction) => {
+        return balanceTransaction.type == BALANCE_TRANSACTION_ENTITY_TYPE.PAYOUT;
+      }
+    )!;
+    const balanceChange =
+      (debitTeacherBalanceTransaction.totalPayment - payoutBalanceTransaction.totalPayment) * -1;
     const updatedTeacher = await this._userDbService.findOneAndUpdate({
       searchQuery: {
-        _id: debitTeacherBalanceTransaction.userId,
+        _id: payoutBalanceTransaction.userId,
       },
       updateQuery: {
         $inc: {
@@ -287,7 +409,8 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     session: ClientSession;
   }): Promise<PaymentServiceExecutePayoutResponse> => {
     const { debitTeacherBalanceTransaction, teacher } = props;
-    const payoutAmount = debitTeacherBalanceTransaction.totalPayment;
+    const { balanceChange } = await this._getTeacherPayoutData(debitTeacherBalanceTransaction);
+    const payoutAmount = this._currency(balanceChange).multiply(-1);
     const payoutMessage = `Minato Manabu has sent you ${payoutAmount} ${DEFAULT_CURRENCY} to your PayPal account.`;
     const executePayoutRes = await this._paypalPaymentService.executePayout({
       type: 'email',
@@ -323,12 +446,16 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       makeUserDbService,
       makeBalanceTransactionEntity,
       makePaypalPaymentService,
+      cloneDeep,
+      currency,
     } = optionalScheduleTaskInitParams;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._balanceTransactionDbService = await makeBalanceTransactionDbService;
     this._userDbService = await makeUserDbService;
     this._balanceTransactionEntity = await makeBalanceTransactionEntity;
     this._paypalPaymentService = await makePaypalPaymentService;
+    this._cloneDeep = cloneDeep;
+    this._currency = currency;
   };
 }
 

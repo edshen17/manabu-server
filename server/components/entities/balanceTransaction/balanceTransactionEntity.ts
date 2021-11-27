@@ -42,6 +42,7 @@ enum BALANCE_TRANSACTION_ENTITY_TYPE {
   PACKAGE_TRANSACTION = 'packageTransaction',
   CREDIT_TRANSACTION = 'creditTransaction',
   PAYOUT = 'payout',
+  EXPIRED = 'expired',
 }
 
 class BalanceTransactionEntity extends AbstractEntity<

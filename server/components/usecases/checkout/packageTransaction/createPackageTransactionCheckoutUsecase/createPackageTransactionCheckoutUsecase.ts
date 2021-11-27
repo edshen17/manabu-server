@@ -229,15 +229,19 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
     const { token, processedPaymentServiceData, userId } = setPackageTransactionJwtParams;
-    const packageTransactionEntityBuildParams = this._getPackageTransactionEntityBuildParams(
+    const packageTransactionEntityBuildParams = this._createPackageTransactionEntityBuildParams(
       setPackageTransactionJwtParams
     );
-    const balanceTransactionEntityBuildParams = this._getBalanceTransactionEntityBuildParams({
-      processedPaymentServiceData,
-      userId: userId!,
-    });
+    const debitBalanceTransactionEntityBuildParams =
+      this._createDebitBalanceTransactionEntityBuildParams({
+        processedPaymentServiceData,
+        userId: userId!,
+      });
     const jwt = this._jwtHandler.sign({
-      toTokenObj: { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams },
+      toTokenObj: {
+        packageTransactionEntityBuildParams,
+        balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
+      },
       expiresIn: '1d',
     });
     await this._cacheDbService.set({
@@ -248,7 +252,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     });
   };
 
-  private _getPackageTransactionEntityBuildParams = (
+  private _createPackageTransactionEntityBuildParams = (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): PackageTransactionEntityBuildParams => {
     const { body, userId, teacher, teacherPackage } = setPackageTransactionJwtParams;
@@ -266,7 +270,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return packageTransactionEntityBuildParams;
   };
 
-  private _getBalanceTransactionEntityBuildParams = (props: {
+  private _createDebitBalanceTransactionEntityBuildParams = (props: {
     processedPaymentServiceData: ProcessedPaymentServiceData;
     userId: ObjectId;
   }): BalanceTransactionEntityBuildParams => {
@@ -274,7 +278,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const { priceData, paymentData } = processedPaymentServiceData;
     const { currency, subTotal, total } = priceData;
     const processingFee = total - subTotal;
-    const balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams = {
+    const debitBalanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams = {
       userId,
       status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
       currency,
@@ -289,7 +293,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       paymentData,
     };
-    return balanceTransactionEntityBuildParams;
+    return debitBalanceTransactionEntityBuildParams;
   };
 
   private _getPaypalRedirectUrl = async (

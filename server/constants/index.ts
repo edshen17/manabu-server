@@ -10,8 +10,8 @@ const PAYMENT_GATEWAY_RATE: StringKeyObject = {
 };
 const MANABU_PROCESSING_RATE: StringKeyObject = {
   UNLICENSED: {
-    amount: 1250,
-    currency: 'JPY',
+    amount: 15,
+    currency: DEFAULT_CURRENCY,
     type: 'absolute',
   },
   LICENSED: {
