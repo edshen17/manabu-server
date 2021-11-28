@@ -40,7 +40,6 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
       now,
       dbServiceAccessOptions,
     });
-    // TODO: Complete admin alerts
     // const overdueAppointments = await this._getOverdueAppointments({
     //   now,
     //   dbServiceAccessOptions,

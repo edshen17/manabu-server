@@ -42,8 +42,5 @@ const TeacherSchema = createSchema({
 
 const Teacher = typedModel('Teacher', TeacherSchema);
 type TeacherDoc = ExtractDoc<typeof TeacherSchema>;
-enum TEACHER_EMAIL_ALERT_NAME {
-  PACKAGE_TRANSACTION_CREATION = 'packageTransactionCreation',
-}
 
-export { Teacher, TeacherSchema, TeacherDoc, TEACHER_EMAIL_ALERT_NAME };
+export { Teacher, TeacherSchema, TeacherDoc };

@@ -3,7 +3,7 @@ import { IS_PRODUCTION } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageDoc } from '../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { JoinedUserDoc, USER_EMAIL_ALERT_NAME } from '../../../../models/User';
+import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
@@ -251,7 +251,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     } to be confirmed.`;
     const alertEmailParams = {
       userId: hostedByData._id,
-      emailAlertName: USER_EMAIL_ALERT_NAME.APPOINTMENT_CREATION,
+      emailAlertName: EMAIL_TEMPLATE_NAME.APPOINTMENT_CREATION,
       sendFrom: EMAIL_SENDER_NAME.NOREPLY,
       subjectLine,
       mjmlFileName: EMAIL_TEMPLATE_NAME.APPOINTMENT_CREATION,

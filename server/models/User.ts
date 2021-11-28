@@ -65,10 +65,4 @@ UserSchema.index(
 const User = typedModel('User', UserSchema);
 type JoinedUserDoc = ExtractDoc<typeof UserSchema>;
 
-enum USER_EMAIL_ALERT_NAME {
-  APPOINTMENT_CREATION = 'appointmentCreation',
-  APPOINTMENT_UPDATE = 'appointmentUpdate',
-  APPOINTMENT_START_REMINDER = 'appointmentStartReminder',
-}
-
-export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed, USER_EMAIL_ALERT_NAME };
+export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed };

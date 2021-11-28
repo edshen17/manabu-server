@@ -238,6 +238,54 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     return debitTeacherBalanceTransaction;
   };
 
+  private _executePayout = async (props: {
+    debitTeacherBalanceTransaction: BalanceTransactionDoc;
+    teacher: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
+  }): Promise<PaymentServiceExecutePayoutResponse> => {
+    const { debitTeacherBalanceTransaction, teacher } = props;
+    const { balanceChange } = await this._getTeacherPayoutData(debitTeacherBalanceTransaction);
+    const payoutAmount = this._currency(balanceChange).multiply(-1);
+    const payoutMessage = `Minato Manabu has sent you ${payoutAmount} ${DEFAULT_CURRENCY} to your PayPal account.`;
+    const executePayoutRes = await this._paypalPaymentService.executePayout({
+      type: 'email',
+      emailData: {
+        subject: `${payoutAmount} Lesson Payout - Minato Manabu`,
+        message: payoutMessage,
+      },
+      id: debitTeacherBalanceTransaction._id,
+      recipients: [
+        {
+          note: payoutMessage,
+          amount: {
+            currency: debitTeacherBalanceTransaction.currency,
+            value: payoutAmount,
+          },
+          receiver: teacher.teacherData!.settings.payoutData.email,
+          sender_item_id: debitTeacherBalanceTransaction.packageTransactionId,
+        },
+      ],
+    });
+    return executePayoutRes;
+  };
+
+  private _getTeacherPayoutData = async (debitTeacherBalanceTransaction: BalanceTransactionDoc) => {
+    const packageTransactionData = debitTeacherBalanceTransaction.packageTransactionData;
+    const packageData = packageTransactionData.packageData;
+    const remainingAppointments = packageTransactionData.remainingAppointments;
+    const hasRemainingAppointments = remainingAppointments > 0;
+    const packageLessonAmount = packageData.lessonAmount;
+    const completedLessons = packageLessonAmount - remainingAppointments;
+    const balanceChange =
+      debitTeacherBalanceTransaction.totalPayment * (completedLessons / packageLessonAmount);
+    const payoutData = {
+      balanceChange: balanceChange * -1,
+      hasRemainingAppointments,
+    };
+    return payoutData;
+  };
+
   private _createCreditTeacherPayoutBalanceTransactions = async (props: {
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
@@ -349,22 +397,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     return unearnedCreditTeacherPayoutBalanceTransactionEntity;
   };
 
-  private _getTeacherPayoutData = async (debitTeacherBalanceTransaction: BalanceTransactionDoc) => {
-    const packageTransactionData = debitTeacherBalanceTransaction.packageTransactionData;
-    const packageData = packageTransactionData.packageData;
-    const remainingAppointments = packageTransactionData.remainingAppointments;
-    const hasRemainingAppointments = remainingAppointments > 0;
-    const packageLessonAmount = packageData.lessonAmount;
-    const completedLessons = packageLessonAmount - remainingAppointments;
-    const balanceChange =
-      debitTeacherBalanceTransaction.totalPayment * (completedLessons / packageLessonAmount);
-    const payoutData = {
-      balanceChange: balanceChange * -1,
-      hasRemainingAppointments,
-    };
-    return payoutData;
-  };
-
   private _editTeacherBalance = async (props: {
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     creditTeacherPayoutBalanceTransactions: BalanceTransactionDoc[];
@@ -398,38 +430,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       session,
     });
     return updatedTeacher;
-  };
-
-  private _executePayout = async (props: {
-    debitTeacherBalanceTransaction: BalanceTransactionDoc;
-    teacher: JoinedUserDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
-  }): Promise<PaymentServiceExecutePayoutResponse> => {
-    const { debitTeacherBalanceTransaction, teacher } = props;
-    const { balanceChange } = await this._getTeacherPayoutData(debitTeacherBalanceTransaction);
-    const payoutAmount = this._currency(balanceChange).multiply(-1);
-    const payoutMessage = `Minato Manabu has sent you ${payoutAmount} ${DEFAULT_CURRENCY} to your PayPal account.`;
-    const executePayoutRes = await this._paypalPaymentService.executePayout({
-      type: 'email',
-      emailData: {
-        subject: `${payoutAmount} Lesson Payout - Minato Manabu`,
-        message: payoutMessage,
-      },
-      id: debitTeacherBalanceTransaction._id,
-      recipients: [
-        {
-          note: payoutMessage,
-          amount: {
-            currency: debitTeacherBalanceTransaction.currency,
-            value: payoutAmount,
-          },
-          receiver: teacher.teacherData!.settings.payoutData.email,
-          sender_item_id: debitTeacherBalanceTransaction.packageTransactionId,
-        },
-      ],
-    });
-    return executePayoutRes;
   };
 
   protected _initTemplate = async (
