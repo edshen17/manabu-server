@@ -7,6 +7,7 @@ const BalanceTransactionSchema = createSchema({
   fees: Type.object({ required: true }).of({}),
   description: Type.string({ required: true }),
   date: Type.date({ required: true }),
+  // createdDate or creationDate for consistency?
   createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });
@@ -15,3 +16,4 @@ const BalanceTransaction = typedModel('BalanceTransaction', BalanceTransactionSc
 type BalanceTransactionDoc = ExtractDoc<typeof BalanceTransactionSchema>;
 
 export { BalanceTransaction, BalanceTransactionSchema, BalanceTransactionDoc };
+
