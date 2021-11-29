@@ -1,0 +1,5 @@
+{
+  "greeting": "こん {{name}}!",
+  "text": "こん",
+  "ending": "こん"
+}

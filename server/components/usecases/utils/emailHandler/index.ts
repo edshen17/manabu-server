@@ -1,35 +1,21 @@
-// import fs from 'fs';
-// import mjml from 'mjml';
-// import nodemailer from 'nodemailer';
-// import vue from 'vue';
-// import { createRenderer } from 'vue-server-renderer';
-// import { makeUserDbService } from '../../../dataAccess/services/user';
-// import { EmailHandler } from './emailHandler';
-// const sgMail = require('@sendgrid/mail');
-// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-// const makeEmailHandler = new EmailHandler().init({
-//   makeUserDbService,
-//   sendgrid,
-// });
-
-// export { makeEmailHandler };
-
 import fs from 'fs';
 import mjml from 'mjml';
-import nodemailer from 'nodemailer';
+import { join } from 'path';
 import vue from 'vue';
 import { createRenderer } from 'vue-server-renderer';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { EmailHandler } from './emailHandler';
+const sendgrid = require('@sendgrid/mail');
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 const makeEmailHandler = new EmailHandler().init({
-  nodemailer,
   fs,
   makeUserDbService,
   vue,
   createRenderer,
   mjml,
+  join,
+  sendgrid,
 });
 
 export { makeEmailHandler };

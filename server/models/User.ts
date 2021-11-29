@@ -16,8 +16,8 @@ const UserSchema = createSchema({
   profileImageUrl: Type.string({ required: false }),
   profileBio: Type.string({ required: false }),
   languages: Type.array({ required: true }).of({
-    language: Type.string(),
-    level: Type.string(),
+    language: Type.string({ required: true }),
+    level: Type.string({ required: true }),
   }),
   region: Type.string({ required: false }),
   timezone: Type.string({ required: false }),
@@ -25,8 +25,8 @@ const UserSchema = createSchema({
   settings: Type.object({
     required: true,
   }).of({
-    currency: Type.string(),
-    locale: Type.string(),
+    currency: Type.string({ required: true }),
+    locale: Type.string({ required: true }),
     emailAlerts: Type.object({
       required: true,
     }).of({

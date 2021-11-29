@@ -1,0 +1,5 @@
+{
+  "greeting": "Hi {{name}}!",
+  "text": "You were invited to try i18next.",
+  "ending": "Internationalized with"
+}

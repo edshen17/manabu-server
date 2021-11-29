@@ -16,7 +16,7 @@ import {
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { EmailHandler, EMAIL_SENDER_NAME } from '../../utils/emailHandler/emailHandler';
+import { EmailHandler } from '../../utils/emailHandler/emailHandler';
 import { EMAIL_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
 import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
 
