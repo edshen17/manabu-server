@@ -19,7 +19,7 @@ type AppointmentEntityBuildResponse = {
   endDate: Date;
   status: string;
   cancellationReason?: string;
-  creationDate: Date;
+  createdDate: Date;
   lastModifiedDate: Date;
 };
 
@@ -39,7 +39,7 @@ class AppointmentEntity extends AbstractEntity<
       startDate,
       endDate,
       status: 'pending',
-      creationDate: new Date(),
+      createdDate: new Date(),
       lastModifiedDate: new Date(),
     };
     return appointmentEntity;

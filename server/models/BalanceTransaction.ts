@@ -28,7 +28,7 @@ const BalanceTransactionSchema = createSchema({
       required: false,
     }),
   }),
-  creationDate: Type.date({ required: true }),
+  createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });
 

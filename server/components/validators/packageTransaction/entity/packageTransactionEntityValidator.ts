@@ -21,7 +21,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       isSubscription: this._joi.boolean(),
       status: this._joi.string().valid('pending', 'confirmed', 'cancelled', 'completed'),
       lastModifiedDate: this._joi.date(),
-      creationDate: this._joi.date(),
+      createdDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       hostedById: this._joi
@@ -43,7 +43,7 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       lessonLanguage: this._joi.string().max(5).forbidden(),
       isSubscription: this._joi.boolean().forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
-      creationDate: this._joi.date().forbidden(),
+      createdDate: this._joi.date().forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

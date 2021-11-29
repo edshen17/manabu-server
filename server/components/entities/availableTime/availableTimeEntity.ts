@@ -13,7 +13,7 @@ type AvailableTimeEntityBuildResponse = {
   hostedById: ObjectId;
   startDate: Date;
   endDate: Date;
-  creationDate: Date;
+  createdDate: Date;
   lastModifiedDate: Date;
 };
 
@@ -30,7 +30,7 @@ class AvailableTimeEntity extends AbstractEntity<
       hostedById,
       startDate,
       endDate,
-      creationDate: new Date(),
+      createdDate: new Date(),
       lastModifiedDate: new Date(),
     };
     return availableTimeEntity;

@@ -39,7 +39,7 @@ before(async () => {
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
-    startDate: fakePackageTransaction.creationDate,
+    startDate: fakePackageTransaction.createdDate,
     endDate: fakePackageTransaction.terminationDate,
   });
   queryStringHandler = makeQueryStringHandler;
@@ -55,7 +55,7 @@ beforeEach(async () => {
     userId: fakePackageTransaction.reservedById,
   };
   const filter = queryStringHandler.encodeQueryStringObj({
-    startDate: fakePackageTransaction.creationDate,
+    startDate: fakePackageTransaction.createdDate,
     endDate: fakePackageTransaction.terminationDate,
   });
   query = queryStringHandler.parseQueryString(filter);

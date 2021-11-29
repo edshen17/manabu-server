@@ -38,7 +38,7 @@ class UserEntityValidator extends AbstractEntityValidator {
       verificationToken: this._joi.string().forbidden(),
       nameNGrams: this._joi.string().max(256),
       namePrefixNGrams: this._joi.string().max(256),
-      creationDate: this._joi.date(),
+      createdDate: this._joi.date(),
       lastOnlineDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
       balance: this._joi.object({
@@ -61,7 +61,7 @@ class UserEntityValidator extends AbstractEntityValidator {
       verificationToken: this._joi.string().forbidden(),
       nameNGrams: this._joi.string().forbidden(),
       namePrefixNGrams: this._joi.string().forbidden(),
-      creationDate: this._joi.date().forbidden(),
+      createdDate: this._joi.date().forbidden(),
       lastOnlineDate: this._joi.date().forbidden(),
       lastModifiedDate: this._joi.date().forbidden(),
       balance: this._joi

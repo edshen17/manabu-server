@@ -35,7 +35,7 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
         id: this._joi.string().max(256).allow(''),
       }),
       lastModifiedDate: this._joi.date(),
-      creationDate: this._joi.date(),
+      createdDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
       userId: this._joi
@@ -75,7 +75,7 @@ class BalanceTransactionEntityValidator extends AbstractEntityValidator {
         id: this._joi.string().max(256).allow('').forbidden(),
       }),
       lastModifiedDate: this._joi.date().forbidden(),
-      creationDate: this._joi.date().forbidden(),
+      createdDate: this._joi.date().forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

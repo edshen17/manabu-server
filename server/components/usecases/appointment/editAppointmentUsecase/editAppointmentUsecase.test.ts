@@ -34,7 +34,7 @@ beforeEach(async () => {
     hostedById: fakePackageTransaction.hostedById,
     reservedById: fakePackageTransaction.reservedById,
     packageTransactionId: fakePackageTransaction._id,
-    startDate: fakePackageTransaction.creationDate,
+    startDate: fakePackageTransaction.createdDate,
     endDate: fakePackageTransaction.terminationDate,
   });
   routeData = {

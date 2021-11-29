@@ -36,7 +36,7 @@ type UserEntityBuildResponse = {
   password?: string;
   profileImageUrl: string;
   profileBio: string;
-  creationDate: Date;
+  createdDate: Date;
   languages?: { level: string; language: string }[];
   region: string;
   timezone: string;
@@ -114,7 +114,7 @@ class UserEntity extends AbstractEntity<
       password: encryptedPassword,
       profileImageUrl: profileImageUrl || `https://avatars.dicebear.com/api/initials/${name}.svg`,
       profileBio: '',
-      creationDate: new Date(),
+      createdDate: new Date(),
       languages: [],
       region: '',
       timezone: '',

@@ -45,7 +45,7 @@ const UserSchema = createSchema({
   teacherData: Type.schema({ required: false }).of(TeacherSchema),
   nameNGrams: Type.string({ required: true }),
   namePrefixNGrams: Type.string({ required: true }),
-  creationDate: Type.date({ required: true }),
+  createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
   lastOnlineDate: Type.date({ required: true }),
   balance: Type.object({ required: true }).of({

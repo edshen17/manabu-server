@@ -29,7 +29,7 @@ type PackageTransactionEntityBuildResponse = {
   remainingReschedules: number;
   isTerminated: boolean;
   status: string;
-  creationDate: Date;
+  createdDate: Date;
   lastModifiedDate: Date;
 };
 
@@ -65,7 +65,7 @@ class PackageTransactionEntity extends AbstractEntity<
       lessonLanguage,
       isSubscription,
       status: 'confirmed',
-      creationDate: new Date(),
+      createdDate: new Date(),
       lastModifiedDate: new Date(),
     };
     return packageTransactionEntity;

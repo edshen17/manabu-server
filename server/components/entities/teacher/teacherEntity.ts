@@ -64,7 +64,7 @@ class TeacherEntity extends AbstractEntity<
       tags: [],
       lessonCount: 0,
       studentCount: 0,
-      creationDate: new Date(),
+      createdDate: new Date(),
       lastModifiedDate: new Date(),
       packages: this._createPackages(),
     };

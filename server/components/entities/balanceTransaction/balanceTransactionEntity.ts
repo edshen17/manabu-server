@@ -28,7 +28,7 @@ type RunningBalance = {
 
 type BalanceTransactionEntityBuildResponse = BalanceTransactionEntityBuildParams & {
   totalPayment: number;
-  creationDate: Date;
+  createdDate: Date;
   lastModifiedDate: Date;
 };
 
@@ -87,7 +87,7 @@ class BalanceTransactionEntity extends AbstractEntity<
       totalPayment,
       runningBalance,
       paymentData,
-      creationDate: new Date(),
+      createdDate: new Date(),
       lastModifiedDate: new Date(),
     };
     return balanceTransactionEntity;
