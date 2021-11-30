@@ -11,7 +11,7 @@ before(async () => {
 // describe('emailHandler', () => {
 //   context('english', () => {
 //     it('should send the email in english', async () => {
-//       await emailHandler.sendEmail({
+//       await emailHandler.send({
 //         to: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
 //         from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
 //         subject: `test email`,

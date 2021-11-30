@@ -16,8 +16,12 @@ import {
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { EmailHandler } from '../../utils/emailHandler/emailHandler';
-import { EMAIL_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
+import {
+  EmailHandler,
+  EmailHandlerSendAlertFromUserIdParams,
+  EMAIL_HANDLER_SENDER_ADDRESS,
+} from '../../utils/emailHandler/emailHandler';
+import { EMAIL_HANDLER_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
 import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
 
 type OptionalCreateAppointmentsUsecaseInitParams = {
@@ -232,7 +236,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       packageData,
       packageTransactionData,
     });
-    this._emailHandler.sendAlertEmailFromUserId(alertEmailParams);
+    this._emailHandler.sendAlertFromUserId(alertEmailParams);
   };
 
   private _getAlertEmailParams = (props: {
@@ -242,23 +246,20 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     isMultipleReservations: boolean;
     packageData: PackageDoc;
     packageTransactionData: PackageTransactionDoc;
-  }) => {
+  }): EmailHandlerSendAlertFromUserIdParams => {
     const { hostedByData, reservedByData, appointmentAmount, isMultipleReservations } = props;
-    const subjectLine = `You have ${appointmentAmount} new ${
+    const subject = `You have ${appointmentAmount} new ${
       isMultipleReservations ? 'appointments' : 'appointment'
     } from ${reservedByData.name} that ${
       isMultipleReservations ? 'need' : 'needs'
     } to be confirmed.`;
     const alertEmailParams = {
       userId: hostedByData._id,
-      emailAlertName: EMAIL_TEMPLATE_NAME.APPOINTMENT_CREATION,
-      sendFrom: EMAIL_SENDER_NAME.NOREPLY,
-      subjectLine,
-      mjmlFileName: EMAIL_TEMPLATE_NAME.APPOINTMENT_CREATION,
+      emailAlertName: EMAIL_HANDLER_TEMPLATE_NAME.APPOINTMENT_CREATION,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      subject,
+      mjmlFileName: EMAIL_HANDLER_TEMPLATE_NAME.APPOINTMENT_CREATION,
       data: {
-        bodyText: `Please confirm the ${
-          isMultipleReservations ? 'appointments' : 'appointment'
-        } made by ${reservedByData.name}`,
         ...props,
       },
     };

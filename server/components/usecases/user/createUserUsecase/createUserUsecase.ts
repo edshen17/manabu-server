@@ -15,8 +15,8 @@ import { ConvertStringToObjectId } from '../../../entities/utils/convertStringTo
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { EmailHandler, EMAIL_SENDER_NAME } from '../../utils/emailHandler/emailHandler';
-import { EMAIL_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
+import { EmailHandler, EMAIL_HANDLER_SENDER_ADDRESS } from '../../utils/emailHandler/emailHandler';
+import { EMAIL_HANDLER_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
 import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 
@@ -174,11 +174,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
 
   private _sendVerificationEmail = (userEntity: any): void => {
     const { name, verificationToken } = userEntity;
-    this._emailHandler.sendEmail({
-      recipientEmails: userEntity.email,
-      sendFrom: EMAIL_SENDER_NAME.NOREPLY,
-      subjectLine: 'Manabu email verification',
-      mjmlFileName: EMAIL_TEMPLATE_NAME.EMAIL_VERIFICATION,
+    this._emailHandler.send({
+      to: userEntity.email,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      subject: 'Manabu email verification',
+      mjmlFileName: EMAIL_HANDLER_TEMPLATE_NAME.EMAIL_VERIFICATION,
       data: { name, verificationToken },
     });
   };
@@ -187,11 +187,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { userEntity, isTeacherApp } = props;
     const userType = isTeacherApp ? 'teacher' : 'user';
     const { name, email } = userEntity;
-    this._emailHandler.sendEmail({
-      recipientEmails: 'manabulessons@gmail.com',
-      sendFrom: EMAIL_SENDER_NAME.NOREPLY,
-      subjectLine: `A new ${userType} signed up`,
-      mjmlFileName: EMAIL_TEMPLATE_NAME.INTERNAL,
+    this._emailHandler.send({
+      to: 'manabulessons@gmail.com',
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      subject: `A new ${userType} signed up`,
+      mjmlFileName: EMAIL_HANDLER_TEMPLATE_NAME.INTERNAL,
       data: {
         name,
         email,

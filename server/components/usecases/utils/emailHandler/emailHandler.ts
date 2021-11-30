@@ -11,13 +11,18 @@ enum EMAIL_HANDLER_SENDER_ADDRESS {
   NOREPLY = 'no-reply@manabu.sg',
 }
 
-type SendEmailParams = {
+type EmailHandlerSendAlertFromUserIdParams = {
+  userId: ObjectId;
+  emailAlertName: string;
+} & Omit<SendParams, 'to'>;
+
+type SendParams = {
   from: EMAIL_HANDLER_SENDER_ADDRESS.SUPPORT | EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY;
   to: string | string[];
   subject: string;
   mjmlFileName: string;
   data: StringKeyObject;
-  locale: string;
+  locale?: string;
 };
 
 class EmailHandler {
@@ -29,8 +34,8 @@ class EmailHandler {
   private _mjml!: any;
   private _join!: any;
 
-  public sendAlertEmailFromUserId = async (
-    props: { userId: ObjectId; emailAlertName: string } & SendEmailParams
+  public sendAlertFromUserId = async (
+    props: EmailHandlerSendAlertFromUserIdParams
   ): Promise<void> => {
     const { userId, emailAlertName, from, subject, mjmlFileName, data } = props;
     const dbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
@@ -46,7 +51,7 @@ class EmailHandler {
     const shouldSendEmail =
       userEmailAlertSettings[emailAlertName] || teacherEmailAlertSettings[emailAlertName];
     if (shouldSendEmail) {
-      this.sendEmail({
+      this.send({
         to: user.email,
         data: { name: user.name, ...data },
         from,
@@ -57,24 +62,20 @@ class EmailHandler {
     }
   };
 
-  public sendEmail = async (
-    props: SendEmailParams & {
-      data: StringKeyObject;
-    }
-  ): Promise<void> => {
+  public send = async (props: SendParams): Promise<void> => {
     const { to, from, subject, mjmlFileName, data, locale } = props;
-    this._initLocale(locale);
+    this._initLocale(locale!);
     const html = await this._createHtmlToRender({
       mjmlFileName,
       data: { ...data, t: i18next.t },
     });
+    const email = {
+      to,
+      from,
+      subject,
+      html,
+    };
     if (IS_PRODUCTION) {
-      const email = {
-        to,
-        from,
-        subject,
-        html,
-      };
       await this._sendgrid.send(email);
     }
   };
@@ -140,4 +141,4 @@ class EmailHandler {
   };
 }
 
-export { EmailHandler, EMAIL_HANDLER_SENDER_ADDRESS };
+export { EmailHandler, EMAIL_HANDLER_SENDER_ADDRESS, EmailHandlerSendAlertFromUserIdParams };

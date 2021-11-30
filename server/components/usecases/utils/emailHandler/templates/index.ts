@@ -1,4 +1,4 @@
-enum EMAIL_TEMPLATE_NAME {
+enum EMAIL_HANDLER_TEMPLATE_NAME {
   INTERNAL = 'internalNewSignUp',
   EMAIL_VERIFICATION = 'emailVerification',
   PACKAGE_TRANSACTION_CREATION = 'packageTransactionCreation',
@@ -7,4 +7,4 @@ enum EMAIL_TEMPLATE_NAME {
   APPOINTMENT_START_REMINDER = 'appointmentStartReminder',
 }
 
-export { EMAIL_TEMPLATE_NAME };
+export { EMAIL_HANDLER_TEMPLATE_NAME };
