@@ -71,7 +71,10 @@ class EmailHandler {
     });
     const email = {
       to,
-      from,
+      from: {
+        name: 'Minato Manabu',
+        email: from,
+      },
       subject,
       html,
     };

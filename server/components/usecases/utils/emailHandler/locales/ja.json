@@ -1,5 +1,25 @@
 {
-  "greeting": "こん {{name}}!",
-  "text": "こん",
-  "ending": "こん"
+  "common": {
+    "header": {
+      "dear": "Dear {{name}},"
+    },
+    "footer": {
+      "contact": "If you have any questions, please feel free to contact us at {{0}} or on social media. We'd be happy to help!",
+      "sincerely": "Sincerely,",
+      "manabuTeam": "The Manabu Team."
+    },
+    "button": {
+      "viewLesson": "View Lesson"
+    },
+    "table": {
+      "teacherName": "Teacher Name",
+      "lessonPlan": "Lesson Plan",
+      "lessonDetails": "Lesson Details",
+      "lessonDate": "Lesson Date/Time",
+      "lessonStatus": "Lesson Status"
+    }
+  },
+  "studentAppointmentUpdate": {
+    "body": "You lesson with {{teacherName}} has been updated."
+  }
 }

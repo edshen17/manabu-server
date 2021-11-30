@@ -1,0 +1,77 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-text color="#183b56" padding="15px 15px 0px 10px" />
+      <mj-font name="Work Sans" href="https://fonts.googleapis.com/css?family=Work+Sans:400,300,600" />
+      <mj-all font-size="16px" line-height="26px" font-family="Work Sans,sans-serif,Arial" />
+      <mj-class name="table-text" line-height="25px"></mj-class>
+      <mj-class name="mjclass" color="green" font-size="30px" />
+      <mj-section full-width="full-width" padding="0px"></mj-section>
+      <mj-column padding="15px"></mj-column>
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="white">
+    <mj-section>
+      <mj-column padding="0px">
+        <mj-image src="https://storage.googleapis.com/japanese-221819.appspot.com/cdn/torii-lg.png" width="80px" alt="logo" />
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column background-color="#fff" css-class="body-section" border-top="4px solid #2294ed">
+        <mj-text>{{ $t("common.header.dear", { name }) }}</mj-text>
+        <mj-text>{{ $t("studentAppointmentUpdate.body") }}</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column width="100%" background-color="#F3F9FF" padding-top="10px" padding-bottom="23px">
+        <mj-text mj-class="table-text">
+          <span>
+            <mj-text><b>{{ $t("common.table.teacherName") }}</b>:</mj-text> {{teacherName}}
+          </span>
+        </mj-text>
+        <mj-text mj-class="table-text">
+          <span>
+            <mj-text><b>{{ $t("common.table.lessonPlan") }}</b>:</mj-text> {{packageName}}
+          </span>
+        </mj-text mj-class="table-text">
+        <mj-text mj-class="table-text">
+          <span>
+            <mj-text><b>{{ $t("common.table.lessonDetails") }}</b>:</mj-text> {{lessonAmount}} x {{lessonDuration}} min lessons
+          </span>
+        </mj-text>
+        <mj-text mj-class="table-text">
+          <span>
+            <mj-text><b>{{ $t("common.table.lessonDate") }}</b>:</mj-text> {{date}}
+          </span>
+        </mj-text>
+        <mj-text mj-class="table-text">
+          <span>
+            <mj-text><b>{{ $t("common.table.lessonStatus") }}</b>:</mj-text> {{status}}
+          </span>
+        </mj-text>
+      </mj-column>
+      <mj-column width="100%">
+        <mj-button :href="`https://manabu.sg/dashboard`" padding="20px" background-color="#2294ed">{{ $t("common.button.viewLesson") }}</mj-button>
+        <mj-text>
+          <i18next path="common.footer.contact" tag="label">
+            <a href="mailto:support@manabu.sg">support@manabu.sg</a>
+          </i18next>
+        </mj-text>
+        <mj-text>{{ $t("common.footer.sincerely") }}</mj-text>
+        <mj-text padding-top="0px" padding-bottom="30px">{{ $t("common.footer.manabuTeam") }}</mj-text>
+        <mj-social font-size="12px" icon-size="35px" mode="horizontal" padding-top="30px" padding-bottom="0px" inner-padding="10px" border-radius="20px">
+          <mj-social-element name="facebook" href="https://www.facebook.com/ManabuOfficial/">
+          </mj-social-element>
+          <mj-social-element name="instagram" href="https://www.instagram.com/nihongo_manabu_/">
+          </mj-social-element>
+          <mj-social-element name="twitter" href="https://twitter.com/lessonsmanabu">
+          </mj-social-element>
+          <mj-social-element name="youtube" href="https://www.youtube.com/channel/UCwtTZCZ9apsj7zNn7n1eS5w">
+          </mj-social-element>
+        </mj-social>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+    </mj-section>
+  </mj-body>
+</mjml>
