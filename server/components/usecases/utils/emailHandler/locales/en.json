@@ -9,17 +9,23 @@
       "manabuTeam": "The Manabu Team."
     },
     "button": {
-      "viewLesson": "View Lesson"
+      "viewLesson": "View Lesson",
+      "confirmLesson": "Confirm Lesson"
     },
     "table": {
       "teacherName": "Teacher Name",
+      "studentName": "Student Name",
       "lessonPlan": "Lesson Plan",
       "lessonDetails": "Lesson Details",
       "lessonDate": "Lesson Date/Time",
-      "lessonStatus": "Lesson Status"
+      "lessonStatus": "Lesson Status",
+      "colon": ":"
     }
   },
   "studentAppointmentUpdate": {
     "body": "You lesson with {{teacherName}} has been updated."
+  },
+  "teacherAppointmentCreation": {
+    "body": "{{studentName}} reserved a new lesson with you."
   }
 }

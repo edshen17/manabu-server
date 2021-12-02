@@ -1,7 +1,0 @@
-<mjml>
-  <mj-body background-color="#ebf2fa">
-    <mj-text padding="15px" align="left">
-      {{ $t('text') }}
-    </mj-text>
-  </mj-body>
-</mjml>

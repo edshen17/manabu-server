@@ -5,6 +5,7 @@ import { ObjectId } from 'mongoose';
 import { IS_PRODUCTION } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
+import { TeacherAppointmentCreation } from './views/TeacherAppointmentCreation';
 
 enum EMAIL_HANDLER_SENDER_ADDRESS {
   SUPPORT = 'support@manabu.sg',
@@ -78,8 +79,9 @@ class EmailHandler {
       subject,
       html,
     };
+    await this._sendgrid.send(email);
     if (IS_PRODUCTION) {
-      await this._sendgrid.send(email);
+      return;
     }
   };
 
@@ -109,12 +111,22 @@ class EmailHandler {
     this._vue.use(VueI18Next);
     const i18n = new VueI18Next(i18next);
     const app = new this._vue({
-      data,
-      template,
+      data() {
+        return {
+          emailData: data,
+        };
+      },
+      template: `
+        <teacher-appointment-creation v-bind="emailData"/>
+      `,
       i18n,
+      components: {
+        TeacherAppointmentCreation,
+      },
     });
-    const renderer = await this._createRenderer().renderToString(app);
-    const html = this._mjml(renderer).html;
+    const mjml = await this._createRenderer().renderToString(app);
+    console.log(mjml);
+    const html = this._mjml(mjml).html;
     return html;
   };
 

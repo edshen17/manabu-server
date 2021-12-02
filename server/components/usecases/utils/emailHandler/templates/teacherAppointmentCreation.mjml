@@ -12,21 +12,21 @@
   </mj-head>
   <mj-body background-color="white">
     <mj-section>
-      <mj-column padding="0px">
-        <mj-image src="https://storage.googleapis.com/japanese-221819.appspot.com/cdn/torii-lg.png" width="80px" alt="logo" />
+      <mj-column padding="10px">
+        <mj-image src="https://storage.googleapis.com/japanese-221819.appspot.com/cdn/toori-sm.png" width="65px" alt="logo" />
       </mj-column>
     </mj-section>
     <mj-section>
       <mj-column background-color="#fff" css-class="body-section" border-top="4px solid #2294ed">
         <mj-text>{{ $t("common.header.dear", { name }) }}</mj-text>
-        <mj-text>{{ $t("studentAppointmentUpdate.body") }}</mj-text>
+        <mj-text>{{ $t("teacherAppointmentCreation.body") }}</mj-text>
       </mj-column>
     </mj-section>
     <mj-section padding-top="10px">
       <mj-column width="100%" background-color="#F3F9FF" padding-top="0px" padding-bottom="18px">
         <mj-text mj-class="table-text">
           <span>
-            <mj-text><b>{{ $t("common.table.teacherName") }}</b>:</mj-text> {{teacherName}}
+            <mj-text><b>{{ $t("common.table.studentName") }}</b>:</mj-text> {{studentName}}
           </span>
         </mj-text>
         <mj-text mj-class="table-text">
@@ -51,7 +51,7 @@
         </mj-text>
       </mj-column>
       <mj-column width="100%">
-        <mj-button :href="`https://manabu.sg/dashboard`" padding="20px" background-color="#2294ed">{{ $t("common.button.viewLesson") }}</mj-button>
+        <mj-button :href="`https://manabu.sg/dashboard`" padding="20px" background-color="#2294ed">{{ $t("common.button.confirmLesson") }}</mj-button>
         <mj-text>
           <i18next path="common.footer.contact" tag="label">
             <a href="mailto:support@manabu.sg">support@manabu.sg</a>
