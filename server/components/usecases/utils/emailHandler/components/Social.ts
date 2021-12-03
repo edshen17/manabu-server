@@ -1,11 +1,15 @@
 const Social = {
   template: `
-    <mj-section>
-      <mj-social v-for="icon in iconData" :key="icon.name" font-size="12px" 
-        icon-size="35px" mode="horizontal" padding-top="30px" padding-bottom="0px" 
-        inner-padding="10px" border-radius="20px">
-        <mj-social-element :name="icon.name" :href="icon.link"></mj-social-element>
-      </mj-social>
+    <mj-section padding="0">
+      <mj-column padding="0">
+        <mj-social font-size="12px" 
+          icon-size="35px" mode="horizontal" padding-top="30px" padding-bottom="0px" 
+          inner-padding="10px" border-radius="20px">
+          <mj-social-element v-for="icon in iconData" :key="icon.name" 
+            :name="icon.name" :href="icon.link">
+          </mj-social-element>
+        </mj-social>
+      </mj-column>
     </mj-section>
   `,
   name: 'Social',

@@ -1,6 +1,8 @@
 import { NODE_ENV } from '../../../../constants';
 import { QueryStringHandler } from '../queryStringHandler/queryStringHandler';
 
+type HostParams = 'server' | 'client';
+
 class RedirectUrlBuilder {
   private _redirectExpressCallbackOptions!: {
     host: string;
@@ -20,12 +22,12 @@ class RedirectUrlBuilder {
     };
   };
 
-  public host = (host: string): this => {
+  public host = (host: HostParams): this => {
     this._redirectExpressCallbackOptions.host = this._getHost(host);
     return this;
   };
 
-  private _getHost = (host: string): string => {
+  private _getHost = (host: HostParams): string => {
     const hostOptions: { [key: string]: any } = {
       client: {
         production: 'https://manabu.sg',

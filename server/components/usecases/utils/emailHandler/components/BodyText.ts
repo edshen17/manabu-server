@@ -3,7 +3,7 @@ import { Signature } from './Signature';
 
 const BodyText = {
   template: `
-    <mj-column width="100%" padding-bottom="0px" padding-top="0px">
+    <mj-column width="100%" padding-top="0px" padding-bottom="18px">
       <mj-text>
         <slot/>
       </mj-text>
