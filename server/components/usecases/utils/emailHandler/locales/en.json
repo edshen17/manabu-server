@@ -4,13 +4,16 @@
       "dear": "Dear {{name}},"
     },
     "footer": {
-      "contact": "If you have any questions, please feel free to contact us at {{0}} or on social media. We'd be happy to help!",
+      "contact": "If you have any questions, please feel free to contact us at {{0}} or on social media. We would be happy to help!",
       "sincerely": "Sincerely,",
       "manabuTeam": "The Manabu Team."
     },
     "button": {
       "viewLesson": "View Lesson",
-      "confirmLesson": "Confirm Lesson"
+      "confirmLesson": "Confirm Lesson",
+      "viewLessonPlan": "View Lesson Plan",
+      "verifyNow": "Verify Now",
+      "viewUserProfile": "View User Profile"
     },
     "table": {
       "teacherName": "Teacher Name",
@@ -19,6 +22,11 @@
       "lessonDetails": "Lesson Details",
       "lessonDate": "Lesson Date/Time",
       "lessonStatus": "Lesson Status",
+      "terminationDate": "Termination Date",
+      "totalPrice": "Total Price",
+      "name": "Name",
+      "userType": "User Type",
+      "email": "Email",
       "colon": ":"
     }
   },
@@ -26,6 +34,27 @@
     "body": "You lesson with {{teacherName}} has been updated."
   },
   "teacherAppointmentCreation": {
-    "body": "{{studentName}} reserved a new lesson with you."
+    "body": "{{studentName}} reserved a lesson with you."
+  },
+  "internalExpiredAppointment": {
+    "body": "{{teacherName}} had an overdue and unconfirmed lesson with {{studentName}}."
+  },
+  "studentPackageTransaction": {
+    "body": "Thank you for your purchase! Below are your lesson plan details."
+  },
+  "teacherAppointmentReminder": {
+    "body": "This is a friendly reminder that you have an appointment with {{studentName}} soon."
+  },
+  "studentAppointmentReminder": {
+    "body": "This is a friendly reminder that you have an appointment with {{teacherName}} soon."
+  },
+  "teacherAppointmentUpdate": {
+    "body": "You lesson with {{studentName}} has been updated."
+  },
+  "emailVerification": {
+    "body": "Thank you for signing up to Manabu! To complete your registration, please verify your email address."
+  },
+  "internalNewUser": {
+    "body": "A new {{userType}} signed up!"
   }
 }

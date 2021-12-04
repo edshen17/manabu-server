@@ -1,16 +1,16 @@
 import { StringKeyObject } from '../../../../../../types/custom';
 import { EmailButton } from './EmailButton';
 
-const ViewLessonPlanButton = {
+const ViewLessonButton = {
   template: `
     <email-button v-bind="buttonProps"/>
   `,
-  name: 'ViewLessonPlanButton',
+  name: 'ViewLessonButton',
   components: {
     EmailButton,
   },
   props: {
-    packageTransaction: {
+    appointment: {
       type: Object,
       required: true,
     },
@@ -21,14 +21,14 @@ const ViewLessonPlanButton = {
   computed: {
     buttonProps: {
       get(): StringKeyObject {
-        const packageTransactionId = (this as any).packageTransaction._id;
+        const appointmentId = (this as any).appointment._id;
         return {
-          endpoint: `/packageTransaction/${packageTransactionId}`,
-          text: (this as any).$t('common.button.viewLessonPlan'),
+          endpoint: `/appointment/${appointmentId}`,
+          text: (this as any).$t('common.button.viewLesson'),
         };
       },
     },
   },
 };
 
-export { ViewLessonPlanButton };
+export { ViewLessonButton };

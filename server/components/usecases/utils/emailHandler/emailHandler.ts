@@ -5,7 +5,6 @@ import { ObjectId } from 'mongoose';
 import { IS_PRODUCTION } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
-import { TeacherAppointmentCreation } from './views/TeacherAppointmentCreation';
 
 enum EMAIL_HANDLER_SENDER_ADDRESS {
   SUPPORT = 'support@manabu.sg',
@@ -21,10 +20,22 @@ type SendParams = {
   from: EMAIL_HANDLER_SENDER_ADDRESS.SUPPORT | EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY;
   to: string | string[];
   subject: string;
-  mjmlFileName: string;
+  templateName: string;
   data: StringKeyObject;
   locale?: string;
 };
+
+enum EMAIL_HANDLER_TEMPLATE {
+  STUDENT_APPOINTMENT_UPDATE = 'StudentAppointmentUpdate',
+  TEACHER_APPOINTMENT_CREATION = 'TeacherAppointmentCreation',
+  INTERNAL_EXPIRED_APPOINTMENT = 'InternalExpiredAppointment',
+  STUDENT_PACKAGE_TRANSACTION = 'StudentPackageTransaction',
+  TEACHER_APPOINTMENT_REMINDER = 'TeacherAppointmentReminder',
+  STUDENT_APPOINTMENT_REMINDER = 'StudentAppointmentReminder',
+  TEACHER_APPOINTMENT_UPDATE = 'TeacherAppointmentUpdate',
+  EMAIL_VERIFICATION = 'EmailVerification',
+  INTERNAL_NEW_USER = 'InternalNewUser',
+}
 
 class EmailHandler {
   private _sendgrid!: any;
@@ -38,7 +49,7 @@ class EmailHandler {
   public sendAlertFromUserId = async (
     props: EmailHandlerSendAlertFromUserIdParams
   ): Promise<void> => {
-    const { userId, emailAlertName, from, subject, mjmlFileName, data } = props;
+    const { userId, emailAlertName, from, subject, templateName, data } = props;
     const dbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
     const user = await this._userDbService.findById({
       _id: userId,
@@ -57,17 +68,17 @@ class EmailHandler {
         data: { name: user.name, ...data },
         from,
         subject,
-        mjmlFileName,
+        templateName,
         locale: userSettings.locale,
       });
     }
   };
 
   public send = async (props: SendParams): Promise<void> => {
-    const { to, from, subject, mjmlFileName, data, locale } = props;
+    const { to, from, subject, templateName, data, locale } = props;
     this._initLocale(locale!);
     const html = await this._createHtmlToRender({
-      mjmlFileName,
+      templateName,
       data: { ...data, t: i18next.t },
     });
     const email = {
@@ -79,9 +90,8 @@ class EmailHandler {
       subject,
       html,
     };
-    await this._sendgrid.send(email);
     if (IS_PRODUCTION) {
-      return;
+      await this._sendgrid.send(email);
     }
   };
 
@@ -102,12 +112,12 @@ class EmailHandler {
   };
 
   private _createHtmlToRender = async (props: {
-    mjmlFileName: string;
+    templateName: string;
     data: StringKeyObject;
   }): Promise<string> => {
-    const { mjmlFileName, data } = props;
-    const dirname = __dirname.replace(/\\/g, '/');
-    const template = this._readMJMLFile(`${dirname}/templates/${mjmlFileName}`);
+    const { templateName, data } = props;
+    const template = this._getTemplate(templateName);
+    const components = await this._getComponents(templateName);
     this._vue.use(VueI18Next);
     const i18n = new VueI18Next(i18next);
     const app = new this._vue({
@@ -116,13 +126,9 @@ class EmailHandler {
           emailData: data,
         };
       },
-      template: `
-        <teacher-appointment-creation v-bind="emailData"/>
-      `,
+      template,
       i18n,
-      components: {
-        TeacherAppointmentCreation,
-      },
+      components,
     });
     const mjml = await this._createRenderer().renderToString(app);
     console.log(mjml);
@@ -130,9 +136,20 @@ class EmailHandler {
     return html;
   };
 
-  private _readMJMLFile = (fileName: string) => {
-    const data = this._fs.readFileSync(`${fileName}.mjml`, 'utf8');
-    return data;
+  private _getTemplate = (templateName: string): string => {
+    const templateComponent = templateName
+      .match(/([A-Z]?[^A-Z]*)/g)!
+      .slice(0, -1)
+      .join('-')
+      .toLowerCase();
+    const template = `<${templateComponent} v-bind="emailData"/>`;
+    return template;
+  };
+
+  private _getComponents = async (templateName: string): Promise<StringKeyObject> => {
+    const dirname = __dirname.replace(/\\/g, '/');
+    const components = await import(`${dirname}/views/${templateName}.ts`);
+    return components;
   };
 
   public init = async (props: {
@@ -156,4 +173,9 @@ class EmailHandler {
   };
 }
 
-export { EmailHandler, EMAIL_HANDLER_SENDER_ADDRESS, EmailHandlerSendAlertFromUserIdParams };
+export {
+  EmailHandler,
+  EMAIL_HANDLER_SENDER_ADDRESS,
+  EmailHandlerSendAlertFromUserIdParams,
+  EMAIL_HANDLER_TEMPLATE,
+};

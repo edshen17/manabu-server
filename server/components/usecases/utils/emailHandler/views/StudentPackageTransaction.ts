@@ -1,34 +1,34 @@
-import { AppointmentDoc } from '../../../../../models/Appointment';
+import { BalanceTransactionDoc } from '../../../../../models/BalanceTransaction';
 import { PackageDoc } from '../../../../../models/Package';
 import { PackageTransactionDoc } from '../../../../../models/PackageTransaction';
 import { StringKeyObject } from '../../../../../types/custom';
 import { convertToTitlecase } from '../../convertToTitlecase';
 import { BodyText } from '../components/BodyText';
-import { ConfirmLessonButton } from '../components/Buttons/ConfirmLessonButton';
+import { ViewLessonPlanButton } from '../components/Buttons/ViewLessonPlanButton';
 import { Email } from '../components/Email';
 import { EmailTable } from '../components/EmailTable';
 
-const TeacherAppointmentCreation = {
+const StudentPackageTransaction = {
   template: `
     <email :name="name">
-      <body-text>{{ $t("teacherAppointmentCreation.body", processedAppointmentData) }}</body-text>
+      <body-text>{{ $t("studentPackageTransaction.body") }}</body-text>
       <email-table :rowData="rowData"/>
-      <confirm-lesson-button :appointment="appointment"/>
+      <view-lesson-plan-button :packageTransaction="packageTransaction"/>
     </email>
   `,
-  name: 'TeacherAppointmentCreation',
+  name: 'StudentPackageTransaction',
   components: {
     Email,
     BodyText,
-    ConfirmLessonButton,
     EmailTable,
+    ViewLessonPlanButton,
   },
   props: {
     name: {
       type: String,
       required: true,
     },
-    appointment: {
+    balanceTransaction: {
       type: Object,
       required: true,
     },
@@ -37,25 +37,16 @@ const TeacherAppointmentCreation = {
     return {};
   },
   computed: {
-    processedAppointmentData: {
-      get(): StringKeyObject {
-        const appointment: AppointmentDoc = (this as any).appointment;
-        const packageTransaction: PackageTransactionDoc = appointment.packageTransactionData;
-        return {
-          studentName: packageTransaction.reservedByData.name,
-        };
-      },
-    },
     rowData: {
       get(): StringKeyObject[] {
         const self = this as any;
-        const appointment: AppointmentDoc = (this as any).appointment;
-        const packageTransaction: PackageTransactionDoc = appointment.packageTransactionData;
+        const balanceTransaction: BalanceTransactionDoc = (this as any).balanceTransaction;
+        const packageTransaction: PackageTransactionDoc = balanceTransaction.packageTransactionData;
         const pkg: PackageDoc = packageTransaction.packageData;
         const rowData = [
           {
-            key: self.$t('common.table.studentName'),
-            value: packageTransaction.reservedByData.name,
+            key: self.$t('common.table.teacherName'),
+            value: packageTransaction.hostedByData.name,
           },
           {
             key: self.$t('common.table.lessonPlan'),
@@ -66,18 +57,24 @@ const TeacherAppointmentCreation = {
             value: `${pkg.lessonAmount} x ${packageTransaction.lessonDuration} min lessons`,
           },
           {
-            key: self.$t('common.table.lessonDate'),
-            value: appointment.startDate,
+            key: self.$t('common.table.terminationDate'),
+            value: packageTransaction.terminationDate,
           },
           {
-            key: self.$t('common.table.lessonStatus'),
-            value: convertToTitlecase(appointment.status),
+            key: self.$t('common.table.totalPrice'),
+            value: `${balanceTransaction.totalPayment} ${balanceTransaction.currency}`,
           },
         ];
         return rowData;
       },
     },
+    packageTransaction: {
+      get(): PackageTransactionDoc {
+        const packageTransaction = (this as any).balanceTransaction.packageTransactionData;
+        return packageTransaction;
+      },
+    },
   },
 };
 
-export { TeacherAppointmentCreation };
+export { StudentPackageTransaction };

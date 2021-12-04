@@ -23,7 +23,7 @@ const ConfirmLessonButton = {
       get(): StringKeyObject {
         const appointmentId = (this as any).appointment._id;
         return {
-          endpoint: `/appointments/${appointmentId}`,
+          endpoint: `/appointment/${appointmentId}`,
           text: (this as any).$t('common.button.confirmLesson'),
         };
       },

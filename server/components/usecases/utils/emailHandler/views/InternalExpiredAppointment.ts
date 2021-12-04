@@ -4,23 +4,23 @@ import { PackageTransactionDoc } from '../../../../../models/PackageTransaction'
 import { StringKeyObject } from '../../../../../types/custom';
 import { convertToTitlecase } from '../../convertToTitlecase';
 import { BodyText } from '../components/BodyText';
-import { ConfirmLessonButton } from '../components/Buttons/ConfirmLessonButton';
+import { ViewLessonButton } from '../components/Buttons/ViewLessonButton';
 import { Email } from '../components/Email';
 import { EmailTable } from '../components/EmailTable';
 
-const TeacherAppointmentCreation = {
+const InternalExpiredAppointment = {
   template: `
     <email :name="name">
-      <body-text>{{ $t("teacherAppointmentCreation.body", processedAppointmentData) }}</body-text>
+      <body-text>{{ $t("internalExpiredAppointment.body", processedAppointmentData) }}</body-text>
       <email-table :rowData="rowData"/>
-      <confirm-lesson-button :appointment="appointment"/>
+      <view-lesson-button :appointment="appointment"/>
     </email>
   `,
-  name: 'TeacherAppointmentCreation',
+  name: 'InternalExpiredAppointment',
   components: {
     Email,
     BodyText,
-    ConfirmLessonButton,
+    ViewLessonButton,
     EmailTable,
   },
   props: {
@@ -42,6 +42,7 @@ const TeacherAppointmentCreation = {
         const appointment: AppointmentDoc = (this as any).appointment;
         const packageTransaction: PackageTransactionDoc = appointment.packageTransactionData;
         return {
+          teacherName: packageTransaction.hostedByData.name,
           studentName: packageTransaction.reservedByData.name,
         };
       },
@@ -52,10 +53,15 @@ const TeacherAppointmentCreation = {
         const appointment: AppointmentDoc = (this as any).appointment;
         const packageTransaction: PackageTransactionDoc = appointment.packageTransactionData;
         const pkg: PackageDoc = packageTransaction.packageData;
+        const { teacherName, studentName } = (this as any).processedAppointmentData;
         const rowData = [
           {
+            key: self.$t('common.table.teacherName'),
+            value: teacherName,
+          },
+          {
             key: self.$t('common.table.studentName'),
-            value: packageTransaction.reservedByData.name,
+            value: studentName,
           },
           {
             key: self.$t('common.table.lessonPlan'),
@@ -80,4 +86,4 @@ const TeacherAppointmentCreation = {
   },
 };
 
-export { TeacherAppointmentCreation };
+export { InternalExpiredAppointment };

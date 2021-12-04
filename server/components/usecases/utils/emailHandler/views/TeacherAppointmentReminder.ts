@@ -4,24 +4,24 @@ import { PackageTransactionDoc } from '../../../../../models/PackageTransaction'
 import { StringKeyObject } from '../../../../../types/custom';
 import { convertToTitlecase } from '../../convertToTitlecase';
 import { BodyText } from '../components/BodyText';
-import { ConfirmLessonButton } from '../components/Buttons/ConfirmLessonButton';
+import { ViewLessonButton } from '../components/Buttons/ViewLessonButton';
 import { Email } from '../components/Email';
 import { EmailTable } from '../components/EmailTable';
 
-const TeacherAppointmentCreation = {
+const TeacherAppointmentReminder = {
   template: `
     <email :name="name">
-      <body-text>{{ $t("teacherAppointmentCreation.body", processedAppointmentData) }}</body-text>
+      <body-text>{{ $t("teacherAppointmentReminder.body", processedAppointmentData) }}</body-text>
       <email-table :rowData="rowData"/>
-      <confirm-lesson-button :appointment="appointment"/>
+      <view-lesson-button :appointment="appointment"/>
     </email>
   `,
   name: 'TeacherAppointmentCreation',
   components: {
     Email,
     BodyText,
-    ConfirmLessonButton,
     EmailTable,
+    ViewLessonButton,
   },
   props: {
     name: {
@@ -80,4 +80,4 @@ const TeacherAppointmentCreation = {
   },
 };
 
-export { TeacherAppointmentCreation };
+export { TeacherAppointmentReminder };
