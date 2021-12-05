@@ -4,17 +4,21 @@ type OptionalPackageEntityInitParams = {};
 
 type PackageEntityBuildParams = {
   lessonAmount: number;
+  description?: string;
+  tags?: string[];
   isOffering: boolean;
-  packageType: string;
+  type: string;
   lessonDurations: number[];
-  packageName: string;
+  name: string;
 };
 
 type PackageEntityBuildResponse = {
   lessonAmount: number;
   isOffering: boolean;
-  packageType: string;
-  packageName: string;
+  type: string;
+  name: string;
+  description?: string;
+  tags?: string[];
   lessonDurations: number[];
   createdDate: Date;
   lastModifiedDate: Date;
@@ -40,12 +44,15 @@ class PackageEntity extends AbstractEntity<
   protected _buildTemplate = (
     buildParams: PackageEntityBuildParams
   ): PackageEntityBuildResponse => {
-    const { lessonAmount, isOffering, packageType, lessonDurations, packageName } = buildParams;
+    const { lessonAmount, isOffering, type, lessonDurations, name, description, tags } =
+      buildParams;
     const packageEntity = {
       lessonAmount,
       isOffering,
-      packageType,
-      packageName,
+      description: description || '',
+      tags: tags || [],
+      type,
+      name,
       lessonDurations,
       createdDate: new Date(),
       lastModifiedDate: new Date(),

@@ -52,7 +52,7 @@ class EditPackageUsecase extends AbstractEditUsecase<
       dbServiceAccessOptions,
     });
     const { lessonAmount, packageDesc, packageName } = body;
-    const isDefaultPackage = packageToUpdate.packageType == PACKAGE_ENTITY_TYPE.DEFAULT;
+    const isDefaultPackage = packageToUpdate.type == PACKAGE_ENTITY_TYPE.DEFAULT;
     const isEditingDefaultPackageRestrictedFields =
       isDefaultPackage && (lessonAmount || packageDesc || packageName);
     if (!isEditingDefaultPackageRestrictedFields) {

@@ -17,7 +17,7 @@ beforeEach(() => {
     },
     lessonAmount: 5,
     isOffering: true,
-    packageType: 'custom',
+    type: 'custom',
     lessonDurations: [30],
   };
 });
@@ -62,7 +62,7 @@ describe('packageEntityValidator', () => {
               },
               lessonAmount: 5,
               isOffering: false,
-              packageType: 'custom',
+              type: 'custom',
               lessonDurations: [30],
             };
             testValidInputs({ validationMode: 'edit', userRole: 'user' });
@@ -77,7 +77,7 @@ describe('packageEntityValidator', () => {
               },
               lessonAmount: 5,
               isOffering: false,
-              packageType: 'custom',
+              type: 'custom',
               lessonDurations: [30],
             };
             testValidInputs({ validationMode: 'edit', userRole: 'admin' });

@@ -38,8 +38,8 @@ beforeEach(async () => {
       packages: [
         {
           lessonAmount: 6,
-          packageType: PACKAGE_ENTITY_TYPE.CUSTOM,
-          packageName: 'some package name',
+          type: PACKAGE_ENTITY_TYPE.CUSTOM,
+          name: 'some package name',
           isOffering: true,
           lessonDurations: [30, 60],
         },

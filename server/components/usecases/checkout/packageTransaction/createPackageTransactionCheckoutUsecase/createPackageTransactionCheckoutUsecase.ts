@@ -212,9 +212,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const priceData = { currency: DEFAULT_CURRENCY, subTotal, total };
     const item = {
       id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
-      name: this._convertToTitlecase(
-        `Minato Manabu - ${teacherPackage.packageName} / ${teacher.name}`
-      ),
+      name: this._convertToTitlecase(`Minato Manabu - ${teacherPackage.name} / ${teacher.name}`),
       price: total,
       quantity: 1,
     };

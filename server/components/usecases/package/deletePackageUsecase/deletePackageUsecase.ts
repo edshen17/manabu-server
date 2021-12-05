@@ -49,7 +49,7 @@ class DeletePackageUsecase extends AbstractDeleteUsecase<
       _id: packageId,
       dbServiceAccessOptions,
     });
-    const isDefaultPackage = packageToDelete.packageType == PACKAGE_ENTITY_TYPE.DEFAULT;
+    const isDefaultPackage = packageToDelete.type == PACKAGE_ENTITY_TYPE.DEFAULT;
     if (!isDefaultPackage) {
       const deletedPackage = <PackageDoc>await this._dbService.findByIdAndDelete({
         _id: packageId,

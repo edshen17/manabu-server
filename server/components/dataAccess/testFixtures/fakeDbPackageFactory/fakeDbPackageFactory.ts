@@ -18,8 +18,8 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   protected _createFakeBuildParams = async (): Promise<PackageEntityBuildParams> => {
     const fakeBuildParams = {
       lessonAmount: 5,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.LIGHT,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     };
@@ -34,29 +34,29 @@ class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
   private _createFakePackages = () => {
     const lightPackage = this._entity.build({
       lessonAmount: 5,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.LIGHT,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const moderatePackage = this._entity.build({
       lessonAmount: 12,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.MODERATE,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.MODERATE,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const mainichiPackage = this._entity.build({
       lessonAmount: 22,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.MAINICHI,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.MAINICHI,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const customPackage = this._entity.build({
       lessonAmount: 6,
-      packageType: PACKAGE_ENTITY_TYPE.CUSTOM,
-      packageName: 'custom package name',
+      type: PACKAGE_ENTITY_TYPE.CUSTOM,
+      name: 'custom package name',
       isOffering: true,
       lessonDurations: [30, 60, 90],
     });

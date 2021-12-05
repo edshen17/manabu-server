@@ -74,29 +74,29 @@ class TeacherEntity extends AbstractEntity<
   private _createPackages = (): PackageEntityBuildResponse[] => {
     const lightPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 5,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.LIGHT,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.LIGHT,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const moderatePackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 12,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.MODERATE,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.MODERATE,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const mainichiPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 22,
-      packageType: PACKAGE_ENTITY_TYPE.DEFAULT,
-      packageName: PACKAGE_ENTITY_NAME.MAINICHI,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.MAINICHI,
       isOffering: true,
       lessonDurations: [30, 60],
     });
     const customPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 10,
-      packageType: PACKAGE_ENTITY_TYPE.CUSTOM,
-      packageName: PACKAGE_ENTITY_NAME.CUSTOM,
+      type: PACKAGE_ENTITY_TYPE.CUSTOM,
+      name: PACKAGE_ENTITY_NAME.CUSTOM,
       isOffering: false,
       lessonDurations: [30, 60],
     });

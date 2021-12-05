@@ -23,13 +23,13 @@ context('package entity', () => {
           lessonAmount: 5,
           isOffering: true,
           lessonDurations: [],
-          packageName: 'light',
-          packageType: 'default',
+          name: 'light',
+          type: 'default',
         });
         expect(fakePackage.lessonAmount).to.equal(5);
         expect(fakePackage.isOffering).to.equal(true);
         expect(fakePackage.lessonDurations.length).to.equal(0);
-        expect(fakePackage.packageType).to.equal('default');
+        expect(fakePackage.type).to.equal('default');
       });
     });
     context('given invalid inputs', () => {

@@ -175,7 +175,7 @@ describe('packageDbService', () => {
         appointmentDbService.getOverrideDbServiceAccessOptions();
       const updatedPackage = (await packageDbService.findOneAndUpdate({
         searchQuery: { _id: fakePackage._id },
-        updateQuery: { packageType: 'custom' },
+        updateQuery: { type: 'custom' },
         dbServiceAccessOptions,
       })) as PackageDoc;
       const updatedPackageTransaction = await packageTransactionDbService.findOne({
@@ -189,9 +189,9 @@ describe('packageDbService', () => {
         dbServiceAccessOptions: overrideDbServiceAccessOptions,
       });
       expect(updatedPackage).to.not.deep.equal(fakePackage);
-      expect(updatedPackage.packageType).to.equal('custom');
-      expect(updatedPackageTransaction.packageData.packageType).to.equal('custom');
-      expect(updatedAppointment.packageTransactionData.packageData.packageType).to.equal('custom');
+      expect(updatedPackage.type).to.equal('custom');
+      expect(updatedPackageTransaction.packageData.type).to.equal('custom');
+      expect(updatedAppointment.packageTransactionData.packageData.type).to.equal('custom');
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {
@@ -210,7 +210,7 @@ describe('packageDbService', () => {
             searchQuery: {
               _id: '608c09b0f12568001535df9a',
             },
-            updateQuery: { packageType: 'custom' },
+            updateQuery: { type: 'custom' },
             dbServiceAccessOptions,
           });
           expect(updatedPackage).to.equal(null);

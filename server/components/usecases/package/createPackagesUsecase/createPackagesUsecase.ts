@@ -85,7 +85,7 @@ class CreatePackagesUsecase extends AbstractCreateUsecase<
     const { updatedDbPackages, modelToInsert } = props;
     const createdPackages = updatedDbPackages.filter((updatedDbPackage) => {
       return modelToInsert.some((bodyPackage) => {
-        return bodyPackage.packageName == updatedDbPackage.packageName;
+        return bodyPackage.name == updatedDbPackage.name;
       });
     });
     return createdPackages;

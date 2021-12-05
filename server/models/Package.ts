@@ -2,10 +2,10 @@ import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 
 const PackageSchema = createSchema({
   lessonAmount: Type.number({ required: true }),
-  packageDesc: Type.string({ required: false }),
-  packageName: Type.string({ required: true }),
+  description: Type.string({ required: false }),
+  name: Type.string({ required: true }),
   isOffering: Type.boolean({ required: true }),
-  packageType: Type.string({
+  type: Type.string({
     enum: ['default', 'custom'],
     required: true,
   }),
