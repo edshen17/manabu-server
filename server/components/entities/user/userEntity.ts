@@ -1,5 +1,5 @@
 import { DEFAULT_CURRENCY, JWT_SECRET } from '../../../constants';
-import { UserContactMethodEmbed } from '../../../models/User';
+import { UserContactMethodEmbed, UserEmailAlertsEmbed } from '../../../models/User';
 import {
   ENTITY_VALIDATOR_VALIDATE_MODES,
   ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
@@ -30,6 +30,14 @@ type UserEntityBuildParams = {
 
 type UserContactMethod = typeof UserContactMethodEmbed;
 
+type UserEmailAlerts = typeof UserEmailAlertsEmbed;
+
+enum USER_ENTITY_EMAIL_ALERT {
+  APPOINTMENT_CREATION = 'appointmentCreation',
+  APPOINTMENT_UPDATE = 'appointmentUpdate',
+  APPOINTMENT_START_REMINDER = 'appointmentStartReminder',
+}
+
 type UserEntityBuildResponse = {
   name: string;
   email: string;
@@ -45,11 +53,7 @@ type UserEntityBuildResponse = {
   settings: {
     currency: string;
     locale: string;
-    emailAlerts: {
-      appointmentCreation: boolean;
-      appointmentUpdate: boolean;
-      appointmentStartReminder: boolean;
-    };
+    emailAlerts: UserEmailAlerts;
   };
   memberships: string[];
   contactMethods: UserContactMethod[] | [];
@@ -186,4 +190,10 @@ class UserEntity extends AbstractEntity<
   };
 }
 
-export { UserEntity, UserEntityBuildParams, UserEntityBuildResponse, UserContactMethod };
+export {
+  UserEntity,
+  UserEntityBuildParams,
+  UserEntityBuildResponse,
+  UserContactMethod,
+  USER_ENTITY_EMAIL_ALERT,
+};

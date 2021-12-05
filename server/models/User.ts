@@ -9,6 +9,12 @@ const UserContactMethodEmbed = {
   methodType: Type.string({ required: true, enum: ['online', 'offline'] }),
 };
 
+const UserEmailAlertsEmbed = {
+  appointmentCreation: Type.boolean({ required: true }),
+  appointmentUpdate: Type.boolean({ required: true }),
+  appointmentStartReminder: Type.boolean({ required: true }),
+};
+
 const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
   email: Type.string({ required: true, index: true, unique: true }),
@@ -29,11 +35,7 @@ const UserSchema = createSchema({
     locale: Type.string({ required: true }),
     emailAlerts: Type.object({
       required: true,
-    }).of({
-      appointmentCreation: Type.boolean({ required: true }),
-      appointmentUpdate: Type.boolean({ required: true }),
-      appointmentStartReminder: Type.boolean({ required: true }),
-    }),
+    }).of(UserEmailAlertsEmbed),
   }),
   memberships: Type.array({ required: true }).of({
     name: Type.string(),
@@ -65,4 +67,4 @@ UserSchema.index(
 const User = typedModel('User', UserSchema);
 type JoinedUserDoc = ExtractDoc<typeof UserSchema>;
 
-export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed };
+export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed, UserEmailAlertsEmbed };

@@ -1,9 +1,6 @@
 import { ObjectId } from 'mongoose';
 import { IS_PRODUCTION } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
-import { PackageDoc } from '../../../../models/Package';
-import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
@@ -13,15 +10,15 @@ import {
   AppointmentEntityBuildParams,
   AppointmentEntityBuildResponse,
 } from '../../../entities/appointment/appointmentEntity';
+import { USER_ENTITY_EMAIL_ALERT } from '../../../entities/user/userEntity';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import {
   EmailHandler,
-  EmailHandlerSendAlertFromUserIdParams,
   EMAIL_HANDLER_SENDER_ADDRESS,
+  EMAIL_HANDLER_TEMPLATE,
 } from '../../utils/emailHandler/emailHandler';
-import { EMAIL_HANDLER_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
 import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
 
 type OptionalCreateAppointmentsUsecaseInitParams = {
@@ -59,7 +56,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       currentAPIUser,
     });
-    this._sendAppointmentAlertEmail(savedDbAppointments);
+    this._sendTeacherAppointmentCreationEmail(savedDbAppointments);
     const usecaseRes = {
       appointments: savedDbAppointments,
     };
@@ -219,51 +216,23 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _sendAppointmentAlertEmail = async (
+  private _sendTeacherAppointmentCreationEmail = async (
     savedDbAppointments: AppointmentDoc[]
   ): Promise<void> => {
-    const packageTransactionData = savedDbAppointments[0].packageTransactionData;
-    const hostedByData = packageTransactionData.hostedByData;
-    const reservedByData = packageTransactionData.reservedByData;
-    const packageData = packageTransactionData.packageData;
-    const appointmentAmount = savedDbAppointments.length;
-    const isMultipleReservations = appointmentAmount > 1;
-    const alertEmailParams = this._getAlertEmailParams({
-      hostedByData,
-      reservedByData,
-      appointmentAmount,
-      isMultipleReservations,
-      packageData,
-      packageTransactionData,
+    savedDbAppointments.sort((a, b) => {
+      return this._dayjs(b).valueOf() - this._dayjs(a).valueOf();
     });
-    this._emailHandler.sendAlertFromUserId(alertEmailParams);
-  };
-
-  private _getAlertEmailParams = (props: {
-    hostedByData: JoinedUserDoc;
-    reservedByData: JoinedUserDoc;
-    appointmentAmount: number;
-    isMultipleReservations: boolean;
-    packageData: PackageDoc;
-    packageTransactionData: PackageTransactionDoc;
-  }): EmailHandlerSendAlertFromUserIdParams => {
-    const { hostedByData, reservedByData, appointmentAmount, isMultipleReservations } = props;
-    const subject = `You have ${appointmentAmount} new ${
-      isMultipleReservations ? 'appointments' : 'appointment'
-    } from ${reservedByData.name} that ${
-      isMultipleReservations ? 'need' : 'needs'
-    } to be confirmed.`;
-    const alertEmailParams = {
-      userId: hostedByData._id,
-      emailAlertName: EMAIL_HANDLER_TEMPLATE_NAME.APPOINTMENT_CREATION,
+    const appointment = savedDbAppointments[0];
+    this._emailHandler.sendAlertFromUserId({
+      userId: appointment.hostedById,
+      emailAlertName: USER_ENTITY_EMAIL_ALERT.APPOINTMENT_CREATION,
       from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-      subject,
-      mjmlFileName: EMAIL_HANDLER_TEMPLATE_NAME.APPOINTMENT_CREATION,
+      templateName: EMAIL_HANDLER_TEMPLATE.TEACHER_APPOINTMENT_CREATION,
       data: {
-        ...props,
+        name: appointment.packageTransactionData.hostedByData.name,
+        appointment,
       },
-    };
-    return alertEmailParams;
+    });
   };
 
   protected _initTemplate = async (

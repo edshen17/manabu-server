@@ -15,8 +15,11 @@ import { ConvertStringToObjectId } from '../../../entities/utils/convertStringTo
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
-import { EmailHandler, EMAIL_HANDLER_SENDER_ADDRESS } from '../../utils/emailHandler/emailHandler';
-import { EMAIL_HANDLER_TEMPLATE_NAME } from '../../utils/emailHandler/templates';
+import {
+  EmailHandler,
+  EMAIL_HANDLER_SENDER_ADDRESS,
+  EMAIL_HANDLER_TEMPLATE,
+} from '../../utils/emailHandler/emailHandler';
 import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 
@@ -87,7 +90,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     }
     if (!user.isEmailVerified) {
       this._sendVerificationEmail(userEntity);
-      this._sendInternalEmail({ userEntity, isTeacherApp });
+      this._sendInternalEmail({ user, isTeacherApp });
     }
     const cookies = this.splitLoginCookies(user);
     const redirectUrl = this._redirectUrlBuilder
@@ -172,29 +175,31 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     );
   };
 
-  private _sendVerificationEmail = (userEntity: any): void => {
-    const { name, verificationToken } = userEntity;
+  private _sendVerificationEmail = (userEntity: UserEntityBuildResponse): void => {
+    const { name, verificationToken, settings, email } = userEntity;
+    const { locale } = settings;
     this._emailHandler.send({
-      to: userEntity.email,
+      to: email,
       from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-      subject: 'Manabu email verification',
-      mjmlFileName: EMAIL_HANDLER_TEMPLATE_NAME.EMAIL_VERIFICATION,
-      data: { name, verificationToken },
+      templateName: EMAIL_HANDLER_TEMPLATE.EMAIL_VERIFICATION,
+      data: {
+        name,
+        verificationToken,
+      },
+      locale,
     });
   };
 
-  private _sendInternalEmail = (props: { userEntity: any; isTeacherApp: boolean }): void => {
-    const { userEntity, isTeacherApp } = props;
+  private _sendInternalEmail = (props: { user: JoinedUserDoc; isTeacherApp: boolean }): void => {
+    const { user, isTeacherApp } = props;
     const userType = isTeacherApp ? 'teacher' : 'user';
-    const { name, email } = userEntity;
     this._emailHandler.send({
       to: 'manabulessons@gmail.com',
       from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-      subject: `A new ${userType} signed up`,
-      mjmlFileName: EMAIL_HANDLER_TEMPLATE_NAME.INTERNAL,
+      templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_NEW_USER,
       data: {
-        name,
-        email,
+        name: 'Admin',
+        user,
         userType,
       },
     });

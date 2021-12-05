@@ -29,6 +29,10 @@ const InternalNewUser = {
       type: Object,
       required: true,
     },
+    userType: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {};

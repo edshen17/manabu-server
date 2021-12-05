@@ -19,7 +19,7 @@ type EmailHandlerSendAlertFromUserIdParams = {
 type SendParams = {
   from: EMAIL_HANDLER_SENDER_ADDRESS.SUPPORT | EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY;
   to: string | string[];
-  subject: string;
+  subject?: string;
   templateName: string;
   data: StringKeyObject;
   locale?: string;
@@ -87,7 +87,7 @@ class EmailHandler {
         name: 'Minato Manabu',
         email: from,
       },
-      subject,
+      subject: subject || this._getSubject({ data, templateName }),
       html,
     };
     if (IS_PRODUCTION) {
@@ -111,6 +111,17 @@ class EmailHandler {
     });
   };
 
+  private _getSubject = (props: { templateName: string; data: StringKeyObject }): string => {
+    const { templateName, data } = props;
+    const camlizedTemplateName = templateName
+      .replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr, idx) =>
+        idx === 0 ? ltr.toLowerCase() : ltr.toUpperCase()
+      )
+      .replace(/\s+/g, '');
+    const subject = i18next.t(`${camlizedTemplateName}.subject`, data);
+    return subject;
+  };
+
   private _createHtmlToRender = async (props: {
     templateName: string;
     data: StringKeyObject;
@@ -131,7 +142,6 @@ class EmailHandler {
       components,
     });
     const mjml = await this._createRenderer().renderToString(app);
-    console.log(mjml);
     const html = this._mjml(mjml).html;
     return html;
   };

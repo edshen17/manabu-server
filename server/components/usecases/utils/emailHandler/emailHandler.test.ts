@@ -38,7 +38,6 @@ describe('emailHandler', () => {
       await emailHandler.send({
         to: 'greencopter4444@gmail.com',
         from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-        subject: 'test subject',
         templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_NEW_USER,
         data: {
           name: 'test',
@@ -46,6 +45,7 @@ describe('emailHandler', () => {
           balanceTransaction: fakeBalanceTransaction,
           verificationToken: 'some verification token',
           user: fakeUser,
+          userType: fakeUser.role,
         },
         locale: 'ja',
       });
