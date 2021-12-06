@@ -1,4 +1,9 @@
-import { IS_PRODUCTION, MANABU_ADMIN_ID, MANABU_ADMIN_PKG_ID } from '../../../../constants';
+import {
+  IS_PRODUCTION,
+  MANABU_ADMIN_EMAIL,
+  MANABU_ADMIN_ID,
+  MANABU_ADMIN_PKG_ID,
+} from '../../../../constants';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
@@ -194,7 +199,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { user, isTeacherApp } = props;
     const userType = isTeacherApp ? 'teacher' : 'user';
     this._emailHandler.send({
-      to: 'manabulessons@gmail.com',
+      to: MANABU_ADMIN_EMAIL,
       from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
       templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_NEW_USER,
       data: {

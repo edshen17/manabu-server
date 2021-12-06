@@ -1,4 +1,3 @@
-import cloneDeep from 'clone-deep';
 import dayjs from 'dayjs';
 import { makeBalanceTransactionDbService } from '../../../dataAccess/services/balanceTransaction';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
@@ -15,7 +14,6 @@ const makeEndPackageTransactionScheduleTask = new EndPackageTransactionScheduleT
   makeBalanceTransactionDbService,
   makeBalanceTransactionEntity,
   makePaypalPaymentService,
-  cloneDeep,
   currency,
 });
 

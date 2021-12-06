@@ -3,6 +3,7 @@ import { StringKeyObject } from '../types/custom';
 const DEFAULT_CURRENCY = 'SGD';
 const MANABU_ADMIN_ID = '60538825a36b9c57a8b19978';
 const MANABU_ADMIN_PKG_ID = '605388cca36b9c57a8b1997a';
+const MANABU_ADMIN_EMAIL = 'manabulessons@gmail.com';
 const PAYMENT_GATEWAY_RATE: StringKeyObject = {
   PAYPAL: 0.03,
   STRIPE: 0.01,
@@ -57,6 +58,7 @@ export {
   G_CLIENTID,
   GOOGLE_CLIENT_SECRET,
   JWT_SECRET,
+  MANABU_ADMIN_EMAIL,
   MANABU_EMAIL_NOREPLY_PASS,
   MANABU_EMAIL_SUPPORT_PASS,
   MONGO_HOST,

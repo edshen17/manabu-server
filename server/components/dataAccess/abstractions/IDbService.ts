@@ -99,6 +99,7 @@ interface IDbService<OptionalDbServiceInitParams, DbServiceResponse> {
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
   getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;
+  getSelfDbServiceAccessOptions: () => DbServiceAccessOptions;
   getOverrideDbServiceAccessOptions: () => DbServiceAccessOptions;
   startSession: () => Promise<ClientSession>;
 }

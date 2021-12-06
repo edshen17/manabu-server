@@ -28,7 +28,6 @@ type OptionalEndPackageTransactionScheduleTaskInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeBalanceTransactionEntity: Promise<BalanceTransactionEntity>;
   makePaypalPaymentService: Promise<PaypalPaymentService>;
-  cloneDeep: any;
   currency: any;
 };
 
@@ -72,7 +71,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _userDbService!: UserDbService;
   private _balanceTransactionEntity!: BalanceTransactionEntity;
   private _paypalPaymentService!: PaypalPaymentService;
-  private _cloneDeep: any;
   private _currency: any;
 
   public execute = async (): Promise<EndPackageTransactionScheduleTaskResponse> => {
@@ -444,7 +442,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       makeUserDbService,
       makeBalanceTransactionEntity,
       makePaypalPaymentService,
-      cloneDeep,
       currency,
     } = optionalScheduleTaskInitParams;
     this._packageTransactionDbService = await makePackageTransactionDbService;
@@ -452,7 +449,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     this._userDbService = await makeUserDbService;
     this._balanceTransactionEntity = await makeBalanceTransactionEntity;
     this._paypalPaymentService = await makePaypalPaymentService;
-    this._cloneDeep = cloneDeep;
     this._currency = currency;
   };
 }

@@ -1,8 +1,13 @@
 import { Dayjs } from 'dayjs';
+import { MANABU_ADMIN_EMAIL } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbService } from '../../../dataAccess/services/appointment/appointmentDbService';
-import { EmailHandler } from '../../../usecases/utils/emailHandler/emailHandler';
+import {
+  EmailHandler,
+  EMAIL_HANDLER_SENDER_ADDRESS,
+  EMAIL_HANDLER_TEMPLATE,
+} from '../../../usecases/utils/emailHandler/emailHandler';
 import { AbstractScheduleTask } from '../../abstractions/AbstractScheduleTask';
 import { ScheduleTaskInitParams } from '../../abstractions/IScheduleTask';
 
@@ -40,16 +45,16 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
       now,
       dbServiceAccessOptions,
     });
-    // const overdueAppointments = await this._getOverdueAppointments({
-    //   now,
-    //   dbServiceAccessOptions,
-    // });
+    const overdueAppointments = await this._getOverdueAppointments({
+      now,
+      dbServiceAccessOptions,
+    });
     for (const appointment of confirmedAppointments) {
       await this._endAppointment({ appointment, now, dbServiceAccessOptions });
     }
-    // for (const appointment of overdueAppointments) {
-    //   await this._alertAdmin(appointment);
-    // }
+    for (const appointment of overdueAppointments) {
+      await this._sendExpiredAppointmentAlert(appointment);
+    }
   };
 
   private _getConfirmedAppointments = async (
@@ -101,6 +106,18 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
         },
       });
     }
+  };
+
+  private _sendExpiredAppointmentAlert = async (appointment: AppointmentDoc): Promise<void> => {
+    await this._emailHandler.send({
+      to: MANABU_ADMIN_EMAIL,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_EXPIRED_APPOINTMENT,
+      data: {
+        name: 'Admin',
+        appointment,
+      },
+    });
   };
 
   protected _initTemplate = async (

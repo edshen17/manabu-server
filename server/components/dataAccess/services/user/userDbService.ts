@@ -1,6 +1,7 @@
 import { JoinedUserDoc } from '../../../../models/User';
+import { StringKeyObject } from '../../../../types/custom';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import { DbServiceFindOneParams, DB_SERVICE_COLLECTIONS } from '../../abstractions/IDbService';
+import { DB_SERVICE_COLLECTIONS } from '../../abstractions/IDbService';
 
 type OptionalUserDbServiceInitParams = {
   comparePassword: any;
@@ -45,23 +46,30 @@ class UserDbService extends AbstractDbService<
     };
   };
 
-  public authenticateUser = async (
-    dbServiceParams: DbServiceFindOneParams,
-    inputtedPassword: string
-  ): Promise<any> => {
-    const userData = await this.findOne(dbServiceParams);
-    if (!userData) {
-      return null;
+  public authenticateUser = async (props: {
+    searchQuery: StringKeyObject;
+    password: string;
+  }): Promise<JoinedUserDoc | undefined> => {
+    const { searchQuery, password } = props;
+    const overrideUser = await this.findOne({
+      searchQuery,
+      dbServiceAccessOptions: this.getOverrideDbServiceAccessOptions(),
+    });
+    if (!overrideUser) {
+      return undefined;
     }
-    if (!userData.password) {
+    if (!overrideUser.password) {
       throw new Error(
         'It seems that you signed up previously through a third-party service like Google.'
       );
     }
-    const isPasswordValid = this._comparePassword(inputtedPassword, userData.password);
+    const isPasswordValid = this._comparePassword(password, overrideUser.password);
     if (isPasswordValid) {
-      const { password, ...partialuserDataWithoutPassword } = userData;
-      return partialuserDataWithoutPassword;
+      const user = await this.findOne({
+        searchQuery,
+        dbServiceAccessOptions: this.getSelfDbServiceAccessOptions(),
+      });
+      return user;
     } else {
       throw new Error('Username or password incorrect.');
     }

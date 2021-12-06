@@ -1,4 +1,5 @@
 import { JoinedUserDoc } from '../../../../models/User';
+import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   UserDbService,
@@ -81,16 +82,11 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   }): Promise<LoginUserUsecaseResponse> => {
     const { body, dbServiceAccessOptions, query } = props;
     const { email, password } = body || {};
-    const dbServiceAccessOptionsCopy = this._cloneDeep(dbServiceAccessOptions);
-    dbServiceAccessOptionsCopy.isOverrideView = true;
     const dbService = <UserDbService>this._dbService;
-    const user = await dbService.authenticateUser(
-      {
-        searchQuery: { email },
-        dbServiceAccessOptions: dbServiceAccessOptionsCopy,
-      },
-      password
-    );
+    const user = await dbService.authenticateUser({
+      searchQuery: { email },
+      password,
+    });
     const handleNoDbUser = () => {
       throw new Error('Username or password incorrect.');
     };
@@ -104,7 +100,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   };
 
   private _loginUser = async (props: {
-    user: JoinedUserDoc;
+    user?: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     query: any;
     handleNoDbUser: () => any;
@@ -132,16 +128,16 @@ class LoginUserUsecase extends AbstractCreateUsecase<
 
   private _createLoginResponse = (user: JoinedUserDoc): LoginUserUsecaseResponse => {
     return {
-      user: user,
+      user,
       cookies: this._createUserUsecase.splitLoginCookies(user),
       redirectUrl: this._CLIENT_DASHBOARD_URL,
     };
   };
 
   private _handleGoogleLogin = async (props: {
-    query: any;
+    query: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    body: any;
+    body: StringKeyObject;
     controllerData: ControllerData;
   }): Promise<LoginUserUsecaseResponse> => {
     const { dbServiceAccessOptions, body, controllerData, query } = props;
@@ -171,7 +167,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     return googleLoginRes;
   };
 
-  private _getGoogleUserData = async (tokens: any): Promise<any> => {
+  private _getGoogleUserData = async (tokens: StringKeyObject): Promise<StringKeyObject> => {
     this._oauth2Client.setCredentials({
       access_token: tokens.access_token,
     });

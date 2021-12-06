@@ -231,6 +231,16 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
     return dbServiceAccessOptions;
   };
 
+  public getSelfDbServiceAccessOptions = (): DbServiceAccessOptions => {
+    const dbServiceAccessOptions: DbServiceAccessOptions = {
+      isCurrentAPIUserPermitted: true,
+      currentAPIUserRole: 'user',
+      isSelf: true,
+      isOverrideView: false,
+    };
+    return dbServiceAccessOptions;
+  };
+
   private _clearCacheDependencies = async (): Promise<void> => {
     const cacheDependencies = this._getCacheDependencies();
     await this._cacheDbService.clearHashKey(this._dbModelName);
