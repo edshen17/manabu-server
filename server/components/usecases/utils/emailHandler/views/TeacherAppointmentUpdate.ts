@@ -59,7 +59,7 @@ const TeacherAppointmentUpdate = {
           },
           {
             key: self.$t('common.table.lessonPlan'),
-            value: convertToTitlecase(pkg.packageName),
+            value: convertToTitlecase(pkg.name),
           },
           {
             key: self.$t('common.table.lessonDetails'),
