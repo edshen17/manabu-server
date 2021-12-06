@@ -9,6 +9,8 @@ import hpp from 'hpp';
 import http from 'http';
 import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler';
 import { DbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
+import { makeScheduler } from './components/schedulers';
+import { Scheduler } from './components/schedulers/scheduler';
 import { IS_PRODUCTION } from './constants';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
@@ -22,6 +24,7 @@ const corsConfig = {
   optionsSuccessStatus: 204,
 };
 let dbConnectionHandler: DbConnectionHandler;
+let scheduler: Scheduler;
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -63,13 +66,16 @@ if (IS_PRODUCTION) {
 app.use(express.static('public'));
 const port = 5000;
 
-makeDbConnectionHandler.then(async (dbHandler) => {
-  dbConnectionHandler = dbHandler;
+(async () => {
+  dbConnectionHandler = await makeDbConnectionHandler;
+  scheduler = await makeScheduler;
   await dbConnectionHandler.connect();
-});
+  await scheduler.start();
+})();
 
 const gracefulShutdown = async (msg: string, callback: () => unknown) => {
   await dbConnectionHandler.stop();
+  await scheduler.stop();
   console.log(`Mongoose disconnected through ${msg}`);
   callback();
 };

@@ -8,6 +8,7 @@ type RequiredSchedulerInitParams = {
 interface IScheduler<OptionalSchedulerInitParams> {
   init: (initParams: SchedulerInitParams<OptionalSchedulerInitParams>) => Promise<this>;
   start: () => Promise<void>;
+  stop: () => Promise<void>;
 }
 
 export { IScheduler, SchedulerInitParams };
