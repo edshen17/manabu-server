@@ -31,30 +31,43 @@
     }
   },
   "studentAppointmentUpdate": {
-    "body": "You lesson with {{teacherName}} has been updated."
+    "subject": "Your lesson has been updated",
+    "body": "Your lesson with {{teacherName}} has been updated."
   },
   "teacherAppointmentCreation": {
+    "subject": "You have a new lesson",
     "body": "{{studentName}} reserved a lesson with you."
   },
   "internalExpiredAppointment": {
+    "subject": "Overdue lesson alert",
     "body": "{{teacherName}} had an overdue and unconfirmed lesson with {{studentName}}."
   },
-  "studentPackageTransaction": {
+  "studentPackageTransactionCreation": {
+    "subject": "Thank you for your purchase",
     "body": "Thank you for your purchase! Below are your lesson plan details."
   },
   "teacherAppointmentReminder": {
-    "body": "This is a friendly reminder that you have an appointment with {{studentName}} soon."
+    "subject": "You have a lesson soon",
+    "body": "This is a friendly reminder that you have an lesson with {{studentName}} soon."
   },
   "studentAppointmentReminder": {
-    "body": "This is a friendly reminder that you have an appointment with {{teacherName}} soon."
+    "subject": "You have a lesson soon",
+    "body": "This is a friendly reminder that you have an lesson with {{teacherName}} soon."
   },
   "teacherAppointmentUpdate": {
-    "body": "You lesson with {{studentName}} has been updated."
+    "subject": "Your lesson has been updated",
+    "body": "Your lesson with {{studentName}} has been updated."
   },
   "emailVerification": {
+    "subject": "Please verify your email",
     "body": "Thank you for signing up to Manabu! To complete your registration, please verify your email address."
   },
   "internalNewUser": {
+    "subject": "New user alert",
     "body": "A new {{userType}} signed up!"
+  },
+  "teacherPackageTransactionCreation": {
+    "subject": "A student purchased a lesson plan from you",
+    "body": "{{studentName}} purchased a lesson plan from you. Below are the lesson plan details."
   }
 }

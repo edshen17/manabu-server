@@ -42,7 +42,7 @@
     "subject": "Overdue lesson alert",
     "body": "{{teacherName}} had an overdue and unconfirmed lesson with {{studentName}}."
   },
-  "studentPackageTransaction": {
+  "studentPackageTransactionCreation": {
     "subject": "Thank you for your purchase",
     "body": "Thank you for your purchase! Below are your lesson plan details."
   },
@@ -65,5 +65,9 @@
   "internalNewUser": {
     "subject": "New user alert",
     "body": "A new {{userType}} signed up!"
+  },
+  "teacherPackageTransactionCreation": {
+    "subject": "A student purchased a lesson plan from you",
+    "body": "{{studentName}} purchased a lesson plan from you. Below are the lesson plan details."
   }
 }

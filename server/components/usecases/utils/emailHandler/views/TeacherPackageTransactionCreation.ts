@@ -8,15 +8,15 @@ import { ViewLessonPlanButton } from '../components/Buttons/ViewLessonPlanButton
 import { Email } from '../components/Email';
 import { EmailTable } from '../components/EmailTable';
 
-const StudentPackageTransaction = {
+const TeacherPackageTransactionCreation = {
   template: `
     <email :name="name">
-      <body-text>{{ $t("studentPackageTransaction.body") }}</body-text>
+      <body-text>{{ $t("teacherPackageTransactionCreation.body", processedPackageTransactionData) }}</body-text>
       <email-table :rowData="rowData"/>
       <view-lesson-plan-button :packageTransaction="packageTransaction"/>
     </email>
   `,
-  name: 'StudentPackageTransaction',
+  name: 'TeacherPackageTransactionCreation',
   components: {
     Email,
     BodyText,
@@ -37,6 +37,15 @@ const StudentPackageTransaction = {
     return {};
   },
   computed: {
+    processedPackageTransactionData: {
+      get(): StringKeyObject {
+        const balanceTransaction: BalanceTransactionDoc = (this as any).balanceTransaction;
+        const packageTransaction: PackageTransactionDoc = balanceTransaction.packageTransactionData;
+        return {
+          studentName: packageTransaction.reservedByData.name,
+        };
+      },
+    },
     rowData: {
       get(): StringKeyObject[] {
         const self = this as any;
@@ -45,8 +54,8 @@ const StudentPackageTransaction = {
         const pkg: PackageDoc = packageTransaction.packageData;
         const rowData = [
           {
-            key: self.$t('common.table.teacherName'),
-            value: packageTransaction.hostedByData.name,
+            key: self.$t('common.table.studentName'),
+            value: packageTransaction.reservedByData.name,
           },
           {
             key: self.$t('common.table.lessonPlan'),
@@ -77,4 +86,4 @@ const StudentPackageTransaction = {
   },
 };
 
-export { StudentPackageTransaction };
+export { TeacherPackageTransactionCreation };

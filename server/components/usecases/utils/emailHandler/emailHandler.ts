@@ -29,12 +29,13 @@ enum EMAIL_HANDLER_TEMPLATE {
   STUDENT_APPOINTMENT_UPDATE = 'StudentAppointmentUpdate',
   TEACHER_APPOINTMENT_CREATION = 'TeacherAppointmentCreation',
   INTERNAL_EXPIRED_APPOINTMENT = 'InternalExpiredAppointment',
-  STUDENT_PACKAGE_TRANSACTION = 'StudentPackageTransaction',
+  STUDENT_PACKAGE_TRANSACTION_CREATION = 'StudentPackageTransactionCreation',
   TEACHER_APPOINTMENT_REMINDER = 'TeacherAppointmentReminder',
   STUDENT_APPOINTMENT_REMINDER = 'StudentAppointmentReminder',
   TEACHER_APPOINTMENT_UPDATE = 'TeacherAppointmentUpdate',
   EMAIL_VERIFICATION = 'EmailVerification',
   INTERNAL_NEW_USER = 'InternalNewUser',
+  TEACHER_PACKAGE_TRANSACTION_CREATION = 'TeacherPackageTransactionCreation',
 }
 
 class EmailHandler {

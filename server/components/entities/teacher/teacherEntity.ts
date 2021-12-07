@@ -38,6 +38,10 @@ enum TEACHER_ENTITY_TYPE {
   UNLICENSED = 'unlicensed',
 }
 
+enum TEACHER_ENTITY_EMAIL_ALERT {
+  PACKAGE_TRANSACTION_CREATION = 'packageTransactionCreation',
+}
+
 class TeacherEntity extends AbstractEntity<
   OptionalTeacherEntityInitParams,
   TeacherEntityBuildParams,
@@ -111,4 +115,10 @@ class TeacherEntity extends AbstractEntity<
   };
 }
 
-export { TeacherEntity, TeacherEntityBuildParams, TeacherEntityBuildResponse, TEACHER_ENTITY_TYPE };
+export {
+  TeacherEntity,
+  TeacherEntityBuildParams,
+  TeacherEntityBuildResponse,
+  TEACHER_ENTITY_TYPE,
+  TEACHER_ENTITY_EMAIL_ALERT,
+};

@@ -17,7 +17,10 @@ import {
   PackageTransactionEntity,
   PackageTransactionEntityBuildParams,
 } from '../../../entities/packageTransaction/packageTransactionEntity';
-import { TEACHER_ENTITY_TYPE } from '../../../entities/teacher/teacherEntity';
+import {
+  TEACHER_ENTITY_EMAIL_ALERT,
+  TEACHER_ENTITY_TYPE,
+} from '../../../entities/teacher/teacherEntity';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import {
@@ -26,6 +29,11 @@ import {
 } from '../../balanceTransaction/createBalanceTransactionsUsecase/createBalanceTransactionsUsecase';
 import { CHECKOUT_TOKEN_HASH_KEY } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
 import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
+import {
+  EmailHandler,
+  EMAIL_HANDLER_SENDER_ADDRESS,
+  EMAIL_HANDLER_TEMPLATE,
+} from '../../utils/emailHandler/emailHandler';
 import { ExchangeRateHandler } from '../../utils/exchangeRateHandler/exchangeRateHandler';
 import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 
@@ -37,6 +45,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
   makeCreateBalanceTransactionsUsecase: Promise<CreateBalanceTransactionsUsecase>;
   makeControllerDataBuilder: ControllerDataBuilder;
+  makeEmailHandler: Promise<EmailHandler>;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
@@ -63,6 +72,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _exchangeRateHandler!: ExchangeRateHandler;
   private _createBalanceTransactionsUsecase!: CreateBalanceTransactionsUsecase;
   private _controllerDataBuilder!: ControllerDataBuilder;
+  private _emailHandler!: EmailHandler;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -151,6 +161,43 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     );
   };
 
+  private _sendPackageTransactionCreationEmails = (
+    balanceTransaction: BalanceTransactionDoc
+  ): void => {
+    this._sendStudentPackageTransactionCreationEmail(balanceTransaction);
+    this._sendTeacherPackageTransactionCreationEmail(balanceTransaction);
+  };
+
+  private _sendStudentPackageTransactionCreationEmail = (
+    balanceTransaction: BalanceTransactionDoc
+  ) => {
+    const packageTransaction = balanceTransaction.packageTransactionData;
+    this._emailHandler.sendAlertFromUserId({
+      userId: packageTransaction.reservedById,
+      emailAlertName: TEACHER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      templateName: EMAIL_HANDLER_TEMPLATE.STUDENT_PACKAGE_TRANSACTION_CREATION,
+      data: {
+        balanceTransaction,
+      },
+    });
+  };
+
+  private _sendTeacherPackageTransactionCreationEmail = (
+    balanceTransaction: BalanceTransactionDoc
+  ): void => {
+    const packageTransaction = balanceTransaction.packageTransactionData;
+    this._emailHandler.sendAlertFromUserId({
+      userId: packageTransaction.hostedById,
+      emailAlertName: TEACHER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      templateName: EMAIL_HANDLER_TEMPLATE.TEACHER_PACKAGE_TRANSACTION_CREATION,
+      data: {
+        balanceTransaction,
+      },
+    });
+  };
+
   private _createBalanceTransactions = async (props: {
     packageTransaction: PackageTransactionDoc;
     balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
@@ -180,10 +227,11 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         session,
         packageTransaction,
       });
-    const balanceTransactions = await this._createBalanceTransactionsUsecase.makeRequest(
+    const balanceTransactionRes = await this._createBalanceTransactionsUsecase.makeRequest(
       createBalanceTransactionsControllerData
     );
-    return balanceTransactions;
+    this._sendPackageTransactionCreationEmails(balanceTransactionRes.balanceTransactions[0]);
+    return balanceTransactionRes;
   };
 
   private _getUserDataFromPackageTransaction = async (props: {
@@ -441,6 +489,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeExchangeRateHandler,
       makeCreateBalanceTransactionsUsecase,
       makeControllerDataBuilder,
+      makeEmailHandler,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -449,6 +498,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._exchangeRateHandler = await makeExchangeRateHandler;
     this._createBalanceTransactionsUsecase = await makeCreateBalanceTransactionsUsecase;
     this._controllerDataBuilder = makeControllerDataBuilder;
+    this._emailHandler = await makeEmailHandler;
   };
 }
 
