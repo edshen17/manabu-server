@@ -8,6 +8,7 @@ import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makePackageTransactionQueryValidator } from '../../../validators/packageTransaction/query';
 import { makeCreateBalanceTransactionsUsecase } from '../../balanceTransaction/createBalanceTransactionsUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
+import { makeEmailHandler } from '../../utils/emailHandler';
 import { makeExchangeRateHandler } from '../../utils/exchangeRateHandler';
 import { makeJwtHandler } from '../../utils/jwtHandler';
 import { CreatePackageTransactionUsecase } from './createPackageTransactionUsecase';
@@ -25,6 +26,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeExchangeRateHandler,
   makeCreateBalanceTransactionsUsecase,
   makeControllerDataBuilder,
+  makeEmailHandler,
 });
 
 export { makeCreatePackageTransactionUsecase };

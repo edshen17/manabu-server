@@ -19,7 +19,7 @@ const TeacherSchema = createSchema({
     isHidden: Type.boolean({ required: true }),
     emailAlerts: Type.object({
       required: true,
-    }).of({ packageTransactionCreation: Type.boolean() }),
+    }).of({}),
     payoutData: { email: Type.string({ required: false }) },
   }),
   teacherType: Type.string({

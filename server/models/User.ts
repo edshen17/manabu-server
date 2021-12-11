@@ -10,6 +10,7 @@ const UserContactMethodEmbed = {
 };
 
 const UserEmailAlertsEmbed = {
+  packageTransactionCreation: Type.boolean({ required: true }),
   appointmentCreation: Type.boolean({ required: true }),
   appointmentUpdate: Type.boolean({ required: true }),
   appointmentStartReminder: Type.boolean({ required: true }),

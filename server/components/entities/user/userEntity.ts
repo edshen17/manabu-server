@@ -36,6 +36,7 @@ enum USER_ENTITY_EMAIL_ALERT {
   APPOINTMENT_CREATION = 'appointmentCreation',
   APPOINTMENT_UPDATE = 'appointmentUpdate',
   APPOINTMENT_START_REMINDER = 'appointmentStartReminder',
+  PACKAGE_TRANSACTION_CREATION = 'packageTransactionCreation',
 }
 
 type UserEntityBuildResponse = {
@@ -131,6 +132,7 @@ class UserEntity extends AbstractEntity<
           appointmentCreation: true,
           appointmentUpdate: true,
           appointmentStartReminder: true,
+          packageTransactionCreation: true,
         },
       },
       memberships: [],

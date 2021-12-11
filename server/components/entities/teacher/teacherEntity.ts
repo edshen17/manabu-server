@@ -23,7 +23,7 @@ type TeacherEntityBuildResponse = {
   priceData: { hourlyRate: number; currency: string };
   settings: {
     isHidden: boolean;
-    emailAlerts: { packageTransactionCreation: boolean };
+    emailAlerts: {};
     payoutData: { email: string };
   };
   tags: string[];
@@ -36,10 +36,6 @@ type TeacherEntityBuildResponse = {
 enum TEACHER_ENTITY_TYPE {
   LICENSED = 'licensed',
   UNLICENSED = 'unlicensed',
-}
-
-enum TEACHER_ENTITY_EMAIL_ALERT {
-  PACKAGE_TRANSACTION_CREATION = 'packageTransactionCreation',
 }
 
 class TeacherEntity extends AbstractEntity<
@@ -59,7 +55,7 @@ class TeacherEntity extends AbstractEntity<
       applicationStatus: 'pending',
       settings: {
         isHidden: false,
-        emailAlerts: { packageTransactionCreation: true },
+        emailAlerts: {},
         payoutData: { email: '' },
       },
       teacherType: TEACHER_ENTITY_TYPE.UNLICENSED,
@@ -115,10 +111,4 @@ class TeacherEntity extends AbstractEntity<
   };
 }
 
-export {
-  TeacherEntity,
-  TeacherEntityBuildParams,
-  TeacherEntityBuildResponse,
-  TEACHER_ENTITY_TYPE,
-  TEACHER_ENTITY_EMAIL_ALERT,
-};
+export { TeacherEntity, TeacherEntityBuildParams, TeacherEntityBuildResponse, TEACHER_ENTITY_TYPE };

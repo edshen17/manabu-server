@@ -17,10 +17,8 @@ import {
   PackageTransactionEntity,
   PackageTransactionEntityBuildParams,
 } from '../../../entities/packageTransaction/packageTransactionEntity';
-import {
-  TEACHER_ENTITY_EMAIL_ALERT,
-  TEACHER_ENTITY_TYPE,
-} from '../../../entities/teacher/teacherEntity';
+import { TEACHER_ENTITY_TYPE } from '../../../entities/teacher/teacherEntity';
+import { USER_ENTITY_EMAIL_ALERT } from '../../../entities/user/userEntity';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import {
@@ -174,7 +172,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const packageTransaction = balanceTransaction.packageTransactionData;
     this._emailHandler.sendAlertFromUserId({
       userId: packageTransaction.reservedById,
-      emailAlertName: TEACHER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
+      emailAlertName: USER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
       from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
       templateName: EMAIL_HANDLER_TEMPLATE.STUDENT_PACKAGE_TRANSACTION_CREATION,
       data: {
@@ -189,7 +187,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const packageTransaction = balanceTransaction.packageTransactionData;
     this._emailHandler.sendAlertFromUserId({
       userId: packageTransaction.hostedById,
-      emailAlertName: TEACHER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
+      emailAlertName: USER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
       from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
       templateName: EMAIL_HANDLER_TEMPLATE.TEACHER_PACKAGE_TRANSACTION_CREATION,
       data: {

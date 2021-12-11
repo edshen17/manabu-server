@@ -22,6 +22,7 @@ class UserEntityValidator extends AbstractEntityValidator {
           appointmentCreation: this._joi.boolean(),
           appointmentUpdate: this._joi.boolean(),
           appointmentStartReminder: this._joi.boolean(),
+          packageTransactionCreation: this._joi.boolean(),
         },
       }),
       memberships: this._joi.array().items({

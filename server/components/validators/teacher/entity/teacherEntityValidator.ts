@@ -16,9 +16,7 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       applicationStatus: this._joi.string().valid('pending', 'approved', 'rejected'),
       settings: this._joi.object({
         isHidden: this._joi.boolean(),
-        emailAlerts: {
-          packageTransactionCreation: this._joi.boolean(),
-        },
+        emailAlerts: {},
         payoutData: this._joi.object({
           email: this._joi.string().email().max(256).allow(''),
         }),
