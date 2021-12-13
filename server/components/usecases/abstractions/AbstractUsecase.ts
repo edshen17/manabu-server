@@ -86,9 +86,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
   }): Promise<boolean> => {
     const { params, currentAPIUser, endpointPath } = props;
     const isSameUserId: boolean =
-      params.userId && currentAPIUser.userId && params.userId == currentAPIUser.userId;
+      params.userId && currentAPIUser.userId && params.userId == currentAPIUser.userId.toString();
     const isSameTeacherId: boolean =
-      params.teacherId && currentAPIUser.teacherId && params.teacherId == currentAPIUser.teacherId;
+      params.teacherId &&
+      currentAPIUser.teacherId &&
+      params.teacherId == currentAPIUser.teacherId.toString();
     const isSelfRoute = endpointPath.includes('self');
     const isAdmin = currentAPIUser.role == 'admin';
     const isResourceOwner = await this._isResourceOwner({ currentAPIUser, params });

@@ -60,14 +60,7 @@ class GetAvailableTimesUsecase extends AbstractGetUsecase<
     const { userId, query } = props;
     const { startDate, endDate } = query;
     const searchQuery = {
-      $or: [
-        {
-          reservedById: userId,
-        },
-        {
-          hostedById: userId,
-        },
-      ],
+      hostedById: userId,
       startDate: {
         $gte: this._dayjs(startDate).toDate() || this._dayjs().startOf('week').toDate(),
       },
