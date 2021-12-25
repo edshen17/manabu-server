@@ -22,7 +22,7 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         }),
       }),
       teacherType: this._joi.string().valid('unlicensed', 'licensed').allow(''),
-      licensePathUrl: this._joi.string().uri().allow('').max(2048),
+      licenseUrl: this._joi.string().uri().allow('').max(2048),
       priceData: this._joi.object({
         hourlyRate: this._joi.number().min(0),
         currency: this._joi.string().max(5),

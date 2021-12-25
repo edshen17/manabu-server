@@ -35,13 +35,13 @@ describe('editTeacherController', () => {
         })
         .params({ teacherId: fakeTeacher.teacherData!._id })
         .body({
-          licensePathUrl: 'https://fakeimg.pl/300/',
+          licenseUrl: 'https://fakeimg.pl/300/',
         })
         .build();
       const editTeacherRes = await editTeacherController.makeRequest(editTeacherHttpRequest);
       expect(editTeacherRes.statusCode).to.equal(200);
       if ('user' in editTeacherRes.body) {
-        expect(editTeacherRes.body.user.teacherData!.licensePathUrl).to.equal(
+        expect(editTeacherRes.body.user.teacherData!.licenseUrl).to.equal(
           'https://fakeimg.pl/300/'
         );
       }
@@ -85,7 +85,7 @@ describe('editTeacherController', () => {
         })
         .params({ uId: undefined })
         .body({
-          licensePathUrl: 'new license path',
+          licenseUrl: 'new license path',
         })
         .build();
       const editTeacherRes = await editTeacherController.makeRequest(editTeacherHttpRequest);

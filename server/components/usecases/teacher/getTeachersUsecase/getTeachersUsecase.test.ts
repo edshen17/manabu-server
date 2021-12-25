@@ -81,7 +81,7 @@ describe('getTeachersUsecase', () => {
         expect(teacher).to.not.have.property('email');
         expect(teacher).to.not.have.property('settings');
         expect(teacher).to.not.have.property('contactMethods');
-        expect(teacher.teacherData).to.not.have.property('licensePathUrl');
+        expect(teacher.teacherData).to.not.have.property('licenseUrl');
         expect(teacher).to.not.have.property('password');
         expect(teacher).to.not.have.property('verificationToken');
       }

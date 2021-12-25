@@ -27,7 +27,7 @@ const TeacherSchema = createSchema({
     enum: ['licensed', 'unlicensed'],
     index: true,
   }),
-  licensePathUrl: Type.string({ required: false }),
+  licenseUrl: Type.string({ required: false }),
   priceData: Type.object({ required: true }).of({
     hourlyRate: Type.number({ required: true }),
     currency: Type.string({ required: true }),

@@ -19,7 +19,7 @@ type TeacherEntityBuildResponse = {
   introductionVideoUrl: string;
   applicationStatus: string;
   teacherType: string;
-  licensePathUrl: string;
+  licenseUrl: string;
   priceData: { hourlyRate: number; currency: string };
   settings: {
     isHidden: boolean;
@@ -59,7 +59,7 @@ class TeacherEntity extends AbstractEntity<
         payoutData: { email: '' },
       },
       teacherType: TEACHER_ENTITY_TYPE.UNLICENSED,
-      licensePathUrl: '',
+      licenseUrl: '',
       priceData: { hourlyRate: 30, currency: DEFAULT_CURRENCY },
       tags: [],
       lessonCount: 0,

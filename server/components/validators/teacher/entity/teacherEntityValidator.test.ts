@@ -52,7 +52,7 @@ describe('teacherEntityValidator', () => {
                 hourlyRate: 35,
                 currency: 'SGD',
               },
-              licensePathUrl: faker.image.dataUri(),
+              licenseUrl: faker.image.dataUri(),
             };
             testValidInputs({ validationMode: 'edit', userRole: 'user' });
           });

@@ -118,7 +118,7 @@ describe('userDbService', () => {
               });
               expect(findByIdTeacher).to.have.property('teacherData');
               expect(findByIdTeacher.teacherData).to.have.property('packages');
-              expect(findByIdTeacher.teacherData).to.not.have.property('licensePathUrl');
+              expect(findByIdTeacher.teacherData).to.not.have.property('licenseUrl');
               expect(findByIdTeacher.teacherData!.applicationStatus).to.equal('approved');
               expect(findByIdTeacher).to.not.have.property('email');
               expect(findByIdTeacher).to.not.have.property('password');
@@ -147,7 +147,7 @@ describe('userDbService', () => {
                 _id: fakeTeacher._id,
                 dbServiceAccessOptions,
               });
-              expect(findByIdTeacher.teacherData).to.have.property('licensePathUrl');
+              expect(findByIdTeacher.teacherData).to.have.property('licenseUrl');
             });
           });
           context('overriding default select view', () => {
@@ -169,7 +169,7 @@ describe('userDbService', () => {
               _id: fakeTeacher._id,
               dbServiceAccessOptions,
             });
-            expect(findByIdTeacher.teacherData).to.have.property('licensePathUrl');
+            expect(findByIdTeacher.teacherData).to.have.property('licenseUrl');
             expect(findByIdTeacher).to.have.property('email');
             expect(findByIdTeacher).to.have.property('settings');
             expect(findByIdTeacher).to.have.property('contactMethods');
@@ -294,9 +294,7 @@ describe('userDbService', () => {
               expect(packageTransactionHostedByData.name).to.equal(updatedTeacher.name);
               expect(packageTransactionHostedByData).to.not.have.property('email');
               expect(packageTransactionHostedByData).to.not.have.property('contactMethods');
-              expect(packageTransactionHostedByData.teacherData).to.not.have.property(
-                'licensePathUrl'
-              );
+              expect(packageTransactionHostedByData.teacherData).to.not.have.property('licenseUrl');
             });
           });
           context('updating others', () => {
@@ -323,7 +321,7 @@ describe('userDbService', () => {
               updateQuery: { profileImageUrl: 'updated image' },
               dbServiceAccessOptions,
             });
-            expect(updatedTeacher.teacherData).to.have.property('licensePathUrl');
+            expect(updatedTeacher.teacherData).to.have.property('licenseUrl');
             expect(updatedTeacher.profileImageUrl).to.equal('updated image');
             expect(updatedTeacher).to.have.property('email');
             expect(updatedTeacher).to.have.property('settings');

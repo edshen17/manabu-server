@@ -60,14 +60,14 @@ describe('getUserUsecase', () => {
         expect(savedDbUser).to.have.property('email');
         expect(savedDbUser).to.have.property('settings');
         expect(savedDbUser).to.have.property('contactMethods');
-        expect(savedDbUser.teacherData).to.have.property('licensePathUrl');
+        expect(savedDbUser.teacherData).to.have.property('licenseUrl');
         expect(savedDbUser).to.not.have.property('password');
         expect(savedDbUser).to.not.have.property('verificationToken');
       } else {
         expect(savedDbUser).to.not.have.property('email');
         expect(savedDbUser).to.not.have.property('settings');
         expect(savedDbUser).to.not.have.property('contactMethods');
-        expect(savedDbUser.teacherData).to.not.have.property('licensePathUrl');
+        expect(savedDbUser.teacherData).to.not.have.property('licenseUrl');
         expect(savedDbUser).to.not.have.property('password');
         expect(savedDbUser).to.not.have.property('verificationToken');
       }

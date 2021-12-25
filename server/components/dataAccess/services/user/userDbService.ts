@@ -27,7 +27,7 @@ class UserDbService extends AbstractDbService<
         nameNGrams: 0,
         namePrefixNGrams: 0,
         balance: 0,
-        'teacherData.licensePathUrl': 0,
+        'teacherData.licenseUrl': 0,
         'teacherData.settings': 0,
       },
       adminView: {

@@ -33,7 +33,7 @@ beforeEach(() => {
     rawBody: {},
     headers: {},
     body: {
-      licensePathUrl: 'https://fakeimg.pl/300/',
+      licenseUrl: 'https://fakeimg.pl/300/',
     },
     params: {
       teacherId: fakeTeacher.teacherData!._id,
@@ -67,7 +67,7 @@ describe('editTeacherUsecase', () => {
     describe('editing teacher data', () => {
       it('should update the teacher in the db and return the correct properties (self)', async () => {
         const editedTeacher = await editTeacher();
-        expect(editedTeacher.teacherData!.licensePathUrl).to.equal('https://fakeimg.pl/300/');
+        expect(editedTeacher.teacherData!.licenseUrl).to.equal('https://fakeimg.pl/300/');
       });
       it('should deny access when updating restricted properties (self)', async () => {
         routeData.body = {
