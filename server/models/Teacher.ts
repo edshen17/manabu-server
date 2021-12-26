@@ -22,7 +22,7 @@ const TeacherSchema = createSchema({
     }).of({}),
     payoutData: { email: Type.string({ required: false }) },
   }),
-  teacherType: Type.string({
+  type: Type.string({
     required: true,
     enum: ['licensed', 'unlicensed'],
     index: true,

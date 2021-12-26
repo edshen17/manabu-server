@@ -392,7 +392,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     packageTransaction: PackageTransactionDoc;
   }): Promise<number> => {
     const { debitTeacherBalanceTransactionEntityBuildParams, teacher, packageTransaction } = props;
-    const teacherType = teacher.teacherData!.teacherType;
+    const teacherType = teacher.teacherData!.type;
     const processingRateObj = MANABU_PROCESSING_RATE[teacherType.toUpperCase()];
     const processingRateAmount = processingRateObj.amount;
     const isProTeacher = teacherType == TEACHER_ENTITY_TYPE.LICENSED;

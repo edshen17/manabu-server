@@ -13,7 +13,7 @@ describe('teacher entity', () => {
     context('given valid inputs', () => {
       it('should create a teacher with the given user id', () => {
         const fakeTeacher = <TeacherEntityBuildResponse>teacherEntity.build({});
-        expect(fakeTeacher.teacherType).to.equal('unlicensed');
+        expect(fakeTeacher.type).to.equal('unlicensed');
       });
     });
   });

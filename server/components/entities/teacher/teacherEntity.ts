@@ -18,7 +18,7 @@ type TeacherEntityBuildResponse = {
   alsoSpeaks: { language: string; level: string }[];
   introductionVideoUrl: string;
   applicationStatus: string;
-  teacherType: string;
+  type: string;
   licenseUrl: string;
   priceData: { hourlyRate: number; currency: string };
   settings: {
@@ -58,7 +58,7 @@ class TeacherEntity extends AbstractEntity<
         emailAlerts: {},
         payoutData: { email: '' },
       },
-      teacherType: TEACHER_ENTITY_TYPE.UNLICENSED,
+      type: TEACHER_ENTITY_TYPE.UNLICENSED,
       licenseUrl: '',
       priceData: { hourlyRate: 30, currency: DEFAULT_CURRENCY },
       tags: [],
