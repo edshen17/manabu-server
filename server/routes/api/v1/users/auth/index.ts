@@ -3,6 +3,7 @@ import { makeLoginUserController } from '../../../../../components/controllers/u
 import { makeVerifyEmailTokenController } from '../../../../../components/controllers/user/verifyEmailTokenController';
 import {
   makeCookieRedirectExpressCallback,
+  makeJSONCookieExpressCallback,
   makeRedirectExpressCallback,
 } from '../../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 const auth = express.Router();
@@ -12,7 +13,7 @@ auth.get(
   makeRedirectExpressCallback.consume(makeVerifyEmailTokenController)
 );
 
-auth.post('/base/login', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
+auth.post('/base/login', makeJSONCookieExpressCallback.consume(makeLoginUserController));
 
 auth.get('/google/login', makeCookieRedirectExpressCallback.consume(makeLoginUserController));
 
