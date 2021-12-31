@@ -12,12 +12,9 @@ class AvailableTimeEntityValidator extends AbstractEntityValidator {
       lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      hostedById: this._joi
-        .alternatives()
-        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
-        .forbidden(),
-      createdDate: this._joi.date().forbidden(),
-      lastModifiedDate: this._joi.date().forbidden(),
+      hostedById: this._joi.forbidden(),
+      createdDate: this._joi.forbidden(),
+      lastModifiedDate: this._joi.forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

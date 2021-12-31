@@ -4,14 +4,20 @@ class TeacherEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
       approvalDate: this._joi.date(),
-      teachingLanguages: this._joi.array().items({
-        language: this._joi.string().max(5),
-        level: this._joi.string().max(5),
-      }),
-      alsoSpeaks: this._joi.array().items({
-        language: this._joi.string().max(5),
-        level: this._joi.string().max(5),
-      }),
+      teachingLanguages: this._joi
+        .array()
+        .items({
+          language: this._joi.string().max(5),
+          level: this._joi.string().max(5),
+        })
+        .max(5),
+      alsoSpeaks: this._joi
+        .array()
+        .items({
+          language: this._joi.string().max(5),
+          level: this._joi.string().max(5),
+        })
+        .max(5),
       introductionVideoUrl: this._joi.string().uri().allow('').max(2048),
       applicationStatus: this._joi.string().valid('pending', 'approved', 'rejected'),
       settings: this._joi.object({
@@ -34,11 +40,11 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      approvalDate: this._joi.date().forbidden(),
-      lessonCount: this._joi.number().integer().forbidden(),
-      studentCount: this._joi.number().integer().forbidden(),
-      createdDate: this._joi.date().forbidden(),
-      lastModifiedDate: this._joi.date().forbidden(),
+      approvalDate: this._joi.forbidden(),
+      lessonCount: this._joi.forbidden(),
+      studentCount: this._joi.forbidden(),
+      createdDate: this._joi.forbidden(),
+      lastModifiedDate: this._joi.forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

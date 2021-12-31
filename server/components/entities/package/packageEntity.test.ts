@@ -22,13 +22,13 @@ context('package entity', () => {
         const fakePackage = await packageEntity.build({
           lessonAmount: 5,
           isOffering: true,
-          lessonDurations: [],
+          lessonDurations: [30],
           name: 'light',
           type: 'default',
         });
         expect(fakePackage.lessonAmount).to.equal(5);
         expect(fakePackage.isOffering).to.equal(true);
-        expect(fakePackage.lessonDurations.length).to.equal(0);
+        expect(fakePackage.lessonDurations.length).to.equal(1);
         expect(fakePackage.type).to.equal('default');
       });
     });

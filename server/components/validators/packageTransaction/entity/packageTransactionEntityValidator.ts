@@ -24,26 +24,17 @@ class PackageTransactionEntityValidator extends AbstractEntityValidator {
       createdDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      hostedById: this._joi
-        .alternatives()
-        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
-        .forbidden(),
-      reservedById: this._joi
-        .alternatives()
-        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
-        .forbidden(),
-      packageId: this._joi
-        .alternatives()
-        .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId())
-        .forbidden(),
-      terminationDate: this._joi.date().forbidden(),
-      isTerminated: this._joi.boolean().forbidden(),
-      remainingAppointments: this._joi.number().min(0).max(30).integer().forbidden(),
-      remainingReschedules: this._joi.number().min(0).max(5).integer().forbidden(),
-      lessonLanguage: this._joi.string().max(5).forbidden(),
-      isSubscription: this._joi.boolean().forbidden(),
-      lastModifiedDate: this._joi.date().forbidden(),
-      createdDate: this._joi.date().forbidden(),
+      hostedById: this._joi.forbidden(),
+      reservedById: this._joi.forbidden(),
+      packageId: this._joi.forbidden(),
+      terminationDate: this._joi.forbidden(),
+      isTerminated: this._joi.forbidden(),
+      remainingAppointments: this._joi.forbidden(),
+      remainingReschedules: this._joi.forbidden(),
+      lessonLanguage: this._joi.forbidden(),
+      isSubscription: this._joi.forbidden(),
+      lastModifiedDate: this._joi.forbidden(),
+      createdDate: this._joi.forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

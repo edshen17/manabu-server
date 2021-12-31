@@ -8,10 +8,13 @@ class UserEntityValidator extends AbstractEntityValidator {
       password: this._joi.string().min(8),
       profileImageUrl: this._joi.string().uri().allow('').max(2048),
       profileBio: this._joi.string().htmlStrip().max(3000),
-      languages: this._joi.array().items({
-        level: this._joi.string().max(5),
-        language: this._joi.string().max(5),
-      }),
+      languages: this._joi
+        .array()
+        .items({
+          level: this._joi.string().max(5),
+          language: this._joi.string().max(5),
+        })
+        .max(5),
       region: this._joi.string().max(256),
       timezone: this._joi.string().max(256),
       role: this._joi.string().valid('user', 'teacher'),
@@ -25,16 +28,22 @@ class UserEntityValidator extends AbstractEntityValidator {
           packageTransactionCreation: this._joi.boolean(),
         },
       }),
-      memberships: this._joi.array().items({
-        name: this._joi.string().max(256),
-        dateJoined: this._joi.date(),
-      }),
-      contactMethods: this._joi.array().items({
-        methodName: this._joi.string().max(256),
-        methodAddress: this._joi.string().max(256),
-        isPrimaryMethod: this._joi.boolean(),
-        methodType: this._joi.string().max(256),
-      }),
+      memberships: this._joi
+        .array()
+        .items({
+          name: this._joi.string().max(256),
+          dateJoined: this._joi.date(),
+        })
+        .max(20),
+      contactMethods: this._joi
+        .array()
+        .items({
+          methodName: this._joi.string().max(256),
+          methodAddress: this._joi.string().max(256),
+          isPrimaryMethod: this._joi.boolean(),
+          methodType: this._joi.string().max(256),
+        })
+        .max(5),
       isEmailVerified: this._joi.boolean(),
       verificationToken: this._joi.string().forbidden(),
       nameNGrams: this._joi.string().max(256),
@@ -50,29 +59,16 @@ class UserEntityValidator extends AbstractEntityValidator {
       }),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
-      role: this._joi.string().valid('user', 'teacher').forbidden(),
-      memberships: this._joi
-        .array()
-        .items({
-          name: this._joi.string().max(256),
-          dateJoined: this._joi.date(),
-        })
-        .forbidden(),
-      isEmailVerified: this._joi.boolean().forbidden(),
-      verificationToken: this._joi.string().forbidden(),
-      nameNGrams: this._joi.string().forbidden(),
-      namePrefixNGrams: this._joi.string().forbidden(),
-      createdDate: this._joi.date().forbidden(),
-      lastOnlineDate: this._joi.date().forbidden(),
-      lastModifiedDate: this._joi.date().forbidden(),
-      balance: this._joi
-        .object({
-          currency: this._joi.string().max(5),
-          totalCurrent: this._joi.number().min(0),
-          totalPending: this._joi.number().min(0),
-          totalAvailable: this._joi.number().min(0),
-        })
-        .forbidden(),
+      role: this._joi.forbidden(),
+      memberships: this._joi.forbidden(),
+      isEmailVerified: this._joi.forbidden(),
+      verificationToken: this._joi.forbidden(),
+      nameNGrams: this._joi.forbidden(),
+      namePrefixNGrams: this._joi.forbidden(),
+      createdDate: this._joi.forbidden(),
+      lastOnlineDate: this._joi.forbidden(),
+      lastModifiedDate: this._joi.forbidden(),
+      balance: this._joi.forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi

@@ -9,7 +9,9 @@ const PackageSchema = createSchema({
     enum: ['default', 'custom'],
     required: true,
   }),
-  lessonDurations: Type.array({ required: true }).of(Type.number({ required: false })),
+  lessonDurations: Type.array({
+    required: true,
+  }).of(Type.number({ required: false })),
   tags: Type.array({ required: false }).of(Type.string({ required: false })),
   createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
