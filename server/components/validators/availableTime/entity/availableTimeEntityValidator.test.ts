@@ -1,5 +1,9 @@
 import { expect } from 'chai';
 import { makeAvailableTimeEntityValidator } from '.';
+import {
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
+} from '../../abstractions/AbstractEntityValidator';
 import { AvailableTimeEntityValidator } from './availableTimeEntityValidator';
 
 let availableTimeEntityValidator: AvailableTimeEntityValidator;
@@ -46,7 +50,10 @@ describe('availableTimeEntityValidator', () => {
     context('valid inputs', () => {
       context('create entity', () => {
         it('should return a valid object', () => {
-          testValidInputs({ validationMode: 'create', userRole: 'user' });
+          testValidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
     });
@@ -56,7 +63,10 @@ describe('availableTimeEntityValidator', () => {
           hostedBy: '5d6ede6a0ba62570afssscedd3a',
         };
         it('should throw an error', () => {
-          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
+          testInvalidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
       context('edit entity', () => {
@@ -65,12 +75,18 @@ describe('availableTimeEntityValidator', () => {
         };
         context('as a non-admin user', () => {
           it('should throw an error', () => {
-            testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
+            testInvalidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+            });
           });
         });
         context('as an admin', () => {
           it('should throw an error', () => {
-            testInvalidInputs({ validationMode: 'edit', userRole: 'admin' });
+            testInvalidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
+            });
           });
         });
       });

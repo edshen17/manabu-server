@@ -1,7 +1,7 @@
 import {
   AbstractEntityValidator,
-  ENTITY_VALIDATOR_VALIDATE_MODES,
-  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
 } from '../../validators/abstractions/AbstractEntityValidator';
 import { EntityInitParams, IEntity } from './IEntity';
 
@@ -21,8 +21,8 @@ abstract class AbstractEntity<OptionalEntityInitParams, EntityBuildParams, Entit
   protected _validate = (buildParams: EntityBuildParams) => {
     this._entityValidator.validate({
       buildParams,
-      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
-      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
     });
   };
 

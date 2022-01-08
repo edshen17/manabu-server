@@ -1,5 +1,9 @@
 import { expect } from 'chai';
 import { makePackageTransactionCheckoutEntityValidator } from '.';
+import {
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
+} from '../../../abstractions/AbstractEntityValidator';
 import { PackageTransactionCheckoutEntityValidator } from './packageTransactionCheckoutEntityValidator';
 
 let packageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
@@ -43,7 +47,10 @@ describe('packageTransactionCheckoutEntityValidator', () => {
     context('valid inputs', () => {
       context('create entity', () => {
         it('should return a valid object', () => {
-          testValidInputs({ validationMode: 'create', userRole: 'user' });
+          testValidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
     });
@@ -55,7 +62,10 @@ describe('packageTransactionCheckoutEntityValidator', () => {
           hostedByData: '5d6ede6a0ba62570afcsaddedd3a',
         };
         it('should throw an error', () => {
-          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
+          testInvalidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
     });

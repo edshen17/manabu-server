@@ -67,7 +67,7 @@ class EditAvailableTimeUsecase extends AbstractEditUsecase<
 
   private _editAvailableTime = async (props: {
     availableTimeId: ObjectId;
-    body: any;
+    body: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<AvailableTimeDoc> => {
     const { availableTimeId, body, dbServiceAccessOptions } = props;

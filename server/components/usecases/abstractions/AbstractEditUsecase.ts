@@ -1,6 +1,6 @@
 import {
   AbstractEntityValidator,
-  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_MODE,
 } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractUsecase } from './AbstractUsecase';
 import { ControllerData } from './IUsecase';
@@ -30,7 +30,7 @@ abstract class AbstractEditUsecase<
     const { role } = currentAPIUser;
     const { body } = routeData;
     this._editEntityValidator.validate({
-      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.EDIT,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
       userRole: role,
       buildParams: body,
     });

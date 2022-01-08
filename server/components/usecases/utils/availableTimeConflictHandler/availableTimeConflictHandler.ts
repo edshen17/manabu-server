@@ -9,21 +9,26 @@ type TestTimeParams = {
   endDate: Date;
 };
 
+enum AVAILABLE_TIME_CONFLIT_HANDLER_ERROR {
+  INVALID_DURATION = 'Your timeslot duration must be divisible by 30 minutes.',
+  INVALID_TIME = 'Timeslots must begin at the start of the hour or 30 minutes into the hour.',
+  OVERLAP = 'You cannot have timeslots that overlap.',
+}
+
 class AvailableTimeConflictHandler {
   private _availableTimeDbService!: AvailableTimeDbService;
   private _dayjs!: any;
-  private _deepEqual!: any;
 
   public testTime = async (props: TestTimeParams): Promise<void> => {
     const { isValidDuration, isValidTime, isOverlapping } = await this._getTestTimeResults(props);
     if (!isValidDuration) {
-      throw new Error('Your timeslot duration must be divisible by 30 minutes.');
+      throw new Error(AVAILABLE_TIME_CONFLIT_HANDLER_ERROR.INVALID_DURATION);
     }
     if (!isValidTime) {
-      throw new Error('Timeslots must begin at the start of the hour or 30 minutes into the hour.');
+      throw new Error(AVAILABLE_TIME_CONFLIT_HANDLER_ERROR.INVALID_TIME);
     }
     if (isOverlapping) {
-      throw new Error('You cannot have timeslots that overlap.');
+      throw new Error(AVAILABLE_TIME_CONFLIT_HANDLER_ERROR.OVERLAP);
     }
   };
 
@@ -54,16 +59,10 @@ class AvailableTimeConflictHandler {
       dbServiceAccessOptions,
     });
     const isSameStartDate = availableTime
-      ? this._deepEqual(
-          this._dayjs(startDate).toDate(),
-          this._dayjs(availableTime.endDate).toDate()
-        )
+      ? this._dayjs(startDate).isSame(availableTime.endDate)
       : false;
     const isSameEndDate = availableTime
-      ? this._deepEqual(
-          this._dayjs(endDate).toDate(),
-          this._dayjs(availableTime.startDate).toDate()
-        )
+      ? this._dayjs(endDate).isSame(availableTime.startDate)
       : false;
     const isOverlapping = availableTime && !(isSameStartDate || isSameEndDate);
     return isOverlapping;
@@ -72,14 +71,12 @@ class AvailableTimeConflictHandler {
   public init = async (initParams: {
     makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
     dayjs: any;
-    deepEqual: any;
   }): Promise<this> => {
-    const { makeAvailableTimeDbService, dayjs, deepEqual } = initParams;
+    const { makeAvailableTimeDbService, dayjs } = initParams;
     this._availableTimeDbService = await makeAvailableTimeDbService;
     this._dayjs = dayjs;
-    this._deepEqual = deepEqual;
     return this;
   };
 }
 
-export { AvailableTimeConflictHandler };
+export { AvailableTimeConflictHandler, AVAILABLE_TIME_CONFLIT_HANDLER_ERROR };

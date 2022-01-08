@@ -1,8 +1,8 @@
 import { DEFAULT_CURRENCY, JWT_SECRET } from '../../../constants';
 import { UserContactMethodEmbed, UserEmailAlertsEmbed } from '../../../models/User';
 import {
-  ENTITY_VALIDATOR_VALIDATE_MODES,
-  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
 } from '../../validators/abstractions/AbstractEntityValidator';
 import { PackageEntityValidator } from '../../validators/package/entity/packageEntityValidator';
 import { TeacherEntityValidator } from '../../validators/teacher/entity/teacherEntityValidator';
@@ -88,21 +88,21 @@ class UserEntity extends AbstractEntity<
     const { teacherData, ...userData } = buildParams;
     this._entityValidator.validate({
       buildParams: userData,
-      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
-      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
     });
     if (teacherData) {
       const { packages, ...toValidateTeacherData } = teacherData;
       this._teacherEntityValidator.validate({
         buildParams: toValidateTeacherData,
-        userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
-        validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+        userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+        validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
       });
       packages.map((pkg) => {
         this._packageEntityValidator.validate({
           buildParams: pkg,
-          userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
-          validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
+          userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
         });
       });
     }

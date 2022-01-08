@@ -102,7 +102,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _loginUser = async (props: {
     user?: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    query: any;
+    query: StringKeyObject;
     handleNoDbUser: () => any;
   }): Promise<LoginUserUsecaseResponse> => {
     const { dbServiceAccessOptions, query, handleNoDbUser } = props || {};

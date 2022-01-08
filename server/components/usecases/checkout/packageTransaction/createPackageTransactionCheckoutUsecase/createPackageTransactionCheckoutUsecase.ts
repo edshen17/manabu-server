@@ -24,8 +24,8 @@ import { PaynowPaymentService } from '../../../../payment/services/paynow/paynow
 import { PaypalPaymentService } from '../../../../payment/services/paypal/paypalPaymentService';
 import { StripePaymentService } from '../../../../payment/services/stripe/stripePaymentService';
 import {
-  ENTITY_VALIDATOR_VALIDATE_MODES,
-  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
 } from '../../../../validators/abstractions/AbstractEntityValidator';
 import { PackageTransactionCheckoutEntityValidator } from '../../../../validators/checkout/packageTransaction/entity/packageTransactionCheckoutEntityValidator';
 import { AbstractCreateUsecase } from '../../../abstractions/AbstractCreateUsecase';
@@ -111,8 +111,8 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const { body, dbServiceAccessOptions } = props;
     const validatedBody = this._packageTransactionCheckoutEntityValidator.validate({
       buildParams: body,
-      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.CREATE,
-      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLES.USER,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+      userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
     });
     const { teacherId, packageId, lessonDuration, lessonLanguage } = validatedBody;
     const teacher = <JoinedUserDoc>await this._dbService.findById({

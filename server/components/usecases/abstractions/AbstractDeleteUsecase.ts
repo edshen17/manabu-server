@@ -1,6 +1,6 @@
 import {
   AbstractEntityValidator,
-  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_MODE,
 } from '../../validators/abstractions/AbstractEntityValidator';
 import { AbstractUsecase } from './AbstractUsecase';
 import { ControllerData } from './IUsecase';
@@ -25,7 +25,7 @@ abstract class AbstractDeleteUsecase<
     const { role } = currentAPIUser;
     const { body } = routeData;
     this._deleteEntityValidator.validate({
-      validationMode: ENTITY_VALIDATOR_VALIDATE_MODES.DELETE,
+      validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.DELETE,
       userRole: role,
       buildParams: body,
     });

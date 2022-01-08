@@ -1,5 +1,9 @@
 import { expect } from 'chai';
 import { makeUserEntityValidator } from '.';
+import {
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
+} from '../../abstractions/AbstractEntityValidator';
 import { UserEntityValidator } from './userEntityValidator';
 
 let userEntityValidator: UserEntityValidator;
@@ -44,7 +48,10 @@ describe('userEntityValidator', () => {
     context('valid inputs', () => {
       context('create entity', () => {
         it('should return a valid object', () => {
-          testValidInputs({ validationMode: 'create', userRole: 'user' });
+          testValidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
       context('edit entity', () => {
@@ -63,7 +70,10 @@ describe('userEntityValidator', () => {
               region: 'some region',
               timezone: 'some timezone',
             };
-            testValidInputs({ validationMode: 'edit', userRole: 'user' });
+            testValidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+            });
           });
         });
         context('as an admin', () => {
@@ -71,7 +81,10 @@ describe('userEntityValidator', () => {
             buildParams = {
               role: 'teacher',
             };
-            testValidInputs({ validationMode: 'edit', userRole: 'admin' });
+            testValidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
+            });
           });
         });
       });
@@ -83,7 +96,10 @@ describe('userEntityValidator', () => {
             name: 5,
             password: 'weak password',
           };
-          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
+          testInvalidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
       context('edit entity', () => {
@@ -92,20 +108,26 @@ describe('userEntityValidator', () => {
             buildParams = {
               verificationToken: 'some token',
               password: 'weak password',
-              role: 'admin',
+              role: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
               dateRegistered: 'new date',
               nonExistent: 'some field',
             };
-            testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
+            testInvalidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+            });
           });
         });
         context('as an admin', () => {
           it('should throw an error', () => {
             buildParams = {
               verificationToken: 'some token',
-              role: 'admin',
+              role: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
             };
-            testInvalidInputs({ validationMode: 'edit', userRole: 'admin' });
+            testInvalidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
+            });
           });
         });
       });

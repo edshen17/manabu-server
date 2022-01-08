@@ -1,5 +1,9 @@
 import { expect } from 'chai';
 import { makeAppointmentEntityValidator } from '.';
+import {
+  ENTITY_VALIDATOR_VALIDATE_MODE,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
+} from '../../abstractions/AbstractEntityValidator';
 import { AppointmentEntityValidator } from './appointmentEntityValidator';
 
 let appointmentEntityValidator: AppointmentEntityValidator;
@@ -47,7 +51,10 @@ describe('appointmentEntityValidator', () => {
     context('valid inputs', () => {
       context('create entity', () => {
         it('should return a valid object', () => {
-          testValidInputs({ validationMode: 'create', userRole: 'user' });
+          testValidInputs({
+            validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
       context('edit entity', () => {
@@ -57,7 +64,10 @@ describe('appointmentEntityValidator', () => {
               status: 'cancelled',
               cancellationReason: 'student cancel',
             };
-            testValidInputs({ validationMode: 'edit', userRole: 'user' });
+            testValidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+            });
           });
         });
         context('as an admin', () => {
@@ -66,7 +76,10 @@ describe('appointmentEntityValidator', () => {
               status: 'cancelled',
               cancellationReason: 'student cancel',
             };
-            testValidInputs({ validationMode: 'edit', userRole: 'admin' });
+            testValidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
+            });
           });
         });
       });
@@ -77,7 +90,10 @@ describe('appointmentEntityValidator', () => {
           hostedById: 5,
         };
         it('should throw an error', () => {
-          testInvalidInputs({ validationMode: 'create', userRole: 'user' });
+          testInvalidInputs({
+            validationMode: 'create',
+            userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+          });
         });
       });
       context('edit entity', () => {
@@ -86,12 +102,18 @@ describe('appointmentEntityValidator', () => {
             buildParams = {
               hostedById: 'some id',
             };
-            testInvalidInputs({ validationMode: 'edit', userRole: 'user' });
+            testInvalidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
+            });
           });
         });
         context('as an admin', () => {
           it('should throw an error', () => {
-            testInvalidInputs({ validationMode: 'edit', userRole: 'admin' });
+            testInvalidInputs({
+              validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.EDIT,
+              userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN,
+            });
           });
         });
       });

@@ -1,12 +1,12 @@
 import { AbstractValidator, JoiValidationObject } from './AbstractValidator';
 
-enum ENTITY_VALIDATOR_VALIDATE_USER_ROLES {
+enum ENTITY_VALIDATOR_VALIDATE_USER_ROLE {
   USER = 'user',
   TEACHER = 'teacher',
   ADMIN = 'admin',
 }
 
-enum ENTITY_VALIDATOR_VALIDATE_MODES {
+enum ENTITY_VALIDATOR_VALIDATE_MODE {
   CREATE = 'create',
   EDIT = 'edit',
   DELETE = 'delete',
@@ -34,13 +34,13 @@ abstract class AbstractEntityValidator extends AbstractValidator<
   protected _validateProps = (props: EntityValidatorValidateParams): JoiValidationObject => {
     const { validationMode, userRole, buildParams } = props;
     let validatedProps;
-    if (userRole == ENTITY_VALIDATOR_VALIDATE_USER_ROLES.ADMIN) {
+    if (userRole == ENTITY_VALIDATOR_VALIDATE_USER_ROLE.ADMIN) {
       validatedProps = this._adminValidationSchema.validate(buildParams);
-    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.CREATE) {
+    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODE.CREATE) {
       validatedProps = this._createValidationSchema.validate(buildParams);
-    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.EDIT) {
+    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODE.EDIT) {
       validatedProps = this._editValidationSchema.validate(buildParams);
-    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODES.DELETE) {
+    } else if (validationMode == ENTITY_VALIDATOR_VALIDATE_MODE.DELETE) {
       validatedProps = this._deleteValidationSchema.validate(buildParams);
     } else {
       validatedProps = {
@@ -53,6 +53,6 @@ abstract class AbstractEntityValidator extends AbstractValidator<
 
 export {
   AbstractEntityValidator,
-  ENTITY_VALIDATOR_VALIDATE_USER_ROLES,
-  ENTITY_VALIDATOR_VALIDATE_MODES,
+  ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
+  ENTITY_VALIDATOR_VALIDATE_MODE,
 };
