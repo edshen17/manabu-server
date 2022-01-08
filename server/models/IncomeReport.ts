@@ -16,7 +16,7 @@ const IncomeReportSchema = createSchema({
   lastModifiedDate: Type.date({ required: true }),
 });
 
-const IncomeReport = typedModel('Package', IncomeReportSchema);
+const IncomeReport = typedModel('IncomeReport', IncomeReportSchema);
 type IncomeReportDoc = ExtractDoc<typeof IncomeReportSchema>;
 
 export { IncomeReport, IncomeReportSchema, IncomeReportDoc };
