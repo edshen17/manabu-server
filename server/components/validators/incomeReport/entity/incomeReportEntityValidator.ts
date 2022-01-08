@@ -1,28 +1,34 @@
 import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
 
-class PackageEntityValidator extends AbstractEntityValidator {
+class IncomeReportEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {
     this._createValidationSchema = this._joi.object().keys({
-      priceData: this._joi.object({
-        currency: this._joi.string().max(5),
-        hourlyRate: this._joi.number().min(0),
-      }),
-      description: this._joi.string().min(0).max(500).allow(''),
-      lessonAmount: this._joi.number().min(1).max(60).integer(),
-      isOffering: this._joi.boolean(),
-      name: this._joi.string().max(2048),
-      type: this._joi.string().valid('default', 'custom'),
-      lessonDurations: this._joi
-        .array()
-        .items(this._joi.number().valid(30, 60, 90, 120))
-        .min(1)
-        .max(6)
-        .unique(),
-      tags: this._joi.array().items(this._joi.string().max(100)).unique(),
+      revenue: this._joi.number().min(0),
+      wageExpense: this._joi.number(),
+      rentExpense: this._joi.number(),
+      advertisingExpense: this._joi.number(),
+      depreciationExpense: this._joi.number(),
+      suppliesExpense: this._joi.number(),
+      internetExpense: this._joi.number(),
+      totalExpense: this._joi.number(),
+      netIncome: this._joi.number(),
+      startDate: this._joi.date(),
+      endDate: this._joi.date(),
       createdDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
     });
     this._editValidationSchema = this._createValidationSchema.keys({
+      revenue: this._joi.forbidden(),
+      wageExpense: this._joi.forbidden(),
+      rentExpense: this._joi.forbidden(),
+      advertisingExpense: this._joi.forbidden(),
+      depreciationExpense: this._joi.forbidden(),
+      suppliesExpense: this._joi.forbidden(),
+      internetExpense: this._joi.forbidden(),
+      totalExpense: this._joi.forbidden(),
+      netIncome: this._joi.forbidden(),
+      startDate: this._joi.forbidden(),
+      endDate: this._joi.forbidden(),
       createdDate: this._joi.forbidden(),
       lastModifiedDate: this._joi.forbidden(),
     });
@@ -31,8 +37,8 @@ class PackageEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
     });
-    this._adminValidationSchema = this._editValidationSchema;
+    this._adminValidationSchema = this._createValidationSchema;
   };
 }
 
-export { PackageEntityValidator };
+export { IncomeReportEntityValidator };
