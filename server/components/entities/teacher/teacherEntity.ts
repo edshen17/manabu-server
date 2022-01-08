@@ -29,6 +29,7 @@ type TeacherEntityBuildResponse = {
   tags: string[];
   lessonCount: number;
   studentCount: number;
+  createdDate: Date;
   lastModifiedDate: Date;
   packages: PackageEntityBuildResponse[];
 };

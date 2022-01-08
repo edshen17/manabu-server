@@ -17,14 +17,12 @@ before(() => {
 beforeEach(() => {
   buildParams = {
     revenue: 100,
-    wageExpense: 50,
+    wageExpense: -50,
     rentExpense: 0,
     advertisingExpense: 0,
     depreciationExpense: 0,
     suppliesExpense: 0,
     internetExpense: 0,
-    totalExpense: 0,
-    netIncome: 50,
     startDate: dayjs().toDate(),
     endDate: dayjs().add(1, 'month').toDate(),
   };
