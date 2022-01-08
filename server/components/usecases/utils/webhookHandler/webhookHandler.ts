@@ -1,5 +1,5 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
-import { DB_SERVICE_COLLECTIONS } from '../../../dataAccess/abstractions/IDbService';
+import { DB_SERVICE_COLLECTION } from '../../../dataAccess/abstractions/IDbService';
 import { ConvertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { CreatePackageTransactionUsecase } from '../../packageTransaction/createPackageTransactionUsecase/createPackageTransactionUsecase';
@@ -29,7 +29,7 @@ class WebhookHandler {
     const resourceName = tokenArr[1];
     let usecaseRes: WebhookHandlerCreateResourceResponse = {};
     switch (resourceName) {
-      case DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS:
+      case DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS:
         usecaseRes = await this._createPackageTransaction({ ...props, userId });
         break;
       default:

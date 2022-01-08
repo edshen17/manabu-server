@@ -67,7 +67,7 @@ enum DB_SERVICE_CACHE_CLIENT {
 }
 
 // does not follow snake case because of mongo collection names
-enum DB_SERVICE_COLLECTIONS {
+enum DB_SERVICE_COLLECTION {
   APPOINTMENTS = 'appointments',
   AVAILABLE_TIMES = 'availabletimes',
   BALANCE_TRANSACTIONS = 'balancetransactions',
@@ -113,7 +113,7 @@ export {
   DB_SERVICE_JOIN_TYPE,
   DB_SERVICE_MODEL_VIEW,
   DB_SERVICE_CACHE_CLIENT,
-  DB_SERVICE_COLLECTIONS,
+  DB_SERVICE_COLLECTION,
   DbServiceFindByIdParams,
   DbServiceFindOneParams,
   DbServiceFindParams,

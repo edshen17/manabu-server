@@ -1,7 +1,7 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import { DB_SERVICE_COLLECTIONS } from '../../abstractions/IDbService';
+import { DB_SERVICE_COLLECTION } from '../../abstractions/IDbService';
 
 type OptionalUserDbServiceInitParams = {
   comparePassword: any;
@@ -76,7 +76,7 @@ class UserDbService extends AbstractDbService<
   };
 
   protected _getCacheDependencies = (): string[] => {
-    return [DB_SERVICE_COLLECTIONS.APPOINTMENTS, DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS];
+    return [DB_SERVICE_COLLECTION.APPOINTMENTS, DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS];
   };
 
   protected _initTemplate = async (

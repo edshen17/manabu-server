@@ -5,7 +5,7 @@ import {
   AbstractEmbeddedDbServiceInitParams,
   DB_SERVICE_EMBED_TYPE,
 } from '../../abstractions/AbstractEmbeddedDbService';
-import { DB_SERVICE_COLLECTIONS } from '../../abstractions/IDbService';
+import { DB_SERVICE_COLLECTION } from '../../abstractions/IDbService';
 
 type OptionalPackageDbServiceInitParams = {};
 
@@ -17,16 +17,17 @@ class PackageDbService extends AbstractEmbeddedDbService<
 > {
   protected _getCacheDependencies = (): string[] => {
     return [
-      DB_SERVICE_COLLECTIONS.USERS,
-      DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS,
-      DB_SERVICE_COLLECTIONS.APPOINTMENTS,
-      DB_SERVICE_COLLECTIONS.TEACHERS,
+      DB_SERVICE_COLLECTION.USERS,
+      DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS,
+      DB_SERVICE_COLLECTION.APPOINTMENTS,
+      DB_SERVICE_COLLECTION.BALANCE_TRANSACTIONS,
+      DB_SERVICE_COLLECTION.TEACHERS,
     ];
   };
 
   protected _initTemplate = async (
     optionalDbServiceInitParams: AbstractEmbeddedDbServiceInitParams<OptionalPackageDbServiceInitParams>
-  ) => {
+  ): Promise<void> => {
     const { makeParentDbService, deepEqual } = optionalDbServiceInitParams;
     this._parentDbService = await makeParentDbService;
     this._deepEqual = deepEqual;

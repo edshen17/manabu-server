@@ -5,7 +5,7 @@ import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
 import {
   DbServiceAccessOptions,
-  DB_SERVICE_COLLECTIONS,
+  DB_SERVICE_COLLECTION,
 } from '../../../../dataAccess/abstractions/IDbService';
 import { CacheDbService, TTL_MS } from '../../../../dataAccess/services/cache/cacheDbService';
 import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
@@ -164,7 +164,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _getProcessedPaymentServiceParams = async (props: GetRedirectUrlParams) => {
     const { body, currentAPIUser, teacher, teacherPackage } = props;
     const { userId } = currentAPIUser;
-    const token = `${userId}-${DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS}`;
+    const token = `${userId}-${DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS}`;
     const processedPaymentServiceData = await this._getProcessedPaymentServiceData(props);
     const { item } = processedPaymentServiceData;
     await this._setTransactionJwt({

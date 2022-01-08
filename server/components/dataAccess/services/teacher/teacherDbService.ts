@@ -5,7 +5,7 @@ import {
   AbstractEmbeddedDbServiceInitParams,
   DB_SERVICE_EMBED_TYPE,
 } from '../../abstractions/AbstractEmbeddedDbService';
-import { DB_SERVICE_COLLECTIONS } from '../../abstractions/IDbService';
+import { DB_SERVICE_COLLECTION } from '../../abstractions/IDbService';
 
 type OptionalTeacherDbServiceInitParams = {};
 
@@ -16,7 +16,7 @@ class TeacherDbService extends AbstractEmbeddedDbService<
   TeacherDbServiceResponse
 > {
   protected _getCacheDependencies = (): string[] => {
-    return [DB_SERVICE_COLLECTIONS.USERS, DB_SERVICE_COLLECTIONS.PACKAGE_TRANSACTIONS];
+    return [DB_SERVICE_COLLECTION.USERS, DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS];
   };
 
   protected _initTemplate = async (

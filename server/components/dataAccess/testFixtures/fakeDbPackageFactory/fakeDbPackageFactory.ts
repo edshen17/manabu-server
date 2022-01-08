@@ -7,10 +7,10 @@ import {
 import { PackageDbServiceResponse } from '../../services/package/packageDbService';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-type PartialFakeDbPackageFactoryInitParams = {};
+type OptionalFakeDbPackageFactoryInitParams = {};
 
 class FakeDbPackageFactory extends AbstractFakeDbDataFactory<
-  PartialFakeDbPackageFactoryInitParams,
+  OptionalFakeDbPackageFactoryInitParams,
   PackageEntityBuildParams,
   PackageEntityBuildResponse,
   PackageDbServiceResponse
