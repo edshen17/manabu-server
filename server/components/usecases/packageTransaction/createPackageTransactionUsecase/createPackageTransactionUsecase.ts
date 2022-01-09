@@ -26,6 +26,7 @@ import {
   CreateBalanceTransactionsUsecaseResponse,
 } from '../../balanceTransaction/createBalanceTransactionsUsecase/createBalanceTransactionsUsecase';
 import { CHECKOUT_TOKEN_HASH_KEY } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
+import { CreateIncomeReportUsecase } from '../../incomeReport/createIncomeReportUsecase/createIncomeReportUsecase';
 import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
 import {
   EmailHandler,
@@ -42,6 +43,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeUserDbService: Promise<UserDbService>;
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
   makeCreateBalanceTransactionsUsecase: Promise<CreateBalanceTransactionsUsecase>;
+  makeCreateIncomeReportUsecase: Promise<CreateIncomeReportUsecase>;
   makeControllerDataBuilder: ControllerDataBuilder;
   makeEmailHandler: Promise<EmailHandler>;
 };
@@ -69,6 +71,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _userDbService!: UserDbService;
   private _exchangeRateHandler!: ExchangeRateHandler;
   private _createBalanceTransactionsUsecase!: CreateBalanceTransactionsUsecase;
+  private _createIncomeReportUsecase!: CreateIncomeReportUsecase;
   private _controllerDataBuilder!: ControllerDataBuilder;
   private _emailHandler!: EmailHandler;
 
@@ -488,6 +491,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeCreateBalanceTransactionsUsecase,
       makeControllerDataBuilder,
       makeEmailHandler,
+      makeCreateIncomeReportUsecase,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -497,6 +501,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._createBalanceTransactionsUsecase = await makeCreateBalanceTransactionsUsecase;
     this._controllerDataBuilder = makeControllerDataBuilder;
     this._emailHandler = await makeEmailHandler;
+    this._createIncomeReportUsecase = await makeCreateIncomeReportUsecase;
   };
 }
 

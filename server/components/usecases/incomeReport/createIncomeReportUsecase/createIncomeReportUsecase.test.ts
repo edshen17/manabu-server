@@ -87,6 +87,18 @@ describe('createIncomeReportUsecaseUsecase', () => {
           const createIncomeReportUsecaseRes = await createIncomeReport();
           await validResOutput(createIncomeReportUsecaseRes);
         });
+        it('should return a new incomeReport', async () => {
+          const createIncomeReportUsecaseRes = await createIncomeReport();
+          const updatedIncomeReportUsecaseRes = await createIncomeReport();
+          const updatedIncomeReport = updatedIncomeReportUsecaseRes.incomeReport;
+          const originalIncomeReport = createIncomeReportUsecaseRes.incomeReport;
+          expect(updatedIncomeReport.revenue - originalIncomeReport.revenue).to.equal(
+            routeData.body.revenue
+          );
+          expect(updatedIncomeReport.wageExpense - originalIncomeReport.wageExpense).to.equal(
+            routeData.body.wageExpense
+          );
+        });
       });
     });
   });

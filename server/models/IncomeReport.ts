@@ -10,8 +10,9 @@ const IncomeReportSchema = createSchema({
   internetExpense: Type.number({ required: true }),
   totalExpense: Type.number({ required: true }),
   netIncome: Type.number({ required: true }),
-  startDate: Type.date({ required: true }),
-  endDate: Type.date({ required: true }),
+  startDate: Type.date({ required: true, index: true }),
+  endDate: Type.date({ required: true, index: true }),
+  dateRangeKey: Type.string({ required: true, index: true }),
   createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });

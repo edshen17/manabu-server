@@ -1,12 +1,14 @@
 import { AbstractEntity } from '../abstractions/AbstractEntity';
+import { DateRangeKeyHandler } from '../utils/dateRangeKeyHandler/dateRangeKeyHandler';
 
 type OptionalIncomeReportEntityInitParams = {
   currency: any;
+  makeDateRangeKeyHandler: DateRangeKeyHandler;
 };
 
 type IncomeReportEntityBuildParams = Omit<
   IncomeReportEntityBuildResponse,
-  'totalExpense' | 'netIncome' | 'createdDate' | 'lastModifiedDate'
+  'totalExpense' | 'netIncome' | 'createdDate' | 'lastModifiedDate' | 'dateRangeKey'
 >;
 
 type IncomeReportEntityBuildResponse = {
@@ -21,6 +23,7 @@ type IncomeReportEntityBuildResponse = {
   netIncome: number;
   startDate: Date;
   endDate: Date;
+  dateRangeKey: string;
   createdDate: Date;
   lastModifiedDate: Date;
 };
@@ -31,6 +34,7 @@ class IncomeReportEntity extends AbstractEntity<
   IncomeReportEntityBuildResponse
 > {
   private _currency!: any;
+  private _dateRangeKeyHandler!: DateRangeKeyHandler;
 
   protected _buildTemplate = (
     buildParams: IncomeReportEntityBuildParams
@@ -58,6 +62,7 @@ class IncomeReportEntity extends AbstractEntity<
       .add(depreciationExpense)
       .add(suppliesExpense)
       .add(internetExpense).value;
+    const dateRangeKey = this._dateRangeKeyHandler.createKey({ startDate, endDate });
     const incomeReportEntity = {
       revenue,
       wageExpense,
@@ -70,6 +75,7 @@ class IncomeReportEntity extends AbstractEntity<
       netIncome: this._currency(revenue).add(totalExpense).value,
       startDate,
       endDate,
+      dateRangeKey,
       createdDate: new Date(),
       lastModifiedDate: new Date(),
     };
@@ -79,8 +85,9 @@ class IncomeReportEntity extends AbstractEntity<
   protected _initTemplate = async (
     optionalInitParams: OptionalIncomeReportEntityInitParams
   ): Promise<void> => {
-    const { currency } = optionalInitParams;
+    const { currency, makeDateRangeKeyHandler } = optionalInitParams;
     this._currency = currency;
+    this._dateRangeKeyHandler = makeDateRangeKeyHandler;
   };
 }
 

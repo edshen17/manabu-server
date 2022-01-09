@@ -14,6 +14,7 @@ class IncomeReportEntityValidator extends AbstractEntityValidator {
       netIncome: this._joi.forbidden(),
       startDate: this._joi.date(),
       endDate: this._joi.date(),
+      dateRangeKey: this._joi.forbidden(),
       createdDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
     });
@@ -29,6 +30,7 @@ class IncomeReportEntityValidator extends AbstractEntityValidator {
       netIncome: this._joi.forbidden(),
       startDate: this._joi.forbidden(),
       endDate: this._joi.forbidden(),
+      dateRangeKey: this._joi.forbidden(),
       createdDate: this._joi.forbidden(),
       lastModifiedDate: this._joi.forbidden(),
     });

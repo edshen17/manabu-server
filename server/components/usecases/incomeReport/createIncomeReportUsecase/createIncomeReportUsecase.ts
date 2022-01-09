@@ -1,6 +1,10 @@
 import { IncomeReportDoc } from '../../../../models/IncomeReport';
+import { StringKeyObject } from '../../../../types/custom';
 import { IncomeReportDbServiceResponse } from '../../../dataAccess/services/incomeReport/incomeReportDbService';
-import { IncomeReportEntity } from '../../../entities/incomeReport/incomeReportEntity';
+import {
+  IncomeReportEntity,
+  IncomeReportEntityBuildResponse,
+} from '../../../entities/incomeReport/incomeReportEntity';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
@@ -23,15 +27,44 @@ class CreateIncomeReportUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreateIncomeReportUsecaseResponse> => {
     const { body, dbServiceAccessOptions } = props;
-    const incomeReportEntity = this._incomeReportEntity.build(body);
-    const incomeReport = await this._dbService.insert({
-      modelToInsert: incomeReportEntity,
+    const incomeReportEntity = await this._incomeReportEntity.build(body);
+    const { dateRangeKey } = incomeReportEntity;
+    let incomeReport = await this._dbService.findOne({
+      searchQuery: {
+        dateRangeKey,
+      },
+      dbServiceAccessOptions,
+    });
+    if (!incomeReport) {
+      incomeReport = await this._dbService.insert({
+        modelToInsert: incomeReportEntity,
+        dbServiceAccessOptions,
+      });
+    }
+    const processedIncomeReportEntity = this._getProcessedIncomeReportEntity(incomeReportEntity);
+    incomeReport = await this._dbService.findOneAndUpdate({
+      searchQuery: { _id: incomeReport._id },
+      updateQuery: { $inc: processedIncomeReportEntity },
       dbServiceAccessOptions,
     });
     const usecaseRes = {
       incomeReport,
     };
     return usecaseRes;
+  };
+
+  private _getProcessedIncomeReportEntity = (
+    incomeReportEntity: IncomeReportEntityBuildResponse
+  ): StringKeyObject => {
+    const processedIncomeReportEntity: StringKeyObject = {};
+    for (const property in incomeReportEntity) {
+      const value = (incomeReportEntity as StringKeyObject)[property];
+      const isNumber = typeof value === 'number';
+      if (isNumber) {
+        processedIncomeReportEntity[property] = value;
+      }
+    }
+    return processedIncomeReportEntity;
   };
 
   protected _initTemplate = async (
