@@ -44,8 +44,9 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       isSelf,
       currentAPIUser,
+      endpointPath,
     });
-    const isValidRequest = this._isValidRequest({ controllerData, isSelf });
+    const isValidRequest = this._isValidRequest({ controllerData, isSelf, endpointPath });
     const dbServiceAccessOptions = this._getDbServiceAccessOptions({
       isCurrentAPIUserPermitted,
       currentAPIUser,
@@ -71,11 +72,15 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
   private _isCurrentAPIUserPermitted = (props: {
     isSelf: boolean;
     currentAPIUser: CurrentAPIUser;
+    endpointPath: string;
   }): boolean => {
-    const { isSelf, currentAPIUser } = props;
+    const { isSelf, currentAPIUser, endpointPath } = props;
+    const isAdminProtected = endpointPath.includes('admin');
     const isAdmin = currentAPIUser.role == 'admin';
     const isProtectedResource = this._isProtectedResource();
-    const isCurrentAPIUserPermitted = isSelf || isAdmin || !isProtectedResource;
+    const isCurrentAPIUserPermitted = isAdminProtected
+      ? isAdmin
+      : isSelf || isAdmin || !isProtectedResource;
     return isCurrentAPIUserPermitted;
   };
 
@@ -134,7 +139,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     let isResourceOwner = false;
     for (const property in resourceData) {
       const value = resourceData[property];
-      const isObject = !!value && value.constructor === Object;
+      const isObject = !value && value.constructor === Object;
       const isArray = Array.isArray(value);
       if (isObject) {
         this._processResourceOwnership({ resourceData: value, userId });
@@ -158,12 +163,14 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
   private _isValidRequest = (props: {
     controllerData: ControllerData;
     isSelf: boolean;
+    endpointPath: string;
   }): boolean => {
-    const { controllerData, isSelf } = props;
+    const { controllerData, isSelf, endpointPath } = props;
     const { currentAPIUser } = controllerData;
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       isSelf,
       currentAPIUser,
+      endpointPath,
     });
     const isValidRouteData = this._isValidRouteData(controllerData);
     const isValidRequest = isCurrentAPIUserPermitted && isValidRouteData;

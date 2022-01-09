@@ -372,11 +372,9 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       props;
     const { userId, currency, packageTransactionId, runningBalance } =
       earnedCreditTeacherPayoutBalanceTransactionEntity;
-    let balanceChange =
-      (debitTeacherBalanceTransaction.totalPayment +
-        earnedCreditTeacherPayoutBalanceTransactionEntity.balanceChange) *
-      -1;
-    balanceChange = this._currency(balanceChange).value; // need to convert to currency format, otherwise rounding error/neg totalAvailable
+    const balanceChange = this._currency(debitTeacherBalanceTransaction.totalPayment)
+      .add(earnedCreditTeacherPayoutBalanceTransactionEntity.balanceChange)
+      .multiply(-1).value;
     const unearnedCreditTeacherPayoutBalanceTransactionEntity =
       await this._balanceTransactionEntity.build({
         userId,
