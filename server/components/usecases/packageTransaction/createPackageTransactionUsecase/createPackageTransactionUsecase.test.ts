@@ -131,8 +131,8 @@ describe('createPackageTransactionUsecase', () => {
         const validResOutput = (
           createPackageTransactionRes: CreatePackageTransactionUsecaseResponse
         ) => {
-          const packageTransaction = createPackageTransactionRes.packageTransaction;
-          const balanceTransactions = createPackageTransactionRes.balanceTransactions;
+          const { packageTransaction, balanceTransactions, incomeReport } =
+            createPackageTransactionRes;
           const studentDebitBalanceTransaction = balanceTransactions[0];
           const studentCreditBalanceTransaction = balanceTransactions[1];
           const teacherBalanceTransaction = balanceTransactions[2];
@@ -149,6 +149,7 @@ describe('createPackageTransactionUsecase', () => {
               studentCreditBalanceTransaction.totalPayment == 0
           ).to.equal(true);
           expect(teacherBalanceTransaction.processingFee < 0).to.equal(true);
+          expect(incomeReport.revenue > 0).to.equal(true);
         };
         it('should create a packageTransaction and 3 balanceTransactions', async () => {
           const createPackageTransactionRes = await createPackageTransaction();
@@ -161,7 +162,7 @@ describe('createPackageTransactionUsecase', () => {
               _id: fakeTeacher.teacherData!._id,
             },
             updateQuery: {
-              teacherType: TEACHER_ENTITY_TYPE.LICENSED,
+              type: TEACHER_ENTITY_TYPE.LICENSED,
             },
             dbServiceAccessOptions,
           });

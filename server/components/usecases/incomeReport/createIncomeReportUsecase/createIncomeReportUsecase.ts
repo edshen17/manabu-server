@@ -40,13 +40,14 @@ class CreateIncomeReportUsecase extends AbstractCreateUsecase<
         modelToInsert: incomeReportEntity,
         dbServiceAccessOptions,
       });
+    } else {
+      const processedIncomeReportEntity = this._getProcessedIncomeReportEntity(incomeReportEntity);
+      incomeReport = await this._dbService.findOneAndUpdate({
+        searchQuery: { _id: incomeReport._id },
+        updateQuery: { $inc: processedIncomeReportEntity },
+        dbServiceAccessOptions,
+      });
     }
-    const processedIncomeReportEntity = this._getProcessedIncomeReportEntity(incomeReportEntity);
-    incomeReport = await this._dbService.findOneAndUpdate({
-      searchQuery: { _id: incomeReport._id },
-      updateQuery: { $inc: processedIncomeReportEntity },
-      dbServiceAccessOptions,
-    });
     const usecaseRes = {
       incomeReport,
     };

@@ -1,4 +1,5 @@
 import cloneDeep from 'clone-deep';
+import dayjs from 'dayjs';
 import deepEqual from 'deep-equal';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
@@ -7,6 +8,7 @@ import { makePackageTransactionEntity } from '../../../entities/packageTransacti
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makePackageTransactionQueryValidator } from '../../../validators/packageTransaction/query';
 import { makeCreateBalanceTransactionsUsecase } from '../../balanceTransaction/createBalanceTransactionsUsecase';
+import { makeCreateIncomeReportUsecase } from '../../incomeReport/createIncomeReportUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 import { makeEmailHandler } from '../../utils/emailHandler';
 import { makeExchangeRateHandler } from '../../utils/exchangeRateHandler';
@@ -27,6 +29,8 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeCreateBalanceTransactionsUsecase,
   makeControllerDataBuilder,
   makeEmailHandler,
+  makeCreateIncomeReportUsecase,
+  dayjs,
 });
 
 export { makeCreatePackageTransactionUsecase };

@@ -1,6 +1,8 @@
+import dayjs from 'dayjs';
 import { ClientSession } from 'mongoose';
 import { DEFAULT_CURRENCY, MANABU_PROCESSING_RATE } from '../../../../constants';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
+import { IncomeReportDoc } from '../../../../models/IncomeReport';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
@@ -21,6 +23,7 @@ import { TEACHER_ENTITY_TYPE } from '../../../entities/teacher/teacherEntity';
 import { USER_ENTITY_EMAIL_ALERT } from '../../../entities/user/userEntity';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { ControllerData } from '../../abstractions/IUsecase';
 import {
   CreateBalanceTransactionsUsecase,
   CreateBalanceTransactionsUsecaseResponse,
@@ -46,11 +49,13 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeCreateIncomeReportUsecase: Promise<CreateIncomeReportUsecase>;
   makeControllerDataBuilder: ControllerDataBuilder;
   makeEmailHandler: Promise<EmailHandler>;
+  dayjs: typeof dayjs;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
   packageTransaction: PackageTransactionDoc;
   balanceTransactions: BalanceTransactionDoc[];
+  incomeReport: IncomeReportDoc;
 };
 
 type CreateBalanceTransactionsRouteDataParams = {
@@ -74,6 +79,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _createIncomeReportUsecase!: CreateIncomeReportUsecase;
   private _controllerDataBuilder!: ControllerDataBuilder;
   private _emailHandler!: EmailHandler;
+  private _dayjs!: typeof dayjs;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -121,7 +127,8 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       paymentId,
       session,
     });
-    const usecaseRes = { packageTransaction, balanceTransactions };
+    const incomeReport = await this._createIncomeReport(balanceTransactions);
+    const usecaseRes = { packageTransaction, balanceTransactions, incomeReport };
     return usecaseRes;
   };
 
@@ -259,7 +266,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
 
   private _getBalanceTransactionsControllerData = async (
     props: CreateBalanceTransactionsRouteDataParams & { session: ClientSession }
-  ) => {
+  ): Promise<ControllerData> => {
     const { user, session } = props;
     const balanceTransactions = await this._getBalanceTransactionBatchBuildParams({ ...props });
     const currentAPIUser = {
@@ -479,6 +486,59 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     });
   };
 
+  private _createIncomeReport = async (
+    balanceTransactions: BalanceTransactionDoc[]
+  ): Promise<IncomeReportDoc> => {
+    const debitTeacherBalanceTransaction = balanceTransactions[2];
+    const createIncomeReportControllerData = await this._getIncomeReportControllerData(
+      debitTeacherBalanceTransaction
+    );
+    const createIncomeReportRes = await this._createIncomeReportUsecase.makeRequest(
+      createIncomeReportControllerData
+    );
+    const { incomeReport } = createIncomeReportRes;
+    return incomeReport;
+  };
+
+  private _getIncomeReportControllerData = async (
+    debitTeacherBalanceTransaction: BalanceTransactionDoc
+  ): Promise<ControllerData> => {
+    const { currency, balanceChange, totalPayment } = debitTeacherBalanceTransaction;
+    const currentAPIUser = {
+      userId: undefined,
+      role: 'admin',
+    };
+    const convertedRevenue = await this._exchangeRateHandler.convert({
+      amount: balanceChange,
+      sourceCurrency: currency,
+      targetCurrency: DEFAULT_CURRENCY,
+    });
+    const convertedWageExpense =
+      (await this._exchangeRateHandler.convert({
+        amount: totalPayment,
+        sourceCurrency: currency,
+        targetCurrency: DEFAULT_CURRENCY,
+      })) * -1;
+    const createIncomeReportRouteData = {
+      rawBody: {},
+      headers: {},
+      params: {},
+      body: {
+        revenue: convertedRevenue,
+        wageExpense: convertedWageExpense,
+        startDate: this._dayjs().date(1).hour(0).minute(0).toDate(),
+        endDate: this._dayjs().date(this._dayjs().daysInMonth()).hour(23).minute(59).toDate(),
+      },
+      query: {},
+      endpointPath: '',
+    };
+    const createIncomeReportControllerData = this._controllerDataBuilder
+      .routeData(createIncomeReportRouteData)
+      .currentAPIUser(currentAPIUser)
+      .build();
+    return createIncomeReportControllerData;
+  };
+
   protected _initTemplate = async (
     optionalInitParams: OptionalCreatePackageTransactionUsecaseInitParams
   ): Promise<void> => {
@@ -492,6 +552,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeControllerDataBuilder,
       makeEmailHandler,
       makeCreateIncomeReportUsecase,
+      dayjs,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -502,6 +563,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._controllerDataBuilder = makeControllerDataBuilder;
     this._emailHandler = await makeEmailHandler;
     this._createIncomeReportUsecase = await makeCreateIncomeReportUsecase;
+    this._dayjs = dayjs;
   };
 }
 
