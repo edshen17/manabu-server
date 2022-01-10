@@ -19,7 +19,7 @@ beforeEach(() => {
 describe('dateRangeKeyHandler', () => {
   describe('createKey', () => {
     it('should create a key given 2 valid dates', () => {
-      const dateRangeKey = dateRangeKeyHandler.createKey({
+      const { dateRangeKey } = dateRangeKeyHandler.createKey({
         startDate: startDate.toDate(),
         endDate: endDate.toDate(),
       });

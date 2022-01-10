@@ -1,5 +1,4 @@
 import cloneDeep from 'clone-deep';
-import dayjs from 'dayjs';
 import deepEqual from 'deep-equal';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
@@ -30,7 +29,6 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeControllerDataBuilder,
   makeEmailHandler,
   makeCreateIncomeReportUsecase,
-  dayjs,
 });
 
 export { makeCreatePackageTransactionUsecase };

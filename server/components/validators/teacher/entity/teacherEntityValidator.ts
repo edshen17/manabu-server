@@ -30,7 +30,7 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       type: this._joi.string().valid('unlicensed', 'licensed').allow(''),
       licenseUrl: this._joi.string().uri().allow('').max(2048),
       priceData: this._joi.object({
-        hourlyRate: this._joi.number().min(0),
+        hourlyRate: this._joi.number().integer().min(0),
         currency: this._joi.string().max(5),
       }),
       tags: this._joi.array().items(this._joi.string().max(100)).unique(),

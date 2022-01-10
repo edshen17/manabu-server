@@ -16,6 +16,7 @@ class IncomeReportDbService extends AbstractDbService<
       rentExpense: 0,
       advertisingExpense: 0,
       depreciationExpense: 0,
+      dageRangeKey: 0,
       suppliesExpense: 0,
       internetExpense: 0,
       totalExpense: 0,

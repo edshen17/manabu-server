@@ -35,6 +35,7 @@ describe('endPackageTransactionScheduleTask', () => {
       await endPackageTransactionScheduleTask.execute();
     expiredPackageTransaction = endedPackageTransactions[0];
     const endedTeacherBalanceRes = endedTeacherBalanceResponses[0];
+    expect(endedTeacherBalanceRes.executePayoutRes.incomeReport.revenue > 0).to.equal(true);
     expect(endedTeacherBalanceRes.executePayoutRes.id.length > 0).to.equal(true);
     expect(
       endedTeacherBalanceRes.creditTeacherPayoutBalanceTransactions[0].balanceChange < 0

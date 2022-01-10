@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { ClientSession } from 'mongoose';
 import { DEFAULT_CURRENCY, MANABU_PROCESSING_RATE } from '../../../../constants';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
@@ -49,7 +48,6 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeCreateIncomeReportUsecase: Promise<CreateIncomeReportUsecase>;
   makeControllerDataBuilder: ControllerDataBuilder;
   makeEmailHandler: Promise<EmailHandler>;
-  dayjs: typeof dayjs;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
@@ -79,7 +77,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _createIncomeReportUsecase!: CreateIncomeReportUsecase;
   private _controllerDataBuilder!: ControllerDataBuilder;
   private _emailHandler!: EmailHandler;
-  private _dayjs!: typeof dayjs;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -526,8 +523,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       body: {
         revenue: convertedRevenue,
         wageExpense: convertedWageExpense,
-        startDate: this._dayjs().date(1).hour(0).minute(0).toDate(),
-        endDate: this._dayjs().date(this._dayjs().daysInMonth()).hour(23).minute(59).toDate(),
       },
       query: {},
       endpointPath: '',
@@ -552,7 +547,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeControllerDataBuilder,
       makeEmailHandler,
       makeCreateIncomeReportUsecase,
-      dayjs,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -563,7 +557,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._controllerDataBuilder = makeControllerDataBuilder;
     this._emailHandler = await makeEmailHandler;
     this._createIncomeReportUsecase = await makeCreateIncomeReportUsecase;
-    this._dayjs = dayjs;
   };
 }
 

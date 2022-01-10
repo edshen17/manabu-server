@@ -8,7 +8,13 @@ type OptionalIncomeReportEntityInitParams = {
 
 type IncomeReportEntityBuildParams = Omit<
   IncomeReportEntityBuildResponse,
-  'totalExpense' | 'netIncome' | 'createdDate' | 'lastModifiedDate' | 'dateRangeKey'
+  | 'totalExpense'
+  | 'netIncome'
+  | 'createdDate'
+  | 'lastModifiedDate'
+  | 'dateRangeKey'
+  | 'startDate'
+  | 'endDate'
 >;
 
 type IncomeReportEntityBuildResponse = {
@@ -55,14 +61,13 @@ class IncomeReportEntity extends AbstractEntity<
     depreciationExpense = this._currency(depreciationExpense || 0).value;
     suppliesExpense = this._currency(suppliesExpense || 0).value;
     internetExpense = this._currency(internetExpense || 0).value;
-    const { startDate, endDate } = buildParams;
     const totalExpense = this._currency(wageExpense)
       .add(rentExpense)
       .add(advertisingExpense)
       .add(depreciationExpense)
       .add(suppliesExpense)
       .add(internetExpense).value;
-    const dateRangeKey = this._dateRangeKeyHandler.createKey({ startDate, endDate });
+    const { startDate, endDate, dateRangeKey } = this._dateRangeKeyHandler.createKey();
     const incomeReportEntity = {
       revenue,
       wageExpense,

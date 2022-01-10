@@ -1,11 +1,14 @@
 import { Dayjs } from 'dayjs';
 import { ClientSession } from 'mongoose';
-import { DEFAULT_CURRENCY } from '../../../../constants';
+import { DEFAULT_CURRENCY, PAYOUT_RATE } from '../../../../constants';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
+import { IncomeReportDoc } from '../../../../models/IncomeReport';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
+import { Await } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { BalanceTransactionDbService } from '../../../dataAccess/services/balanceTransaction/balanceTransactionDbService';
+import { IncomeReportDbService } from '../../../dataAccess/services/incomeReport/incomeReportDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import {
@@ -14,6 +17,7 @@ import {
   BALANCE_TRANSACTION_ENTITY_STATUS,
   BALANCE_TRANSACTION_ENTITY_TYPE,
 } from '../../../entities/balanceTransaction/balanceTransactionEntity';
+import { DateRangeKeyHandler } from '../../../entities/utils/dateRangeKeyHandler/dateRangeKeyHandler';
 import {
   PaymentServiceExecutePayoutResponse,
   PAYMENT_GATEWAY_NAME,
@@ -29,6 +33,8 @@ type OptionalEndPackageTransactionScheduleTaskInitParams = {
   makeBalanceTransactionEntity: Promise<BalanceTransactionEntity>;
   makePaypalPaymentService: Promise<PaypalPaymentService>;
   currency: any;
+  makeIncomeReportDbService: Promise<IncomeReportDbService>;
+  makeDateRangeKeyHandler: DateRangeKeyHandler;
 };
 
 type GetExpiredPackageTransactionsParams = {
@@ -48,12 +54,14 @@ type EndPackageTransactionScheduleTaskResponse = {
   endedTeacherBalanceResponses: EndTeacherBalanceTransactionResponse[];
 };
 
-type SendTeacherPayoutResponse = PaymentServiceExecutePayoutResponse;
+type ExecutePayoutResponse = PaymentServiceExecutePayoutResponse & {
+  incomeReport: IncomeReportDoc;
+};
 
 type EndTeacherBalanceTransactionResponse = {
   debitTeacherBalanceTransaction: BalanceTransactionDoc;
   teacher: JoinedUserDoc;
-  executePayoutRes: SendTeacherPayoutResponse;
+  executePayoutRes: ExecutePayoutResponse;
   creditTeacherPayoutBalanceTransactions: BalanceTransactionDoc[];
 };
 
@@ -72,6 +80,8 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _balanceTransactionEntity!: BalanceTransactionEntity;
   private _paypalPaymentService!: PaypalPaymentService;
   private _currency: any;
+  private _incomeReportDbService!: IncomeReportDbService;
+  private _dateRangeKeyHandler!: DateRangeKeyHandler;
 
   public execute = async (): Promise<EndPackageTransactionScheduleTaskResponse> => {
     const now = this._dayjs();
@@ -241,10 +251,18 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     teacher: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
-  }): Promise<PaymentServiceExecutePayoutResponse> => {
-    const { debitTeacherBalanceTransaction, teacher } = props;
-    const { balanceChange } = await this._getTeacherPayoutData(debitTeacherBalanceTransaction);
-    const payoutAmount = this._currency(balanceChange).multiply(-1);
+  }): Promise<ExecutePayoutResponse> => {
+    const { debitTeacherBalanceTransaction, teacher, dbServiceAccessOptions } = props;
+    const { hasRemainingAppointments, balanceChange } = await this._getTeacherPayoutData(
+      debitTeacherBalanceTransaction
+    );
+    const incomeReport = await this._updateIncomeReport({
+      debitTeacherBalanceTransaction,
+      hasRemainingAppointments,
+      balanceChange,
+      dbServiceAccessOptions,
+    });
+    const payoutAmount = this._currency(balanceChange).multiply(-1).value;
     const payoutMessage = `Minato Manabu has sent you ${payoutAmount} ${DEFAULT_CURRENCY} to your PayPal account.`;
     const executePayoutRes = await this._paypalPaymentService.executePayout({
       type: 'email',
@@ -265,7 +283,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         },
       ],
     });
-    return executePayoutRes;
+    return { ...executePayoutRes, incomeReport };
   };
 
   private _getTeacherPayoutData = async (debitTeacherBalanceTransaction: BalanceTransactionDoc) => {
@@ -275,20 +293,78 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     const hasRemainingAppointments = remainingAppointments > 0;
     const packageLessonAmount = packageData.lessonAmount;
     const completedLessons = packageLessonAmount - remainingAppointments;
-    const balanceChange =
-      debitTeacherBalanceTransaction.totalPayment * (completedLessons / packageLessonAmount);
+    const balanceChange = this._currency(debitTeacherBalanceTransaction.totalPayment).multiply(
+      (-1 * completedLessons) / packageLessonAmount
+    ).value;
     const payoutData = {
-      balanceChange: balanceChange * -1,
+      balanceChange,
       hasRemainingAppointments,
     };
     return payoutData;
+  };
+
+  private _updateIncomeReport = async (
+    props: Await<ReturnType<EndPackageTransactionScheduleTask['_getTeacherPayoutData']>> & {
+      debitTeacherBalanceTransaction: BalanceTransactionDoc;
+      dbServiceAccessOptions: DbServiceAccessOptions;
+    }
+  ): Promise<IncomeReportDoc> => {
+    const {
+      debitTeacherBalanceTransaction,
+      balanceChange,
+      hasRemainingAppointments,
+      dbServiceAccessOptions,
+    } = props;
+    const createdDate = debitTeacherBalanceTransaction.createdDate;
+    const payoutFee = this._currency(balanceChange).multiply(PAYOUT_RATE).value;
+    const additionalEarnings = this._currency(debitTeacherBalanceTransaction.totalPayment).add(
+      balanceChange
+    ).value;
+    const { dateRangeKey } = this._dateRangeKeyHandler.createKey({
+      startDate: this._dayjs(createdDate).date(1).hour(0).minute(0).toDate(),
+      endDate: this._dayjs(createdDate)
+        .date(this._dayjs().daysInMonth())
+        .hour(23)
+        .minute(59)
+        .toDate(),
+    });
+    let incomeReport: IncomeReportDoc;
+    if (hasRemainingAppointments) {
+      const expenseDecrease = this._currency(additionalEarnings).add(payoutFee).value;
+      incomeReport = await this._incomeReportDbService.findOneAndUpdate({
+        searchQuery: {
+          dateRangeKey,
+        },
+        updateQuery: {
+          $inc: {
+            wageExpense: expenseDecrease,
+            totalExpense: expenseDecrease,
+            netIncome: expenseDecrease,
+          },
+        },
+        dbServiceAccessOptions,
+      });
+    } else {
+      incomeReport = await this._incomeReportDbService.findOneAndUpdate({
+        searchQuery: { dateRangeKey },
+        updateQuery: {
+          $inc: {
+            wageExpense: payoutFee,
+            totalExpense: payoutFee,
+            netIncome: payoutFee,
+          },
+        },
+        dbServiceAccessOptions,
+      });
+    }
+    return incomeReport;
   };
 
   private _createCreditTeacherPayoutBalanceTransactions = async (props: {
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
-    executePayoutRes: SendTeacherPayoutResponse;
+    executePayoutRes: ExecutePayoutResponse;
   }): Promise<BalanceTransactionDoc[]> => {
     const { dbServiceAccessOptions, session, debitTeacherBalanceTransaction, executePayoutRes } =
       props;
@@ -353,7 +429,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         processingFee: 0,
         tax: 0,
         runningBalance: {
-          totalAvailable: runningBalance.totalAvailable + balanceChange,
+          totalAvailable: this._currency(runningBalance.totalAvailable).add(balanceChange).value,
           currency: runningBalance.currency,
         },
         paymentData: {
@@ -386,7 +462,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         processingFee: 0,
         tax: 0,
         runningBalance: {
-          totalAvailable: runningBalance.totalAvailable + balanceChange,
+          totalAvailable: this._currency(runningBalance.totalAvailable).add(balanceChange).value,
           currency: runningBalance.currency,
         },
       });
@@ -410,8 +486,9 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         return balanceTransaction.type == BALANCE_TRANSACTION_ENTITY_TYPE.PAYOUT;
       }
     )!;
-    const balanceChange =
-      (debitTeacherBalanceTransaction.totalPayment - payoutBalanceTransaction.totalPayment) * -1;
+    const balanceChange = this._currency(
+      debitTeacherBalanceTransaction.totalPayment - payoutBalanceTransaction.totalPayment
+    ).multiply(-1).value;
     const updatedTeacher = await this._userDbService.findOneAndUpdate({
       searchQuery: {
         _id: payoutBalanceTransaction.userId,
@@ -440,6 +517,8 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       makeUserDbService,
       makeBalanceTransactionEntity,
       makePaypalPaymentService,
+      makeIncomeReportDbService,
+      makeDateRangeKeyHandler,
       currency,
     } = optionalScheduleTaskInitParams;
     this._packageTransactionDbService = await makePackageTransactionDbService;
@@ -448,6 +527,8 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     this._balanceTransactionEntity = await makeBalanceTransactionEntity;
     this._paypalPaymentService = await makePaypalPaymentService;
     this._currency = currency;
+    this._incomeReportDbService = await makeIncomeReportDbService;
+    this._dateRangeKeyHandler = makeDateRangeKeyHandler;
   };
 }
 

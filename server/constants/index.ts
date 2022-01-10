@@ -6,8 +6,8 @@ const MANABU_ADMIN_PKG_ID = '605388cca36b9c57a8b1997a';
 const MANABU_ADMIN_EMAIL = 'manabulessons@gmail.com';
 const PAYOUT_RATE = 0.02;
 const PAYMENT_GATEWAY_RATE: StringKeyObject = {
-  PAYPAL: 0.03,
-  STRIPE: 0.01,
+  PAYPAL: 0.044,
+  STRIPE: 0.03,
   PAYNOW: 0.01,
 };
 const MANABU_PROCESSING_RATE: StringKeyObject = {
