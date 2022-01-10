@@ -1,3 +1,4 @@
+import { DEFAULT_CURRENCY } from '../../../constants';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { DateRangeKeyHandler } from '../utils/dateRangeKeyHandler/dateRangeKeyHandler';
 
@@ -15,6 +16,7 @@ type IncomeReportEntityBuildParams = Omit<
   | 'dateRangeKey'
   | 'startDate'
   | 'endDate'
+  | 'currency'
 >;
 
 type IncomeReportEntityBuildResponse = {
@@ -29,6 +31,7 @@ type IncomeReportEntityBuildResponse = {
   netIncome: number;
   startDate: Date;
   endDate: Date;
+  currency: string;
   dateRangeKey: string;
   createdDate: Date;
   lastModifiedDate: Date;
@@ -80,6 +83,7 @@ class IncomeReportEntity extends AbstractEntity<
       netIncome: this._currency(revenue).add(totalExpense).value,
       startDate,
       endDate,
+      currency: DEFAULT_CURRENCY,
       dateRangeKey,
       createdDate: new Date(),
       lastModifiedDate: new Date(),

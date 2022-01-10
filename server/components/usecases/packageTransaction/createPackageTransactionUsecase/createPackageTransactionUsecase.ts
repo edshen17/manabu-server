@@ -400,32 +400,19 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   }): Promise<number> => {
     const { debitTeacherBalanceTransactionEntityBuildParams, teacher, packageTransaction } = props;
     const teacherType = teacher.teacherData!.type;
-    const processingRateObj = MANABU_PROCESSING_RATE[teacherType.toUpperCase()];
-    const processingRateAmount = processingRateObj.amount;
     const isProTeacher = teacherType == TEACHER_ENTITY_TYPE.LICENSED;
-    let processingFee;
-    if (isProTeacher) {
-      processingFee = await this._exchangeRateHandler.multiply({
-        multiplicand: {
-          amount: debitTeacherBalanceTransactionEntityBuildParams.balanceChange,
-        },
-        multiplier: {
-          amount: processingRateAmount,
-        },
-        targetCurrency: DEFAULT_CURRENCY,
-      });
-    } else {
-      processingFee = await this._exchangeRateHandler.multiply({
-        multiplicand: {
-          amount: packageTransaction.packageData.lessonAmount,
-        },
-        multiplier: {
-          amount: processingRateAmount,
-          sourceCurrency: processingRateObj.currency,
-        },
-        targetCurrency: DEFAULT_CURRENCY,
-      });
-    }
+    const processingRate = isProTeacher
+      ? MANABU_PROCESSING_RATE.LICENSED
+      : MANABU_PROCESSING_RATE.UNLICENSED;
+    const processingFee = await this._exchangeRateHandler.multiply({
+      multiplicand: {
+        amount: debitTeacherBalanceTransactionEntityBuildParams.balanceChange,
+      },
+      multiplier: {
+        amount: processingRate,
+      },
+      targetCurrency: DEFAULT_CURRENCY,
+    });
     return processingFee * -1;
   };
 

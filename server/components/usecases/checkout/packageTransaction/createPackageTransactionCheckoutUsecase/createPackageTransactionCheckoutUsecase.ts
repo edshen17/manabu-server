@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongoose';
-import { DEFAULT_CURRENCY, PAYMENT_GATEWAY_RATE } from '../../../../../constants';
+import { DEFAULT_CURRENCY, PAYMENT_GATEWAY_FEE } from '../../../../../constants';
 import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
@@ -200,18 +200,10 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       },
       targetCurrency: DEFAULT_CURRENCY,
     });
-    const total = await this._exchangeRateHandler.multiply({
-      multiplicand: {
-        amount: subTotal,
-      },
-      multiplier: {
-        amount: 1 + PAYMENT_GATEWAY_RATE[paymentGateway.toUpperCase()],
-      },
-      targetCurrency: '',
-    });
+    const total = subTotal + PAYMENT_GATEWAY_FEE[paymentGateway.toUpperCase()](subTotal);
     const priceData = { currency: DEFAULT_CURRENCY, subTotal, total };
     const item = {
-      id: `h-${teacher._id}-r-${currentAPIUser.userId}-${lessonLanguage}`,
+      id: `teacher-${teacher._id}-student-${currentAPIUser.userId}-${lessonLanguage}`,
       name: this._convertToTitlecase(`Minato Manabu - ${teacherPackage.name} / ${teacher.name}`),
       price: total,
       quantity: 1,

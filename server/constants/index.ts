@@ -5,22 +5,22 @@ const MANABU_ADMIN_ID = '60538825a36b9c57a8b19978';
 const MANABU_ADMIN_PKG_ID = '605388cca36b9c57a8b1997a';
 const MANABU_ADMIN_EMAIL = 'manabulessons@gmail.com';
 const PAYOUT_RATE = 0.02;
-const PAYMENT_GATEWAY_RATE: StringKeyObject = {
-  PAYPAL: 0.044,
-  STRIPE: 0.03,
-  PAYNOW: 0.01,
-};
-const MANABU_PROCESSING_RATE: StringKeyObject = {
-  UNLICENSED: {
-    amount: 15,
-    currency: DEFAULT_CURRENCY,
-    type: 'absolute',
+const PAYMENT_GATEWAY_FEE: StringKeyObject = {
+  PAYPAL: (subtotal: number) => {
+    return 0.044 * subtotal + 0.5;
   },
-  LICENSED: {
-    amount: 0.16,
-    type: 'percent',
+  STRIPE: (subtotal: number) => {
+    return 0.034 * subtotal + 0.5;
+  },
+  PAYNOW: (subtotal: number) => {
+    return 0.01 * subtotal;
   },
 };
+enum MANABU_PROCESSING_RATE {
+  UNLICENSED = 0.5,
+  LICENSED = 0.16,
+}
+
 const NODE_ENV = process.env.NODE_ENV!;
 const IS_PRODUCTION = NODE_ENV == 'production';
 const G_CLIENTID = process.env.G_CLIENTID!;
@@ -74,7 +74,7 @@ export {
   REDIS_PASS,
   REDIS_PORT,
   NODE_ENV,
-  PAYMENT_GATEWAY_RATE,
+  PAYMENT_GATEWAY_FEE,
   STRIPE_WEBHOOK_SECREY_KEY,
   OPEN_EXCHANGE_RATE_API_KEY_DEV,
   PAYPAL_CLIENT_ID_DEV,
