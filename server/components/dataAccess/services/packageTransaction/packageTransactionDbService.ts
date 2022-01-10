@@ -1,11 +1,7 @@
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { StringKeyObject } from '../../../../types/custom';
 import { AbstractDbService } from '../../abstractions/AbstractDbService';
-import {
-  DbServiceAccessOptions,
-  DB_SERVICE_COLLECTION,
-  DB_SERVICE_JOIN_TYPE,
-} from '../../abstractions/IDbService';
+import { DbServiceAccessOptions, DB_SERVICE_JOIN_TYPE } from '../../abstractions/IDbService';
 import { PackageDbService } from '../package/packageDbService';
 import { UserDbService } from '../user/userDbService';
 
@@ -50,10 +46,6 @@ class PackageTransactionDbService extends AbstractDbService<
       packageData,
     };
     return computedProps;
-  };
-
-  protected _getCacheDependencies = (): string[] => {
-    return [DB_SERVICE_COLLECTION.APPOINTMENTS, DB_SERVICE_COLLECTION.BALANCE_TRANSACTIONS];
   };
 
   protected _initTemplate = async (

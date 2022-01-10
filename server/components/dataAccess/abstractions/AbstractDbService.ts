@@ -14,6 +14,7 @@ import {
   DbServiceModelViews,
   DbServiceUpdateParams,
   DB_SERVICE_CACHE_CLIENT,
+  DB_SERVICE_COLLECTION,
   DB_SERVICE_JOIN_TYPE,
   DB_SERVICE_MODEL_VIEW,
   IDbService,
@@ -241,16 +242,38 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
     return dbServiceAccessOptions;
   };
 
-  private _clearCacheDependencies = async (): Promise<void> => {
-    const cacheDependencies = this._getCacheDependencies();
-    await this._cacheDbService.clearHashKey(this._dbModelName);
-    for (const cacheDependency of cacheDependencies) {
-      await this._cacheDbService.clearHashKey(cacheDependency);
+  private _clearCacheDependents = async (collectionName: string): Promise<void> => {
+    const cacheDependencies = this._getCacheDependents();
+    const collectionDependents = cacheDependencies[collectionName];
+    const seenCollections: string[] = [];
+    const hasSeenCollection = !seenCollections.includes(collectionName);
+    if (hasSeenCollection) {
+      await this._cacheDbService.clearHashKey(collectionName);
+      seenCollections.push(collectionName);
+      for (const dependentCollectionName of collectionDependents) {
+        this._clearCacheDependents(dependentCollectionName);
+      }
     }
   };
 
-  protected _getCacheDependencies = (): string[] => {
-    return [];
+  private _getCacheDependents = (): StringKeyObject => {
+    const CACHE_DEPENDENTS = {
+      [DB_SERVICE_COLLECTION.USERS]: [DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS],
+      [DB_SERVICE_COLLECTION.TEACHERS]: [DB_SERVICE_COLLECTION.USERS],
+      [DB_SERVICE_COLLECTION.PACKAGES]: [
+        DB_SERVICE_COLLECTION.TEACHERS,
+        DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS,
+      ],
+      [DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS]: [
+        DB_SERVICE_COLLECTION.APPOINTMENTS,
+        DB_SERVICE_COLLECTION.BALANCE_TRANSACTIONS,
+      ],
+      [DB_SERVICE_COLLECTION.APPOINTMENTS]: [],
+      [DB_SERVICE_COLLECTION.BALANCE_TRANSACTIONS]: [],
+      [DB_SERVICE_COLLECTION.AVAILABLE_TIMES]: [],
+      [DB_SERVICE_COLLECTION.INCOME_REPORT]: [],
+    };
+    return CACHE_DEPENDENTS;
   };
 
   public findById = async (props: DbServiceFindByIdParams): Promise<DbServiceResponse> => {
@@ -370,10 +393,13 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
   };
 
   private _clearCacheBrancher = async (): Promise<void> => {
+    if (!this._dbModelName) {
+      return;
+    }
     if (!IS_PRODUCTION) {
-      await this._clearCacheDependencies();
+      await this._clearCacheDependents(this._dbModelName);
     } else {
-      this._clearCacheDependencies();
+      this._clearCacheDependents(this._dbModelName);
     }
   };
 

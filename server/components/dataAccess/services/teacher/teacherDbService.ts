@@ -5,7 +5,6 @@ import {
   AbstractEmbeddedDbServiceInitParams,
   DB_SERVICE_EMBED_TYPE,
 } from '../../abstractions/AbstractEmbeddedDbService';
-import { DB_SERVICE_COLLECTION } from '../../abstractions/IDbService';
 
 type OptionalTeacherDbServiceInitParams = {};
 
@@ -15,17 +14,9 @@ class TeacherDbService extends AbstractEmbeddedDbService<
   OptionalTeacherDbServiceInitParams,
   TeacherDbServiceResponse
 > {
-  protected _getCacheDependencies = (): string[] => {
-    return [
-      DB_SERVICE_COLLECTION.USERS,
-      DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS,
-      DB_SERVICE_COLLECTION.BALANCE_TRANSACTIONS,
-    ];
-  };
-
   protected _initTemplate = async (
     optionalDbServiceInitParams: AbstractEmbeddedDbServiceInitParams<OptionalTeacherDbServiceInitParams>
-  ) => {
+  ): Promise<void> => {
     const { makeParentDbService, deepEqual } = optionalDbServiceInitParams;
     this._parentDbService = await makeParentDbService;
     this._deepEqual = deepEqual;
