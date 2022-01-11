@@ -86,6 +86,7 @@ describe('getTeachersUsecase', () => {
         expect(teacher).to.not.have.property('verificationToken');
       }
     };
+
     const testTeacherError = async () => {
       let error;
       try {

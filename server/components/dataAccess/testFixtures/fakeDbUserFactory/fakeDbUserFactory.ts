@@ -24,13 +24,15 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
     const fakeBuildParams = await this._createFakeBuildParams();
     fakeBuildParams.teacherData = await this._fakeDbTeacherFactory.createFakeData();
     const fakeDbTeacher = await this.createFakeDbData(fakeBuildParams);
-    await this._cacheDbService.createUserNode(fakeDbTeacher);
+    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+    await this._cacheDbService.createUserNode({ user: fakeDbTeacher, dbServiceAccessOptions });
     return fakeDbTeacher;
   };
 
   public createFakeDbUser = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbData();
-    await this._cacheDbService.createUserNode(fakeDbUser);
+    const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
+    await this._cacheDbService.createUserNode({ user: fakeDbUser, dbServiceAccessOptions });
     return fakeDbUser;
   };
 

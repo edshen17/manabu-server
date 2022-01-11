@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 import { CacheDbService } from './cacheDbService';
 import { makeCacheDbService } from './index';
 
@@ -60,14 +61,28 @@ describe('cacheDbService', () => {
   });
   describe('graphQuery', () => {
     it('should make a graph query', async () => {
-      await cacheDbService.graphQuery("CREATE (:person{name:'roi',age:32})");
-      await cacheDbService.graphQuery("CREATE (:person{name:'amit',age:30})");
-      await cacheDbService.graphQuery(
-        "MATCH (a:person), (b:person) WHERE (a.name = 'roi' AND b.name='amit') CREATE (a)-[:knows]->(b)"
-      );
-      const res = await cacheDbService.graphQuery(
-        'MATCH (a:person)-[:knows]->(:person) RETURN a.name'
-      );
+      const dbServiceAccessOptions: DbServiceAccessOptions = {
+        isCurrentAPIUserPermitted: true,
+        currentAPIUserRole: 'user',
+        isSelf: true,
+      };
+      await cacheDbService.graphQuery({
+        query: "CREATE (:person{name:'roi',age:32})",
+        dbServiceAccessOptions,
+      });
+      await cacheDbService.graphQuery({
+        query: "CREATE (:person{name:'amit',age:30})",
+        dbServiceAccessOptions,
+      });
+      await cacheDbService.graphQuery({
+        query:
+          "MATCH (a:person), (b:person) WHERE (a.name = 'roi' AND b.name='amit') CREATE (a)-[:knows]->(b)",
+        dbServiceAccessOptions,
+      });
+      const res = await cacheDbService.graphQuery({
+        query: 'MATCH (a:person)-[:knows]->(:person) RETURN a.name',
+        dbServiceAccessOptions,
+      });
       while (res.hasNext()) {
         const record = res.next();
         expect(record.get('a.name')).to.equal('roi');

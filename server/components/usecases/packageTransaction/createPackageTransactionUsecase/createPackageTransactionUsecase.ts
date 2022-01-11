@@ -153,17 +153,18 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       session,
     });
-    await this._createStudentTeacherEdge(packageTransaction);
+    await this._createStudentTeacherEdge({ packageTransaction, dbServiceAccessOptions });
     return packageTransaction;
   };
 
-  private _createStudentTeacherEdge = async (
-    packageTransaction: PackageTransactionDoc
-  ): Promise<void> => {
-    await this._cacheDbService.graphQuery(
-      `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" }),
-      (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:TEACHES]->(student)`
-    );
+  private _createStudentTeacherEdge = async (props: {
+    packageTransaction: PackageTransactionDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<void> => {
+    const { packageTransaction, dbServiceAccessOptions } = props;
+    const query = `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" }),
+    (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:teaches]->(student)`;
+    await this._cacheDbService.graphQuery({ query, dbServiceAccessOptions });
   };
 
   private _sendPackageTransactionCreationEmails = (

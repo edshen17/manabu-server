@@ -120,7 +120,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
-    await this._cacheDbService.createUserNode(user);
+    await this._cacheDbService.createUserNode({ user, dbServiceAccessOptions });
     return user;
   };
 
@@ -128,10 +128,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
-    const { user, dbServiceAccessOptions } = props;
-    const joinedUserData = await this._createTeacherData({ user, dbServiceAccessOptions });
-    await this._createDbAdminPackageTransaction({ user, dbServiceAccessOptions });
-    await this._createGraphAdminTeacherEdge(user);
+    const joinedUserData = await this._createTeacherData(props);
+    await this._createDbAdminPackageTransaction(props);
+    await this._createGraphAdminTeacherEdge(props);
     return joinedUserData;
   };
 
@@ -172,12 +171,16 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     return newPackageTransaction;
   };
 
-  private _createGraphAdminTeacherEdge = async (user: JoinedUserDoc): Promise<void> => {
-    await this._cacheDbService.graphQuery(
-      `MATCH (teacher: User {_id: "${
-        user._id
-      }"}), (admin: User {_id:"${MANABU_ADMIN_ID}"}) MERGE (admin)-[r: MANAGES {since: "${new Date().toISOString()}"}]->(teacher)`
-    );
+  private _createGraphAdminTeacherEdge = async (props: {
+    user: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<void> => {
+    const { user, dbServiceAccessOptions } = props;
+    const query = `MATCH (teacher: User {_id: "${
+      user._id
+    }"}), (admin: User {_id:"${MANABU_ADMIN_ID}"}) MERGE (admin)-[r: manages {since: "${new Date().toISOString()}"}]->(teacher)`;
+
+    await this._cacheDbService.graphQuery({ query, dbServiceAccessOptions });
   };
 
   private _sendVerificationEmail = (userEntity: UserEntityBuildResponse): void => {

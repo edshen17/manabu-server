@@ -1,5 +1,6 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
+import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 
 type CacheDbServiceInitParams = {
   redisClient: any;
@@ -96,13 +97,28 @@ class CacheDbService {
     await this._redisClient.flushdb();
   };
 
-  public graphQuery = async (query: string): Promise<any> => {
+  public graphQuery = async (props: {
+    query: string;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<any> => {
+    const { query, dbServiceAccessOptions } = props;
+    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
+    if (!isCurrentAPIUserPermitted) {
+      throw Error('Access denied.');
+    }
     const graphRes = await this._redisGraph.query(query);
     return graphRes;
   };
 
-  public createUserNode = async (user: JoinedUserDoc): Promise<void> => {
-    await this.graphQuery(`CREATE (user: User { _id: "${user._id}" })`);
+  public createUserNode = async (props: {
+    user: JoinedUserDoc;
+    dbServiceAccessOptions: DbServiceAccessOptions;
+  }): Promise<void> => {
+    const { user, dbServiceAccessOptions } = props;
+    await this.graphQuery({
+      query: `CREATE (user: User { _id: "${user._id}" })`,
+      dbServiceAccessOptions,
+    });
   };
 
   public init = async (initParams: CacheDbServiceInitParams): Promise<this> => {
