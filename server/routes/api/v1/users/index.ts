@@ -4,6 +4,7 @@ import { makeGetAvailableTimesController } from '../../../../components/controll
 import { makeCreateUserController } from '../../../../components/controllers/user/createUserController';
 import { makeEditUserController } from '../../../../components/controllers/user/editUserController';
 import { makeGetUserController } from '../../../../components/controllers/user/getUserController';
+import { makeGetUserTeacherEdgesController } from '../../../../components/controllers/user/getUserTeacherEdgesController';
 import {
   makeJSONCookieExpressCallback,
   makeJSONExpressCallback,
@@ -13,12 +14,20 @@ import { auth } from './auth/index';
 const users = express.Router();
 
 users.get('/:userId', makeJSONExpressCallback.consume(makeGetUserController));
-users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController));
 users.get(
   '/:userId/availableTimes',
   makeJSONExpressCallback.consume(makeGetAvailableTimesController)
 );
 users.get('/:userId/appointments', makeJSONExpressCallback.consume(makeGetAppointmentsController));
+users.get(
+  '/:userId/userTeacherEdges',
+  makeJSONExpressCallback.consume(makeGetUserTeacherEdgesController)
+);
+users.get(
+  '/self/userTeacherEdges',
+  makeJSONExpressCallback.consume(makeGetUserTeacherEdgesController)
+);
+users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController));
 users.post('/', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 users.use('/auth', auth);
 
