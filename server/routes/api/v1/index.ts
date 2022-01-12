@@ -1,4 +1,5 @@
 import express from 'express';
+import { admin } from './admin';
 import { appointments } from './appointments';
 import { availableTimes } from './availableTimes';
 import { checkout } from './checkout';
@@ -19,5 +20,6 @@ api.use('/utils', utils);
 api.use('/packageTransactions', packageTransactions);
 api.use('/checkout', checkout);
 api.use('/webhooks', webhooks);
+api.use('/admin', admin);
 
 export { api };
