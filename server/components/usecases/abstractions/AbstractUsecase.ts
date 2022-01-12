@@ -20,6 +20,12 @@ type MakeRequestTemplateParams = {
   headers: any;
 };
 
+type IsCurrentAPIUserPermittedParams = {
+  isSelf: boolean;
+  currentAPIUser: CurrentAPIUser;
+  endpointPath: string;
+};
+
 abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbServiceResponse>
   implements IUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbServiceResponse>
 {
@@ -69,15 +75,11 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     return makeRequestTemplateParams;
   };
 
-  private _isCurrentAPIUserPermitted = (props: {
-    isSelf: boolean;
-    currentAPIUser: CurrentAPIUser;
-    endpointPath: string;
-  }): boolean => {
+  private _isCurrentAPIUserPermitted = (props: IsCurrentAPIUserPermittedParams): boolean => {
     const { isSelf, currentAPIUser, endpointPath } = props;
     const isAdminProtected = endpointPath.includes('admin');
     const isAdmin = currentAPIUser.role == 'admin';
-    const isProtectedResource = this._isProtectedResource();
+    const isProtectedResource = this._isProtectedResource(props);
     const isCurrentAPIUserPermitted = isAdminProtected
       ? isAdmin
       : isSelf || isAdmin || !isProtectedResource;
@@ -155,7 +157,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     return isResourceOwner;
   };
 
-  protected _isProtectedResource = (): boolean => {
+  protected _isProtectedResource = (props: IsCurrentAPIUserPermittedParams): boolean => {
     return true;
   };
 
@@ -237,4 +239,4 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
   };
 }
 
-export { AbstractUsecase, MakeRequestTemplateParams };
+export { AbstractUsecase, MakeRequestTemplateParams, IsCurrentAPIUserPermittedParams };
