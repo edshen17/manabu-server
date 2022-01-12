@@ -93,10 +93,6 @@ class CacheDbService {
     await this._redisClient.del(hashKey.toLowerCase());
   };
 
-  public clearAll = async (): Promise<void> => {
-    await this._redisClient.flushdb();
-  };
-
   public graphQuery = async (props: {
     query: string;
     dbServiceAccessOptions: DbServiceAccessOptions;

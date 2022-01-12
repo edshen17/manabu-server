@@ -19,8 +19,12 @@ abstract class AbstractGetUsecase<
     sort: StringKeyObject;
   }): PaginationOptions => {
     const { query, fallbackQuery, sort } = props;
-    const { page, limit } = query || fallbackQuery;
-    const paginationOptions = { page, limit, sort };
+    const { page, limit } = query;
+    const paginationOptions = {
+      page: page || fallbackQuery.page,
+      limit: limit || fallbackQuery.limit,
+      sort,
+    };
     return paginationOptions;
   };
 }

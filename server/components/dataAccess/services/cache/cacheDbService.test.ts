@@ -52,13 +52,6 @@ describe('cacheDbService', () => {
       expect(storedItem).to.equal(null);
     });
   });
-  describe('clearAll', () => {
-    it('should clear everything in the cache', async () => {
-      await cacheDbService.clearAll();
-      const storedItem = await cacheDbService.get({ hashKey, key: 'storeditem' });
-      expect(storedItem).to.equal(null);
-    });
-  });
   describe('graphQuery', () => {
     it('should make a graph query', async () => {
       const dbServiceAccessOptions: DbServiceAccessOptions = {
