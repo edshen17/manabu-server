@@ -22,9 +22,6 @@ class GetTeachersUsecase extends AbstractGetUsecase<
       query,
       dbServiceAccessOptions,
     });
-    if (!teachers) {
-      throw new Error('Teachers not found.');
-    }
     return { teachers };
   };
 

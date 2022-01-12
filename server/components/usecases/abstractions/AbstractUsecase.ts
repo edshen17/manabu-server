@@ -97,9 +97,8 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
       currentAPIUser.teacherId &&
       params.teacherId == currentAPIUser.teacherId.toString();
     const isSelfRoute = endpointPath.includes('self');
-    const isAdmin = currentAPIUser.role == 'admin';
     const isResourceOwner = await this._isResourceOwner({ currentAPIUser, params });
-    const isSelf = isSameUserId || isSameTeacherId || isSelfRoute || isAdmin || isResourceOwner;
+    const isSelf = isSameUserId || isSameTeacherId || isSelfRoute || isResourceOwner;
     return isSelf;
   };
 
