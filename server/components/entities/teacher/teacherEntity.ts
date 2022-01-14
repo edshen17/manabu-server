@@ -14,8 +14,8 @@ type OptionalTeacherEntityInitParams = {
 type TeacherEntityBuildParams = {};
 
 type TeacherEntityBuildResponse = {
-  teachingLanguages: { language: string; level: string }[];
-  alsoSpeaks: { language: string; level: string }[];
+  teachingLanguages: { code: string; level: string }[];
+  alsoSpeaks: { code: string; level: string }[];
   introductionVideoUrl: string;
   applicationStatus: string;
   type: string;

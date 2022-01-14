@@ -46,7 +46,7 @@ type UserEntityBuildResponse = {
   profileImageUrl: string;
   profileBio: string;
   createdDate: Date;
-  languages?: { level: string; language: string }[];
+  languages?: { level: string; code: string }[];
   region: string;
   timezone: string;
   lastOnlineDate: Date;

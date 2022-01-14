@@ -7,14 +7,14 @@ class TeacherEntityValidator extends AbstractEntityValidator {
       teachingLanguages: this._joi
         .array()
         .items({
-          language: this._joi.string().max(5),
+          code: this._joi.string().max(5),
           level: this._joi.string().max(5),
         })
         .max(5),
       alsoSpeaks: this._joi
         .array()
         .items({
-          language: this._joi.string().max(5),
+          code: this._joi.string().max(5),
           level: this._joi.string().max(5),
         })
         .max(5),

@@ -23,7 +23,7 @@ const UserSchema = createSchema({
   profileImageUrl: Type.string({ required: false }),
   profileBio: Type.string({ required: false }),
   languages: Type.array({ required: true }).of({
-    language: Type.string({ required: true }),
+    code: Type.string({ required: true }),
     level: Type.string({ required: true }),
   }),
   region: Type.string({ required: false }),

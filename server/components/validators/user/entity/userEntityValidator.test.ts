@@ -62,7 +62,7 @@ describe('userEntityValidator', () => {
               password: 'NewPassword!2',
               email: 'newEmail@gmail.com',
               profileBio: 'new bio',
-              languages: [{ language: 'ja', level: 'C2' }],
+              languages: [{ code: 'ja', level: 'C2' }],
               settings: {
                 currency: 'SGD',
                 locale: 'en',

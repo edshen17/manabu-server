@@ -12,7 +12,7 @@ class UserEntityValidator extends AbstractEntityValidator {
         .array()
         .items({
           level: this._joi.string().max(5),
-          language: this._joi.string().max(5),
+          code: this._joi.string().max(5),
         })
         .max(5),
       region: this._joi.string().max(256),

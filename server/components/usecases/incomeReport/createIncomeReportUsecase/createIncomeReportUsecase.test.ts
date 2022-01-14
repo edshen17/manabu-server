@@ -44,7 +44,7 @@ beforeEach(async () => {
   };
 });
 
-describe('createIncomeReportUsecaseUsecase', () => {
+describe('createIncomeReportUsecase', () => {
   describe('makeRequest', () => {
     const createIncomeReport = async () => {
       const controllerData = controllerDataBuilder

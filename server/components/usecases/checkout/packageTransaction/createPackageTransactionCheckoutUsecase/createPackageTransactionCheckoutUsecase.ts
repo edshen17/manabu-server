@@ -127,7 +127,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const isValidLessonDuration = teacherPackage.lessonDurations.includes(lessonDuration);
     const isValidLessonLanguage =
       teacherData.teachingLanguages.findIndex((teachingLanguage) => {
-        return teachingLanguage.language == lessonLanguage;
+        return teachingLanguage.code == lessonLanguage;
       }) != -1;
     const isValidBody = isTeacherApproved && isValidLessonDuration && isValidLessonLanguage;
     if (!isValidBody) {

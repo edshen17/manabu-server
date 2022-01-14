@@ -4,11 +4,11 @@ import { PackageSchema } from './Package';
 const TeacherSchema = createSchema({
   approvalDate: Type.date({ required: false }),
   teachingLanguages: Type.array({ required: true }).of({
-    language: Type.string(),
+    code: Type.string(),
     level: Type.string(),
   }),
   alsoSpeaks: Type.array({ required: true }).of({
-    language: Type.string(),
+    code: Type.string(),
     level: Type.string(),
   }),
   introductionVideoUrl: Type.string({ required: false }),
