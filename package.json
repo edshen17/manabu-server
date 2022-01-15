@@ -13,6 +13,9 @@
     "kill": "taskkill /F /IM node.exe",
     "postinstall": "npx patch-package"
   },
+  "nodemonConfig": {
+    "ignore": ["client/*"]
+  },
   "main": "server/index.ts",
   "dependencies": {
     "@panter/vue-i18next": "^0.15.2",

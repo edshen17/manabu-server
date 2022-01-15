@@ -20,20 +20,24 @@ class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {
   private _sendAppointmentReminderScheduleTask!: SendAppointmentReminderScheduleTask;
 
   public start = async (): Promise<void> => {
-    const self = this;
-    const cronJob = new this._cron(
-      SCHEDULER_INTERVAL.FIVE_MINUTES,
-      async function () {
-        await self._endAppointmentScheduleTask.execute();
-        await self._endPackageTransactionScheduleTask.execute();
-        await self._sendAppointmentReminderScheduleTask.execute();
-        self._cronJobs.push(cronJob);
-      },
-      null,
-      true,
-      'America/New_York'
-    );
-    cronJob.start();
+    try {
+      const self = this;
+      const cronJob = new this._cron(
+        SCHEDULER_INTERVAL.FIVE_MINUTES,
+        async function () {
+          await self._endAppointmentScheduleTask.execute();
+          await self._endPackageTransactionScheduleTask.execute();
+          await self._sendAppointmentReminderScheduleTask.execute();
+          self._cronJobs.push(cronJob);
+        },
+        null,
+        true,
+        'America/New_York'
+      );
+      cronJob.start();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   protected _initTemplate = async (
