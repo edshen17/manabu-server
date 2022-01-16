@@ -10,6 +10,7 @@ import {
   makeJSONExpressCallback,
 } from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 import { auth } from './auth/index';
+import { self } from './self';
 
 const users = express.Router();
 
@@ -23,12 +24,9 @@ users.get(
   '/:userId/userTeacherEdges',
   makeJSONExpressCallback.consume(makeGetUserTeacherEdgesController)
 );
-users.get(
-  '/self/userTeacherEdges',
-  makeJSONExpressCallback.consume(makeGetUserTeacherEdgesController)
-);
 users.patch('/:userId', makeJSONExpressCallback.consume(makeEditUserController));
 users.post('/', makeJSONCookieExpressCallback.consume(makeCreateUserController));
 users.use('/auth', auth);
+users.use('/self', self);
 
 export { users };

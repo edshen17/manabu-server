@@ -1,9 +1,4 @@
-import {
-  IS_PRODUCTION,
-  MANABU_ADMIN_EMAIL,
-  MANABU_ADMIN_ID,
-  MANABU_ADMIN_PKG_ID,
-} from '../../../../constants';
+import { MANABU_ADMIN_EMAIL, MANABU_ADMIN_ID, MANABU_ADMIN_PKG_ID } from '../../../../constants';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
@@ -20,12 +15,12 @@ import { ConvertStringToObjectId } from '../../../entities/utils/convertStringTo
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { CookieData, CookieHandler } from '../../utils/cookieHandler/cookieHandler';
 import {
   EmailHandler,
   EMAIL_HANDLER_SENDER_ADDRESS,
   EMAIL_HANDLER_TEMPLATE,
 } from '../../utils/emailHandler/emailHandler';
-import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 
 type OptionalCreateUserUsecaseInitParams = {
@@ -37,20 +32,10 @@ type OptionalCreateUserUsecaseInitParams = {
   makePackageDbService: Promise<PackageDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeCacheDbService: Promise<CacheDbService>;
-  makeJwtHandler: Promise<JwtHandler>;
+  makeCookieHandler: Promise<CookieHandler>;
   makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: ConvertStringToObjectId;
-};
-
-type CookieData = {
-  name: string;
-  value: string;
-  options: {
-    maxAge: number;
-    httpOnly: boolean;
-    secure: boolean;
-  };
 };
 
 type CreateUserUsecaseResponse = {
@@ -68,11 +53,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _packageTransactionEntity!: PackageTransactionEntity;
   private _teacherEntity!: TeacherEntity;
   private _packageTransactionDbService!: PackageTransactionDbService;
-  private _jwtHandler!: JwtHandler;
   private _emailHandler!: EmailHandler;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _convertStringToObjectId!: any;
   private _cacheDbService!: CacheDbService;
+  private _cookieHandler!: CookieHandler;
 
   protected _isSelf = async (props: {
     params: any;
@@ -97,7 +82,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       this._sendVerificationEmail(userEntity);
       this._sendInternalEmail({ user, isTeacherApp });
     }
-    const cookies = this.splitLoginCookies(user);
+    const cookies = this._cookieHandler.splitLoginCookies(user);
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
       .endpoint('/dashboard')
@@ -213,46 +198,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     });
   };
 
-  public splitLoginCookies = (user: JoinedUserDoc): CookieData[] => {
-    const { _id, role } = user;
-    const toTokenObj = {
-      _id,
-      role,
-      teacherData: {
-        _id: user.teacherData?._id,
-      },
-    };
-    const token = this._jwtHandler.sign({ toTokenObj, expiresIn: '7d' });
-    const tokenArr: string[] = token.split('.');
-    const options = this._setCookieOptions();
-    const hpCookie = {
-      name: 'hp',
-      value: `${tokenArr[0]}.${tokenArr[1]}`,
-      options,
-    };
-    const sigCookie = {
-      name: 'sig',
-      value: `.${tokenArr[2]}`,
-      options,
-    };
-    const loginCookies = [hpCookie, sigCookie];
-    return loginCookies;
-  };
-
-  private _setCookieOptions = (): CookieData['options'] => {
-    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-    const cookieOptions = {
-      maxAge: ONE_WEEK_MS,
-      httpOnly: true,
-      secure: true,
-    };
-    if (!IS_PRODUCTION) {
-      cookieOptions.httpOnly = false;
-      cookieOptions.secure = false;
-    }
-    return cookieOptions;
-  };
-
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateUserUsecaseInitParams
   ): Promise<void> => {
@@ -262,9 +207,9 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makeTeacherEntity,
       makePackageTransactionDbService,
       makeCacheDbService,
-      makeJwtHandler,
       makeEmailHandler,
       makeRedirectUrlBuilder,
+      makeCookieHandler,
       convertStringToObjectId,
     } = optionalInitParams;
     this._userEntity = await makeUserEntity;
@@ -272,10 +217,10 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._teacherEntity = await makeTeacherEntity;
     this._packageTransactionDbService = await makePackageTransactionDbService;
     this._cacheDbService = await makeCacheDbService;
-    this._jwtHandler = await makeJwtHandler;
     this._emailHandler = await makeEmailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;
+    this._cookieHandler = await makeCookieHandler;
   };
 }
 

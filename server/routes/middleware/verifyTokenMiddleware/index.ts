@@ -9,7 +9,7 @@ let jwtHandler: JwtHandler;
   jwtHandler = await makeJwtHandler;
 })();
 
-const verifyToken = async (req: any, res: any, next: any) => {
+const verifyToken = async (req: any, res: any, next: any): Promise<void> => {
   try {
     if (req.headers['x-requested-with'] && req.cookies.hp && req.cookies.sig) {
       const token = req.cookies.hp + req.cookies.sig;

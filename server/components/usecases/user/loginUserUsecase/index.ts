@@ -5,6 +5,7 @@ import { GOOGLE_CLIENT_SECRET, G_CLIENTID } from '../../../../constants';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeUserQueryValidator } from '../../../validators/user/query';
+import { makeCookieHandler } from '../../utils/cookieHandler';
 import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { makeCreateUserUsecase } from '../createUserUsecase';
 import { LoginUserUsecase } from './loginUserUsecase';
@@ -26,6 +27,7 @@ const makeLoginUserUsecase = new LoginUserUsecase().init({
   makeQueryValidator: makeUserQueryValidator,
   makeParamsValidator: makeBaseParamsValidator,
   deepEqual,
+  makeCookieHandler,
 });
 
 export { makeLoginUserUsecase };

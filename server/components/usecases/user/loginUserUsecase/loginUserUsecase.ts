@@ -9,6 +9,8 @@ import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHtt
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
+import { makeCookieHandler } from '../../utils/cookieHandler';
+import { CookieHandler } from '../../utils/cookieHandler/cookieHandler';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import {
   CreateUserUsecase,
@@ -20,6 +22,7 @@ type OptionalLoginUserUsecaseInitParams = {
   oauth2Client: any;
   google: any;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
+  makeCookieHandler: Promise<CookieHandler>;
 };
 type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 
@@ -38,6 +41,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _google!: any;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _CLIENT_DASHBOARD_URL!: string;
+  private _cookieHandler!: CookieHandler;
 
   protected _isSelf = async (props: {
     params: any;
@@ -129,7 +133,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
   private _createLoginResponse = (user: JoinedUserDoc): LoginUserUsecaseResponse => {
     return {
       user,
-      cookies: this._createUserUsecase.splitLoginCookies(user),
+      cookies: this._cookieHandler.splitLoginCookies(user),
       redirectUrl: this._CLIENT_DASHBOARD_URL,
     };
   };
@@ -192,6 +196,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
       .host('client')
       .endpoint('/dashboard')
       .build();
+    this._cookieHandler = await makeCookieHandler;
   };
 }
 

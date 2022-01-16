@@ -12,8 +12,8 @@ import { makeUserEntity } from '../../../entities/user';
 import { convertStringToObjectId } from '../../../entities/utils/convertStringToObjectId';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeUserQueryValidator } from '../../../validators/user/query';
+import { makeCookieHandler } from '../../utils/cookieHandler';
 import { makeEmailHandler } from '../../utils/emailHandler';
-import { makeJwtHandler } from '../../utils/jwtHandler';
 import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { CreateUserUsecase } from './createUserUsecase';
 
@@ -27,7 +27,6 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makePackageDbService,
   makePackageTransactionDbService,
   makeCacheDbService,
-  makeJwtHandler,
   makeEmailHandler,
   makeRedirectUrlBuilder,
   cloneDeep,
@@ -35,6 +34,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeQueryValidator: makeUserQueryValidator,
   convertStringToObjectId,
   deepEqual,
+  makeCookieHandler,
 });
 
 export { makeCreateUserUsecase };
