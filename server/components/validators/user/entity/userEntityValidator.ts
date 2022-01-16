@@ -38,10 +38,10 @@ class UserEntityValidator extends AbstractEntityValidator {
       contactMethods: this._joi
         .array()
         .items({
-          methodName: this._joi.string().max(256),
-          methodAddress: this._joi.string().max(256),
+          name: this._joi.string().max(256).valid('skype', 'discord', 'line', 'zoom'),
+          address: this._joi.string().max(500),
           isPrimaryMethod: this._joi.boolean(),
-          methodType: this._joi.string().max(256),
+          type: this._joi.string().max(256).valid('online', 'offline'),
         })
         .max(5),
       isEmailVerified: this._joi.boolean(),

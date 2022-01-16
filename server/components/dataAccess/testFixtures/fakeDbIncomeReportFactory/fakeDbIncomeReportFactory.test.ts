@@ -16,7 +16,6 @@ before(async () => {
 
 beforeEach(async () => {
   fakeIncomeReport = await fakeDbIncomeReportFactory.createFakeDbData();
-  console.log(fakeIncomeReport);
   fakeIncomeReport = await incomeReportDbService.findById({
     _id: fakeIncomeReport._id,
     dbServiceAccessOptions: {

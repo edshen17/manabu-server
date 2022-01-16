@@ -44,9 +44,9 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
       profileImageUrl: this._faker.image.imageUrl(),
       contactMethods: [
         {
-          methodName: 'LINE',
-          methodType: 'online',
-          methodAddress: this._faker.internet.userName(),
+          name: 'line',
+          type: 'online',
+          address: this._faker.internet.userName(),
           isPrimaryMethod: true,
         },
       ],

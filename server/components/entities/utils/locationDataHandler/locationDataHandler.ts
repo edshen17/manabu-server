@@ -4,8 +4,8 @@ import { UserContactMethod } from '../../user/userEntity';
 
 type LocationData =
   | {
-      locationName: string;
-      locationType: string;
+      name: string;
+      type: string;
       matchedContactMethod: MatchedContactMethod;
     }
   | StringKeyObject;
@@ -27,16 +27,15 @@ class LocationDataHandler {
     const matchedContactMethod = this._getMatchedContactMethod(props);
     const { hostedByContactMethod, reservedByContactMethod } = matchedContactMethod;
     const isOnline =
-      hostedByContactMethod.methodType == 'online' &&
-      reservedByContactMethod.methodType == 'online';
+      hostedByContactMethod.type == 'online' && reservedByContactMethod.type == 'online';
     const locationData = <LocationData>{
       matchedContactMethod,
       locationType: isOnline ? 'online' : 'offline',
     };
-    if (hostedByContactMethod.methodName == reservedByContactMethod.methodName) {
-      locationData.locationName = hostedByContactMethod.methodName;
+    if (hostedByContactMethod.name == reservedByContactMethod.name) {
+      locationData.name = hostedByContactMethod.name;
     } else {
-      locationData.locationName = 'alternative';
+      locationData.name = 'alternative';
     }
     return locationData;
   };
@@ -69,8 +68,7 @@ class LocationDataHandler {
     );
     hostedByContactMethods.forEach((hostedByContactMethod) => {
       reservedByContactMethods.forEach((reservedByContactMethod) => {
-        const isSharedContactMethod =
-          hostedByContactMethod.methodName == reservedByContactMethod.methodName;
+        const isSharedContactMethod = hostedByContactMethod.name == reservedByContactMethod.name;
         if (isSharedContactMethod) {
           matchedContactMethod.hostedByContactMethod = hostedByContactMethod;
           matchedContactMethod.reservedByContactMethod = reservedByContactMethod;

@@ -3,10 +3,10 @@ import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 import { TeacherSchema } from './Teacher';
 
 const UserContactMethodEmbed = {
-  methodName: Type.string({ required: true }),
-  methodAddress: Type.string({ required: true }),
+  name: Type.string({ required: true }),
+  address: Type.string({ required: true }),
   isPrimaryMethod: Type.boolean({ required: true }),
-  methodType: Type.string({ required: true, enum: ['online', 'offline'] }),
+  type: Type.string({ required: true, enum: ['online', 'offline'] }),
 };
 
 const UserEmailAlertsEmbed = {

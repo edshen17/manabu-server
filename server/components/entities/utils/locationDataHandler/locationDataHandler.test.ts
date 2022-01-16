@@ -49,17 +49,17 @@ describe('locationDataHandler', () => {
         it('should return locationData with a matched contact method', () => {
           expect(locationData.matchedContactMethod).to.have.property('hostedByContactMethod');
           expect(locationData.matchedContactMethod).to.have.property('reservedByContactMethod');
-          expect(locationData.locationName).to.not.equal('alternative');
+          expect(locationData.name).to.not.equal('alternative');
         });
       });
       context('different contact method', () => {
         it('should return locationData with an alternative contact method', () => {
-          overrideFakeTeacher.contactMethods[0].methodName = 'Skype';
+          overrideFakeTeacher.contactMethods[0].name = 'Skype';
           locationData = locationDataHandler.getLocationData({
             hostedByData: overrideFakeTeacher,
             reservedByData: overrideFakeUser,
           });
-          expect(locationData.locationName).to.equal('alternative');
+          expect(locationData.name).to.equal('alternative');
         });
       });
     });
