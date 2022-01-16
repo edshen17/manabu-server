@@ -78,9 +78,9 @@ describe('createBalanceTransactionsUsecase', () => {
     const testBalanceTransactionsError = async () => {
       let error;
       try {
-        error = await createBalanceTransactions();
+        await createBalanceTransactions();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

@@ -86,6 +86,8 @@ abstract class AbstractEmbeddedDbService<
     let processedResult;
     if (!dbQueryResult) {
       return null;
+    } else if (isReturningParent) {
+      processedResult = dbQueryResult;
     } else if (isResultArray) {
       processedResult = dbQueryResult
         .map((dbDoc: any) => {
@@ -101,8 +103,6 @@ abstract class AbstractEmbeddedDbService<
         dbQueryResult: dbQueryResult[embeddedParentFieldName],
         searchQuery,
       });
-    } else if (isReturningParent) {
-      processedResult = dbQueryResult;
     } else {
       processedResult = dbQueryResult[embeddedParentFieldName];
     }

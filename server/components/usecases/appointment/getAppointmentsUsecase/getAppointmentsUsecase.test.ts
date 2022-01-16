@@ -86,7 +86,7 @@ describe('getAppointmentsUsecase', () => {
       try {
         error = await getAppointments();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

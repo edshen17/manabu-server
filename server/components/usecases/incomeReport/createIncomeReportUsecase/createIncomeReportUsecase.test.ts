@@ -59,9 +59,9 @@ describe('createIncomeReportUsecase', () => {
     const testIncomeReportError = async () => {
       let error;
       try {
-        error = await createIncomeReport();
+        await createIncomeReport();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

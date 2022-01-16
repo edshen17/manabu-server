@@ -95,9 +95,9 @@ describe('createAppointmentUsecase', () => {
     const testAppointmentsError = async () => {
       let error;
       try {
-        error = await createAppointments();
+        await createAppointments();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

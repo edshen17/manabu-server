@@ -97,9 +97,9 @@ describe('createPackageTransactionUsecase', () => {
     const testPackageTransactionError = async () => {
       let error;
       try {
-        error = await createPackageTransaction();
+        await createPackageTransaction();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

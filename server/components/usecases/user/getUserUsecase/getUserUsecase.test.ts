@@ -75,9 +75,9 @@ describe('getUserUsecase', () => {
     const testUserError = async () => {
       let error;
       try {
-        error = await getUser();
+        await getUser();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

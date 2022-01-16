@@ -60,13 +60,13 @@ describe('editAvailableTimeUsecase', () => {
       return editAvailableTimeUsecaseRes;
     };
     const testAvailableTimeError = async () => {
-      let err;
+      let error;
       try {
-        err = await editAvailableTime();
+        await editAvailableTime();
       } catch (err) {
-        return;
+        error = err;
       }
-      expect(err).to.be.an('error');
+      expect(error).to.be.an('error');
     };
     context('db access permitted', () => {
       context('invalid inputs', () => {

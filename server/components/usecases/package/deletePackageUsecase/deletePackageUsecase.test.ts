@@ -54,13 +54,13 @@ describe('deletePackageUsecase', () => {
     };
 
     const testPackageError = async () => {
-      let err;
+      let error;
       try {
-        err = await deletePackage();
+        await deletePackage();
       } catch (err) {
-        return;
+        error = err;
       }
-      expect(err).to.be.an('error');
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {

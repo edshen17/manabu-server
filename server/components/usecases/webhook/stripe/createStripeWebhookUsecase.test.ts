@@ -83,7 +83,7 @@ describe('createStripeWebhookUsecase', () => {
       try {
         error = await createStripeWebhook();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

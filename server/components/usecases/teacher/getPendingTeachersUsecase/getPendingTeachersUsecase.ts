@@ -33,7 +33,7 @@ class GetPendingTeachersUsecase extends AbstractGetUsecase<
       searchQuery: {
         applicationStatus: 'pending',
       },
-      dbServiceAccessOptions,
+      dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
       paginationOptions,
     });
     return pendingTeachers;

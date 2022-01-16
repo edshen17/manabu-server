@@ -57,9 +57,9 @@ describe('editTeacherUsecase', () => {
     const testTeacherError = async () => {
       let error;
       try {
-        error = await editTeacher();
+        await editTeacher();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

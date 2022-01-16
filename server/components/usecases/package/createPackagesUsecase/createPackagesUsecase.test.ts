@@ -63,13 +63,13 @@ describe('createPackageUsecase', () => {
     };
 
     const testPackagesError = async () => {
-      let err;
+      let error;
       try {
-        err = await createPackages();
+        await createPackages();
       } catch (err) {
-        return;
+        error = err;
       }
-      expect(err).to.be.an('error');
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {

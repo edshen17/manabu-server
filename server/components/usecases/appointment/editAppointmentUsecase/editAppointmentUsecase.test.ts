@@ -81,9 +81,9 @@ describe('editAppointmentUsecase', () => {
     const testAppointmentError = async () => {
       let error;
       try {
-        error = await editAppointment();
+        await editAppointment();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

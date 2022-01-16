@@ -62,7 +62,7 @@ describe('createPaynowWebhookUsecase', () => {
       try {
         error = await createPaypalWebhook();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

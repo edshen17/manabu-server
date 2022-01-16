@@ -48,7 +48,7 @@ describe('availableTimeConflictHandler', () => {
       try {
         error = await testTime();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

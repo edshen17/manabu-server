@@ -90,9 +90,9 @@ describe('getTeachersUsecase', () => {
     const testTeacherError = async () => {
       let error;
       try {
-        error = await getTeachers();
+        await getTeachers();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

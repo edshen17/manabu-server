@@ -58,9 +58,9 @@ describe('createAvailableTimeUsecase', () => {
     const testAvailableTimeError = async () => {
       let error;
       try {
-        error = await createAvailableTime();
+        await createAvailableTime();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

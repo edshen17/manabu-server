@@ -60,13 +60,13 @@ describe('getPackageTransactionUsecase', () => {
     };
 
     const testPackageTransactionError = async () => {
-      let err;
+      let error;
       try {
-        err = await getPackageTransaction();
+        await getPackageTransaction();
       } catch (err) {
-        return;
+        error = err;
       }
-      expect(err).to.be.an('error');
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {

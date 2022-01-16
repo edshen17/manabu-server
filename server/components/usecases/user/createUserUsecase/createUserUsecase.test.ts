@@ -45,9 +45,9 @@ describe('createUserUsecase', () => {
     const testUserError = async () => {
       let error;
       try {
-        error = await createUser();
+        await createUser();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

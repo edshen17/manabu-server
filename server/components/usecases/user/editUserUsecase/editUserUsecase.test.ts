@@ -62,9 +62,9 @@ describe('editUserUsecase', () => {
     const testUserError = async () => {
       let error;
       try {
-        error = await editUser();
+        await editUser();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

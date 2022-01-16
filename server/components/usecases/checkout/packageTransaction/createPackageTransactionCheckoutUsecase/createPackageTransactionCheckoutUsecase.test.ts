@@ -61,9 +61,9 @@ describe('createPackageTransactionCheckoutUsecase', () => {
     const testPackageTransactionCheckoutError = async () => {
       let error;
       try {
-        error = await createPackageTransactionCheckout();
+        await createPackageTransactionCheckout();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

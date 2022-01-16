@@ -116,16 +116,16 @@ describe('appointmentDbService', () => {
     context('db access denied', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-        let err;
+        let error;
         try {
-          err = await appointmentDbService.findById({
+          await appointmentDbService.findById({
             _id: fakeAppointment._id,
             dbServiceAccessOptions,
           });
         } catch (err) {
-          return;
+          error = err;
         }
-        expect(err).be.an('error');
+        expect(error).be.an('error');
       });
     });
   });
@@ -133,16 +133,16 @@ describe('appointmentDbService', () => {
     context('db access permitted', () => {
       context('invalid inputs', () => {
         it('should throw an error if required fields are not given', async () => {
-          let err;
+          let error;
           try {
-            err = await appointmentDbService.insert({
+            await appointmentDbService.insert({
               modelToInsert: {},
               dbServiceAccessOptions,
             });
           } catch (err) {
-            return;
+            error = err;
           }
-          expect(err).be.an('error');
+          expect(error).be.an('error');
         });
       });
       context('valid inputs', () => {
@@ -160,16 +160,16 @@ describe('appointmentDbService', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
         const { _id, ...modelToInsert } = fakeAppointment;
-        let err;
+        let error;
         try {
-          err = await appointmentDbService.insert({
+          await appointmentDbService.insert({
             modelToInsert,
             dbServiceAccessOptions,
           });
         } catch (err) {
-          return;
+          error = err;
         }
-        expect(err).be.an('error');
+        expect(error).be.an('error');
       });
     });
   });
@@ -221,13 +221,13 @@ describe('appointmentDbService', () => {
     context('db access denied', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-        let err;
+        let error;
         try {
-          err = await updateAppointment();
+          await updateAppointment();
         } catch (err) {
-          return;
+          error = err;
         }
-        expect(err).be.an('error');
+        expect(error).be.an('error');
       });
     });
   });
@@ -279,12 +279,13 @@ describe('appointmentDbService', () => {
     context('db access denied', () => {
       it('should throw an error', async () => {
         dbServiceAccessOptions.isCurrentAPIUserPermitted = false;
-        let err;
+        let error;
         try {
-          err = await deleteAppointment();
+          await deleteAppointment();
         } catch (err: any) {
-          expect(err.message).to.equal('Access denied.');
+          error = err;
         }
+        expect(error).to.be.an('error');
       });
     });
   });

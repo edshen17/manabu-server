@@ -56,13 +56,13 @@ describe('editPackageUsecase', () => {
     };
 
     const testPackageError = async () => {
-      let err;
+      let error;
       try {
-        err = await editPackage();
+        await editPackage();
       } catch (err) {
-        return;
+        error = err;
       }
-      expect(err).to.be.an('error');
+      expect(error).to.be.an('error');
     };
 
     context('db access permitted', () => {

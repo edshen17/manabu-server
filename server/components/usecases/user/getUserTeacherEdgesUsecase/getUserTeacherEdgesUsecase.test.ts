@@ -85,9 +85,9 @@ describe('getUserTeacherEdgesUsecase', () => {
     const testUserTeacherEdgesError = async () => {
       let error;
       try {
-        error = await getUserTeacherEdges();
+        await getUserTeacherEdges();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };

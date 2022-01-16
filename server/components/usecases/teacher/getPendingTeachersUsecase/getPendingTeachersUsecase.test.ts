@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import { makeGetPendingTeachersUsecase } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
+import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
+import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -11,6 +13,7 @@ import { GetPendingTeachersUsecase } from './getPendingTeachersUsecase';
 
 let getPendingTeachersUsecase: GetPendingTeachersUsecase;
 let fakeDbUserFactory: FakeDbUserFactory;
+let teacherDbService: TeacherDbService;
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeTeacher: JoinedUserDoc;
 let routeData: RouteData;
@@ -20,10 +23,17 @@ before(async () => {
   getPendingTeachersUsecase = await makeGetPendingTeachersUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   controllerDataBuilder = makeControllerDataBuilder;
+  teacherDbService = await makeTeacherDbService;
 });
 
 beforeEach(async () => {
+  const dbServiceAccessOptions = teacherDbService.getBaseDbServiceAccessOptions();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
+  await teacherDbService.findOneAndUpdate({
+    searchQuery: { _id: fakeTeacher.teacherData!._id },
+    updateQuery: { applicationStatus: 'pending' },
+    dbServiceAccessOptions,
+  });
   routeData = {
     rawBody: {},
     headers: {},
@@ -60,9 +70,9 @@ describe('getPendingTeachersUsecase', () => {
     const testTeacherError = async () => {
       let error;
       try {
-        error = await getPendingTeachers();
+        await getPendingTeachers();
       } catch (err) {
-        return;
+        error = err;
       }
       expect(error).to.be.an('error');
     };
