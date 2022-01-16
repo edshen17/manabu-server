@@ -16,6 +16,7 @@ type CurrentAPIUser = {
   userId?: ObjectId;
   teacherId?: ObjectId;
   role: string;
+  token?: string;
 };
 
 export { IHttpRequest, CurrentAPIUser };

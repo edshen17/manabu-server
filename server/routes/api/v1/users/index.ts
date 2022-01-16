@@ -14,7 +14,7 @@ import { self } from './self';
 
 const users = express.Router();
 
-users.get('/:userId', makeJSONExpressCallback.consume(makeGetUserController));
+users.get('/:userId', makeJSONCookieExpressCallback.consume(makeGetUserController));
 users.get(
   '/:userId/availableTimes',
   makeJSONExpressCallback.consume(makeGetAvailableTimesController)

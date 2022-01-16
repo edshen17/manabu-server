@@ -37,7 +37,7 @@ class JwtHandler {
       hashKey: CACHE_DB_HASH_KEY.BLACKLIST,
       key: token,
       value: token,
-      ttlMs: TTL_MS.DAY,
+      ttlMs: TTL_MS.WEEK,
     });
     return blacklistedToken;
   };

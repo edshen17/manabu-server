@@ -2,17 +2,26 @@ import { ObjectId } from 'mongoose';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { CookieData, CookieHandler } from '../../utils/cookieHandler/cookieHandler';
+import { JwtHandler } from '../../utils/jwtHandler/jwtHandler';
 
-type OptionalGetUserUsecaseInitParams = {};
-type GetUserUsecaseResponse = { user: JoinedUserDoc };
+type OptionalGetUserUsecaseInitParams = {
+  makeCookieHandler: Promise<CookieHandler>;
+  makeJwtHandler: Promise<JwtHandler>;
+};
+type GetUserUsecaseResponse = { user: JoinedUserDoc; cookies?: CookieData[] };
 
 class GetUserUsecase extends AbstractGetUsecase<
   OptionalGetUserUsecaseInitParams,
   GetUserUsecaseResponse,
   UserDbServiceResponse
 > {
+  private _cookieHandler!: CookieHandler;
+  private _jwtHandler!: JwtHandler;
+
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetUserUsecaseResponse> => {
@@ -23,13 +32,15 @@ class GetUserUsecase extends AbstractGetUsecase<
       _id,
       dbServiceAccessOptions,
     });
+    let cookies;
     if (!user) {
       throw new Error('User not found.');
     }
     if (isSelf) {
       this._updateOnlineTimestamp({ _id, dbServiceAccessOptions });
+      cookies = await this._refreshJwt({ currentAPIUser, user });
     }
-    return { user };
+    return { user, cookies };
   };
 
   private _getUser = async (props: {
@@ -58,6 +69,28 @@ class GetUserUsecase extends AbstractGetUsecase<
       },
       dbServiceAccessOptions,
     });
+  };
+
+  private _refreshJwt = async (props: {
+    user: JoinedUserDoc;
+    currentAPIUser: CurrentAPIUser;
+  }): Promise<CookieData[] | undefined> => {
+    const { user, currentAPIUser } = props;
+    const { token } = currentAPIUser;
+    let cookies;
+    if (token) {
+      cookies = this._cookieHandler.splitLoginCookies(user);
+      await this._jwtHandler.blacklist(token);
+    }
+    return cookies;
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalGetUserUsecaseInitParams
+  ): Promise<void> => {
+    const { makeCookieHandler, makeJwtHandler } = optionalInitParams;
+    this._cookieHandler = await makeCookieHandler;
+    this._jwtHandler = await makeJwtHandler;
   };
 }
 

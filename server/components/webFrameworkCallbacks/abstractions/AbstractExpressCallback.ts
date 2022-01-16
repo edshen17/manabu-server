@@ -29,8 +29,20 @@ abstract class AbstractExpressCallback implements IExpressCallback {
   };
 
   private _createHttpRequest = (req: any): IHttpRequest => {
-    const { body, query, params, ip, method, path, userId, role, teacherId, headers, rawBody } =
-      req;
+    const {
+      body,
+      query,
+      params,
+      ip,
+      method,
+      path,
+      userId,
+      role,
+      teacherId,
+      headers,
+      rawBody,
+      token,
+    } = req;
     const httpRequest = {
       body,
       rawBody,
@@ -43,6 +55,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
         userId: userId,
         role: role || 'user',
         teacherId: teacherId,
+        token,
       },
       headers,
     };

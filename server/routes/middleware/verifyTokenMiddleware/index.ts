@@ -20,6 +20,7 @@ const verifyToken = async (req: any, res: any, next: any): Promise<void> => {
       const { _id, role, teacherData } = decodedUser;
       req.userId = convertStringToObjectId(_id);
       req.role = role || 'user';
+      req.token = token;
       if (teacherData) {
         req.teacherId = convertStringToObjectId(teacherData._id);
       }
