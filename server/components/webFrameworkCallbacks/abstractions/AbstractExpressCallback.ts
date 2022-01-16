@@ -35,7 +35,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
       params,
       ip,
       method,
-      path,
+      originalUrl,
       userId,
       role,
       teacherId,
@@ -50,7 +50,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
       params,
       ip,
       method,
-      path,
+      path: originalUrl,
       currentAPIUser: {
         userId: userId,
         role: role || 'user',

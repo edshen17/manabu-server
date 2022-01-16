@@ -55,8 +55,8 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<LoginUserUsecaseResponse> => {
     const { body, dbServiceAccessOptions, query, endpointPath, controllerData } = props;
-    const isBaseLogin = endpointPath == SERVER_LOGIN_ENDPOINTS.BASE_LOGIN;
-    const isGoogleLogin = endpointPath == SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN;
+    const isBaseLogin = endpointPath.includes(SERVER_LOGIN_ENDPOINTS.BASE_LOGIN);
+    const isGoogleLogin = endpointPath.includes(SERVER_LOGIN_ENDPOINTS.GOOGLE_LOGIN);
     if (isBaseLogin) {
       const baseLoginRes = await this._handleBaseLogin({
         body,
