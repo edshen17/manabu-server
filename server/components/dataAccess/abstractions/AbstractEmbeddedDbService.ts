@@ -154,12 +154,13 @@ abstract class AbstractEmbeddedDbService<
   };
 
   public find = async (dbServiceParams: DbServiceFindParams): Promise<DbDoc[]> => {
-    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
+    const { searchQuery, dbServiceAccessOptions, session, paginationOptions } = dbServiceParams;
     const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
     const dbQueryPromise = this._parentDbService.find({
       searchQuery: embeddedSearchQuery,
       dbServiceAccessOptions,
       session,
+      paginationOptions,
     });
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,

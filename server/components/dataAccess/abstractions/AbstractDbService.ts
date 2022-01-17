@@ -305,7 +305,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
       sort: {},
     };
     const cacheKey = this._getCacheKey({
-      searchQuery,
+      searchQuery: { ...searchQuery, paginationOptions },
       modelViewName,
       cacheClient: DB_SERVICE_CACHE_CLIENT.FIND,
     });
@@ -313,10 +313,10 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
     const cacheData = await this._getCacheData(cacheKey);
     const dbQueryPromise = this._dbModel
       .find(searchQuery, modelView)
-      .sort(sort)
       .skip(page * limit)
       .limit(limit)
       .session(session)
+      .sort(sort)
       .lean();
     const storedData = await this._handleStoredData({
       cacheKey,

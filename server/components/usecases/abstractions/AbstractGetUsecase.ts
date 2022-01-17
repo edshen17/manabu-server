@@ -21,8 +21,8 @@ abstract class AbstractGetUsecase<
     const { query, fallbackQuery, sort } = props;
     const { page, limit } = query;
     const paginationOptions = {
-      page: page || fallbackQuery.page,
-      limit: limit || fallbackQuery.limit,
+      page: parseInt(page) || fallbackQuery.page,
+      limit: parseInt(limit) || fallbackQuery.limit,
       sort,
     };
     return paginationOptions;
