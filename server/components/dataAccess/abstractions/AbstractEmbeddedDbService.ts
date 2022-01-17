@@ -170,6 +170,22 @@ abstract class AbstractEmbeddedDbService<
     return dbQueryResult;
   };
 
+  public countDocuments = async (dbServiceParams: DbServiceFindOneParams): Promise<number> => {
+    const { searchQuery, dbServiceAccessOptions, session } = dbServiceParams;
+    const embeddedSearchQuery = this._convertToEmbeddedQuery(searchQuery);
+    const dbQueryPromise = this._parentDbService.countDocuments({
+      searchQuery: embeddedSearchQuery,
+      dbServiceAccessOptions,
+      session,
+    });
+    const dbQueryResult = await this._getDbQueryResult({
+      dbServiceAccessOptions,
+      dbQueryPromise,
+      searchQuery,
+    });
+    return dbQueryResult;
+  };
+
   public insert = async (dbServiceParams: DbServiceInsertParams): Promise<DbDoc> => {
     throw new Error(
       'Cannot insert an embedded document. Use findOneAndUpdate/updateMany on the parent document instead.'

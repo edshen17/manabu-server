@@ -64,6 +64,7 @@ enum DB_SERVICE_CACHE_CLIENT {
   FIND = 'find',
   FIND_ONE = 'find_one',
   FIND_BY_ID = 'find_by_id',
+  COUNT_DOCUMENTS = 'count_documents',
 }
 
 // does not follow snake case because of mongo collection names
@@ -97,6 +98,7 @@ interface IDbService<OptionalDbServiceInitParams, DbServiceResponse> {
   updateMany: (dbServiceParams: DbServiceUpdateParams) => Promise<DbServiceResponse[]>;
   findByIdAndDelete: (dbServiceParams: DbServiceFindByIdParams) => Promise<DbServiceResponse>;
   findOneAndDelete: (dbServiceParams: DbServiceFindOneParams) => Promise<DbServiceResponse>;
+  countDocuments: (dbServiceParams: DbServiceFindOneParams) => Promise<number>;
   init: (initParams: DbServiceInitParams<OptionalDbServiceInitParams>) => Promise<this>;
   getDbServiceModelViews: () => DbServiceModelViews;
   getBaseDbServiceAccessOptions: () => DbServiceAccessOptions;

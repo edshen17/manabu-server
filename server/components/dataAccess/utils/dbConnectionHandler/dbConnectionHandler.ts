@@ -21,14 +21,14 @@ class DbConnectionHandler {
   private _getDbUri = async (): Promise<string> => {
     const dbHost = 'staging'; // change to users
     const uriOptions = 'retryWrites=false&w=majority';
-    const dbUri = `mongodb+srv://manabu:${MONGO_PASS}@${MONGO_HOST}/${dbHost}?${uriOptions}`;
-    // if (!IS_PRODUCTION) {
-    //   const mongod = await this._mongoMemoryReplSet.create({
-    //     replSet: { count: 1, storageEngine: 'wiredTiger' },
-    //   });
-    //   this._replicaSets.push(mongod);
-    //   dbUri = `${mongod.getUri()}&${uriOptions}`;
-    // }
+    let dbUri = `mongodb+srv://manabu:${MONGO_PASS}@${MONGO_HOST}/${dbHost}?${uriOptions}`;
+    if (!IS_PRODUCTION) {
+      const mongod = await this._mongoMemoryReplSet.create({
+        replSet: { count: 1, storageEngine: 'wiredTiger' },
+      });
+      this._replicaSets.push(mongod);
+      dbUri = `${mongod.getUri()}&${uriOptions}`;
+    }
     return dbUri;
   };
 

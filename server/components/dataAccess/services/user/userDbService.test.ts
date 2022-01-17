@@ -357,4 +357,13 @@ describe('userDbService', () => {
       });
     });
   });
+  describe('countDocuments', () => {
+    it('should count the documents', async () => {
+      const userCount = await userDbService.countDocuments({
+        searchQuery: { _id: fakeTeacher._id },
+        dbServiceAccessOptions,
+      });
+      expect(userCount).to.equal(1);
+    });
+  });
 });

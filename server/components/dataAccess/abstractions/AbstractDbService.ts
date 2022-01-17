@@ -327,6 +327,26 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
     return storedData;
   };
 
+  public countDocuments = async (props: DbServiceFindOneParams): Promise<number> => {
+    const { searchQuery, dbServiceAccessOptions, session } = props;
+    const { modelViewName } = this._getDbServiceModelView(dbServiceAccessOptions);
+    const cacheKey = this._getCacheKey({
+      searchQuery,
+      modelViewName,
+      cacheClient: DB_SERVICE_CACHE_CLIENT.FIND,
+    });
+    this._testAccessPermitted(dbServiceAccessOptions);
+    const cacheData = await this._getCacheData(cacheKey);
+    const dbQueryPromise = this._dbModel.countDocuments(searchQuery).session(session);
+    const storedData = await this._handleStoredData({
+      cacheKey,
+      cacheData,
+      dbQueryPromise,
+      dbServiceAccessOptions,
+    });
+    return storedData;
+  };
+
   public insert = async (props: DbServiceInsertParams): Promise<DbServiceResponse> => {
     const { modelToInsert, dbServiceAccessOptions, session } = props;
     this._testAccessPermitted(dbServiceAccessOptions);
