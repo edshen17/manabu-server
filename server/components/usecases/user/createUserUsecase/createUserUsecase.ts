@@ -113,9 +113,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     user: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc> => {
-    const joinedUserData = await this._createTeacherData(props);
-    await this._createDbAdminPackageTransaction(props);
-    await this._createGraphAdminTeacherEdge(props);
+    const [joinedUserData] = await Promise.all([
+      this._createTeacherData(props),
+      this._createDbAdminPackageTransaction(props),
+      this._createGraphAdminTeacherEdge(props),
+    ]);
     return joinedUserData;
   };
 

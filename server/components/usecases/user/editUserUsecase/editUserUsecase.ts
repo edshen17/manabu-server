@@ -9,6 +9,7 @@ import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalEditUserUsecaseInitParams = {
   makeNGramHandler: NGramHandler;
+  sanitizeHtml: any;
 };
 
 type EditUserUsecaseResponse = { user: JoinedUserDoc };
@@ -19,18 +20,22 @@ class EditUserUsecase extends AbstractEditUsecase<
   UserDbServiceResponse
 > {
   private _nGramHandler!: NGramHandler;
+  private _sanitizeHtml!: any;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<EditUserUsecaseResponse> => {
     const { params, body, dbServiceAccessOptions } = props;
-    const { name } = body;
+    const { name, profileBio } = body;
     if (name) {
       body.nameNGrams = this._nGramHandler.createEdgeNGrams({ str: name, isPrefixOnly: false });
       body.namePrefixNGrams = this._nGramHandler.createEdgeNGrams({
         str: name,
         isPrefixOnly: true,
       });
+    }
+    if (profileBio) {
+      body.profileBio = this._sanitizeHtml(profileBio);
     }
     const user = await this._dbService.findOneAndUpdate({
       searchQuery: { _id: params.userId },
@@ -44,9 +49,10 @@ class EditUserUsecase extends AbstractEditUsecase<
   protected _initTemplate = async (
     optionalInitParams: AbstractEditUsecaseInitParams<OptionalEditUserUsecaseInitParams>
   ): Promise<void> => {
-    const { makeEditEntityValidator, makeNGramHandler } = optionalInitParams;
+    const { makeEditEntityValidator, makeNGramHandler, sanitizeHtml } = optionalInitParams;
     this._editEntityValidator = makeEditEntityValidator;
     this._nGramHandler = makeNGramHandler;
+    this._sanitizeHtml = sanitizeHtml;
   };
 }
 

@@ -1,5 +1,6 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
+import sanitizeHtml from 'sanitize-html';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeNGramHandler } from '../../../entities/utils/nGramHandler';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
@@ -15,6 +16,7 @@ const makeEditUserUsecase = new EditUserUsecase().init({
   cloneDeep,
   makeNGramHandler,
   deepEqual,
+  sanitizeHtml,
 });
 
 export { makeEditUserUsecase };

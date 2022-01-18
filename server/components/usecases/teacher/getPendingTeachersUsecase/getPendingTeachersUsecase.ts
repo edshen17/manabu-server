@@ -6,7 +6,7 @@ import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalGetTeachersUsecaseInitParams = {};
-type GetPendingTeachersUsecaseResponse = { teachers: JoinedUserDoc[] };
+type GetPendingTeachersUsecaseResponse = { teachers: JoinedUserDoc[]; pages: number };
 
 class GetPendingTeachersUsecase extends AbstractGetUsecase<
   OptionalGetTeachersUsecaseInitParams,
@@ -17,26 +17,33 @@ class GetPendingTeachersUsecase extends AbstractGetUsecase<
     props: MakeRequestTemplateParams
   ): Promise<GetPendingTeachersUsecaseResponse> => {
     const { query, dbServiceAccessOptions } = props;
-    const teachers = await this._getPendingTeachers({ query, dbServiceAccessOptions });
-    return { teachers };
+    const pendingTeachersRes = await this._getPendingTeachersRes({ query, dbServiceAccessOptions });
+    return pendingTeachersRes;
   };
 
-  private _getPendingTeachers = async (props: {
+  private _getPendingTeachersRes = async (props: {
     dbServiceAccessOptions: DbServiceAccessOptions;
     query: StringKeyObject;
-  }): Promise<JoinedUserDoc[]> => {
+  }): Promise<GetPendingTeachersUsecaseResponse> => {
     const { dbServiceAccessOptions, query } = props;
+    const searchQuery = {
+      applicationStatus: 'pending',
+    };
     const fallbackQuery = { page: 0, limit: 10 };
     const sort = { 'teacherData.createdDate': 1 };
     const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
-    const pendingTeachers = <JoinedUserDoc[]>await this._dbService.find({
-      searchQuery: {
-        applicationStatus: 'pending',
-      },
-      dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
+    const parentDbServiceAccessOptions = { ...dbServiceAccessOptions, isReturningParent: true };
+    const teachers = <JoinedUserDoc[]>await this._dbService.find({
+      searchQuery,
+      dbServiceAccessOptions: parentDbServiceAccessOptions,
       paginationOptions,
     });
-    return pendingTeachers;
+    const count = await this._dbService.countDocuments({
+      searchQuery,
+      dbServiceAccessOptions: parentDbServiceAccessOptions,
+    });
+    const pages = Math.ceil(count / paginationOptions.limit) - 1;
+    return { teachers, pages };
   };
 }
 

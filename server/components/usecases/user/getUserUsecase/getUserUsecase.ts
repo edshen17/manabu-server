@@ -65,7 +65,7 @@ class GetUserUsecase extends AbstractGetUsecase<
         _id,
       },
       updateQuery: {
-        lastOnline: new Date(),
+        lastOnlineDate: new Date(),
       },
       dbServiceAccessOptions,
     });
