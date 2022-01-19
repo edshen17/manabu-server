@@ -25,10 +25,10 @@ type PackageEntityBuildResponse = {
 };
 
 enum PACKAGE_ENTITY_NAME {
-  LIGHT = 'light plan',
-  MODERATE = 'moderate plan',
-  MAINICHI = 'mainichi plan',
-  CUSTOM = 'custom plan',
+  LIGHT = 'light',
+  MODERATE = 'moderate',
+  MAINICHI = 'mainichi',
+  CUSTOM = 'custom',
 }
 
 enum PACKAGE_ENTITY_TYPE {

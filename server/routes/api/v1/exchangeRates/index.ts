@@ -2,8 +2,8 @@ import express from 'express';
 import { makeGetExchangeRatesController } from '../../../../components/controllers/exchangeRate/getExchangeRatesController';
 import { makeJSONExpressCallback } from '../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 
-const utils = express.Router();
+const exchangeRates = express.Router();
 
-utils.get('/exchangeRates', makeJSONExpressCallback.consume(makeGetExchangeRatesController));
+exchangeRates.get('/', makeJSONExpressCallback.consume(makeGetExchangeRatesController));
 
-export { utils };
+export { exchangeRates };
