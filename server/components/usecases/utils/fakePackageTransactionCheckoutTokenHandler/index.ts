@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { makeCreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase';
 import { makeControllerDataBuilder } from '../controllerDataBuilder';
@@ -8,6 +10,8 @@ const makeFakePackageTransactionCheckoutTokenHandler =
     makeFakeDbUserFactory,
     makeControllerDataBuilder,
     makeCreatePackageTransactionCheckoutUsecase,
+    makeFakeDbAvailableTimeFactory,
+    dayjs,
   });
 
 export { makeFakePackageTransactionCheckoutTokenHandler };

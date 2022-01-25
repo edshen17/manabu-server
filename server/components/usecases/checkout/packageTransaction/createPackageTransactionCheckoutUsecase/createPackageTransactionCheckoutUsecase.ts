@@ -55,10 +55,13 @@ type CreatePackageTransactionCheckoutUsecaseResponse = {
 
 type GetRedirectUrlParams = MakeRequestTemplateParams & TestBodyResponse;
 
+type Timeslot = { startDate: Date; endDate: Date };
+
 type TestBodyResponse = {
   teacher: JoinedUserDoc;
   teacherData: JoinedUserDoc['teacherData'];
   teacherPackage: PackageDoc;
+  timeslots: Timeslot[];
 };
 
 type GetPaymentServiceRedirectUrlParams = Await<
@@ -72,6 +75,7 @@ type SetPackageTransactionJwtParams = {
   token: string;
   teacher: JoinedUserDoc;
   processedPaymentServiceData: ProcessedPaymentServiceData;
+  timeslots: Timeslot[];
 };
 
 type ProcessedPaymentServiceData = Await<
@@ -117,7 +121,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
       userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
     });
-    const { teacherId, packageId, lessonDuration, lessonLanguage } = validatedBody;
+    const { teacherId, packageId, lessonDuration, lessonLanguage, timeslots } = validatedBody;
     const teacher = <JoinedUserDoc>await this._dbService.findById({
       _id: this._convertStringToObjectId(teacherId),
       dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
@@ -136,7 +140,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     if (!isValidBody) {
       throw new Error('Invalid body.');
     }
-    return { teacher, teacherData, teacherPackage };
+    return { teacher, teacherData, teacherPackage, timeslots };
   };
 
   private _getPackageTransactionCheckoutResponse = async (
@@ -165,7 +169,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getProcessedPaymentServiceParams = async (props: GetRedirectUrlParams) => {
-    const { body, currentAPIUser, teacher, teacherPackage } = props;
+    const { body, currentAPIUser, teacher, teacherPackage, timeslots } = props;
     const { userId } = currentAPIUser;
     const token = `${userId}-${DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS}`;
     const processedPaymentServiceData = await this._getProcessedPaymentServiceData(props);
@@ -176,6 +180,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       teacher,
       token,
       userId,
+      timeslots,
       processedPaymentServiceData,
     });
     const successRedirectUrl = this._redirectUrlBuilder
@@ -229,7 +234,8 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _setTransactionJwt = async (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
-    const { token, processedPaymentServiceData, userId } = setPackageTransactionJwtParams;
+    const { token, processedPaymentServiceData, userId, timeslots } =
+      setPackageTransactionJwtParams;
     const packageTransactionEntityBuildParams = this._createPackageTransactionEntityBuildParams(
       setPackageTransactionJwtParams
     );
@@ -242,7 +248,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       toTokenObj: {
         packageTransactionEntityBuildParams,
         balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
-        //put appointments  here
+        timeslots,
       },
       expiresIn: '1d',
     });
@@ -438,4 +444,5 @@ export {
   CreatePackageTransactionCheckoutUsecase,
   CreatePackageTransactionCheckoutUsecaseResponse,
   CHECKOUT_TOKEN_HASH_KEY,
+  Timeslot,
 };

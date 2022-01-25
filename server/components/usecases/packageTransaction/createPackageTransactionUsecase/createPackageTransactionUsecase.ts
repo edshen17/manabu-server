@@ -1,5 +1,6 @@
 import { ClientSession } from 'mongoose';
 import { DEFAULT_CURRENCY, MANABU_PROCESSING_RATE } from '../../../../constants';
+import { AppointmentDoc } from '../../../../models/Appointment';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
 import { IncomeReportDoc } from '../../../../models/IncomeReport';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -20,14 +21,22 @@ import {
 } from '../../../entities/packageTransaction/packageTransactionEntity';
 import { TEACHER_ENTITY_TYPE } from '../../../entities/teacher/teacherEntity';
 import { USER_ENTITY_EMAIL_ALERT } from '../../../entities/user/userEntity';
+import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 import { ControllerData } from '../../abstractions/IUsecase';
 import {
+  CreateAppointmentsUsecase,
+  CreateAppointmentsUsecaseResponse,
+} from '../../appointment/createAppointmentsUsecase/createAppointmentsUsecase';
+import {
   CreateBalanceTransactionsUsecase,
   CreateBalanceTransactionsUsecaseResponse,
 } from '../../balanceTransaction/createBalanceTransactionsUsecase/createBalanceTransactionsUsecase';
-import { CHECKOUT_TOKEN_HASH_KEY } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
+import {
+  CHECKOUT_TOKEN_HASH_KEY,
+  Timeslot,
+} from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase/createPackageTransactionCheckoutUsecase';
 import { CreateIncomeReportUsecase } from '../../incomeReport/createIncomeReportUsecase/createIncomeReportUsecase';
 import { ControllerDataBuilder } from '../../utils/controllerDataBuilder/controllerDataBuilder';
 import {
@@ -48,12 +57,14 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeCreateIncomeReportUsecase: Promise<CreateIncomeReportUsecase>;
   makeControllerDataBuilder: ControllerDataBuilder;
   makeEmailHandler: Promise<EmailHandler>;
+  makeCreateAppointmentsUsecase: Promise<CreateAppointmentsUsecase>;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
   packageTransaction: PackageTransactionDoc;
   balanceTransactions: BalanceTransactionDoc[];
   incomeReport: IncomeReportDoc;
+  appointments: AppointmentDoc[];
 };
 
 type CreateBalanceTransactionsRouteDataParams = {
@@ -61,6 +72,14 @@ type CreateBalanceTransactionsRouteDataParams = {
   user: JoinedUserDoc;
   teacher: JoinedUserDoc;
   packageTransaction: PackageTransactionDoc;
+};
+
+type CreateAppointmentsRouteDataParams = {
+  packageTransaction: PackageTransactionDoc;
+  timeslots: Timeslot[];
+  dbServiceAccessOptions: DbServiceAccessOptions;
+  session: ClientSession;
+  currentAPIUser: CurrentAPIUser;
 };
 
 class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
@@ -77,11 +96,12 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _createIncomeReportUsecase!: CreateIncomeReportUsecase;
   private _controllerDataBuilder!: ControllerDataBuilder;
   private _emailHandler!: EmailHandler;
+  private _createAppointmentsUsecase!: CreateAppointmentsUsecase;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionUsecaseResponse> => {
-    const { query, dbServiceAccessOptions } = props;
+    const { query, dbServiceAccessOptions, currentAPIUser } = props;
     const session = await this._dbService.startSession();
     session.startTransaction();
     let usecaseRes!: CreatePackageTransactionUsecaseResponse;
@@ -90,6 +110,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         query,
         dbServiceAccessOptions,
         session,
+        currentAPIUser,
       });
       await this._editTeacherPendingBalance({ usecaseRes, dbServiceAccessOptions, session });
       await session.commitTransaction();
@@ -106,16 +127,24 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     query: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
     session: ClientSession;
+    currentAPIUser: CurrentAPIUser;
   }): Promise<CreatePackageTransactionUsecaseResponse> => {
-    const { query, dbServiceAccessOptions, session } = props;
+    const { query, dbServiceAccessOptions, session, currentAPIUser } = props;
     const { token, paymentId } = query;
     const verifiedJwt = await this._getVerifiedJwt(token);
-    const { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams } =
+    const { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams, timeslots } =
       verifiedJwt;
     const packageTransaction = await this._createPackageTransaction({
       packageTransactionEntityBuildParams,
       dbServiceAccessOptions,
       session,
+    });
+    const { appointments } = await this._createAppointments({
+      packageTransaction,
+      timeslots,
+      dbServiceAccessOptions,
+      session,
+      currentAPIUser,
     });
     const { balanceTransactions } = await this._createBalanceTransactions({
       packageTransaction,
@@ -125,7 +154,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       session,
     });
     const incomeReport = await this._createIncomeReport(balanceTransactions);
-    const usecaseRes = { packageTransaction, balanceTransactions, incomeReport };
+    const usecaseRes = { packageTransaction, balanceTransactions, incomeReport, appointments };
     return usecaseRes;
   };
 
@@ -167,41 +196,47 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     await this._cacheDbService.graphQuery({ query, dbServiceAccessOptions });
   };
 
-  private _sendPackageTransactionCreationEmails = (
-    balanceTransaction: BalanceTransactionDoc
-  ): void => {
-    this._sendStudentPackageTransactionCreationEmail(balanceTransaction);
-    this._sendTeacherPackageTransactionCreationEmail(balanceTransaction);
+  private _createAppointments = async (
+    props: CreateAppointmentsRouteDataParams
+  ): Promise<CreateAppointmentsUsecaseResponse> => {
+    const createAppointmentsControllerData = await this._getAppointmentsControllerData({
+      ...props,
+    });
+    const createAppointmentsRes = await this._createAppointmentsUsecase.makeRequest(
+      createAppointmentsControllerData
+    );
+    return createAppointmentsRes;
   };
 
-  private _sendStudentPackageTransactionCreationEmail = (
-    balanceTransaction: BalanceTransactionDoc
-  ) => {
-    const packageTransaction = balanceTransaction.packageTransactionData;
-    this._emailHandler.sendAlertFromUserId({
-      userId: packageTransaction.reservedById,
-      emailAlertName: USER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
-      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-      templateName: EMAIL_HANDLER_TEMPLATE.STUDENT_PACKAGE_TRANSACTION_CREATION,
-      data: {
-        balanceTransaction,
-      },
+  private _getAppointmentsControllerData = async (
+    props: CreateAppointmentsRouteDataParams
+  ): Promise<ControllerData> => {
+    const { currentAPIUser, session, timeslots, packageTransaction } = props;
+    const { _id, hostedById } = packageTransaction;
+    const appointments = timeslots.map((timeslot) => {
+      const appointmentEntityBuildParams = {
+        ...timeslot,
+        hostedById,
+        packageTransactionId: _id,
+      };
+      return appointmentEntityBuildParams;
     });
-  };
-
-  private _sendTeacherPackageTransactionCreationEmail = (
-    balanceTransaction: BalanceTransactionDoc
-  ): void => {
-    const packageTransaction = balanceTransaction.packageTransactionData;
-    this._emailHandler.sendAlertFromUserId({
-      userId: packageTransaction.hostedById,
-      emailAlertName: USER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
-      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-      templateName: EMAIL_HANDLER_TEMPLATE.TEACHER_PACKAGE_TRANSACTION_CREATION,
-      data: {
-        balanceTransaction,
+    const createAppointmentsRouteData = {
+      rawBody: {},
+      headers: {},
+      params: {},
+      body: {
+        appointments,
+        session,
       },
-    });
+      query: {},
+      endpointPath: '',
+    };
+    const createAppointmentsControllerData = this._controllerDataBuilder
+      .routeData(createAppointmentsRouteData)
+      .currentAPIUser(currentAPIUser)
+      .build();
+    return createAppointmentsControllerData;
   };
 
   private _createBalanceTransactions = async (props: {
@@ -447,6 +482,43 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     return totalAvailableBalance;
   };
 
+  private _sendPackageTransactionCreationEmails = (
+    balanceTransaction: BalanceTransactionDoc
+  ): void => {
+    this._sendStudentPackageTransactionCreationEmail(balanceTransaction);
+    this._sendTeacherPackageTransactionCreationEmail(balanceTransaction);
+  };
+
+  private _sendStudentPackageTransactionCreationEmail = (
+    balanceTransaction: BalanceTransactionDoc
+  ) => {
+    const packageTransaction = balanceTransaction.packageTransactionData;
+    this._emailHandler.sendAlertFromUserId({
+      userId: packageTransaction.reservedById,
+      emailAlertName: USER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      templateName: EMAIL_HANDLER_TEMPLATE.STUDENT_PACKAGE_TRANSACTION_CREATION,
+      data: {
+        balanceTransaction,
+      },
+    });
+  };
+
+  private _sendTeacherPackageTransactionCreationEmail = (
+    balanceTransaction: BalanceTransactionDoc
+  ): void => {
+    const packageTransaction = balanceTransaction.packageTransactionData;
+    this._emailHandler.sendAlertFromUserId({
+      userId: packageTransaction.hostedById,
+      emailAlertName: USER_ENTITY_EMAIL_ALERT.PACKAGE_TRANSACTION_CREATION,
+      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+      templateName: EMAIL_HANDLER_TEMPLATE.TEACHER_PACKAGE_TRANSACTION_CREATION,
+      data: {
+        balanceTransaction,
+      },
+    });
+  };
+
   private _editTeacherPendingBalance = async (props: {
     usecaseRes: CreatePackageTransactionUsecaseResponse;
     dbServiceAccessOptions: DbServiceAccessOptions;
@@ -535,6 +607,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeControllerDataBuilder,
       makeEmailHandler,
       makeCreateIncomeReportUsecase,
+      makeCreateAppointmentsUsecase,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -545,6 +618,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._controllerDataBuilder = makeControllerDataBuilder;
     this._emailHandler = await makeEmailHandler;
     this._createIncomeReportUsecase = await makeCreateIncomeReportUsecase;
+    this._createAppointmentsUsecase = await makeCreateAppointmentsUsecase;
   };
 }
 

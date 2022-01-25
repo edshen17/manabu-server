@@ -1,6 +1,10 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeWebhookHandler } from '.';
+import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { JoinedUserDoc } from '../../../../models/User';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -13,9 +17,11 @@ import { WebhookHandler, WebhookHandlerCreateResourceResponse } from './webhookH
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbUserFactory: FakeDbUserFactory;
+let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;
 let webhookHandler: WebhookHandler;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
+let fakeAvailableTime: AvailableTimeDoc;
 let currentAPIUser: CurrentAPIUser;
 let createPackageTransactionCheckoutRouteData: RouteData;
 let createPackageTransactionCheckoutUsecase: CreatePackageTransactionCheckoutUsecase;
@@ -25,12 +31,20 @@ before(async () => {
   controllerDataBuilder = makeControllerDataBuilder;
   webhookHandler = await makeWebhookHandler;
   fakeDbUserFactory = await makeFakeDbUserFactory;
+  fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
   createPackageTransactionCheckoutUsecase = await makeCreatePackageTransactionCheckoutUsecase;
 });
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
+  const startDate = dayjs().toDate();
+  const endDate = dayjs().add(1, 'hour').toDate();
+  fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData({
+    hostedById: fakeTeacher._id,
+    startDate,
+    endDate,
+  });
   currentAPIUser = {
     userId: fakeUser._id,
     role: fakeUser.role,
@@ -44,6 +58,7 @@ beforeEach(async () => {
       packageId: fakeTeacher.teacherData!.packages[0]._id,
       lessonDuration: 60,
       lessonLanguage: 'ja',
+      timeslots: [{ startDate, endDate }],
     },
     query: {
       paymentGateway: 'stripe',

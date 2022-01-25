@@ -6,6 +6,7 @@ import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makePackageTransactionQueryValidator } from '../../../validators/packageTransaction/query';
+import { makeCreateAppointmentsUsecase } from '../../appointment/createAppointmentsUsecase';
 import { makeCreateBalanceTransactionsUsecase } from '../../balanceTransaction/createBalanceTransactionsUsecase';
 import { makeCreateIncomeReportUsecase } from '../../incomeReport/createIncomeReportUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
@@ -29,6 +30,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeControllerDataBuilder,
   makeEmailHandler,
   makeCreateIncomeReportUsecase,
+  makeCreateAppointmentsUsecase,
 });
 
 export { makeCreatePackageTransactionUsecase };

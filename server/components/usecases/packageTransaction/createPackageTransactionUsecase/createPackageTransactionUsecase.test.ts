@@ -1,8 +1,12 @@
 import { expect } from 'chai';
+import dayjs from 'dayjs';
 import { makeCreatePackageTransactionUsecase } from '.';
+import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { JoinedUserDoc } from '../../../../models/User';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
+import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory';
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { TEACHER_ENTITY_TYPE } from '../../../entities/teacher/teacherEntity';
@@ -19,7 +23,9 @@ import {
 
 let controllerDataBuilder: ControllerDataBuilder;
 let fakeDbUserFactory: FakeDbUserFactory;
+let fakeDbAvailableTimeFactory: FakeDbAvailableTimeFactory;
 let fakeTeacher: JoinedUserDoc;
+let fakeAvailableTime: AvailableTimeDoc;
 let createPackageTransactionUsecase: CreatePackageTransactionUsecase;
 let createPackageTransactionCheckoutUsecase: CreatePackageTransactionCheckoutUsecase;
 let createPackageTransactionUsecaseRouteData: RouteData;
@@ -34,11 +40,19 @@ before(async () => {
   createPackageTransactionCheckoutUsecase = await makeCreatePackageTransactionCheckoutUsecase;
   fakeDbUserFactory = await makeFakeDbUserFactory;
   teacherDbService = await makeTeacherDbService;
+  fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
 });
 
 beforeEach(async () => {
   fakeUser = await fakeDbUserFactory.createFakeDbUser();
   fakeTeacher = await fakeDbUserFactory.createFakeDbTeacher();
+  const startDate = dayjs().toDate();
+  const endDate = dayjs().add(1, 'hour').toDate();
+  fakeAvailableTime = await fakeDbAvailableTimeFactory.createFakeDbData({
+    hostedById: fakeTeacher._id,
+    startDate,
+    endDate,
+  });
   currentAPIUser = {
     userId: fakeUser._id,
     role: fakeUser.role,
@@ -52,6 +66,7 @@ beforeEach(async () => {
       packageId: fakeTeacher.teacherData!.packages[0]._id,
       lessonDuration: 60,
       lessonLanguage: 'ja',
+      timeslots: [{ startDate, endDate }],
     },
     query: {
       paymentGateway: 'paypal',

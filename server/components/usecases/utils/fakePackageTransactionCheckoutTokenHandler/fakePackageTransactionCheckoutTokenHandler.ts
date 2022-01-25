@@ -1,3 +1,4 @@
+import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { ControllerData, RouteData } from '../../abstractions/IUsecase';
@@ -6,8 +7,10 @@ import { ControllerDataBuilder } from '../controllerDataBuilder/controllerDataBu
 
 class FakePackageTransactionCheckoutTokenHandler {
   private _fakeDbUserFactory!: FakeDbUserFactory;
+  private _fakeDbAvailableTimeFactory!: FakeDbAvailableTimeFactory;
   private _controllerDataBuilder!: ControllerDataBuilder;
   private _createPackageTransactionCheckoutUsecase!: CreatePackageTransactionCheckoutUsecase;
+  private _dayjs!: any;
 
   public createTokenData = async (): Promise<{
     token: string;
@@ -34,6 +37,13 @@ class FakePackageTransactionCheckoutTokenHandler {
 
   private _createRouteData = async (): Promise<RouteData> => {
     const fakeTeacher = await this._fakeDbUserFactory.createFakeDbTeacher();
+    const startDate = this._dayjs().toDate();
+    const endDate = this._dayjs().add(1, 'hour').toDate();
+    const fakeAvailableTime = await this._fakeDbAvailableTimeFactory.createFakeDbData({
+      hostedById: fakeTeacher._id,
+      startDate,
+      endDate,
+    });
     const createPackageTransactionCheckoutRouteData = {
       rawBody: {},
       headers: {},
@@ -43,6 +53,7 @@ class FakePackageTransactionCheckoutTokenHandler {
         packageId: fakeTeacher.teacherData!.packages[0]._id,
         lessonDuration: 60,
         lessonLanguage: 'ja',
+        timeslots: [{ startDate, endDate }],
       },
       query: {
         paymentGateway: 'paynow',
@@ -68,16 +79,22 @@ class FakePackageTransactionCheckoutTokenHandler {
     makeFakeDbUserFactory: Promise<FakeDbUserFactory>;
     makeControllerDataBuilder: ControllerDataBuilder;
     makeCreatePackageTransactionCheckoutUsecase: Promise<CreatePackageTransactionCheckoutUsecase>;
+    makeFakeDbAvailableTimeFactory: Promise<FakeDbAvailableTimeFactory>;
+    dayjs: any;
   }): Promise<this> => {
     const {
       makeFakeDbUserFactory,
       makeControllerDataBuilder,
       makeCreatePackageTransactionCheckoutUsecase,
+      makeFakeDbAvailableTimeFactory,
+      dayjs,
     } = initParams;
     this._fakeDbUserFactory = await makeFakeDbUserFactory;
     this._controllerDataBuilder = makeControllerDataBuilder;
     this._createPackageTransactionCheckoutUsecase =
       await makeCreatePackageTransactionCheckoutUsecase;
+    this._fakeDbAvailableTimeFactory = await makeFakeDbAvailableTimeFactory;
+    this._dayjs = dayjs;
     return this;
   };
 }
