@@ -4,7 +4,7 @@ import { makeJSONExpressCallback } from '../../../../../components/webFrameworkC
 
 const packageTransactions = express.Router();
 
-packageTransactions.get(
+packageTransactions.post(
   '/',
   makeJSONExpressCallback.consume(makeCreatePackageTransactionCheckoutController)
 );

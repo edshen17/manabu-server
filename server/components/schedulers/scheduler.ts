@@ -12,6 +12,7 @@ type OptionalSchedulerInitParams = {
 
 enum SCHEDULER_INTERVAL {
   FIVE_MINUTES = '0 */5 * * * *',
+  ONE_HOUR = '0 */60 * * * *',
 }
 
 class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {

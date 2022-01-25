@@ -33,6 +33,7 @@ import { MakeRequestTemplateParams } from '../../../abstractions/AbstractUsecase
 import { ConvertToTitlecase } from '../../../utils/convertToTitlecase';
 import { ExchangeRateHandler } from '../../../utils/exchangeRateHandler/exchangeRateHandler';
 import { JwtHandler } from '../../../utils/jwtHandler/jwtHandler';
+import { RedirectUrlBuilder } from '../../../utils/redirectUrlBuilder/redirectUrlBuilder';
 
 type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePaypalPaymentService: Promise<PaypalPaymentService>;
@@ -40,6 +41,7 @@ type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makePaynowPaymentService: Promise<PaynowPaymentService>;
   makeExchangeRateHandler: Promise<ExchangeRateHandler>;
   makeJwtHandler: Promise<JwtHandler>;
+  makeRedirectUrlBuilder: RedirectUrlBuilder;
   makeCacheDbService: Promise<CacheDbService>;
   makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
   convertStringToObjectId: ConvertStringToObjectId;
@@ -88,6 +90,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _paynowPaymentService!: PaynowPaymentService;
   private _exchangeRateHandler!: ExchangeRateHandler;
   private _cacheDbService!: CacheDbService;
+  private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _jwtHandler!: JwtHandler;
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
@@ -175,10 +178,18 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       userId,
       processedPaymentServiceData,
     });
+    const successRedirectUrl = this._redirectUrlBuilder
+      .host('client')
+      .endpoint('/dashboard')
+      .build();
+    const cancelRedirectUrl = this._redirectUrlBuilder
+      .host('client')
+      .endpoint(`/user/${teacher._id}`)
+      .build();
     const processedPaymentServiceParams = {
       item,
-      successRedirectUrl: 'https://manabu.sg/dashboard',
-      cancelRedirectUrl: 'https://manabu.sg/cancel',
+      successRedirectUrl,
+      cancelRedirectUrl,
       currency: DEFAULT_CURRENCY,
       token: token,
     };
@@ -231,6 +242,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       toTokenObj: {
         packageTransactionEntityBuildParams,
         balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
+        //put appointments  here
       },
       expiresIn: '1d',
     });
@@ -405,6 +417,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       makeJwtHandler,
       makeCacheDbService,
       makePackageTransactionCheckoutEntityValidator,
+      makeRedirectUrlBuilder,
       convertStringToObjectId,
       convertToTitlecase,
     } = optionalInitParams;
@@ -413,6 +426,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     this._paynowPaymentService = await makePaynowPaymentService;
     this._exchangeRateHandler = await makeExchangeRateHandler;
     this._jwtHandler = await makeJwtHandler;
+    this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._cacheDbService = await makeCacheDbService;
     this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
     this._convertStringToObjectId = convertStringToObjectId;

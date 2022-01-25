@@ -120,12 +120,12 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     const endedPackageTransactions = [];
     const endedTeacherBalanceResponses = [];
     for (const packageTransaction of expiredPackageTransactions) {
-      const endedTeacherBalanceTransactionRes = await this._endTeacherBalanceTransaction({
+      const endedPackageTransaction = await this._endPackageTransaction({
         packageTransaction,
         dbServiceAccessOptions,
         session,
       });
-      const endedPackageTransaction = await this._endPackageTransaction({
+      const endedTeacherBalanceTransactionRes = await this._endTeacherBalanceTransaction({
         packageTransaction,
         dbServiceAccessOptions,
         session,

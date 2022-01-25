@@ -12,6 +12,7 @@ import { makePackageTransactionCheckoutQueryValidator } from '../../../../valida
 import { convertToTitlecase } from '../../../utils/convertToTitlecase';
 import { makeExchangeRateHandler } from '../../../utils/exchangeRateHandler';
 import { makeJwtHandler } from '../../../utils/jwtHandler';
+import { makeRedirectUrlBuilder } from '../../../utils/redirectUrlBuilder';
 import { CreatePackageTransactionCheckoutUsecase } from './createPackageTransactionCheckoutUsecase';
 
 const makeCreatePackageTransactionCheckoutUsecase =
@@ -24,6 +25,7 @@ const makeCreatePackageTransactionCheckoutUsecase =
     deepEqual,
     makePaypalPaymentService,
     makeStripePaymentService,
+    makeRedirectUrlBuilder,
     convertStringToObjectId,
     convertToTitlecase,
     makeExchangeRateHandler,
