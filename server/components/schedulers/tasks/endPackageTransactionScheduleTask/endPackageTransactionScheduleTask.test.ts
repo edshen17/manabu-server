@@ -41,7 +41,6 @@ describe('endPackageTransactionScheduleTask', () => {
       endedTeacherBalanceRes.creditTeacherPayoutBalanceTransactions[0].balanceChange < 0
     ).to.equal(true);
     expect(expiredPackageTransaction.remainingAppointments).to.equal(0);
-    expect(expiredPackageTransaction.remainingReschedules).to.equal(0);
     expect(expiredPackageTransaction.isTerminated).to.equal(true);
     expect(endedTeacherBalanceRes.teacher.balance.totalAvailable).to.equal(0);
     expect(endedTeacherBalanceRes.debitTeacherBalanceTransaction.balanceChange > 0).to.equal(true);

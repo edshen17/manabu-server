@@ -26,7 +26,6 @@ type PackageTransactionEntityBuildResponse = {
   lessonLanguage: string;
   isSubscription: boolean;
   transactionDate: Date;
-  remainingReschedules: number;
   isTerminated: boolean;
   status: string;
   createdDate: Date;
@@ -61,7 +60,6 @@ class PackageTransactionEntity extends AbstractEntity<
       terminationDate: this._dayjs().add(3, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
-      remainingReschedules: 5,
       lessonLanguage,
       isSubscription,
       status: 'confirmed',

@@ -10,7 +10,6 @@ const PackageTransactionSchema = createSchema({
   terminationDate: Type.date({ required: true }),
   isTerminated: Type.boolean({ required: true }),
   remainingAppointments: Type.number({ required: true }),
-  remainingReschedules: Type.number({ required: true }),
   lessonLanguage: Type.string({ required: true }),
   isSubscription: Type.boolean({ required: true }),
   status: Type.string({

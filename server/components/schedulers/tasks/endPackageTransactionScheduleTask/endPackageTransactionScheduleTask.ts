@@ -174,7 +174,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       updateQuery: {
         isTerminated: true,
         remainingAppointments: 0,
-        remainingReschedules: 0,
       },
       session,
     });
