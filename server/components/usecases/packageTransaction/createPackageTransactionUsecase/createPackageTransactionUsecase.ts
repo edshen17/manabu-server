@@ -8,6 +8,7 @@ import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { GraphDbService } from '../../../dataAccess/services/graph/graphDbService';
 import { PackageTransactionDbServiceResponse } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import {
@@ -58,6 +59,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeControllerDataBuilder: ControllerDataBuilder;
   makeEmailHandler: Promise<EmailHandler>;
   makeCreateAppointmentsUsecase: Promise<CreateAppointmentsUsecase>;
+  makeGraphDbService: Promise<GraphDbService>;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
@@ -97,6 +99,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _controllerDataBuilder!: ControllerDataBuilder;
   private _emailHandler!: EmailHandler;
   private _createAppointmentsUsecase!: CreateAppointmentsUsecase;
+  private _graphDbService!: GraphDbService;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -193,7 +196,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const { packageTransaction, dbServiceAccessOptions } = props;
     const query = `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" }),
     (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:teaches]->(student)`;
-    await this._cacheDbService.graphQuery({ query, dbServiceAccessOptions });
+    await this._graphDbService.graphQuery({ query, dbServiceAccessOptions });
   };
 
   private _createAppointments = async (
@@ -608,6 +611,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeEmailHandler,
       makeCreateIncomeReportUsecase,
       makeCreateAppointmentsUsecase,
+      makeGraphDbService,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -619,6 +623,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._emailHandler = await makeEmailHandler;
     this._createIncomeReportUsecase = await makeCreateIncomeReportUsecase;
     this._createAppointmentsUsecase = await makeCreateAppointmentsUsecase;
+    this._graphDbService = await makeGraphDbService;
   };
 }
 

@@ -1,7 +1,7 @@
 import cloneDeep from 'clone-deep';
 import faker from 'faker';
 import { makeUserEntity } from '../../../entities/user';
-import { makeCacheDbService } from '../../services/cache';
+import { makeGraphDbService } from '../../services/graph';
 import { makeUserDbService } from '../../services/user';
 import { makeFakeDbTeacherFactory } from '../fakeDbTeacherFactory';
 import { FakeDbUserFactory } from './fakeDbUserFactory';
@@ -12,7 +12,7 @@ const makeFakeDbUserFactory = new FakeDbUserFactory().init({
   makeEntity: makeUserEntity,
   makeDbService: makeUserDbService,
   makeFakeDbTeacherFactory,
-  makeCacheDbService,
+  makeGraphDbService,
 });
 
 export { makeFakeDbUserFactory };

@@ -1,6 +1,6 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
-import { makeCacheDbService } from '../../../dataAccess/services/cache';
+import { makeGraphDbService } from '../../../dataAccess/services/graph';
 import { makePackageDbService } from '../../../dataAccess/services/package';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
@@ -26,9 +26,9 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeTeacherDbService,
   makePackageDbService,
   makePackageTransactionDbService,
-  makeCacheDbService,
   makeEmailHandler,
   makeRedirectUrlBuilder,
+  makeGraphDbService,
   cloneDeep,
   makeParamsValidator: makeBaseParamsValidator,
   makeQueryValidator: makeUserQueryValidator,

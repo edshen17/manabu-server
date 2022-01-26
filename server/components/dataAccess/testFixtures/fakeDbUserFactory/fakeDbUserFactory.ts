@@ -1,13 +1,13 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { UserEntityBuildParams, UserEntityBuildResponse } from '../../../entities/user/userEntity';
-import { CacheDbService } from '../../services/cache/cacheDbService';
+import { GraphDbService } from '../../services/graph/graphDbService';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 import { FakeDbTeacherFactory } from '../fakeDbTeacherFactory/fakeDbTeacherFactory';
 
 type OptionalFakeDbUserFactoryInitParams = {
   faker: any;
   makeFakeDbTeacherFactory: Promise<FakeDbTeacherFactory>;
-  makeCacheDbService: Promise<CacheDbService>;
+  makeGraphDbService: Promise<GraphDbService>;
 };
 
 class FakeDbUserFactory extends AbstractFakeDbDataFactory<
@@ -18,21 +18,21 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
 > {
   private _faker: any;
   private _fakeDbTeacherFactory!: FakeDbTeacherFactory;
-  private _cacheDbService!: CacheDbService;
+  private _graphDbService!: GraphDbService;
 
   public createFakeDbTeacher = async (): Promise<JoinedUserDoc> => {
     const fakeBuildParams = await this._createFakeBuildParams();
     fakeBuildParams.teacherData = await this._fakeDbTeacherFactory.createFakeData();
     const fakeDbTeacher = await this.createFakeDbData(fakeBuildParams);
     const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
-    await this._cacheDbService.createUserNode({ user: fakeDbTeacher, dbServiceAccessOptions });
+    await this._graphDbService.createUserNode({ user: fakeDbTeacher, dbServiceAccessOptions });
     return fakeDbTeacher;
   };
 
   public createFakeDbUser = async (): Promise<JoinedUserDoc> => {
     const fakeDbUser = await this.createFakeDbData();
     const dbServiceAccessOptions = this._dbService.getBaseDbServiceAccessOptions();
-    await this._cacheDbService.createUserNode({ user: fakeDbUser, dbServiceAccessOptions });
+    await this._graphDbService.createUserNode({ user: fakeDbUser, dbServiceAccessOptions });
     return fakeDbUser;
   };
 
@@ -55,10 +55,10 @@ class FakeDbUserFactory extends AbstractFakeDbDataFactory<
   };
 
   protected _initTemplate = async (optionalInitParams: OptionalFakeDbUserFactoryInitParams) => {
-    const { faker, makeFakeDbTeacherFactory, makeCacheDbService } = optionalInitParams;
+    const { faker, makeFakeDbTeacherFactory, makeGraphDbService } = optionalInitParams;
     this._faker = faker;
     this._fakeDbTeacherFactory = await makeFakeDbTeacherFactory;
-    this._cacheDbService = await makeCacheDbService;
+    this._graphDbService = await makeGraphDbService;
   };
 }
 

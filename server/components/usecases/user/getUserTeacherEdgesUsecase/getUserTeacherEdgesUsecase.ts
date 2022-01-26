@@ -1,12 +1,12 @@
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
-import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { GraphDbService } from '../../../dataAccess/services/graph/graphDbService';
 import { UserDbServiceResponse } from '../../../dataAccess/services/user/userDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalGetUserTeacherEdgesUsecaseInitParams = {
-  makeCacheDbService: Promise<CacheDbService>;
+  makeGraphDbService: Promise<GraphDbService>;
 };
 type GetUserTeacherEdgesUsecaseResponse = { users: JoinedUserDoc[]; pages: number };
 
@@ -15,7 +15,7 @@ class GetUserTeacherEdgesUsecase extends AbstractGetUsecase<
   GetUserTeacherEdgesUsecaseResponse,
   UserDbServiceResponse
 > {
-  private _cacheDbService!: CacheDbService;
+  private _graphDbService!: GraphDbService;
 
   protected _isProtectedResource = (): boolean => {
     return true;
@@ -26,7 +26,7 @@ class GetUserTeacherEdgesUsecase extends AbstractGetUsecase<
   ): Promise<GetUserTeacherEdgesUsecaseResponse> => {
     const { dbServiceAccessOptions } = props;
     const { graphQuery, limit } = await this._getGraphQuery(props);
-    const res = await this._cacheDbService.graphQuery({
+    const res = await this._graphDbService.graphQuery({
       query: graphQuery,
       dbServiceAccessOptions,
     });
@@ -78,8 +78,8 @@ class GetUserTeacherEdgesUsecase extends AbstractGetUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalGetUserTeacherEdgesUsecaseInitParams
   ): Promise<void> => {
-    const { makeCacheDbService } = optionalInitParams;
-    this._cacheDbService = await makeCacheDbService;
+    const { makeGraphDbService } = optionalInitParams;
+    this._graphDbService = await makeGraphDbService;
   };
 }
 

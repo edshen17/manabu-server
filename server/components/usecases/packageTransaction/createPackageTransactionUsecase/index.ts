@@ -1,6 +1,7 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
+import { makeGraphDbService } from '../../../dataAccess/services/graph';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
@@ -31,6 +32,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeEmailHandler,
   makeCreateIncomeReportUsecase,
   makeCreateAppointmentsUsecase,
+  makeGraphDbService,
 });
 
 export { makeCreatePackageTransactionUsecase };

@@ -2,7 +2,7 @@ import { MANABU_ADMIN_EMAIL, MANABU_ADMIN_ID, MANABU_ADMIN_PKG_ID } from '../../
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
-import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { GraphDbService } from '../../../dataAccess/services/graph/graphDbService';
 import { PackageDbService } from '../../../dataAccess/services/package/packageDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
@@ -31,7 +31,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makeTeacherDbService: Promise<TeacherDbService>;
   makePackageDbService: Promise<PackageDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
-  makeCacheDbService: Promise<CacheDbService>;
+  makeGraphDbService: Promise<GraphDbService>;
   makeCookieHandler: Promise<CookieHandler>;
   makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
@@ -56,7 +56,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _emailHandler!: EmailHandler;
   private _redirectUrlBuilder!: RedirectUrlBuilder;
   private _convertStringToObjectId!: any;
-  private _cacheDbService!: CacheDbService;
+  private _graphDbService!: GraphDbService;
   private _cookieHandler!: CookieHandler;
 
   protected _isSelf = async (props: {
@@ -105,7 +105,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
-    await this._cacheDbService.createUserNode({ user, dbServiceAccessOptions });
+    await this._graphDbService.createUserNode({ user, dbServiceAccessOptions });
     return user;
   };
 
@@ -167,7 +167,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       user._id
     }"}), (admin: User {_id:"${MANABU_ADMIN_ID}"}) MERGE (admin)-[r: manages {since: "${new Date().toISOString()}"}]->(teacher)`;
 
-    await this._cacheDbService.graphQuery({ query, dbServiceAccessOptions });
+    await this._graphDbService.graphQuery({ query, dbServiceAccessOptions });
   };
 
   private _sendVerificationEmail = (userEntity: UserEntityBuildResponse): void => {
@@ -208,7 +208,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makePackageTransactionEntity,
       makeTeacherEntity,
       makePackageTransactionDbService,
-      makeCacheDbService,
+      makeGraphDbService,
       makeEmailHandler,
       makeRedirectUrlBuilder,
       makeCookieHandler,
@@ -218,7 +218,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._packageTransactionEntity = await makePackageTransactionEntity;
     this._teacherEntity = await makeTeacherEntity;
     this._packageTransactionDbService = await makePackageTransactionDbService;
-    this._cacheDbService = await makeCacheDbService;
+    this._graphDbService = await makeGraphDbService;
     this._emailHandler = await makeEmailHandler;
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;

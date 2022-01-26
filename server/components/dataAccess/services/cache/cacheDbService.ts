@@ -1,13 +1,10 @@
-import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
-import { DbServiceAccessOptions } from '../../abstractions/IDbService';
 
 type CacheDbServiceInitParams = {
   redisClient: any;
   convertStringToObjectId: any;
   cloneDeep: any;
   dayjs: any;
-  redisGraph: any;
 };
 
 enum TTL_MS {
@@ -20,7 +17,6 @@ class CacheDbService {
   private _convertStringToObjectId!: any;
   private _cloneDeep!: any;
   private _dayjs!: any;
-  private _redisGraph!: any;
 
   public get = async (props: { hashKey: string; key: string }): Promise<any> => {
     const { hashKey, key } = props;
@@ -93,37 +89,16 @@ class CacheDbService {
     await this._redisClient.del(hashKey.toLowerCase());
   };
 
-  public graphQuery = async (props: {
-    query: string;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<any> => {
-    const { query, dbServiceAccessOptions } = props;
-    const { isCurrentAPIUserPermitted } = dbServiceAccessOptions;
-    if (!isCurrentAPIUserPermitted) {
-      throw Error('Access denied.');
-    }
-    const graphRes = await this._redisGraph.query(query);
-    return graphRes;
-  };
-
-  public createUserNode = async (props: {
-    user: JoinedUserDoc;
-    dbServiceAccessOptions: DbServiceAccessOptions;
-  }): Promise<void> => {
-    const { user, dbServiceAccessOptions } = props;
-    await this.graphQuery({
-      query: `CREATE (user: User { _id: "${user._id}" })`,
-      dbServiceAccessOptions,
-    });
+  public graphQuery = () => {
+    return;
   };
 
   public init = async (initParams: CacheDbServiceInitParams): Promise<this> => {
-    const { redisClient, convertStringToObjectId, cloneDeep, dayjs, redisGraph } = initParams;
+    const { redisClient, convertStringToObjectId, cloneDeep, dayjs } = initParams;
     this._redisClient = redisClient;
     this._convertStringToObjectId = convertStringToObjectId;
     this._cloneDeep = cloneDeep;
     this._dayjs = dayjs;
-    this._redisGraph = redisGraph;
     return this;
   };
 }

@@ -2,7 +2,6 @@ import cloneDeep from 'clone-deep';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Redis from 'ioredis';
-import { Graph } from 'redisgraph.js';
 import {
   IS_PRODUCTION,
   REDIS_HOST,
@@ -30,14 +29,12 @@ const clientOptions: StringKeyObject = IS_PRODUCTION
     };
 
 const redisClient = new Redis(clientOptions);
-const redisGraph = new Graph('social-network', redisClient);
 
 const makeCacheDbService = new CacheDbService().init({
   redisClient,
   convertStringToObjectId,
   cloneDeep,
   dayjs,
-  redisGraph,
 });
 
-export { makeCacheDbService };
+export { makeCacheDbService, redisClient };

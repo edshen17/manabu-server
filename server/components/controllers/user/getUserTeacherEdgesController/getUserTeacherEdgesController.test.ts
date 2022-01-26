@@ -2,8 +2,8 @@ import { expect } from 'chai';
 import { makeGetUserTeacherEdgesController } from '.';
 import { JoinedUserDoc } from '../../../../models/User';
 import { StringKeyObject } from '../../../../types/custom';
-import { makeCacheDbService } from '../../../dataAccess/services/cache';
-import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { makeGraphDbService } from '../../../dataAccess/services/graph';
+import { GraphDbService } from '../../../dataAccess/services/graph/graphDbService';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
 import { GetUserTeacherEdgesUsecaseResponse } from '../../../usecases/user/getUserTeacherEdgesUsecase/getUserTeacherEdgesUsecase';
@@ -18,7 +18,7 @@ let iHttpRequestBuilder: IHttpRequestBuilder;
 let fakeDbUserFactory: FakeDbUserFactory;
 let fakeUser: JoinedUserDoc;
 let fakeTeacher: JoinedUserDoc;
-let cacheDbService: CacheDbService;
+let graphDbService: GraphDbService;
 let body: StringKeyObject;
 let currentAPIUser: CurrentAPIUser;
 let params: StringKeyObject;
@@ -28,7 +28,7 @@ before(async () => {
   iHttpRequestBuilder = makeIHttpRequestBuilder;
   getUserTeacherEdgesController = await makeGetUserTeacherEdgesController;
   fakeDbUserFactory = await makeFakeDbUserFactory;
-  cacheDbService = await makeCacheDbService;
+  graphDbService = await makeGraphDbService;
 });
 
 beforeEach(async () => {
@@ -38,7 +38,7 @@ beforeEach(async () => {
   (student:User{ _id: "${
     fakeUser._id
   }" }) MERGE (teacher)-[r:teaches {since: "${new Date().toISOString()}"}]->(student)`;
-  await cacheDbService.graphQuery({
+  await graphDbService.graphQuery({
     query,
     dbServiceAccessOptions: {
       isCurrentAPIUserPermitted: true,

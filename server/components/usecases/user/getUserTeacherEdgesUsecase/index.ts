@@ -1,6 +1,6 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
-import { makeCacheDbService } from '../../../dataAccess/services/cache';
+import { makeGraphDbService } from '../../../dataAccess/services/graph';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { makeUserParamsValidator } from '../../../validators/user/params';
@@ -12,7 +12,7 @@ const makeGetUserTeacherEdgesUsecase = new GetUserTeacherEdgesUsecase().init({
   makeQueryValidator: makeBaseQueryValidator,
   cloneDeep,
   deepEqual,
-  makeCacheDbService,
+  makeGraphDbService,
 });
 
 export { makeGetUserTeacherEdgesUsecase };
