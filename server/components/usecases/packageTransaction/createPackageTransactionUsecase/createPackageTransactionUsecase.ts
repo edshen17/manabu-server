@@ -10,6 +10,7 @@ import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbServ
 import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 import { GraphDbService } from '../../../dataAccess/services/graph/graphDbService';
 import { PackageTransactionDbServiceResponse } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
+import { TeacherDbService } from '../../../dataAccess/services/teacher/teacherDbService';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 import {
   BalanceTransactionEntityBuildParams,
@@ -60,6 +61,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeEmailHandler: Promise<EmailHandler>;
   makeCreateAppointmentsUsecase: Promise<CreateAppointmentsUsecase>;
   makeGraphDbService: Promise<GraphDbService>;
+  makeTeacherDbService: Promise<TeacherDbService>;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
@@ -100,6 +102,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _emailHandler!: EmailHandler;
   private _createAppointmentsUsecase!: CreateAppointmentsUsecase;
   private _graphDbService!: GraphDbService;
+  private _teacherDbService!: TeacherDbService;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -197,6 +200,25 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const query = `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" }),
     (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:teaches]->(student)`;
     await this._graphDbService.graphQuery({ query, dbServiceAccessOptions });
+    const isRepeatStudent = await this._graphDbService.isConnected({
+      node1: `User{ _id: "${packageTransaction.reservedById}" }`,
+      node2: `User{ _id: "${packageTransaction.hostedById}" }`,
+      relationship: ':teaches',
+      dbServiceAccessOptions,
+    });
+    const updateQuery: StringKeyObject = {
+      $inc: { lessonCount: 1 },
+    };
+    if (!isRepeatStudent) {
+      updateQuery.$inc.studentCount = 1;
+    }
+    this._teacherDbService.findOneAndUpdate({
+      searchQuery: {
+        _id: packageTransaction.hostedByData.teacherData!._id,
+      },
+      updateQuery,
+      dbServiceAccessOptions,
+    });
   };
 
   private _createAppointments = async (
@@ -612,6 +634,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeCreateIncomeReportUsecase,
       makeCreateAppointmentsUsecase,
       makeGraphDbService,
+      makeTeacherDbService,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -624,6 +647,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._createIncomeReportUsecase = await makeCreateIncomeReportUsecase;
     this._createAppointmentsUsecase = await makeCreateAppointmentsUsecase;
     this._graphDbService = await makeGraphDbService;
+    this._teacherDbService = await makeTeacherDbService;
   };
 }
 

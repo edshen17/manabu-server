@@ -3,6 +3,7 @@ import deepEqual from 'deep-equal';
 import { makeCacheDbService } from '../../../dataAccess/services/cache';
 import { makeGraphDbService } from '../../../dataAccess/services/graph';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
+import { makeTeacherDbService } from '../../../dataAccess/services/teacher';
 import { makeUserDbService } from '../../../dataAccess/services/user';
 import { makePackageTransactionEntity } from '../../../entities/packageTransaction';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
@@ -33,6 +34,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeCreateIncomeReportUsecase,
   makeCreateAppointmentsUsecase,
   makeGraphDbService,
+  makeTeacherDbService,
 });
 
 export { makeCreatePackageTransactionUsecase };
