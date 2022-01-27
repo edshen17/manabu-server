@@ -201,9 +201,9 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     MATCH (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:teaches]->(student)`;
     await this._graphDbService.graphQuery({ query, dbServiceAccessOptions });
     const isRepeatStudent = await this._graphDbService.isConnected({
-      node1: `:User{ _id: "${packageTransaction.hostedById}" }`,
-      node2: `:User{ _id: "${packageTransaction.reservedById}" }`,
-      relationship: ':teaches',
+      node1: `User{ _id: "${packageTransaction.hostedById}" }`,
+      node2: `User{ _id: "${packageTransaction.reservedById}" }`,
+      relationship: 'teaches',
       dbServiceAccessOptions,
     });
     const updateQuery: StringKeyObject = {

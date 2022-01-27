@@ -41,7 +41,7 @@ class GraphDbService {
     const { node1, node2, relationship, dbServiceAccessOptions } = props;
     this._testAccessPermitted(dbServiceAccessOptions);
     const res = await this._redisGraph.query(
-      `MATCH (${node1})-[r${relationship}]-(${node2}) RETURN EXISTS(r)`
+      `MATCH (:${node1})-[r:${relationship}]-(:${node2}) RETURN EXISTS(r)`
     );
     while (res.hasNext()) {
       const record = res.next();

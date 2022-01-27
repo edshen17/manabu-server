@@ -43,9 +43,9 @@ describe('graphDbService', () => {
   describe('isConnected', () => {
     it('should return a boolean that signifies if a relationship exists', async () => {
       const isConnected = await graphDbService.isConnected({
-        node1: ":person{name:'roi',age:32}",
-        node2: ":person{name:'amit',age:30}",
-        relationship: ':knows',
+        node1: "person{name:'roi',age:32}",
+        node2: "person{name:'amit',age:30}",
+        relationship: 'knows',
         dbServiceAccessOptions,
       });
       expect(isConnected).to.equal(true);
