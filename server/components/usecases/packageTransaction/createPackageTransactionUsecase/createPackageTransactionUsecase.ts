@@ -197,12 +197,12 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<void> => {
     const { packageTransaction, dbServiceAccessOptions } = props;
-    const query = `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" }),
-    (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:teaches]->(student)`;
+    const query = `MATCH (teacher:User{ _id: "${packageTransaction.hostedById}" })
+    MATCH (student:User{ _id: "${packageTransaction.reservedById}" }) MERGE (teacher)-[r:teaches]->(student)`;
     await this._graphDbService.graphQuery({ query, dbServiceAccessOptions });
     const isRepeatStudent = await this._graphDbService.isConnected({
-      node1: `User{ _id: "${packageTransaction.reservedById}" }`,
-      node2: `User{ _id: "${packageTransaction.hostedById}" }`,
+      node1: `:User{ _id: "${packageTransaction.hostedById}" }`,
+      node2: `:User{ _id: "${packageTransaction.reservedById}" }`,
       relationship: ':teaches',
       dbServiceAccessOptions,
     });

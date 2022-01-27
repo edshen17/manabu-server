@@ -165,7 +165,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     const { user, dbServiceAccessOptions } = props;
     const query = `MATCH (teacher: User {_id: "${
       user._id
-    }"}), (admin: User {_id:"${MANABU_ADMIN_ID}"}) MERGE (admin)-[r: manages {since: "${new Date().toISOString()}"}]->(teacher)`;
+    }"}) MATCH (admin: User {_id:"${MANABU_ADMIN_ID}"}) MERGE (admin)-[r: manages {since: "${new Date().toISOString()}"}]->(teacher)`;
 
     await this._graphDbService.graphQuery({ query, dbServiceAccessOptions });
   };
