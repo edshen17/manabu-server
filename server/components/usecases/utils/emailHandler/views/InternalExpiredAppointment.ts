@@ -40,10 +40,9 @@ const InternalExpiredAppointment = {
     processedAppointmentData: {
       get(): StringKeyObject {
         const appointment: AppointmentDoc = (this as any).appointment;
-        const packageTransaction: PackageTransactionDoc = appointment.packageTransactionData;
         return {
-          teacherName: packageTransaction.hostedByData.name,
-          studentName: packageTransaction.reservedByData.name,
+          teacherName: appointment.hostedByData.name,
+          studentName: appointment.reservedByData.name,
         };
       },
     },

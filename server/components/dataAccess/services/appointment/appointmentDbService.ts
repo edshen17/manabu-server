@@ -51,6 +51,16 @@ class AppointmentDbService extends AbstractDbService<
     const hostedById = dbDoc.hostedById;
     const reservedById = dbDoc.reservedById;
     const packageTransactionId = dbDoc.packageTransactionId;
+    const hostedByData = await this._getDbDataById({
+      dbService: this._userDbService,
+      dbServiceAccessOptions,
+      _id: hostedById,
+    });
+    const reservedByData = await this._getDbDataById({
+      dbService: this._userDbService,
+      dbServiceAccessOptions,
+      _id: reservedById,
+    });
     const packageTransactionData = await this._getDbDataById({
       dbService: this._packageTransactionDbService,
       dbServiceAccessOptions,
@@ -60,6 +70,8 @@ class AppointmentDbService extends AbstractDbService<
     const computedProps = {
       packageTransactionData,
       locationData,
+      hostedByData,
+      reservedByData,
     };
     return computedProps;
   };

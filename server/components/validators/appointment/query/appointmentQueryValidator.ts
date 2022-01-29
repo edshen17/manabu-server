@@ -1,7 +1,7 @@
 import { AbstractQueryValidator } from '../../abstractions/AbstractQueryValidator';
 
 class AppointmentQueryValidator extends AbstractQueryValidator {
-  protected _initValidationSchemas = () => {
+  protected _initValidationSchemas = (): void => {
     this._queryValidationSchema = this._joi.object().keys({
       startDate: this._joi.date(),
       endDate: this._joi.date(),

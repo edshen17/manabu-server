@@ -70,7 +70,7 @@ class GetAppointmentsUsecase extends AbstractGetUsecase<
         },
       ],
       startDate: {
-        $gte: startDate || this._dayjs().startOf('week').toDate(),
+        $gte: startDate || this._dayjs().toDate(),
       },
       endDate: {
         $lte: endDate || this._dayjs().endOf('week').toDate(),
