@@ -6,11 +6,12 @@ type LocationData =
   | {
       name: string;
       type: string;
-      matchedContactMethod: MatchedContactMethod;
+      hostedByContactMethod: UserContactMethod;
+      reservedByContactMethod: UserContactMethod;
     }
   | StringKeyObject;
 
-type MatchedContactMethod = {
+type GetUserContactMethodsResponse = {
   hostedByContactMethod: UserContactMethod;
   reservedByContactMethod: UserContactMethod;
 };
@@ -24,12 +25,12 @@ class LocationDataHandler {
     if (!hasLocationData) {
       return {};
     }
-    const matchedContactMethod = this._getMatchedContactMethod(props);
-    const { hostedByContactMethod, reservedByContactMethod } = matchedContactMethod;
+    const { hostedByContactMethod, reservedByContactMethod } = this._getUserContactMethods(props);
     const isOnline =
       hostedByContactMethod.type == 'online' && reservedByContactMethod.type == 'online';
     const locationData = <LocationData>{
-      matchedContactMethod,
+      hostedByContactMethod,
+      reservedByContactMethod,
       locationType: isOnline ? 'online' : 'offline',
     };
     if (hostedByContactMethod.name == reservedByContactMethod.name) {
@@ -53,33 +54,30 @@ class LocationDataHandler {
     return hasLocationData;
   };
 
-  private _getMatchedContactMethod = (props: {
+  private _getUserContactMethods = (props: {
     hostedByData: JoinedUserDoc;
     reservedByData: JoinedUserDoc;
-  }): MatchedContactMethod => {
+  }): GetUserContactMethodsResponse => {
     const { hostedByData, reservedByData } = props;
-    const matchedContactMethod = <MatchedContactMethod>{
-      hostedByContactMethod: {},
-      reservedByContactMethod: {},
-    };
     const hostedByContactMethods = this._sortByPrimaryContactMethod(hostedByData.contactMethods);
     const reservedByContactMethods = this._sortByPrimaryContactMethod(
       reservedByData.contactMethods
     );
+    const userContactMethods = {} as GetUserContactMethodsResponse;
     hostedByContactMethods.forEach((hostedByContactMethod) => {
       reservedByContactMethods.forEach((reservedByContactMethod) => {
         const isSharedContactMethod = hostedByContactMethod.name == reservedByContactMethod.name;
         if (isSharedContactMethod) {
-          matchedContactMethod.hostedByContactMethod = hostedByContactMethod;
-          matchedContactMethod.reservedByContactMethod = reservedByContactMethod;
+          userContactMethods.hostedByContactMethod = hostedByContactMethod;
+          userContactMethods.reservedByContactMethod = reservedByContactMethod;
           return;
         } else {
-          matchedContactMethod.hostedByContactMethod = hostedByContactMethods[0];
-          matchedContactMethod.reservedByContactMethod = reservedByContactMethods[0];
+          userContactMethods.hostedByContactMethod = hostedByContactMethods[0];
+          userContactMethods.reservedByContactMethod = reservedByContactMethods[0];
         }
       });
     });
-    return matchedContactMethod;
+    return userContactMethods;
   };
 
   private _sortByPrimaryContactMethod = (contactMethods: UserContactMethod[]) => {

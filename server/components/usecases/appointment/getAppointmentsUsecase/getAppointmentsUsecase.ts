@@ -60,7 +60,7 @@ class GetAppointmentsUsecase extends AbstractGetUsecase<
   }): StringKeyObject => {
     const { userId, query } = props;
     const { startDate, endDate } = query;
-    const searchQuery = {
+    const searchQuery: StringKeyObject = {
       $or: [
         {
           reservedById: userId,
@@ -69,13 +69,13 @@ class GetAppointmentsUsecase extends AbstractGetUsecase<
           hostedById: userId,
         },
       ],
-      startDate: {
-        $gte: startDate || this._dayjs().toDate(),
-      },
-      endDate: {
-        $lte: endDate || this._dayjs().endOf('week').toDate(),
-      },
     };
+    if (startDate) {
+      searchQuery.startDate = { $gte: startDate };
+    }
+    if (endDate) {
+      searchQuery.endDate = { $lte: endDate };
+    }
     return searchQuery;
   };
 

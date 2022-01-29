@@ -47,8 +47,8 @@ describe('locationDataHandler', () => {
     context('valid inputs', () => {
       context('same contact method', async () => {
         it('should return locationData with a matched contact method', () => {
-          expect(locationData.matchedContactMethod).to.have.property('hostedByContactMethod');
-          expect(locationData.matchedContactMethod).to.have.property('reservedByContactMethod');
+          expect(locationData).to.have.property('hostedByContactMethod');
+          expect(locationData).to.have.property('reservedByContactMethod');
           expect(locationData.name).to.not.equal('alternative');
         });
       });
