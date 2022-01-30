@@ -28,7 +28,7 @@ class SendAppointmentReminderScheduleTask extends AbstractScheduleTask<
 
   public execute = async (): Promise<void> => {
     const reminderTime = this._dayjs().subtract(2, 'hours');
-    const dbServiceAccessOptions = this._appointmentDbService.getBaseDbServiceAccessOptions();
+    const dbServiceAccessOptions = this._appointmentDbService.getOverrideDbServiceAccessOptions();
     const startingAppointments = await this._appointmentDbService.find({
       searchQuery: {
         startDate: {

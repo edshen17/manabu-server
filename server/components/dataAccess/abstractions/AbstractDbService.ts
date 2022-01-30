@@ -27,7 +27,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
   protected _dbModelName!: string;
   protected _cloneDeep!: CloneDeep;
   protected _joinType: string = DB_SERVICE_JOIN_TYPE.NONE;
-  protected _ttlMs: number = TTL_MS.WEEK;
+  protected _ttlMs: number = TTL_MS.HOUR;
   protected _cacheDbService!: CacheDbService;
   protected _mongoose!: Mongoose;
 
@@ -348,7 +348,7 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
   };
 
   public insert = async (props: DbServiceInsertParams): Promise<DbServiceResponse> => {
-    const { modelToInsert, dbServiceAccessOptions, session } = props;
+    const { modelToInsert, dbServiceAccessOptions, session, preserveCache } = props;
     this._testAccessPermitted(dbServiceAccessOptions);
     let dbQueryResult: DbServiceResponse;
     if (!session) {
@@ -368,12 +368,12 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
         dbServiceAccessOptions,
       });
     }
-    await this._clearCacheBrancher();
+    await this._clearCacheBrancher(preserveCache);
     return dbQueryResult;
   };
 
   public insertMany = async (props: DbServiceInsertManyParams): Promise<DbServiceResponse[]> => {
-    const { modelToInsert, dbServiceAccessOptions, session } = props;
+    const { modelToInsert, dbServiceAccessOptions, session, preserveCache } = props;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.insertMany(modelToInsert, modelView, {
@@ -384,12 +384,19 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheBrancher();
+    await this._clearCacheBrancher(preserveCache);
     return dbQueryResult;
   };
 
   public findOneAndUpdate = async (props: DbServiceUpdateParams): Promise<DbServiceResponse> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, session, queryOptions } = props;
+    const {
+      searchQuery,
+      updateQuery,
+      dbServiceAccessOptions,
+      session,
+      queryOptions,
+      preserveCache,
+    } = props;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
@@ -408,12 +415,12 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheBrancher();
+    await this._clearCacheBrancher(preserveCache);
     return dbQueryResult;
   };
 
-  private _clearCacheBrancher = async (): Promise<void> => {
-    if (!this._dbModelName) {
+  private _clearCacheBrancher = async (preserveCache?: boolean): Promise<void> => {
+    if (!this._dbModelName || preserveCache) {
       return;
     }
     if (!IS_PRODUCTION) {
@@ -424,7 +431,14 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
   };
 
   public updateMany = async (props: DbServiceUpdateParams): Promise<DbServiceResponse[]> => {
-    const { searchQuery, updateQuery, dbServiceAccessOptions, queryOptions, session } = props;
+    const {
+      searchQuery,
+      updateQuery,
+      dbServiceAccessOptions,
+      queryOptions,
+      session,
+      preserveCache,
+    } = props;
     const { modelView } = this._getDbServiceModelView(dbServiceAccessOptions);
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel
@@ -443,31 +457,31 @@ abstract class AbstractDbService<OptionalDbServiceInitParams, DbServiceResponse>
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheBrancher();
+    await this._clearCacheBrancher(preserveCache);
     return dbQueryResult;
   };
 
   public findByIdAndDelete = async (props: DbServiceFindByIdParams): Promise<DbServiceResponse> => {
-    const { _id, dbServiceAccessOptions, session } = props;
+    const { _id, dbServiceAccessOptions, session, preserveCache } = props;
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.findByIdAndDelete(_id).session(session).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheBrancher();
+    await this._clearCacheBrancher(preserveCache);
     return dbQueryResult;
   };
 
   public findOneAndDelete = async (props: DbServiceFindOneParams): Promise<DbServiceResponse> => {
-    const { searchQuery, dbServiceAccessOptions, session } = props;
+    const { searchQuery, dbServiceAccessOptions, session, preserveCache } = props;
     this._testAccessPermitted(dbServiceAccessOptions);
     const dbQueryPromise = this._dbModel.findOneAndDelete(searchQuery).session(session).lean();
     const dbQueryResult = await this._getDbQueryResult({
       dbServiceAccessOptions,
       dbQueryPromise,
     });
-    await this._clearCacheBrancher();
+    await this._clearCacheBrancher(preserveCache);
     return dbQueryResult;
   };
 

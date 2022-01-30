@@ -32,7 +32,7 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
 
   public execute = async (): Promise<void> => {
     const now = this._dayjs();
-    const dbServiceAccessOptions = this._appointmentDbService.getBaseDbServiceAccessOptions();
+    const dbServiceAccessOptions = this._appointmentDbService.getOverrideDbServiceAccessOptions();
     await this._endAppointments({ now, dbServiceAccessOptions });
   };
 

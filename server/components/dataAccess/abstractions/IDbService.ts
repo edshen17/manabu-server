@@ -21,6 +21,7 @@ type BaseDbServiceParams = {
   queryOptions?: StringKeyObject;
   dbServiceAccessOptions: DbServiceAccessOptions;
   session?: ClientSession;
+  preserveCache?: boolean;
 };
 
 type DbServiceAccessOptions = {

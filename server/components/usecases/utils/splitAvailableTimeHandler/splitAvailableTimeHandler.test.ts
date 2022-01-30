@@ -110,7 +110,7 @@ describe('splitAvailableTimeHandler', () => {
           const newAvailableTime = await availableTimeDbService.findOne({
             searchQuery: {
               hostedById: fakePackageTransaction.hostedById,
-              startDate: splitAvailableTimeParams.appointmentEndDate,
+              startDate: splitAvailableTimeParams.appointmentStartDate,
             },
             dbServiceAccessOptions,
           });

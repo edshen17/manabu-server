@@ -68,6 +68,7 @@ class GetUserUsecase extends AbstractGetUsecase<
         lastOnlineDate: new Date(),
       },
       dbServiceAccessOptions,
+      preserveCache: true,
     });
   };
 

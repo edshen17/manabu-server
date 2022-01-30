@@ -40,7 +40,7 @@ class SplitAvailableTimeHandler {
     const isSameStartDate =
       overlapAvailableTime.startDate.getTime() == appointment.startDate.getTime();
     const isSameEndDate = overlapAvailableTime.endDate.getTime() == appointment.endDate.getTime();
-    const updateAvailableTimeProps = { overlapAvailableTime, dbServiceAccessOptions };
+    const updateAvailableTimeProps = { overlapAvailableTime, dbServiceAccessOptions, session };
     if (isSameStartDate) {
       await this._updateAvailableTime({
         updateQuery: { startDate: appointment.endDate },
@@ -58,7 +58,7 @@ class SplitAvailableTimeHandler {
       });
       const modelToInsert = await this._availableTimeEntity.build({
         hostedById,
-        startDate: appointment.endDate,
+        startDate: appointment.startDate,
         endDate: overlapAvailableTime.endDate,
       });
       await this._availableTimeDbService.insert({ modelToInsert, dbServiceAccessOptions, session });
@@ -69,12 +69,14 @@ class SplitAvailableTimeHandler {
     updateQuery: StringKeyObject;
     overlapAvailableTime: AvailableTimeDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    session: ClientSession;
   }): Promise<void> => {
-    const { updateQuery, overlapAvailableTime, dbServiceAccessOptions } = props;
+    const { updateQuery, overlapAvailableTime, dbServiceAccessOptions, session } = props;
     await this._availableTimeDbService.findOneAndUpdate({
       searchQuery: { _id: overlapAvailableTime._id },
       updateQuery,
       dbServiceAccessOptions,
+      session,
     });
   };
 
