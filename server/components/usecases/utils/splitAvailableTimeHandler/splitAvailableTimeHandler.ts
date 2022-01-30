@@ -68,8 +68,11 @@ class SplitAvailableTimeHandler {
       updateQuery,
       dbServiceAccessOptions,
     });
-    const diff = this._dayjs(updatedAvailableTime.endDate).diff(updatedAvailableTime.startDate);
-    if (diff < 60 * 30 * 1000) {
+    const minDiff = this._dayjs(updatedAvailableTime.endDate).diff(
+      updatedAvailableTime.startDate,
+      'minutes'
+    );
+    if (minDiff < 30) {
       await this._availableTimeDbService.findOneAndDelete({
         searchQuery: {
           _id: updatedAvailableTime._id,

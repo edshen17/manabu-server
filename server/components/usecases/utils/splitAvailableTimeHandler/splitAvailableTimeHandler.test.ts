@@ -1,3 +1,4 @@
+import { expect } from 'chai';
 import dayjs from 'dayjs';
 import { makeSplitAvailableTimeHandler } from '.';
 import { AppointmentDoc } from '../../../../models/Appointment';
