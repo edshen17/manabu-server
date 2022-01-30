@@ -1,4 +1,4 @@
-import { ClientSession } from 'mongoose';
+import dayjs from 'dayjs';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { AvailableTimeDoc } from '../../../../models/AvailableTime';
 import { StringKeyObject } from '../../../../types/custom';
@@ -9,38 +9,27 @@ import { AvailableTimeEntity } from '../../../entities/availableTime/availableTi
 class SplitAvailableTimeHandler {
   private _availableTimeDbService!: AvailableTimeDbService;
   private _availableTimeEntity!: AvailableTimeEntity;
+  private _dayjs!: typeof dayjs;
 
   public split = async (appointments: AppointmentDoc[]): Promise<void> => {
-    const session = await this._availableTimeDbService.startSession();
-    session.startTransaction();
-    try {
-      for (const appointment of appointments) {
-        await this._splitAvailableTime({ appointment, session });
-      }
-      await session.commitTransaction();
-    } catch (err) {
-      await session.abortTransaction();
-    } finally {
-      session.endSession();
+    for (const appointment of appointments) {
+      await this._splitAvailableTime(appointment);
     }
   };
 
-  private _splitAvailableTime = async (props: {
-    appointment: AppointmentDoc;
-    session: ClientSession;
-  }): Promise<void> => {
-    const { appointment, session } = props;
+  private _splitAvailableTime = async (appointment: AppointmentDoc): Promise<void> => {
     const { hostedById, startDate, endDate } = appointment;
     const dbServiceAccessOptions = this._availableTimeDbService.getBaseDbServiceAccessOptions();
     const overlapAvailableTime = await this._availableTimeDbService.findOne({
       searchQuery: { hostedById, startDate: { $lt: endDate }, endDate: { $gt: startDate } },
       dbServiceAccessOptions,
-      session,
     });
-    const isSameStartDate =
-      overlapAvailableTime.startDate.getTime() == appointment.startDate.getTime();
-    const isSameEndDate = overlapAvailableTime.endDate.getTime() == appointment.endDate.getTime();
-    const updateAvailableTimeProps = { overlapAvailableTime, dbServiceAccessOptions, session };
+    if (!overlapAvailableTime) {
+      return;
+    }
+    const isSameStartDate = this._isSameDate(overlapAvailableTime.startDate, appointment.startDate);
+    const isSameEndDate = this._isSameDate(overlapAvailableTime.endDate, appointment.endDate);
+    const updateAvailableTimeProps = { overlapAvailableTime, dbServiceAccessOptions };
     if (isSameStartDate) {
       await this._updateAvailableTime({
         updateQuery: { startDate: appointment.endDate },
@@ -58,10 +47,13 @@ class SplitAvailableTimeHandler {
       });
       const modelToInsert = await this._availableTimeEntity.build({
         hostedById,
-        startDate: appointment.startDate,
+        startDate: appointment.endDate,
         endDate: overlapAvailableTime.endDate,
       });
-      await this._availableTimeDbService.insert({ modelToInsert, dbServiceAccessOptions, session });
+      await this._availableTimeDbService.insert({
+        modelToInsert,
+        dbServiceAccessOptions,
+      });
     }
   };
 
@@ -69,24 +61,38 @@ class SplitAvailableTimeHandler {
     updateQuery: StringKeyObject;
     overlapAvailableTime: AvailableTimeDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<void> => {
-    const { updateQuery, overlapAvailableTime, dbServiceAccessOptions, session } = props;
-    await this._availableTimeDbService.findOneAndUpdate({
+    const { updateQuery, overlapAvailableTime, dbServiceAccessOptions } = props;
+    const updatedAvailableTime = await this._availableTimeDbService.findOneAndUpdate({
       searchQuery: { _id: overlapAvailableTime._id },
       updateQuery,
       dbServiceAccessOptions,
-      session,
     });
+    const diff = this._dayjs(updatedAvailableTime.endDate).diff(updatedAvailableTime.startDate);
+    if (diff < 60 * 30 * 1000) {
+      await this._availableTimeDbService.findOneAndDelete({
+        searchQuery: {
+          _id: updatedAvailableTime._id,
+        },
+        dbServiceAccessOptions,
+      });
+    }
+  };
+
+  private _isSameDate = (date1: Date, date2: Date): boolean => {
+    const isSameDate = this._dayjs(date1).isSame(date2);
+    return isSameDate;
   };
 
   public init = async (props: {
     makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
     makeAvailableTimeEntity: Promise<AvailableTimeEntity>;
+    dayjs: typeof dayjs;
   }): Promise<this> => {
-    const { makeAvailableTimeDbService, makeAvailableTimeEntity } = props;
+    const { makeAvailableTimeDbService, makeAvailableTimeEntity, dayjs } = props;
     this._availableTimeDbService = await makeAvailableTimeDbService;
     this._availableTimeEntity = await makeAvailableTimeEntity;
+    this._dayjs = dayjs;
     return this;
   };
 }
