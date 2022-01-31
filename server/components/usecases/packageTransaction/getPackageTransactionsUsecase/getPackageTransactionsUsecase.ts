@@ -70,8 +70,9 @@ class GetPackageTransactionsUsecase extends AbstractGetUsecase<
     userId: ObjectId;
     query: StringKeyObject;
   }): StringKeyObject => {
-    const { userId } = props;
-    const searchQuery = {
+    const { userId, query } = props;
+    const { startDate, endDate } = query;
+    const searchQuery: StringKeyObject = {
       $or: [
         {
           reservedById: userId,
@@ -81,6 +82,12 @@ class GetPackageTransactionsUsecase extends AbstractGetUsecase<
         },
       ],
     };
+    if (startDate) {
+      searchQuery.startDate = { $gte: startDate };
+    }
+    if (endDate) {
+      searchQuery.endDate = { $lte: endDate };
+    }
     return searchQuery;
   };
 }

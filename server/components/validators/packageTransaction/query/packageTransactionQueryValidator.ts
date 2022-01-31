@@ -11,6 +11,8 @@ class PackageTransactionQueryValidator extends AbstractQueryValidator {
           this._joi.string().max(2048)
         ),
       paymentId: this._joi.string().max(2048).allow(''),
+      startDate: this._joi.date(),
+      endDate: this._joi.date(),
     });
   };
 }

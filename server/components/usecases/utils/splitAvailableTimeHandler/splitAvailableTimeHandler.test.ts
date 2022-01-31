@@ -114,17 +114,15 @@ describe('splitAvailableTimeHandler', () => {
             },
             dbServiceAccessOptions,
           });
-          expect(dayjs(updatedAvailableTime.startDate).isSame(dayjs(fakeAvailableTime.startDate)));
+          expect(
+            dayjs(updatedAvailableTime.startDate).isSame(dayjs(fakeAvailableTime.startDate))
+          ).to.equal(true);
           expect(
             dayjs(updatedAvailableTime.endDate).isSame(
               dayjs(fakeAvailableTime.startDate).add(1, 'hour')
             )
-          );
-          expect(
-            dayjs(newAvailableTime.endDate).isSame(
-              dayjs(splitAvailableTimeParams.availableTimeEndDate)
-            )
-          );
+          ).to.equal(true);
+          expect(newAvailableTime).to.equal(null);
         });
       }
     );

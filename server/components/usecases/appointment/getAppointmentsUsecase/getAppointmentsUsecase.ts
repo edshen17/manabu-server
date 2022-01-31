@@ -6,9 +6,7 @@ import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appoi
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
-type OptionalGetAppointmentsUsecaseInitParams = {
-  dayjs: any;
-};
+type OptionalGetAppointmentsUsecaseInitParams = {};
 
 type GetAppointmentsUsecaseResponse = { appointments: AppointmentDoc[] };
 
@@ -17,8 +15,6 @@ class GetAppointmentsUsecase extends AbstractGetUsecase<
   GetAppointmentsUsecaseResponse,
   AppointmentDbServiceResponse
 > {
-  private _dayjs!: any;
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetAppointmentsUsecaseResponse> => {
@@ -77,13 +73,6 @@ class GetAppointmentsUsecase extends AbstractGetUsecase<
       searchQuery.endDate = { $lte: endDate };
     }
     return searchQuery;
-  };
-
-  protected _initTemplate = async (
-    optionalInitParams: OptionalGetAppointmentsUsecaseInitParams
-  ): Promise<void> => {
-    const { dayjs } = optionalInitParams;
-    this._dayjs = dayjs;
   };
 }
 

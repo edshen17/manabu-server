@@ -25,21 +25,23 @@ class PackageTransactionDbService extends AbstractDbService<
   }): Promise<StringKeyObject> => {
     const { dbDoc, dbServiceAccessOptions } = props;
     const { hostedById, reservedById, packageId } = dbDoc;
-    const hostedByData = await this._getDbDataById({
-      dbService: this._userDbService,
-      dbServiceAccessOptions,
-      _id: hostedById,
-    });
-    const reservedByData = await this._getDbDataById({
-      dbService: this._userDbService,
-      dbServiceAccessOptions,
-      _id: reservedById,
-    });
-    const packageData = await this._getDbDataById({
-      dbService: this._packageDbService,
-      dbServiceAccessOptions,
-      _id: packageId,
-    });
+    const [hostedByData, reservedByData, packageData] = await Promise.all([
+      this._getDbDataById({
+        dbService: this._userDbService,
+        dbServiceAccessOptions,
+        _id: hostedById,
+      }),
+      this._getDbDataById({
+        dbService: this._userDbService,
+        dbServiceAccessOptions,
+        _id: reservedById,
+      }),
+      this._getDbDataById({
+        dbService: this._packageDbService,
+        dbServiceAccessOptions,
+        _id: packageId,
+      }),
+    ]);
     const computedProps = {
       hostedByData,
       reservedByData,

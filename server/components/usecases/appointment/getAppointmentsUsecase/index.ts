@@ -1,5 +1,4 @@
 import cloneDeep from 'clone-deep';
-import dayjs from 'dayjs';
 import deepEqual from 'deep-equal';
 import { makeAppointmentDbService } from '../../../dataAccess/services/appointment';
 import { makeAppointmentQueryValidator } from '../../../validators/appointment/query';
@@ -12,7 +11,6 @@ const makeGetAppointmentsUsecase = new GetAppointmentsUsecase().init({
   makeQueryValidator: makeAppointmentQueryValidator,
   cloneDeep,
   deepEqual,
-  dayjs,
 });
 
 export { makeGetAppointmentsUsecase };

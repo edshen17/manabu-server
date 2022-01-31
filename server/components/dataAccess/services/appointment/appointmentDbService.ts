@@ -51,22 +51,24 @@ class AppointmentDbService extends AbstractDbService<
     const hostedById = dbDoc.hostedById;
     const reservedById = dbDoc.reservedById;
     const packageTransactionId = dbDoc.packageTransactionId;
-    const hostedByData = await this._getDbDataById({
-      dbService: this._userDbService,
-      dbServiceAccessOptions,
-      _id: hostedById,
-    });
-    const reservedByData = await this._getDbDataById({
-      dbService: this._userDbService,
-      dbServiceAccessOptions,
-      _id: reservedById,
-    });
-    const packageTransactionData = await this._getDbDataById({
-      dbService: this._packageTransactionDbService,
-      dbServiceAccessOptions,
-      _id: packageTransactionId,
-    });
-    const locationData = await this._getLocationData({ hostedById, reservedById });
+    const [hostedByData, reservedByData, packageTransactionData, locationData] = await Promise.all([
+      this._getDbDataById({
+        dbService: this._userDbService,
+        dbServiceAccessOptions,
+        _id: hostedById,
+      }),
+      this._getDbDataById({
+        dbService: this._userDbService,
+        dbServiceAccessOptions,
+        _id: reservedById,
+      }),
+      this._getDbDataById({
+        dbService: this._packageTransactionDbService,
+        dbServiceAccessOptions,
+        _id: packageTransactionId,
+      }),
+      this._getLocationData({ hostedById, reservedById }),
+    ]);
     const computedProps = {
       packageTransactionData,
       locationData,
@@ -82,14 +84,16 @@ class AppointmentDbService extends AbstractDbService<
   }): Promise<LocationData> => {
     const { hostedById, reservedById } = props;
     const overrideDbServiceAccessOptions = this._userDbService.getOverrideDbServiceAccessOptions();
-    const overrideHostedByData = await this._userDbService.findById({
-      _id: hostedById,
-      dbServiceAccessOptions: overrideDbServiceAccessOptions,
-    });
-    const overrideReservedByData = await this._userDbService.findById({
-      _id: reservedById,
-      dbServiceAccessOptions: overrideDbServiceAccessOptions,
-    });
+    const [overrideHostedByData, overrideReservedByData] = await Promise.all([
+      this._userDbService.findById({
+        _id: hostedById,
+        dbServiceAccessOptions: overrideDbServiceAccessOptions,
+      }),
+      this._userDbService.findById({
+        _id: reservedById,
+        dbServiceAccessOptions: overrideDbServiceAccessOptions,
+      }),
+    ]);
     const locationData = this._locationDataHandler.getLocationData({
       hostedByData: overrideHostedByData,
       reservedByData: overrideReservedByData,
