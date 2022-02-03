@@ -103,7 +103,7 @@ class AppointmentDbService extends AbstractDbService<
 
   protected _initTemplate = async (
     optionalDbServiceInitParams: OptionalAppointmentDbServiceInitParams
-  ) => {
+  ): Promise<void> => {
     const { makePackageTransactionDbService, makeUserDbService, makeLocationDataHandler } =
       optionalDbServiceInitParams;
     this._packageTransactionDbService = await makePackageTransactionDbService;

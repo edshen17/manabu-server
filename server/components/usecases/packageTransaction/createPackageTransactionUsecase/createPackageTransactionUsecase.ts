@@ -309,16 +309,18 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     teacher: JoinedUserDoc;
   }> => {
     const { packageTransaction, dbServiceAccessOptions, session } = props;
-    const user = await this._userDbService.findById({
-      _id: packageTransaction.reservedById,
-      dbServiceAccessOptions,
-      session,
-    });
-    const teacher = await this._userDbService.findById({
-      _id: packageTransaction.hostedById,
-      dbServiceAccessOptions,
-      session,
-    });
+    const [user, teacher] = await Promise.all([
+      this._userDbService.findById({
+        _id: packageTransaction.reservedById,
+        dbServiceAccessOptions,
+        session,
+      }),
+      this._userDbService.findById({
+        _id: packageTransaction.hostedById,
+        dbServiceAccessOptions,
+        session,
+      }),
+    ]);
     return { user, teacher };
   };
 
@@ -553,7 +555,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const { balanceTransactions } = usecaseRes;
     const debitTeacherBalanceTransaction = balanceTransactions[2];
     const teacherTotalPayment = debitTeacherBalanceTransaction.totalPayment;
-    const updatedTeacher = await this._userDbService.findOneAndUpdate({
+    await this._userDbService.findOneAndUpdate({
       searchQuery: {
         _id: debitTeacherBalanceTransaction.userId,
       },

@@ -4,6 +4,7 @@ import { makeAppointmentDbService } from '../../../dataAccess/services/appointme
 import { makeAppointmentEntityValidator } from '../../../validators/appointment/entity';
 import { makeAppointmentParamsValidator } from '../../../validators/appointment/params';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
+import { makeSplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler';
 import { EditAppointmentUsecase } from './editAppointmentUsecase';
 
 const makeEditAppointmentUsecase = new EditAppointmentUsecase().init({
@@ -13,6 +14,7 @@ const makeEditAppointmentUsecase = new EditAppointmentUsecase().init({
   makeDbService: makeAppointmentDbService,
   deepEqual,
   makeEditEntityValidator: makeAppointmentEntityValidator,
+  makeSplitAvailableTimeHandler,
 });
 
 export { makeEditAppointmentUsecase };

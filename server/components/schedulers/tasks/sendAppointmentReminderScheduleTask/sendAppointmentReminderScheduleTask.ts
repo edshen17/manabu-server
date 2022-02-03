@@ -53,7 +53,7 @@ class SendAppointmentReminderScheduleTask extends AbstractScheduleTask<
     const APPOINTMENT_REMINDER_HASH_KEY = 'appointmentReminder';
     const sentEmailReminder = await this._cacheDbService.get({
       hashKey: APPOINTMENT_REMINDER_HASH_KEY,
-      key: appointment._id,
+      key: appointment._id.toString(),
     });
     if (!sentEmailReminder) {
       await this._emailHandler.sendAlertFromUserId({
@@ -76,7 +76,7 @@ class SendAppointmentReminderScheduleTask extends AbstractScheduleTask<
       });
       await this._cacheDbService.set({
         hashKey: APPOINTMENT_REMINDER_HASH_KEY,
-        key: appointment._id,
+        key: appointment._id.toString(),
         value: appointment,
         ttlMs: TTL_MS.DAY,
       });

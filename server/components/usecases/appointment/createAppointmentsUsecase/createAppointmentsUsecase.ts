@@ -1,6 +1,7 @@
 import { ClientSession, ObjectId } from 'mongoose';
 import { IS_PRODUCTION } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
+import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
@@ -32,6 +33,7 @@ type OptionalCreateAppointmentsUsecaseInitParams = {
 
 type CreateAppointmentsUsecaseResponse = {
   appointments: AppointmentDoc[];
+  packageTransaction: PackageTransactionDoc;
 };
 
 class CreateAppointmentsUsecase extends AbstractCreateUsecase<
@@ -50,16 +52,17 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreateAppointmentsUsecaseResponse> => {
     const { body, dbServiceAccessOptions, currentAPIUser } = props;
-    const { appointments, session } = body;
-    const savedDbAppointments = await this._createAppointments({
-      appointments,
+    const { session } = body;
+    const { appointments, packageTransaction } = await this._createAppointments({
+      appointments: body.appointments,
       dbServiceAccessOptions,
       currentAPIUser,
       session,
     });
-    this._sendTeacherAppointmentCreationEmail(savedDbAppointments);
+    this._sendTeacherAppointmentCreationEmail(appointments);
     const usecaseRes = {
-      appointments: savedDbAppointments,
+      appointments,
+      packageTransaction,
     };
     return usecaseRes;
   };
@@ -69,7 +72,7 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
     currentAPIUser: CurrentAPIUser;
     session?: ClientSession;
-  }): Promise<AppointmentDoc[]> => {
+  }): Promise<CreateAppointmentsUsecaseResponse> => {
     const { appointments, dbServiceAccessOptions, session } = props;
     const modelToInsert: AppointmentEntityBuildResponse[] = [];
     // all go through or none go through
@@ -82,9 +85,9 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
       session,
     });
-    await this._decrementAppointmentCount(savedDbAppointments);
+    const packageTransaction = await this._decrementAppointmentCount(savedDbAppointments);
     await this._splitAvailableTimeBrancher(savedDbAppointments);
-    return savedDbAppointments;
+    return { appointments: savedDbAppointments, packageTransaction };
   };
 
   private _createAppointment = async (props: {
@@ -187,7 +190,9 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     }
   };
 
-  private _decrementAppointmentCount = async (appointments: AppointmentDoc[]): Promise<void> => {
+  private _decrementAppointmentCount = async (
+    appointments: AppointmentDoc[]
+  ): Promise<PackageTransactionDoc> => {
     const packageTransactionId = appointments[0].packageTransactionId;
     const dbServiceAccessOptions =
       this._packageTransactionDbService.getBaseDbServiceAccessOptions();
@@ -197,15 +202,16 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
       dbServiceAccessOptions,
     });
     const hasAppointmentsRemaining =
-      packageTransaction.remainingAppointments + appointmentsToSubtract > 0;
+      packageTransaction.remainingAppointments + appointmentsToSubtract >= 0;
     if (hasAppointmentsRemaining) {
-      await this._packageTransactionDbService.findOneAndUpdate({
+      const packageTransaction = await this._packageTransactionDbService.findOneAndUpdate({
         searchQuery: { _id: packageTransactionId },
         updateQuery: {
           $inc: { remainingAppointments: appointmentsToSubtract },
         },
         dbServiceAccessOptions,
       });
+      return packageTransaction;
     } else {
       throw new Error('You do not have enough remaining lessons!');
     }

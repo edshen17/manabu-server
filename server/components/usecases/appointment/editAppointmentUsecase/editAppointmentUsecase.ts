@@ -1,13 +1,19 @@
 import { ObjectId } from 'mongoose';
+import { IS_PRODUCTION } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
+import { AppointmentEntityValidator } from '../../../validators/appointment/entity/appointmentEntityValidator';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
 import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
+import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler/splitAvailableTimeHandler';
 
-type OptionalEditAppointmentUsecaseInitParams = {};
+type OptionalEditAppointmentUsecaseInitParams = {
+  makeSplitAvailableTimeHandler: Promise<SplitAvailableTimeHandler>;
+  makeEditEntityValidator: AppointmentEntityValidator;
+};
 
 type EditAppointmentUsecaseResponse = {
   appointment: AppointmentDoc;
@@ -18,6 +24,8 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
   EditAppointmentUsecaseResponse,
   AppointmentDbServiceResponse
 > {
+  private _splitAvailableTimeHandler!: SplitAvailableTimeHandler;
+
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
       hasResourceAccessCheck: true,
@@ -65,7 +73,24 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
       updateQuery: body,
       dbServiceAccessOptions,
     });
+    await this._splitAvailableTimeBrancher([appointment]);
     return appointment;
+  };
+
+  private _splitAvailableTimeBrancher = async (appointments: AppointmentDoc[]): Promise<void> => {
+    if (!IS_PRODUCTION) {
+      await this._splitAvailableTimeHandler.split(appointments);
+    } else {
+      this._splitAvailableTimeHandler.split(appointments);
+    }
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalEditAppointmentUsecaseInitParams
+  ): Promise<void> => {
+    const { makeSplitAvailableTimeHandler, makeEditEntityValidator } = optionalInitParams;
+    this._splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
+    this._editEntityValidator = makeEditEntityValidator;
   };
 }
 

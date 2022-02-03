@@ -3,6 +3,7 @@ import { MANABU_ADMIN_EMAIL } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbService } from '../../../dataAccess/services/appointment/appointmentDbService';
+import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import {
   EmailHandler,
   EMAIL_HANDLER_SENDER_ADDRESS,
@@ -13,6 +14,7 @@ import { ScheduleTaskInitParams } from '../../abstractions/IScheduleTask';
 
 type OptionalEndAppointmentScheduleTaskInitParams = {
   makeAppointmentDbService: Promise<AppointmentDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeEmailHandler: Promise<EmailHandler>;
 };
 
@@ -28,6 +30,7 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
   EndAppointmentScheduleTaskResponse
 > {
   private _appointmentDbService!: AppointmentDbService;
+  private _packageTransactionDbService!: PackageTransactionDbService;
   private _emailHandler!: EmailHandler;
 
   public execute = async (): Promise<void> => {
@@ -93,13 +96,25 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }) => {
     const { appointment, now, dbServiceAccessOptions } = props;
-    const confirmationDeadline = this._dayjs(appointment.endDate).add(3, 'days');
-    const isConfirmationDeadline = now.diff(confirmationDeadline) > 0;
-    if (isConfirmationDeadline) {
-      await this._appointmentDbService.findOneAndUpdate({
+    // TODO: Add confirmation deadline.
+    // const confirmationDeadline = this._dayjs(appointment.endDate).add(3, 'days');
+    // const isConfirmationDeadline = now.isBefore(confirmationDeadline);
+    // if (isConfirmationDeadline) {
+    // }
+    const completedAppointment = await this._appointmentDbService.findOneAndUpdate({
+      dbServiceAccessOptions,
+      searchQuery: {
+        _id: appointment._id,
+      },
+      updateQuery: {
+        status: 'completed',
+      },
+    });
+    if (completedAppointment.packageTransactionData.remainingAppointments == 0) {
+      await this._packageTransactionDbService.findOneAndUpdate({
         dbServiceAccessOptions,
         searchQuery: {
-          _id: appointment._id,
+          _id: appointment.packageTransactionId,
         },
         updateQuery: {
           status: 'completed',
@@ -126,9 +141,11 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
       'dayjs'
     >
   ): Promise<void> => {
-    const { makeAppointmentDbService, makeEmailHandler } = optionalScheduleTaskInitParams;
+    const { makeAppointmentDbService, makeEmailHandler, makePackageTransactionDbService } =
+      optionalScheduleTaskInitParams;
     this._appointmentDbService = await makeAppointmentDbService;
     this._emailHandler = await makeEmailHandler;
+    this._packageTransactionDbService = await makePackageTransactionDbService;
   };
 }
 

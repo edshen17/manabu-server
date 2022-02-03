@@ -151,7 +151,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
                   $lte: now.toDate(),
                 },
               },
-              { remainingAppointments: 0 },
+              { status: 'completed' },
             ],
           },
           { isTerminated: false },
