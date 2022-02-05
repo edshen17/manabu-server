@@ -52,7 +52,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
       method,
       path: originalUrl,
       currentAPIUser: {
-        userId: userId,
+        userId,
         role: role || 'user',
         teacherId: teacherId,
         token,

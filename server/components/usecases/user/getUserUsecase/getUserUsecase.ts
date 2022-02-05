@@ -81,7 +81,9 @@ class GetUserUsecase extends AbstractGetUsecase<
     let cookies;
     if (token) {
       cookies = this._cookieHandler.splitLoginCookies(user);
-      await this._jwtHandler.blacklist(token);
+      setTimeout(async () => {
+        await this._jwtHandler.blacklist(token);
+      }, 5 * 60 * 1000);
     }
     return cookies;
   };
