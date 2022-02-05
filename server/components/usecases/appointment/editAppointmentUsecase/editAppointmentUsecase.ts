@@ -4,6 +4,8 @@ import { AppointmentDoc } from '../../../../models/Appointment';
 import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
+import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
+import { AvailableTimeEntity } from '../../../entities/availableTime/availableTimeEntity';
 import { AppointmentEntityValidator } from '../../../validators/appointment/entity/appointmentEntityValidator';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractEditUsecase } from '../../abstractions/AbstractEditUsecase';
@@ -12,7 +14,9 @@ import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler
 
 type OptionalEditAppointmentUsecaseInitParams = {
   makeSplitAvailableTimeHandler: Promise<SplitAvailableTimeHandler>;
+  makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
   makeEditEntityValidator: AppointmentEntityValidator;
+  makeAvailableTimeEntity: Promise<AvailableTimeEntity>;
 };
 
 type EditAppointmentUsecaseResponse = {
@@ -25,6 +29,8 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
   AppointmentDbServiceResponse
 > {
   private _splitAvailableTimeHandler!: SplitAvailableTimeHandler;
+  private _availableTimeDbService!: AvailableTimeDbService;
+  private _availableTimeEntity!: AvailableTimeEntity;
 
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
@@ -74,6 +80,18 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
       dbServiceAccessOptions,
     });
     await this._splitAvailableTimeBrancher([appointment]);
+    if (appointment.status == 'cancelled') {
+      const { hostedById, startDate, endDate } = appointment;
+      const availableTimeEntity = await this._availableTimeEntity.build({
+        hostedById,
+        startDate,
+        endDate,
+      });
+      this._availableTimeDbService.insert({
+        modelToInsert: availableTimeEntity,
+        dbServiceAccessOptions,
+      });
+    }
     return appointment;
   };
 
@@ -88,9 +106,16 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
   protected _initTemplate = async (
     optionalInitParams: OptionalEditAppointmentUsecaseInitParams
   ): Promise<void> => {
-    const { makeSplitAvailableTimeHandler, makeEditEntityValidator } = optionalInitParams;
+    const {
+      makeSplitAvailableTimeHandler,
+      makeEditEntityValidator,
+      makeAvailableTimeDbService,
+      makeAvailableTimeEntity,
+    } = optionalInitParams;
     this._splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
     this._editEntityValidator = makeEditEntityValidator;
+    this._availableTimeDbService = await makeAvailableTimeDbService;
+    this._availableTimeEntity = await makeAvailableTimeEntity;
   };
 }
 

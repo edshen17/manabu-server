@@ -49,8 +49,9 @@ class AvailableTimeConflictHandler {
     const dbServiceAccessOptions = this._availableTimeDbService.getBaseDbServiceAccessOptions();
     const searchQuery: StringKeyObject = {
       hostedById,
-      startDate: { $lte: endDate },
-      endDate: { $gte: startDate },
+      startDate: { $lt: endDate },
+      endDate: { $gt: startDate },
+      status: { $ne: 'cancelled' },
     };
     if (availableTimeId) {
       // when editing, need to exclude the edited availableTime so it doesn't throw an error
