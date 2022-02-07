@@ -69,6 +69,7 @@ class UserEntityValidator extends AbstractEntityValidator {
       lastOnlineDate: this._joi.forbidden(),
       lastModifiedDate: this._joi.forbidden(),
       balance: this._joi.forbidden(),
+      approvalDate: this._joi.forbidden(),
     });
     this._deleteValidationSchema = this._createValidationSchema.keys({
       _id: this._joi
@@ -76,10 +77,6 @@ class UserEntityValidator extends AbstractEntityValidator {
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
     });
     this._adminValidationSchema = this._editValidationSchema.keys({
-      memberships: this._joi.array().items({
-        name: this._joi.string().max(256),
-        dateJoined: this._joi.date(),
-      }),
       role: this._joi.string().valid('user', 'teacher'),
     });
   };

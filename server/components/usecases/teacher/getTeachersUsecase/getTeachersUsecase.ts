@@ -30,12 +30,16 @@ class GetTeachersUsecase extends AbstractGetUsecase<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<JoinedUserDoc[]> => {
     const { query, dbServiceAccessOptions } = props;
-    const searchQuery = this._processQuery(query);
+    // const searchQuery = this._processQuery(query);
     const fallbackQuery = { page: 0, limit: 20 };
     const sort = { 'teacherData.approvalDate': 1 };
     const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
     const teachers = <JoinedUserDoc[]>await this._dbService.find({
-      searchQuery,
+      searchQuery: {
+        role: 'teacher',
+        'teacherData.settings.isHidden': false,
+        'teacherData.applicationStatus': 'approved',
+      },
       dbServiceAccessOptions,
       paginationOptions,
     });

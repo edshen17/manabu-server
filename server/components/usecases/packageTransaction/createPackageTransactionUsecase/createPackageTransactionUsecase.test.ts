@@ -63,7 +63,7 @@ beforeEach(async () => {
     params: {},
     body: {
       teacherId: fakeTeacher.teacherData!._id,
-      packageId: fakeTeacher.teacherData!.packages[0]._id,
+      packageId: fakeTeacher.teacherData!.packages[3]._id,
       lessonDuration: 60,
       lessonLanguage: 'ja',
       timeslots: [{ startDate, endDate }],

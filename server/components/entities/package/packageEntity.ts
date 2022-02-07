@@ -25,6 +25,7 @@ type PackageEntityBuildResponse = {
 };
 
 enum PACKAGE_ENTITY_NAME {
+  TRIAL = 'trial',
   LIGHT = 'light',
   MODERATE = 'moderate',
   MAINICHI = 'mainichi',

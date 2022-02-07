@@ -42,6 +42,7 @@ class TeacherEntityValidator extends AbstractEntityValidator {
     this._editValidationSchema = this._createValidationSchema.keys({
       approvalDate: this._joi.forbidden(),
       lessonCount: this._joi.forbidden(),
+      applicationStatus: this._joi.forbidden(),
       studentCount: this._joi.forbidden(),
       createdDate: this._joi.forbidden(),
       lastModifiedDate: this._joi.forbidden(),
@@ -51,7 +52,10 @@ class TeacherEntityValidator extends AbstractEntityValidator {
         .alternatives()
         .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
     });
-    this._adminValidationSchema = this._editValidationSchema;
+    this._adminValidationSchema = this._editValidationSchema.keys({
+      applicationStatus: this._joi.string().valid('pending', 'approved', 'rejected'),
+      approvalDate: this._joi.date(),
+    });
   };
 }
 

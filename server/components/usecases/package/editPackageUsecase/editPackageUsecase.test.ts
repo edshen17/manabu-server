@@ -33,7 +33,7 @@ beforeEach(async () => {
     rawBody: {},
     headers: {},
     params: {
-      packageId: fakeTeacher.teacherData!.packages[3]._id,
+      packageId: fakeTeacher.teacherData!.packages[4]._id,
     },
     body: {
       lessonAmount: 10,

@@ -39,9 +39,9 @@ describe('getTeachersController', () => {
         dbServiceAccessOptions,
       });
       const filter = queryStringHandler.encodeQueryStringObj({
-        teacherType: ['unlicensed', 'licensed'],
-        contactMethodName: ['Skype', 'LINE'],
-        contactMethodType: ['online', 'offline'],
+        // teacherType: ['unlicensed', 'licensed'],
+        // contactMethodName: ['Skype', 'LINE'],
+        // contactMethodType: ['online', 'offline'],
       });
       const query = queryStringHandler.parseQueryString(filter);
       const getTeachersHttpRequest = iHttpRequestBuilder

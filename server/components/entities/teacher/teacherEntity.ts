@@ -73,6 +73,13 @@ class TeacherEntity extends AbstractEntity<
   };
 
   private _createPackages = (): PackageEntityBuildResponse[] => {
+    const trialPackage = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 1,
+      type: PACKAGE_ENTITY_TYPE.DEFAULT,
+      name: PACKAGE_ENTITY_NAME.TRIAL,
+      isOffering: true,
+      lessonDurations: [30, 60],
+    });
     const lightPackage = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 5,
       type: PACKAGE_ENTITY_TYPE.DEFAULT,
@@ -94,14 +101,36 @@ class TeacherEntity extends AbstractEntity<
       isOffering: true,
       lessonDurations: [30, 60],
     });
-    const customPackage = <PackageEntityBuildResponse>this._packageEntity.build({
+    const customPackage1 = <PackageEntityBuildResponse>this._packageEntity.build({
       lessonAmount: 10,
       type: PACKAGE_ENTITY_TYPE.CUSTOM,
-      name: PACKAGE_ENTITY_NAME.CUSTOM,
+      name: `${PACKAGE_ENTITY_NAME.CUSTOM} 1`,
       isOffering: false,
       lessonDurations: [30, 60],
     });
-    return [lightPackage, moderatePackage, mainichiPackage, customPackage];
+    const customPackage2 = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 10,
+      type: PACKAGE_ENTITY_TYPE.CUSTOM,
+      name: `${PACKAGE_ENTITY_NAME.CUSTOM} 2`,
+      isOffering: false,
+      lessonDurations: [30, 60],
+    });
+    const customPackage3 = <PackageEntityBuildResponse>this._packageEntity.build({
+      lessonAmount: 10,
+      type: PACKAGE_ENTITY_TYPE.CUSTOM,
+      name: `${PACKAGE_ENTITY_NAME.CUSTOM} 3`,
+      isOffering: false,
+      lessonDurations: [30, 60],
+    });
+    return [
+      trialPackage,
+      lightPackage,
+      moderatePackage,
+      mainichiPackage,
+      customPackage1,
+      customPackage2,
+      customPackage3,
+    ];
   };
 
   protected _initTemplate = async (

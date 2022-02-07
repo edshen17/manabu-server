@@ -1,8 +1,6 @@
 import { StringKeyObject } from '../types/custom';
 
 const DEFAULT_CURRENCY = 'SGD';
-const MANABU_ADMIN_ID = '60538825a36b9c57a8b19978';
-const MANABU_ADMIN_PKG_ID = '605388cca36b9c57a8b1997a';
 const MANABU_ADMIN_EMAIL = 'manabulessons@gmail.com';
 const PAYOUT_RATE = 0.02;
 const PAYMENT_GATEWAY_FEE: StringKeyObject = {
@@ -39,6 +37,8 @@ const REDIS_HOST = process.env.REDIS_HOST!;
 const REDIS_PASS = process.env.REDIS_PASS!;
 const REDIS_PORT = process.env.REDIS_PORT!;
 const STRIPE_WEBHOOK_SECREY_KEY = process.env.STRIPE_WEBHOOK_SECREY_KEY!;
+const MANABU_ADMIN_ID = process.env.MANABU_ADMIN_ID!;
+const MANABU_ADMIN_PKG_ID = process.env.MANABU_ADMIN_PKG_ID!;
 
 // DEV
 const OPEN_EXCHANGE_RATE_API_KEY_DEV = process.env.OPEN_EXCHANGE_RATE_API_KEY_DEV!;
