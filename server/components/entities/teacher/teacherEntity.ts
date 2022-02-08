@@ -95,7 +95,7 @@ class TeacherEntity extends AbstractEntity<
       lessonDurations: [30, 60],
     });
     const mainichiPackage = <PackageEntityBuildResponse>this._packageEntity.build({
-      lessonAmount: 22,
+      lessonAmount: 20,
       type: PACKAGE_ENTITY_TYPE.DEFAULT,
       name: PACKAGE_ENTITY_NAME.MAINICHI,
       isOffering: true,
@@ -109,14 +109,14 @@ class TeacherEntity extends AbstractEntity<
       lessonDurations: [30, 60],
     });
     const customPackage2 = <PackageEntityBuildResponse>this._packageEntity.build({
-      lessonAmount: 10,
+      lessonAmount: 11,
       type: PACKAGE_ENTITY_TYPE.CUSTOM,
       name: `${PACKAGE_ENTITY_NAME.CUSTOM} 2`,
       isOffering: false,
       lessonDurations: [30, 60],
     });
     const customPackage3 = <PackageEntityBuildResponse>this._packageEntity.build({
-      lessonAmount: 10,
+      lessonAmount: 12,
       type: PACKAGE_ENTITY_TYPE.CUSTOM,
       name: `${PACKAGE_ENTITY_NAME.CUSTOM} 3`,
       isOffering: false,

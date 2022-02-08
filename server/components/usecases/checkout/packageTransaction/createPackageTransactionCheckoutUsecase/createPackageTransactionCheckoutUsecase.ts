@@ -1,5 +1,9 @@
 import { ObjectId } from 'mongoose';
-import { DEFAULT_CURRENCY, PAYMENT_GATEWAY_FEE } from '../../../../../constants';
+import {
+  DEFAULT_CURRENCY,
+  PACKAGE_DISCOUNT_RATE,
+  PAYMENT_GATEWAY_FEE,
+} from '../../../../../constants';
 import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
@@ -206,13 +210,14 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const { lessonDuration, lessonLanguage } = body;
     const { paymentGateway } = query;
     const { hourlyRate, currency } = teacherData!.priceData;
+    const lessonAmount = teacherPackage.lessonAmount;
     const subTotal = await this._exchangeRateHandler.multiply({
       multiplicand: {
         sourceCurrency: currency,
         amount: hourlyRate,
       },
       multiplier: {
-        amount: (lessonDuration / 60) * teacherPackage.lessonAmount,
+        amount: (lessonDuration / 60) * lessonAmount * (1 - PACKAGE_DISCOUNT_RATE(lessonAmount)),
       },
       targetCurrency: DEFAULT_CURRENCY,
     });

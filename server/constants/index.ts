@@ -19,6 +19,19 @@ enum MANABU_PROCESSING_RATE {
   LICENSED = 0.16,
 }
 
+const PACKAGE_DISCOUNT_RATE = (lessonAmount: number) => {
+  let discountRate;
+  if (lessonAmount <= 5) {
+    discountRate = 0;
+  } else if (lessonAmount > 5 && lessonAmount < 20) {
+    discountRate = lessonAmount * 0.004166;
+  } else {
+    discountRate = lessonAmount * 0.005;
+  }
+  const roundedDiscountRate = Math.round((discountRate + Number.EPSILON) * 100) / 100;
+  return roundedDiscountRate;
+};
+
 const NODE_ENV = process.env.NODE_ENV!;
 const IS_PRODUCTION = NODE_ENV == 'production';
 const G_CLIENTID = process.env.G_CLIENTID!;
@@ -60,6 +73,7 @@ export {
   PAYOUT_RATE,
   MANABU_ADMIN_PKG_ID,
   MANABU_PROCESSING_RATE,
+  PACKAGE_DISCOUNT_RATE,
   G_CLIENTID,
   GOOGLE_CLIENT_SECRET,
   JWT_SECRET,

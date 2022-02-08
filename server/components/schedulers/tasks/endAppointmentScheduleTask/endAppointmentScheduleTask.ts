@@ -44,27 +44,24 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<void> => {
     const { now, dbServiceAccessOptions } = props;
-    const confirmedAppointments = await this._getConfirmedAppointments({
-      now,
-      dbServiceAccessOptions,
+    const confirmedAppointments = await this._getPastAppointments({
+      ...props,
+      status: 'confirmed',
     });
-    const overdueAppointments = await this._getOverdueAppointments({
-      now,
-      dbServiceAccessOptions,
+    const cancelledAppointments = await this._getPastAppointments({
+      ...props,
+      status: 'cancelled',
     });
-    for (const appointment of confirmedAppointments) {
+    const overdueAppointments = await this._getPastAppointments({
+      ...props,
+      status: 'pending',
+    });
+    for (const appointment of confirmedAppointments.concat(cancelledAppointments)) {
       await this._endAppointment({ appointment, now, dbServiceAccessOptions });
     }
     for (const appointment of overdueAppointments) {
       await this._sendExpiredAppointmentAlert(appointment);
     }
-  };
-
-  private _getConfirmedAppointments = async (
-    props: GetAppointmentsParams
-  ): Promise<AppointmentDoc[]> => {
-    const confirmedAppointments = this._getPastAppointments({ ...props, status: 'confirmed' });
-    return confirmedAppointments;
   };
 
   private _getPastAppointments = async (
@@ -81,13 +78,6 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
       },
     });
     return confirmedAppointments;
-  };
-
-  private _getOverdueAppointments = async (
-    props: GetAppointmentsParams
-  ): Promise<AppointmentDoc[]> => {
-    const overdueAppointments = this._getPastAppointments({ ...props, status: 'pending' });
-    return overdueAppointments;
   };
 
   private _endAppointment = async (props: {
