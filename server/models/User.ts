@@ -40,7 +40,7 @@ const UserSchema = createSchema({
   }),
   memberships: Type.array({ required: true }).of({
     name: Type.string(),
-    dateJoined: Type.date(),
+    createdDate: Type.date(),
   }),
   contactMethods: Type.array({ required: true }).of(UserContactMethodEmbed),
   isEmailVerified: Type.boolean({ required: true }),

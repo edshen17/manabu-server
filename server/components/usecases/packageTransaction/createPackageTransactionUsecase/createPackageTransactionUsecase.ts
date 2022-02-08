@@ -69,6 +69,7 @@ type CreatePackageTransactionUsecaseResponse = {
   balanceTransactions: BalanceTransactionDoc[];
   incomeReport: IncomeReportDoc;
   appointments: AppointmentDoc[];
+  user: JoinedUserDoc;
 };
 
 type CreateBalanceTransactionsRouteDataParams = {
@@ -160,7 +161,23 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       session,
     });
     const incomeReport = await this._createIncomeReport(balanceTransactions);
-    const usecaseRes = { packageTransaction, balanceTransactions, incomeReport, appointments };
+    const user = await this._userDbService.findOneAndUpdate({
+      searchQuery: {
+        _id: currentAPIUser.userId,
+        'memberships.name': { $ne: 'beta' },
+      },
+      updateQuery: {
+        $addToSet: { memberships: { name: 'beta', createdDate: new Date() } },
+      },
+      dbServiceAccessOptions,
+    });
+    const usecaseRes = {
+      packageTransaction,
+      balanceTransactions,
+      incomeReport,
+      appointments,
+      user,
+    };
     return usecaseRes;
   };
 

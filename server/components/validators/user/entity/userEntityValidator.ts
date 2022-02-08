@@ -32,7 +32,7 @@ class UserEntityValidator extends AbstractEntityValidator {
         .array()
         .items({
           name: this._joi.string().max(256),
-          dateJoined: this._joi.date(),
+          createdDate: this._joi.date(),
         })
         .max(20),
       contactMethods: this._joi

@@ -146,11 +146,12 @@ describe('createPackageTransactionUsecase', () => {
         const validResOutput = (
           createPackageTransactionRes: CreatePackageTransactionUsecaseResponse
         ) => {
-          const { packageTransaction, balanceTransactions, incomeReport } =
+          const { packageTransaction, balanceTransactions, incomeReport, user } =
             createPackageTransactionRes;
           const studentDebitBalanceTransaction = balanceTransactions[0];
           const studentCreditBalanceTransaction = balanceTransactions[1];
           const teacherBalanceTransaction = balanceTransactions[2];
+          expect(user.memberships.length > 0).to.equal(true);
           expect(packageTransaction).to.have.property('hostedById');
           expect(packageTransaction).to.have.property('reservedById');
           expect(packageTransaction).to.have.property('packageId');

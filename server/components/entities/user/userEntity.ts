@@ -56,7 +56,7 @@ type UserEntityBuildResponse = {
     locale: string;
     emailAlerts: UserEmailAlerts;
   };
-  memberships: string[];
+  memberships: { name: string; createdDate: Date }[];
   contactMethods: UserContactMethod[] | [];
   isEmailVerified: boolean;
   verificationToken: string;
