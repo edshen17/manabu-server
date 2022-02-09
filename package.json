@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "server": "nodemon server/index.ts",
-    "start": "node server/dist/index.js",
+    "start": "node server/dist/server/index.js",
     "test": "mocha --timeout 50000 --parallel --exit -r ts-node/register --require fixtures.ts server/**/*.test.ts",
     "madge": "madge --circular --extensions ts ./",
     "ngrok": "ngrok http 5000",
