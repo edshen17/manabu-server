@@ -11,7 +11,6 @@ import { makeDbConnectionHandler } from './components/dataAccess/utils/dbConnect
 import { DbConnectionHandler } from './components/dataAccess/utils/dbConnectionHandler/dbConnectionHandler';
 import { makeScheduler } from './components/schedulers';
 import { Scheduler } from './components/schedulers/scheduler';
-import { IS_PRODUCTION } from './constants';
 import { v1 } from './routes/api';
 import { verifyToken } from './routes/middleware/verifyTokenMiddleware';
 
@@ -48,20 +47,33 @@ app.use(
 );
 app.use('/api/', v1);
 
-if (IS_PRODUCTION) {
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.header('x-forwarded-proto') !== 'https') {
-      res.redirect(`https://${req.header('host')}${req.url}`);
-    } else {
-      next();
-    }
-  });
-  // static folder
-  app.use(express.static(__dirname + '/public/'));
+// if (IS_PRODUCTION) {
+//   app.use((req: Request, res: Response, next: NextFunction) => {
+//     if (req.header('x-forwarded-proto') !== 'https') {
+//       res.redirect(`https://${req.header('host')}${req.url}`);
+//     } else {
+//       next();
+//     }
+//   });
+//   // static folder
+//   app.use(express.static(__dirname + '/public/'));
 
-  // handle spa
-  app.get(/.*/, (req: Request, res: Response) => res.sendFile(__dirname + '/public/index.html'));
-}
+//   // handle spa
+//   app.get(/.*/, (req: Request, res: Response) => res.sendFile(__dirname + '/public/index.html'));
+// }
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  if (req.header('x-forwarded-proto') !== 'https') {
+    res.redirect(`https://${req.header('host')}${req.url}`);
+  } else {
+    next();
+  }
+});
+// static folder
+app.use(express.static(__dirname + '/public/'));
+
+// handle spa
+app.get(/.*/, (req: Request, res: Response) => res.sendFile(__dirname + '/public/index.html'));
 
 app.use(express.static('public'));
 const port = process.env.PORT || 5000;
