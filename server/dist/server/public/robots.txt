@@ -1,0 +1,10 @@
+User-agent: *
+disallow: /dashboard
+disallow: /api/*
+disallow: /user/*
+disallow: /settings
+disallow: /logout
+disallow: /appointment/*
+disallow: /calendar/*
+disallow: /payment
+disallow: /404
