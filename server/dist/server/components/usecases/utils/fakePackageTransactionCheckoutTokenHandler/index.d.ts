@@ -1,3 +1,0 @@
-import { FakePackageTransactionCheckoutTokenHandler } from './fakePackageTransactionCheckoutTokenHandler';
-declare const makeFakePackageTransactionCheckoutTokenHandler: Promise<FakePackageTransactionCheckoutTokenHandler>;
-export { makeFakePackageTransactionCheckoutTokenHandler };
