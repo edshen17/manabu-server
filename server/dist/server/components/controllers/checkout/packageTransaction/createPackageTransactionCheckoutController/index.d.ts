@@ -1,0 +1,3 @@
+import { CreatePackageTransactionCheckoutController } from './createPackageTransactionCheckoutController';
+declare const makeCreatePackageTransactionCheckoutController: Promise<CreatePackageTransactionCheckoutController>;
+export { makeCreatePackageTransactionCheckoutController };
