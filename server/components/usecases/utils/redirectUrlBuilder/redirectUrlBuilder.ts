@@ -22,19 +22,21 @@ class RedirectUrlBuilder {
     };
   };
 
-  public host = (host: HostParams): this => {
-    this._redirectExpressCallbackOptions.host = this._getHost(host);
+  public host = (host: HostParams, hostUrl?: string): this => {
+    this._redirectExpressCallbackOptions.host = this._getHost(host, hostUrl);
     return this;
   };
 
-  private _getHost = (host: HostParams): string => {
+  private _getHost = (host: HostParams, hostUrl?: string): string => {
     const hostOptions: { [key: string]: any } = {
       client: {
-        production: 'https://manabu.sg',
+        production: hostUrl ? hostUrl : 'https://floating-wave-80444.herokuapp.com/',
         development: 'http://localhost:8080',
       },
       server: {
-        production: 'https://manabu.sg/api/v1',
+        production: hostUrl
+          ? `${hostUrl}/api/v1`
+          : 'https://floating-wave-80444.herokuapp.com//api/v1',
         development: 'http://localhost:5000/api/v1',
       },
     };
