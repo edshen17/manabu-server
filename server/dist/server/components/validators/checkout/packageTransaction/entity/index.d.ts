@@ -1,3 +1,0 @@
-import { PackageTransactionCheckoutEntityValidator } from './packageTransactionCheckoutEntityValidator';
-declare const makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
-export { makePackageTransactionCheckoutEntityValidator };
