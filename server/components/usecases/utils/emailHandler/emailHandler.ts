@@ -159,7 +159,9 @@ class EmailHandler {
 
   private _getComponents = async (templateName: string): Promise<StringKeyObject> => {
     const dirname = __dirname.replace(/\\/g, '/');
-    const components = await import(`${dirname}/views/${templateName}.ts`);
+    const components = await import(
+      `${dirname}/views/${templateName}.${IS_PRODUCTION ? '.js' : '.ts'}`
+    );
     return components;
   };
 
