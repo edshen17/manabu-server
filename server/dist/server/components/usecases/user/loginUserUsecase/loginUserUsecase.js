@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginUserUsecase = void 0;
+const constants_1 = require("../../../../constants");
 const AbstractCreateUsecase_1 = require("../../abstractions/AbstractCreateUsecase");
 const cookieHandler_1 = require("../../utils/cookieHandler");
 var SERVER_LOGIN_ENDPOINTS;
@@ -10,7 +11,6 @@ var SERVER_LOGIN_ENDPOINTS;
 })(SERVER_LOGIN_ENDPOINTS || (SERVER_LOGIN_ENDPOINTS = {}));
 class LoginUserUsecase extends AbstractCreateUsecase_1.AbstractCreateUsecase {
     _createUserUsecase;
-    _oauth2Client;
     _google;
     _redirectUrlBuilder;
     _CLIENT_DASHBOARD_URL;
@@ -94,9 +94,17 @@ class LoginUserUsecase extends AbstractCreateUsecase_1.AbstractCreateUsecase {
     };
     _handleGoogleLogin = async (props) => {
         const { dbServiceAccessOptions, body, controllerData, query } = props;
+        const { routeData } = controllerData;
+        const { headers } = routeData;
+        const { host } = headers;
         const { code } = query;
-        const { tokens } = await this._oauth2Client.getToken(code);
-        const { email, name, picture } = await this._getGoogleUserData(tokens);
+        const oAUthRedirectUrl = this._redirectUrlBuilder
+            .host('server', host)
+            .endpoint('/users/auth/google/login')
+            .build();
+        const oauth2Client = new this._google.auth.OAuth2(constants_1.G_CLIENTID, constants_1.GOOGLE_CLIENT_SECRET, oAUthRedirectUrl);
+        const { tokens } = await oauth2Client.getToken(code);
+        const { email, name, picture } = await this._getGoogleUserData({ tokens, oauth2Client });
         const user = await this._dbService.findOne({
             searchQuery: { email },
             dbServiceAccessOptions,
@@ -119,21 +127,21 @@ class LoginUserUsecase extends AbstractCreateUsecase_1.AbstractCreateUsecase {
         });
         return googleLoginRes;
     };
-    _getGoogleUserData = async (tokens) => {
-        this._oauth2Client.setCredentials({
+    _getGoogleUserData = async (props) => {
+        const { tokens, oauth2Client } = props;
+        oauth2Client.setCredentials({
             access_token: tokens.access_token,
         });
         const oauth2 = this._google.oauth2({
-            auth: this._oauth2Client,
+            auth: oauth2Client,
             version: 'v2',
         });
         const googleRes = await oauth2.userinfo.get();
         return googleRes.data;
     };
     _initTemplate = async (optionalInitParams) => {
-        const { makeCreateUserUsecase, oauth2Client, google, makeRedirectUrlBuilder } = optionalInitParams;
+        const { makeCreateUserUsecase, google, makeRedirectUrlBuilder } = optionalInitParams;
         this._createUserUsecase = await makeCreateUserUsecase;
-        this._oauth2Client = oauth2Client;
         this._google = google;
         this._redirectUrlBuilder = makeRedirectUrlBuilder;
         this._CLIENT_DASHBOARD_URL = this._redirectUrlBuilder

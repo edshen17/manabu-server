@@ -5,7 +5,7 @@ declare class RedirectUrlBuilder {
     private _queryStringHandler;
     constructor();
     private _setDefaultProperties;
-    host: (host: HostParams) => this;
+    host: (host: HostParams, hostUrl?: string | undefined) => this;
     private _getHost;
     endpoint: (endpoint: string) => this;
     encodeQueryStringObj: (toEncodeObj: {}) => this;

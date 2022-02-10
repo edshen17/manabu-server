@@ -11,7 +11,8 @@
     "madge": "madge --circular --extensions ts ./",
     "ngrok": "ngrok http 5000",
     "kill": "taskkill /F /IM node.exe",
-    "postinstall": "npx patch-package"
+    "postinstall": "npx patch-package && npm run cpy",
+    "cpy": "cpy --parents server/**/*.json server/dist" 
   },
   "nodemonConfig": {
     "ignore": [
@@ -99,6 +100,7 @@
     "@types/redis": "^2.8.28",
     "@types/sanitize-html": "^2.6.2",
     "chai": "^4.3.4",
+    "cpy-cli": "^3.1.1",
     "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",

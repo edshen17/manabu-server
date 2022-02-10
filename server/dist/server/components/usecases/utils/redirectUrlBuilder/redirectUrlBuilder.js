@@ -15,18 +15,20 @@ class RedirectUrlBuilder {
             queryStrings: '',
         };
     };
-    host = (host) => {
-        this._redirectExpressCallbackOptions.host = this._getHost(host);
+    host = (host, hostUrl) => {
+        this._redirectExpressCallbackOptions.host = this._getHost(host, hostUrl);
         return this;
     };
-    _getHost = (host) => {
+    _getHost = (host, hostUrl) => {
         const hostOptions = {
             client: {
-                production: 'https://manabu.sg',
+                production: hostUrl ? `https://${hostUrl}` : 'https://floating-wave-80444.herokuapp.com',
                 development: 'http://localhost:8080',
             },
             server: {
-                production: 'https://manabu.sg/api/v1',
+                production: hostUrl
+                    ? `https://${hostUrl}/api/v1`
+                    : 'https://floating-wave-80444.herokuapp.com/api/v1',
                 development: 'http://localhost:5000/api/v1',
             },
         };

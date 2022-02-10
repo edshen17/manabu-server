@@ -7,7 +7,6 @@ import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBu
 import { CreateUserUsecase, CreateUserUsecaseResponse } from '../createUserUsecase/createUserUsecase';
 declare type OptionalLoginUserUsecaseInitParams = {
     makeCreateUserUsecase: Promise<CreateUserUsecase>;
-    oauth2Client: any;
     google: any;
     makeRedirectUrlBuilder: RedirectUrlBuilder;
     makeCookieHandler: Promise<CookieHandler>;
@@ -15,7 +14,6 @@ declare type OptionalLoginUserUsecaseInitParams = {
 declare type LoginUserUsecaseResponse = CreateUserUsecaseResponse;
 declare class LoginUserUsecase extends AbstractCreateUsecase<OptionalLoginUserUsecaseInitParams, LoginUserUsecaseResponse, UserDbServiceResponse> {
     private _createUserUsecase;
-    private _oauth2Client;
     private _google;
     private _redirectUrlBuilder;
     private _CLIENT_DASHBOARD_URL;

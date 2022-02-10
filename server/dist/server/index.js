@@ -55,10 +55,7 @@ if (constants_1.IS_PRODUCTION) {
     // static folder
     app.use(express_1.default.static(__dirname + '/public/'));
     // handle spa
-    app.get(/.*/, (req, res) => {
-        console.log('hih');
-        res.sendFile(__dirname + '/public/robots.txt');
-    });
+    app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 }
 app.use(express_1.default.static('public'));
 const port = process.env.PORT || 5000;
