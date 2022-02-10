@@ -30,12 +30,12 @@ class RedirectUrlBuilder {
   private _getHost = (host: HostParams, hostUrl?: string): string => {
     const hostOptions: { [key: string]: any } = {
       client: {
-        production: hostUrl ? hostUrl : 'https://floating-wave-80444.herokuapp.com/',
+        production: hostUrl ? `https://${hostUrl}` : 'https://floating-wave-80444.herokuapp.com/',
         development: 'http://localhost:8080',
       },
       server: {
         production: hostUrl
-          ? `${hostUrl}/api/v1`
+          ? `https://${hostUrl}/api/v1`
           : 'https://floating-wave-80444.herokuapp.com//api/v1',
         development: 'http://localhost:5000/api/v1',
       },
