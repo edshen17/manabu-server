@@ -52,8 +52,8 @@ class PaypalPaymentService extends AbstractPaymentService<
       this._paymentLib.payment.create(
         createPaymentJson,
         (err: SDKError, payment: StringKeyObject) => {
-          if (err) {
-            reject(err);
+          if (err || !payment) {
+            reject(err || payment);
           }
           const redirectUrl = payment.links.filter((link: StringKeyObject) => {
             return link.rel == 'approval_url';
