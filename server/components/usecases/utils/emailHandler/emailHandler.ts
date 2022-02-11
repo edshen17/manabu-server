@@ -90,9 +90,9 @@ class EmailHandler {
       subject: subject || this._getSubject({ data, templateName }),
       html,
     };
-    // if (IS_PRODUCTION) {
-    await this._sendgrid.send(email);
-    // }
+    if (IS_PRODUCTION) {
+      await this._sendgrid.send(email);
+    }
   };
 
   private _initLocale = (locale: string): void => {
