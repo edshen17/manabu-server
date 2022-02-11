@@ -2,7 +2,6 @@ import VueI18Next from '@panter/vue-i18next';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { ObjectId } from 'mongoose';
-import { IS_PRODUCTION } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { UserDbService } from '../../../dataAccess/services/user/userDbService';
 
@@ -91,9 +90,9 @@ class EmailHandler {
       subject: subject || this._getSubject({ data, templateName }),
       html,
     };
-    if (IS_PRODUCTION) {
-      await this._sendgrid.send(email);
-    }
+    // if (IS_PRODUCTION) {
+    await this._sendgrid.send(email);
+    // }
   };
 
   private _initLocale = (locale: string): void => {
@@ -159,9 +158,7 @@ class EmailHandler {
 
   private _getComponents = async (templateName: string): Promise<StringKeyObject> => {
     const dirname = __dirname.replace(/\\/g, '/');
-    const components = await import(
-      `${dirname}/views/${templateName}.${IS_PRODUCTION ? '.js' : '.ts'}`
-    );
+    const components = await import(`${dirname}/views/${templateName}`);
     return components;
   };
 
