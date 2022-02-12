@@ -5,6 +5,7 @@ import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbServiceResponse } from '../../../dataAccess/services/appointment/appointmentDbService';
 import { AvailableTimeDbService } from '../../../dataAccess/services/availableTime/availableTimeDbService';
+import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import { AvailableTimeEntity } from '../../../entities/availableTime/availableTimeEntity';
 import { AppointmentEntityValidator } from '../../../validators/appointment/entity/appointmentEntityValidator';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -15,6 +16,7 @@ import { SplitAvailableTimeHandler } from '../../utils/splitAvailableTimeHandler
 type OptionalEditAppointmentUsecaseInitParams = {
   makeSplitAvailableTimeHandler: Promise<SplitAvailableTimeHandler>;
   makeAvailableTimeDbService: Promise<AvailableTimeDbService>;
+  makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeEditEntityValidator: AppointmentEntityValidator;
   makeAvailableTimeEntity: Promise<AvailableTimeEntity>;
 };
@@ -31,6 +33,7 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
   private _splitAvailableTimeHandler!: SplitAvailableTimeHandler;
   private _availableTimeDbService!: AvailableTimeDbService;
   private _availableTimeEntity!: AvailableTimeEntity;
+  private _packageTransactionDbService!: PackageTransactionDbService;
 
   protected _getResourceAccessData = (): StringKeyObject => {
     return {
@@ -49,6 +52,7 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
       appointmentId,
       body,
       dbServiceAccessOptions,
+      currentAPIUser,
     });
     const usecaseRes = {
       appointment,
@@ -72,16 +76,18 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
     appointmentId: ObjectId;
     body: any;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    currentAPIUser: CurrentAPIUser;
   }): Promise<AppointmentDoc> => {
-    const { appointmentId, body, dbServiceAccessOptions } = props;
+    const { appointmentId, body, dbServiceAccessOptions, currentAPIUser } = props;
     const appointment = await this._dbService.findOneAndUpdate({
       searchQuery: { _id: appointmentId },
       updateQuery: body,
       dbServiceAccessOptions,
     });
     await this._splitAvailableTimeBrancher([appointment]);
-    if (appointment.status == 'cancelled') {
+    if (body.status == 'cancelled') {
       const { hostedById, startDate, endDate } = appointment;
+      const isHostedByCancel = hostedById == currentAPIUser.userId;
       const availableTimeEntity = await this._availableTimeEntity.build({
         hostedById,
         startDate,
@@ -91,6 +97,17 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
         modelToInsert: availableTimeEntity,
         dbServiceAccessOptions,
       });
+      if (isHostedByCancel) {
+        this._packageTransactionDbService.findOneAndUpdate({
+          searchQuery: {
+            _id: appointment.packageTransactionId,
+          },
+          updateQuery: {
+            $inc: { remainingAppointments: 1 },
+          },
+          dbServiceAccessOptions,
+        });
+      }
     }
     return appointment;
   };
@@ -111,11 +128,13 @@ class EditAppointmentUsecase extends AbstractEditUsecase<
       makeEditEntityValidator,
       makeAvailableTimeDbService,
       makeAvailableTimeEntity,
+      makePackageTransactionDbService,
     } = optionalInitParams;
     this._splitAvailableTimeHandler = await makeSplitAvailableTimeHandler;
     this._editEntityValidator = makeEditEntityValidator;
     this._availableTimeDbService = await makeAvailableTimeDbService;
     this._availableTimeEntity = await makeAvailableTimeEntity;
+    this._packageTransactionDbService = await makePackageTransactionDbService;
   };
 }
 

@@ -2,6 +2,7 @@ import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
 import { makeAppointmentDbService } from '../../../dataAccess/services/appointment';
 import { makeAvailableTimeDbService } from '../../../dataAccess/services/availableTime';
+import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
 import { makeAvailableTimeEntity } from '../../../entities/availableTime';
 import { makeAppointmentEntityValidator } from '../../../validators/appointment/entity';
 import { makeAppointmentParamsValidator } from '../../../validators/appointment/params';
@@ -19,6 +20,7 @@ const makeEditAppointmentUsecase = new EditAppointmentUsecase().init({
   makeSplitAvailableTimeHandler,
   makeAvailableTimeDbService,
   makeAvailableTimeEntity,
+  makePackageTransactionDbService,
 });
 
 export { makeEditAppointmentUsecase };
