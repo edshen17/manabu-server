@@ -4,7 +4,7 @@ import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import {
   UserDbService,
-  UserDbServiceResponse,
+  UserDbServiceResponse
 } from '../../../dataAccess/services/user/userDbService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
@@ -15,7 +15,7 @@ import { CookieHandler } from '../../utils/cookieHandler/cookieHandler';
 import { RedirectUrlBuilder } from '../../utils/redirectUrlBuilder/redirectUrlBuilder';
 import {
   CreateUserUsecase,
-  CreateUserUsecaseResponse,
+  CreateUserUsecaseResponse
 } from '../createUserUsecase/createUserUsecase';
 
 type OptionalLoginUserUsecaseInitParams = {
@@ -149,7 +149,7 @@ class LoginUserUsecase extends AbstractCreateUsecase<
     const { host } = headers;
     const { code } = query;
     const oAUthRedirectUrl = this._redirectUrlBuilder
-      .host('server', host)
+      .host('server')
       .endpoint('/users/auth/google/login')
       .build();
     const oauth2Client = new this._google.auth.OAuth2(
