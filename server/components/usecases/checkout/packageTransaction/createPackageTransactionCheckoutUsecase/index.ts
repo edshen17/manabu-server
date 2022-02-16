@@ -14,6 +14,7 @@ import { makeExchangeRateHandler } from '../../../utils/exchangeRateHandler';
 import { makeJwtHandler } from '../../../utils/jwtHandler';
 import { makeRedirectUrlBuilder } from '../../../utils/redirectUrlBuilder';
 import { CreatePackageTransactionCheckoutUsecase } from './createPackageTransactionCheckoutUsecase';
+const currency = require('currency.js');
 
 const makeCreatePackageTransactionCheckoutUsecase =
   new CreatePackageTransactionCheckoutUsecase().init({
@@ -26,6 +27,7 @@ const makeCreatePackageTransactionCheckoutUsecase =
     makePaypalPaymentService,
     makeStripePaymentService,
     makeRedirectUrlBuilder,
+    currency,
     convertStringToObjectId,
     convertToTitlecase,
     makeExchangeRateHandler,

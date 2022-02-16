@@ -48,6 +48,7 @@ type OptionalCreatePackageTransactionCheckoutUsecaseInitParams = {
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   makeCacheDbService: Promise<CacheDbService>;
   makePackageTransactionCheckoutEntityValidator: PackageTransactionCheckoutEntityValidator;
+  currency: any;
   convertStringToObjectId: ConvertStringToObjectId;
   convertToTitlecase: ConvertToTitlecase;
 };
@@ -103,6 +104,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _packageTransactionCheckoutEntityValidator!: PackageTransactionCheckoutEntityValidator;
   private _convertStringToObjectId!: ConvertStringToObjectId;
   private _convertToTitlecase!: ConvertToTitlecase;
+  private _currency!: any;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -226,7 +228,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const item = {
       id: `teacher-${teacher._id}-student-${currentAPIUser.userId}-${lessonLanguage}`,
       name: this._convertToTitlecase(`Minato Manabu - ${teacherPackage.name} / ${teacher.name}`),
-      price: total,
+      price: this._currency(total).value,
       quantity: 1,
     };
     const paymentData = {
@@ -429,6 +431,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       makeCacheDbService,
       makePackageTransactionCheckoutEntityValidator,
       makeRedirectUrlBuilder,
+      currency,
       convertStringToObjectId,
       convertToTitlecase,
     } = optionalInitParams;
@@ -440,6 +443,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._cacheDbService = await makeCacheDbService;
     this._packageTransactionCheckoutEntityValidator = makePackageTransactionCheckoutEntityValidator;
+    this._currency = currency;
     this._convertStringToObjectId = convertStringToObjectId;
     this._convertToTitlecase = convertToTitlecase;
   };
