@@ -55,11 +55,16 @@ class PaypalPaymentService extends AbstractPaymentService<
           if (err || !payment) {
             reject(err || payment);
           }
-          const redirectUrl = payment.links.filter((link: StringKeyObject) => {
-            return link.rel == 'approval_url';
-          })[0].href;
-          const executePaymentRes = { redirectUrl };
-          resolve(executePaymentRes);
+          if (payment && payment.links) {
+            const redirectUrl = payment.links.filter((link: StringKeyObject) => {
+              return link.rel == 'approval_url';
+            })[0].href;
+            const executePaymentRes = { redirectUrl };
+            resolve(executePaymentRes);
+          } else {
+            const paypalErr = new Error();
+            reject(paypalErr);
+          }
         }
       );
     });

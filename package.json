@@ -12,7 +12,7 @@
     "ngrok": "ngrok http 5000",
     "kill": "taskkill /F /IM node.exe",
     "postinstall": "npx patch-package && npm run cpy",
-    "cpy": "cpy --parents server/**/*.json server/dist" 
+    "cpy": "cpy --parents server/**/*.json server/dist"
   },
   "nodemonConfig": {
     "ignore": [
@@ -81,6 +81,7 @@
     "query-string": "^7.0.1",
     "rand-token": "^1.0.1",
     "redis-json": "^6.0.1",
+    "redis-om": "^0.1.7",
     "redisgraph.js": "^2.3.0",
     "sanitize-html": "^2.6.1",
     "stripe": "^8.184.0",
