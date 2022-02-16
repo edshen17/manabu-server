@@ -81,7 +81,6 @@
     "query-string": "^7.0.1",
     "rand-token": "^1.0.1",
     "redis-json": "^6.0.1",
-    "redis-om": "^0.1.7",
     "redisgraph.js": "^2.3.0",
     "sanitize-html": "^2.6.1",
     "stripe": "^8.184.0",
