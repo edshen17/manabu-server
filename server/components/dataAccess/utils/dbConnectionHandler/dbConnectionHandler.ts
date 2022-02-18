@@ -19,7 +19,7 @@ class DbConnectionHandler {
   };
 
   private _getDbUri = async (): Promise<string> => {
-    const dbHost = IS_PRODUCTION ? 'production' : 'staging'; // change to users
+    const dbHost = IS_PRODUCTION ? 'production' : 'staging';
     const uriOptions = 'retryWrites=false&w=majority';
     let dbUri = `mongodb+srv://manabu:${MONGO_PASS}@${MONGO_HOST}/${dbHost}?${uriOptions}`;
     if (!IS_PRODUCTION) {

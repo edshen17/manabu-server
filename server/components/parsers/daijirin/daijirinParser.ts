@@ -1,5 +1,8 @@
+import { JsonDbService } from '../../dataAccess/services/json/jsonDbService';
+
 class DaijirinParser {
   private _fsPromises!: any;
+  private _jsonDbService!: JsonDbService;
 
   public parse = async (): Promise<void> => {
     const fileNames: string[] = await this._fsPromises.readdir('../data/daijirin');
@@ -11,9 +14,17 @@ class DaijirinParser {
     }
   };
 
-  public init = async (initParams: { fs: any }): Promise<this> => {
-    const { fs } = initParams;
+  public init = async (initParams: {
+    fs: any;
+    makeJsonDbService: Promise<JsonDbService>;
+  }): Promise<this> => {
+    const { fs, makeJsonDbService } = initParams;
     this._fsPromises = fs.promises;
+    try {
+      this._jsonDbService = await makeJsonDbService;
+    } catch (err) {
+      console.log(err);
+    }
     return this;
   };
 }

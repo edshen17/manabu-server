@@ -1,39 +1,122 @@
-import { REDIS_JSON_URL } from '../../../../constants';
+import { Mongoose, Types } from 'mongoose';
+import { SchemaFieldTypes } from 'redis';
 import { StringKeyObject } from '../../../../types/custom';
 
 class JsonDbService {
-  private _client!: any;
-  private _entity!: any;
-  private _schema!: any;
-  private _repository!: any;
+  private _redisClient!: any;
+  private _mongoose!: Mongoose;
 
-  public init = async (initParams: {
-    client: any;
-    entity: any;
-    schema: any;
-    repository: any;
-  }): Promise<this> => {
-    const { client, entity, schema, repository } = initParams;
-    this._client = client;
-    this._entity = entity;
-    this._schema = schema;
-    this._repository = repository;
-    await this._client.open(REDIS_JSON_URL);
+  public insert = async (props: {
+    modelName: string;
+    modelToInsert: StringKeyObject;
+  }): Promise<StringKeyObject> => {
+    const { modelName, modelToInsert } = props;
+    const pluralizedName = this._pluraizeName(modelName);
+    const _id = new this._mongoose.Types.ObjectId();
+    await this._redisClient.json.set(`${pluralizedName}:${_id}`, '$', { _id, ...modelToInsert });
+    const insertedModel = await this.findById({ modelName, _id });
+    return insertedModel;
+  };
+
+  private _pluraizeName = (name: string): string => {
+    const pluralizedName = `${name}s`;
+    return pluralizedName;
+  };
+
+  public findById = async (props: {
+    modelName: string;
+    _id: Types.ObjectId;
+  }): Promise<StringKeyObject> => {
+    const { modelName, _id } = props;
+    const pluralizedName = this._pluraizeName(modelName);
+    const storedData = await this._redisClient.json.get(`${pluralizedName}:${_id}`);
+    return storedData;
+  };
+
+  public findByIdAndDelete = async (props: {
+    modelName: string;
+    _id: Types.ObjectId;
+  }): Promise<void> => {
+    const { modelName, _id } = props;
+    const pluralizedName = this._pluraizeName(modelName);
+    await this._redisClient.json.del(`${pluralizedName}:${_id}`);
+  };
+
+  public search = async (props: {
+    modelName: string;
+    searchQuery: string;
+  }): Promise<StringKeyObject> => {
+    const { modelName, searchQuery } = props;
+    const pluralizedName = this._pluraizeName(modelName);
+    const resultData = await this._redisClient.ft.search(`idx:${pluralizedName}`, searchQuery);
+    return resultData;
+  };
+
+  public init = async (initParams: { redisClient: any; mongoose: Mongoose }): Promise<this> => {
+    const { redisClient, mongoose } = initParams;
+    this._redisClient = redisClient;
+    this._mongoose = mongoose;
+    await this._redisClient.connect();
+    console.log(this._redisClient.ft.create());
+    await this._createJaToJaWordSchema();
     return this;
   };
 
-  private _createWordSchema = (): StringKeyObject => {
-    class Word extends this._entity {}
-    const schema = new this._schema(Word, {
-      word: { type: 'string' },
-      definition: { type: 'string' },
-      audioLinks: { type: 'array' },
-      wordLanguage: { type: 'string' },
-      definitionLanguage: { type: 'string' },
-      // meta: Object
-      // createdDate: Date,
-      // lastModifiedDate: Date
+  private _createJaToJaWordSchema = async (): Promise<void> => {
+    await this.createSchema({
+      modelName: 'ja-ja:word',
+      model: {
+        word: {
+          type: SchemaFieldTypes.TEXT,
+          SORTABLE: 'UNF',
+          AS: 'word',
+        },
+        kana: {
+          type: SchemaFieldTypes.TEXT,
+          AS: 'kana',
+        },
+        definition: {
+          type: SchemaFieldTypes.TEXT,
+          AS: 'definition',
+        },
+        'audioLinks[0:]': {
+          type: SchemaFieldTypes.TEXT,
+          AS: 'audioLinks',
+        },
+        'pitch[0:]': {
+          type: SchemaFieldTypes.NUMERIC,
+          AS: 'pitch',
+        },
+        createdDate: {
+          type: SchemaFieldTypes.NUMERIC,
+        },
+        lastModifiedDate: {
+          type: SchemaFieldTypes.NUMERIC,
+        },
+      },
     });
+  };
+
+  public createSchema = async (props: {
+    modelName: string;
+    model: StringKeyObject;
+  }): Promise<void> => {
+    const { modelName, model } = props;
+    const pluralizedName = this._pluraizeName(modelName);
+    const redisModel: StringKeyObject = {};
+    for (const property in model) {
+      redisModel[`$.${property}`] = model[property];
+    }
+    try {
+      await this._redisClient.ft.create(`idx:${pluralizedName}`, redisModel, {
+        ON: 'JSON',
+        PREFIX: `${pluralizedName}`,
+      });
+    } catch (err: any) {
+      if (err.message != 'Index already exists') {
+        throw err;
+      }
+    }
   };
 }
 
