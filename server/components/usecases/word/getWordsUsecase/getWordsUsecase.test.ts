@@ -21,14 +21,14 @@ beforeEach(async () => {
     rawBody: {},
     headers: {},
     params: {
-      word: 'danshi',
+      word: 'kayoubi',
     },
     body: {},
     query: {
       wordLanguage: 'ja',
       definitionLanguage: 'ja',
       page: 0,
-      limit: 10,
+      limit: 25,
     },
     endpointPath: '',
   };
