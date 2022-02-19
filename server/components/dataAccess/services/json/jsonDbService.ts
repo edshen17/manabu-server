@@ -1,9 +1,11 @@
+import { SearchOptions } from '@node-redis/search/dist/commands/SEARCH';
 import { Mongoose, Types } from 'mongoose';
 import { SchemaFieldTypes } from 'redis';
+import { RedisClient } from '.';
 import { StringKeyObject } from '../../../../types/custom';
 
 class JsonDbService {
-  private _redisClient!: any;
+  private _redisClient!: RedisClient;
   private _mongoose!: Mongoose;
 
   public insert = async (props: {
@@ -12,7 +14,7 @@ class JsonDbService {
   }): Promise<StringKeyObject> => {
     const { modelName, modelToInsert } = props;
     const pluralizedName = this._pluraizeName(modelName);
-    const _id = new this._mongoose.Types.ObjectId();
+    const _id = new this._mongoose.Types.ObjectId() as any;
     await this._redisClient.json.set(`${pluralizedName}:${_id}`, '$', { _id, ...modelToInsert });
     const insertedModel = await this.findById({ modelName, _id });
     return insertedModel;
@@ -23,10 +25,7 @@ class JsonDbService {
     return pluralizedName;
   };
 
-  public findById = async (props: {
-    modelName: string;
-    _id: Types.ObjectId;
-  }): Promise<StringKeyObject> => {
+  public findById = async (props: { modelName: string; _id: any }): Promise<any> => {
     const { modelName, _id } = props;
     const pluralizedName = this._pluraizeName(modelName);
     const storedData = await this._redisClient.json.get(`${pluralizedName}:${_id}`);
@@ -45,10 +44,15 @@ class JsonDbService {
   public search = async (props: {
     modelName: string;
     searchQuery: string;
+    options?: SearchOptions;
   }): Promise<StringKeyObject> => {
-    const { modelName, searchQuery } = props;
+    const { modelName, searchQuery, options } = props;
     const pluralizedName = this._pluraizeName(modelName);
-    const resultData = await this._redisClient.ft.search(`idx:${pluralizedName}`, searchQuery);
+    const resultData = await this._redisClient.ft.search(
+      `idx:${pluralizedName}`,
+      searchQuery,
+      options
+    );
     return resultData;
   };
 
@@ -57,7 +61,6 @@ class JsonDbService {
     this._redisClient = redisClient;
     this._mongoose = mongoose;
     await this._redisClient.connect();
-    console.log(this._redisClient.ft.create());
     await this._createJaToJaWordSchema();
     return this;
   };
@@ -86,12 +89,6 @@ class JsonDbService {
         'pitch[0:]': {
           type: SchemaFieldTypes.NUMERIC,
           AS: 'pitch',
-        },
-        createdDate: {
-          type: SchemaFieldTypes.NUMERIC,
-        },
-        lastModifiedDate: {
-          type: SchemaFieldTypes.NUMERIC,
         },
       },
     });
