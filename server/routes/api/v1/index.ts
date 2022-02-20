@@ -9,6 +9,7 @@ import { packageTransactions } from './packageTransactions';
 import { teachers } from './teachers/index';
 import { users } from './users/index';
 import { webhooks } from './webhooks';
+import { words } from './words';
 
 const api = express.Router();
 api.use('/appointments', appointments);
@@ -20,6 +21,7 @@ api.use('/exchangeRates', exchangeRates);
 api.use('/packageTransactions', packageTransactions);
 api.use('/checkout', checkout);
 api.use('/webhooks', webhooks);
+api.use('/words', words);
 api.use('/admin', admin);
 
 export { api };
