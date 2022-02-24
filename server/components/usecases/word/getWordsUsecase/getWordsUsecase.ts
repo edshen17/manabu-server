@@ -27,13 +27,15 @@ class GetWordsUsecase extends AbstractGetUsecase<
     const { wordLanguage, definitionLanguage, page, limit } = query;
     const hiragana = this._wanakana.toHiragana(word);
     const katakana = this._wanakana.toKatakana(word);
+    const size = parseInt(limit) || 25;
+    const from = parseInt(page) * size || 0;
     const { documents } = await this._jsonDbService.search({
       modelName: `${wordLanguage}-${definitionLanguage}:word`,
       searchQuery: `@word|kana:(${word} | ${hiragana} | ${katakana})`,
       options: {
         LIMIT: {
-          from: parseInt(page) || 0,
-          size: parseInt(limit) || 25,
+          from,
+          size,
         },
       },
     });
