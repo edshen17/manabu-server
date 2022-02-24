@@ -31,7 +31,7 @@ class GetWordsUsecase extends AbstractGetUsecase<
     const from = parseInt(page) * size || 0;
     const { documents } = await this._jsonDbService.search({
       modelName: `${wordLanguage}-${definitionLanguage}:word`,
-      searchQuery: `@word|kana:(${word} | ${hiragana} | ${katakana})`,
+      searchQuery: `@word|kana:(${word}* | ${hiragana}* | ${katakana}*)`,
       options: {
         LIMIT: {
           from,
