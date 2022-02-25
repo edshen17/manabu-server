@@ -3,6 +3,7 @@ import { MANABU_ADMIN_EMAIL } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbService } from '../../../dataAccess/services/appointment/appointmentDbService';
+import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import {
   EmailHandler,
@@ -16,6 +17,7 @@ type OptionalEndAppointmentScheduleTaskInitParams = {
   makeAppointmentDbService: Promise<AppointmentDbService>;
   makePackageTransactionDbService: Promise<PackageTransactionDbService>;
   makeEmailHandler: Promise<EmailHandler>;
+  makeCacheDbService: Promise<CacheDbService>;
 };
 
 type GetAppointmentsParams = {
@@ -32,6 +34,7 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
   private _appointmentDbService!: AppointmentDbService;
   private _packageTransactionDbService!: PackageTransactionDbService;
   private _emailHandler!: EmailHandler;
+  private _cacheDbService!: CacheDbService;
 
   public execute = async (): Promise<void> => {
     const now = this._dayjs();
@@ -114,15 +117,22 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
   };
 
   private _sendExpiredAppointmentAlert = async (appointment: AppointmentDoc): Promise<void> => {
-    await this._emailHandler.send({
-      to: MANABU_ADMIN_EMAIL,
-      from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-      templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_EXPIRED_APPOINTMENT,
-      data: {
-        name: 'Admin',
-        appointment,
-      },
+    const APPOINTMENT_ALERT_HASH_KEY = 'expiredAppointmentAlert';
+    const sentEmailAlert = await this._cacheDbService.get({
+      hashKey: APPOINTMENT_ALERT_HASH_KEY,
+      key: appointment._id.toString(),
     });
+    if (!sentEmailAlert) {
+      await this._emailHandler.send({
+        to: MANABU_ADMIN_EMAIL,
+        from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
+        templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_EXPIRED_APPOINTMENT,
+        data: {
+          name: 'Admin',
+          appointment,
+        },
+      });
+    }
   };
 
   protected _initTemplate = async (
@@ -131,11 +141,16 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
       'dayjs'
     >
   ): Promise<void> => {
-    const { makeAppointmentDbService, makeEmailHandler, makePackageTransactionDbService } =
-      optionalScheduleTaskInitParams;
+    const {
+      makeAppointmentDbService,
+      makeEmailHandler,
+      makePackageTransactionDbService,
+      makeCacheDbService,
+    } = optionalScheduleTaskInitParams;
     this._appointmentDbService = await makeAppointmentDbService;
     this._emailHandler = await makeEmailHandler;
     this._packageTransactionDbService = await makePackageTransactionDbService;
+    this._cacheDbService = await makeCacheDbService;
   };
 }
 
