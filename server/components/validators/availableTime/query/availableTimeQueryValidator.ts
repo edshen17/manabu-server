@@ -5,8 +5,8 @@ class AvailableTimeQueryValidator extends AbstractQueryValidator {
     this._queryValidationSchema = this._joi.object().keys({
       startDate: this._joi.date(),
       endDate: this._joi.date(),
-      page: this._joi.number().max(1000),
-      limit: this._joi.number().max(1000),
+      page: this._joi.number().min(0).max(1000),
+      limit: this._joi.number().min(0).max(1000),
     });
   };
 }

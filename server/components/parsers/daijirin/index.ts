@@ -1,8 +1,12 @@
-import fs from 'fs';
-import { DaijirinParser } from './daijirinParser';
+// import axios from 'axios';
+// import fs from 'fs';
+// import { makeJsonDbService } from '../../dataAccess/services/json';
+// import { DaijirinParser } from './daijirinParser';
 
-const makeDaijirinParser = new DaijirinParser().init({
-  fs,
-});
+// const makeDaijirinParser = new DaijirinParser().init({
+//   fs,
+//   makeJsonDbService,
+//   axios,
+// });
 
-export { makeDaijirinParser };
+// export { makeDaijirinParser };
