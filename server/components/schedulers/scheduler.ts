@@ -27,7 +27,7 @@ class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {
         SCHEDULER_INTERVAL.FIVE_MINUTES,
         async function () {
           await self._endAppointmentScheduleTask.execute();
-          await self._endPackageTransactionScheduleTask.execute();
+          // await self._endPackageTransactionScheduleTask.execute();
           await self._sendAppointmentReminderScheduleTask.execute();
           self._cronJobs.push(cronJob);
         },
