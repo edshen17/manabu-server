@@ -67,10 +67,14 @@ app.use(express.static('public'));
 const port = process.env.PORT || 5000;
 
 (async () => {
-  dbConnectionHandler = await makeDbConnectionHandler;
-  scheduler = await makeScheduler;
-  await dbConnectionHandler.connect();
-  await scheduler.start();
+  try {
+    dbConnectionHandler = await makeDbConnectionHandler;
+    scheduler = await makeScheduler;
+    await dbConnectionHandler.connect();
+    await scheduler.start();
+  } catch (err) {
+    console.log(err);
+  }
 })();
 
 const gracefulShutdown = async (msg: string, callback: () => unknown) => {
@@ -90,6 +94,10 @@ process.on('SIGTERM', async () => {
   gracefulShutdown('Heroku app termination', function () {
     process.exit(0);
   });
+});
+
+process.on('uncaughtException', function (err) {
+  console.log(err.stack);
 });
 
 http.createServer(app).listen(port, function () {
