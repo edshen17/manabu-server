@@ -1,4 +1,4 @@
-import { ClientSession, ObjectId } from 'mongoose';
+import { ObjectId } from 'mongoose';
 import { IS_PRODUCTION } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -52,12 +52,10 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreateAppointmentsUsecaseResponse> => {
     const { body, dbServiceAccessOptions, currentAPIUser } = props;
-    const { session } = body;
     const { appointments, packageTransaction } = await this._createAppointments({
       appointments: body.appointments,
       dbServiceAccessOptions,
       currentAPIUser,
-      session,
     });
     this._sendTeacherAppointmentCreationEmail(appointments);
     const usecaseRes = {
@@ -71,9 +69,8 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     appointments: AppointmentEntityBuildParams[];
     dbServiceAccessOptions: DbServiceAccessOptions;
     currentAPIUser: CurrentAPIUser;
-    session?: ClientSession;
   }): Promise<CreateAppointmentsUsecaseResponse> => {
-    const { appointments, dbServiceAccessOptions, session } = props;
+    const { appointments, dbServiceAccessOptions } = props;
     const modelToInsert: AppointmentEntityBuildResponse[] = [];
     // all go through or none go through
     for (const appointment of appointments) {
@@ -83,7 +80,6 @@ class CreateAppointmentsUsecase extends AbstractCreateUsecase<
     const savedDbAppointments = await this._dbService.insertMany({
       modelToInsert,
       dbServiceAccessOptions,
-      session,
     });
     const packageTransaction = await this._decrementAppointmentCount(savedDbAppointments);
     await this._splitAvailableTimeBrancher(savedDbAppointments);

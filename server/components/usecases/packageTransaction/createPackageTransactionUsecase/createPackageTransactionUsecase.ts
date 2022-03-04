@@ -1,4 +1,3 @@
-import { ClientSession } from 'mongoose';
 import { DEFAULT_CURRENCY, MANABU_PROCESSING_RATE } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
@@ -83,7 +82,6 @@ type CreateAppointmentsRouteDataParams = {
   packageTransaction: PackageTransactionDoc;
   timeslots: Timeslot[];
   dbServiceAccessOptions: DbServiceAccessOptions;
-  session: ClientSession;
   currentAPIUser: CurrentAPIUser;
 };
 
@@ -109,34 +107,21 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreatePackageTransactionUsecaseResponse> => {
     const { query, dbServiceAccessOptions, currentAPIUser } = props;
-    const session = await this._dbService.startSession();
-    session.startTransaction();
-    let usecaseRes!: CreatePackageTransactionUsecaseResponse;
-    try {
-      usecaseRes = await this._getCreatePackageTransactionUsecaseRes({
-        query,
-        dbServiceAccessOptions,
-        session,
-        currentAPIUser,
-      });
-      await this._editTeacherPendingBalance({ usecaseRes, dbServiceAccessOptions, session });
-      await session.commitTransaction();
-    } catch (err) {
-      await session.abortTransaction();
-      throw err;
-    } finally {
-      session.endSession();
-    }
+    const usecaseRes = await this._getCreatePackageTransactionUsecaseRes({
+      query,
+      dbServiceAccessOptions,
+      currentAPIUser,
+    });
+    await this._editTeacherPendingBalance({ usecaseRes, dbServiceAccessOptions });
     return usecaseRes;
   };
 
   private _getCreatePackageTransactionUsecaseRes = async (props: {
     query: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
     currentAPIUser: CurrentAPIUser;
   }): Promise<CreatePackageTransactionUsecaseResponse> => {
-    const { query, dbServiceAccessOptions, session, currentAPIUser } = props;
+    const { query, dbServiceAccessOptions, currentAPIUser } = props;
     const { token, paymentId } = query;
     const verifiedJwt = await this._getVerifiedJwt(token);
     const { packageTransactionEntityBuildParams, balanceTransactionEntityBuildParams, timeslots } =
@@ -144,13 +129,11 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     const packageTransaction = await this._createPackageTransaction({
       packageTransactionEntityBuildParams,
       dbServiceAccessOptions,
-      session,
     });
     const { appointments } = await this._createAppointments({
       packageTransaction,
       timeslots,
       dbServiceAccessOptions,
-      session,
       currentAPIUser,
     });
     const { balanceTransactions } = await this._createBalanceTransactions({
@@ -158,7 +141,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       balanceTransactionEntityBuildParams,
       dbServiceAccessOptions,
       paymentId,
-      session,
     });
     const incomeReport = await this._createIncomeReport(balanceTransactions);
     const user = await this._userDbService.findOneAndUpdate({
@@ -194,16 +176,14 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _createPackageTransaction = async (props: {
     packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<PackageTransactionDoc> => {
-    const { packageTransactionEntityBuildParams, dbServiceAccessOptions, session } = props;
+    const { packageTransactionEntityBuildParams, dbServiceAccessOptions } = props;
     const packageTransactionEntity = await this._packageTransactionEntity.build(
       packageTransactionEntityBuildParams
     );
     const packageTransaction = await this._dbService.insert({
       modelToInsert: packageTransactionEntity,
       dbServiceAccessOptions,
-      session,
     });
     await this._createStudentTeacherEdge({ packageTransaction, dbServiceAccessOptions });
     return packageTransaction;
@@ -253,7 +233,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _getAppointmentsControllerData = async (
     props: CreateAppointmentsRouteDataParams
   ): Promise<ControllerData> => {
-    const { currentAPIUser, session, timeslots, packageTransaction } = props;
+    const { currentAPIUser, timeslots, packageTransaction } = props;
     const { _id, hostedById } = packageTransaction;
     const appointments = timeslots.map((timeslot) => {
       const appointmentEntityBuildParams = {
@@ -269,7 +249,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       params: {},
       body: {
         appointments,
-        session,
       },
       query: {},
       endpointPath: '',
@@ -286,19 +265,16 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     balanceTransactionEntityBuildParams: BalanceTransactionEntityBuildParams;
     paymentId: string;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<CreateBalanceTransactionsUsecaseResponse> => {
     const {
       packageTransaction,
       dbServiceAccessOptions,
       balanceTransactionEntityBuildParams,
       paymentId,
-      session,
     } = props;
     const { user, teacher } = await this._getUserDataFromPackageTransaction({
       packageTransaction,
       dbServiceAccessOptions,
-      session,
     });
     balanceTransactionEntityBuildParams.packageTransactionId = packageTransaction._id;
     balanceTransactionEntityBuildParams.paymentData!.id = paymentId;
@@ -307,7 +283,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         user,
         teacher,
         balanceTransactionEntityBuildParams,
-        session,
         packageTransaction,
       });
     const balanceTransactionRes = await this._createBalanceTransactionsUsecase.makeRequest(
@@ -320,31 +295,28 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _getUserDataFromPackageTransaction = async (props: {
     packageTransaction: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<{
     user: JoinedUserDoc;
     teacher: JoinedUserDoc;
   }> => {
-    const { packageTransaction, dbServiceAccessOptions, session } = props;
+    const { packageTransaction, dbServiceAccessOptions } = props;
     const [user, teacher] = await Promise.all([
       this._userDbService.findById({
         _id: packageTransaction.reservedById,
         dbServiceAccessOptions,
-        session,
       }),
       this._userDbService.findById({
         _id: packageTransaction.hostedById,
         dbServiceAccessOptions,
-        session,
       }),
     ]);
     return { user, teacher };
   };
 
   private _getBalanceTransactionsControllerData = async (
-    props: CreateBalanceTransactionsRouteDataParams & { session: ClientSession }
+    props: CreateBalanceTransactionsRouteDataParams
   ): Promise<ControllerData> => {
-    const { user, session } = props;
+    const { user } = props;
     const balanceTransactions = await this._getBalanceTransactionBatchBuildParams({ ...props });
     const currentAPIUser = {
       userId: user._id,
@@ -356,7 +328,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       params: {},
       body: {
         balanceTransactions,
-        session,
       },
       query: {},
       endpointPath: '',
@@ -566,9 +537,8 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _editTeacherPendingBalance = async (props: {
     usecaseRes: CreatePackageTransactionUsecaseResponse;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<void> => {
-    const { usecaseRes, dbServiceAccessOptions, session } = props;
+    const { usecaseRes, dbServiceAccessOptions } = props;
     const { balanceTransactions } = usecaseRes;
     const debitTeacherBalanceTransaction = balanceTransactions[2];
     const teacherTotalPayment = debitTeacherBalanceTransaction.totalPayment;
@@ -583,7 +553,6 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         },
       },
       dbServiceAccessOptions,
-      session,
     });
   };
 

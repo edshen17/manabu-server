@@ -1,4 +1,3 @@
-import { ClientSession } from 'mongoose';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { BalanceTransactionDbServiceResponse } from '../../../dataAccess/services/balanceTransaction/balanceTransactionDbService';
@@ -29,12 +28,11 @@ class CreateBalanceTransactionsUsecase extends AbstractCreateUsecase<
     props: MakeRequestTemplateParams
   ): Promise<CreateBalanceTransactionsUsecaseResponse> => {
     const { body, dbServiceAccessOptions, currentAPIUser } = props;
-    const { balanceTransactions, session } = body;
+    const { balanceTransactions } = body;
     const savedDbBalanceTransactions = await this._createBalanceTransactions({
       balanceTransactions,
       dbServiceAccessOptions,
       currentAPIUser,
-      session,
     });
     const usecaseRes = {
       balanceTransactions: savedDbBalanceTransactions,
@@ -46,9 +44,8 @@ class CreateBalanceTransactionsUsecase extends AbstractCreateUsecase<
     balanceTransactions: BalanceTransactionEntityBuildParams[];
     dbServiceAccessOptions: DbServiceAccessOptions;
     currentAPIUser: CurrentAPIUser;
-    session?: ClientSession;
   }): Promise<BalanceTransactionDoc[]> => {
-    const { balanceTransactions, dbServiceAccessOptions, session } = props;
+    const { balanceTransactions, dbServiceAccessOptions } = props;
     const modelToInsert: BalanceTransactionEntityBuildParams[] = [];
     for (const balanceTransaction of balanceTransactions) {
       await this._createBalanceTransaction({ balanceTransaction, modelToInsert });
@@ -56,7 +53,6 @@ class CreateBalanceTransactionsUsecase extends AbstractCreateUsecase<
     const savedDbBalanceTransactions = await this._dbService.insertMany({
       modelToInsert,
       dbServiceAccessOptions,
-      session,
     });
     return savedDbBalanceTransactions;
   };
