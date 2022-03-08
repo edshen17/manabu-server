@@ -38,6 +38,29 @@ beforeEach(async () => {
             custom: token,
           },
         ],
+        payer: {
+          payment_method: 'paypal',
+          status: 'VERIFIED',
+          payer_info: {
+            email: 'sb-7b43ig5841559@personal.example.com',
+            first_name: 'John',
+            last_name: 'Doe',
+            payer_id: 'V35LZLP6T9FD2',
+            shipping_address: {
+              recipient_name: 'Doe John',
+              line1: '123 Thomson Rd.',
+              city: 'Singapore',
+              state: 'SG_zip = 308123',
+              postal_code: '308123',
+              country_code: 'SG',
+              default_address: false,
+              preferred_address: false,
+              primary_address: false,
+              disable_for_transaction: false,
+            },
+            country_code: 'SG',
+          },
+        },
       },
       id: 'WH-7Y7254563A4550640-11V2185806837105M',
     },
@@ -47,7 +70,7 @@ beforeEach(async () => {
   };
 });
 
-describe('createPaynowWebhookUsecase', () => {
+describe('createPaypalWebhookUsecase', () => {
   describe('makeRequest', () => {
     const createPaypalWebhook = async () => {
       const controllerData = controllerDataBuilder

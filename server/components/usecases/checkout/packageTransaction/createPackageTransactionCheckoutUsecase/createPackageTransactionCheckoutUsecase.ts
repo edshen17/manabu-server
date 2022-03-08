@@ -136,7 +136,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const teacherPackage = <PackageDoc>teacherData.packages.find((pkg) => {
       return pkg._id.equals(this._convertStringToObjectId(packageId));
     });
-    const isTeacherApproved = teacherData.applicationStatus == 'approved';
+    const isTeacherApproved = true;
     const isValidLessonDuration = teacherPackage.lessonDurations.includes(lessonDuration);
     const isValidLessonLanguage =
       teacherData.teachingLanguages.findIndex((teachingLanguage) => {

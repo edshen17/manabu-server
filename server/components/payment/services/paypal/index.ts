@@ -24,4 +24,4 @@ paypal.configure(paypalConfig);
 
 const makePaypalPaymentService = new PaypalPaymentService().init({ paymentLib: paypal });
 
-export { makePaypalPaymentService };
+export { makePaypalPaymentService, paypal };

@@ -103,4 +103,4 @@ class PaypalPaymentService extends AbstractPaymentService<
   };
 }
 
-export { PaypalPaymentService };
+export { PaypalPaymentService, Paypal };

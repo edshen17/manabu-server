@@ -5,7 +5,7 @@ import { makeCreatePaypalWebhookUsecase } from '../../../../usecases/webhook/pay
 import { CreatePaypalWebhookController } from './createPaypalWebhookController';
 
 const makeCreatePaypalWebhookController = new CreatePaypalWebhookController({
-  successStatusCode: StatusCodes.CREATED,
+  successStatusCode: StatusCodes.OK,
   errorStatusCode: StatusCodes.CONFLICT,
 }).init({
   makeUsecase: makeCreatePaypalWebhookUsecase,
