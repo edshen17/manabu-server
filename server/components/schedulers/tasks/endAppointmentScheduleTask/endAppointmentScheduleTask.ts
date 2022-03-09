@@ -3,7 +3,7 @@ import { MANABU_ADMIN_EMAIL } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { AppointmentDbService } from '../../../dataAccess/services/appointment/appointmentDbService';
-import { CacheDbService } from '../../../dataAccess/services/cache/cacheDbService';
+import { CacheDbService, TTL_MS } from '../../../dataAccess/services/cache/cacheDbService';
 import { PackageTransactionDbService } from '../../../dataAccess/services/packageTransaction/packageTransactionDbService';
 import {
   EmailHandler,
@@ -131,6 +131,12 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
           name: 'Admin',
           appointment,
         },
+      });
+      await this._cacheDbService.set({
+        hashKey: APPOINTMENT_ALERT_HASH_KEY,
+        key: appointment._id.toString(),
+        value: appointment,
+        ttlMs: TTL_MS.WEEK,
       });
     }
   };
