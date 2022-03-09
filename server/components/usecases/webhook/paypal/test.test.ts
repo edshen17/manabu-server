@@ -1,4 +1,5 @@
 // import { StringKeyObject } from '../../../../types/custom';
+// import { paypal } from '../../../payment/services/paypal';
 
 // const executePayment = async (props: {
 //   paymentId: string;
@@ -10,9 +11,10 @@
 //   const { payer_id } = payer_info;
 //   const paymentJson = {
 //     payer_id,
+//     // transactions,
 //   };
-//   console.log(paymentId, paymentJson);
 //   return new Promise((resolve, reject) => {
+//     console.log(paymentId, paymentJson);
 //     paypal.payment.execute(paymentId, paymentJson, (err: any, payment: StringKeyObject) => {
 //       if (err || !payment) {
 //         reject(err || payment);

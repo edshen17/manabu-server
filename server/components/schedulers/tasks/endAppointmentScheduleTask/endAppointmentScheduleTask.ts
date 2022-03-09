@@ -62,9 +62,9 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
     for (const appointment of confirmedAppointments.concat(cancelledAppointments)) {
       await this._endAppointment({ appointment, now, dbServiceAccessOptions });
     }
-    // for (const appointment of overdueAppointments) {
-    //   await this._sendExpiredAppointmentAlert(appointment);
-    // }
+    for (const appointment of overdueAppointments) {
+      await this._sendExpiredAppointmentAlert(appointment);
+    }
   };
 
   private _getPastAppointments = async (
