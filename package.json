@@ -7,7 +7,7 @@
     "build": "tsc",
     "server": "nodemon server/index.ts",
     "start": "node server/dist/server/index.js",
-    "test": "mocha --no-timeouts --parallel --exit -r ts-node/register --require fixtures.ts server/**/test.test.ts",
+    "test": "mocha --no-timeouts --parallel --exit -r ts-node/register --require fixtures.ts server/**/*.test.ts",
     "madge": "madge --circular --extensions ts ./",
     "ngrok": "ngrok http 5000",
     "kill": "taskkill /F /IM node.exe",
@@ -21,6 +21,7 @@
   },
   "main": "server/index.ts",
   "dependencies": {
+    "@google-cloud/vision": "^2.4.2",
     "@node-redis/search": "^1.0.2",
     "@panter/vue-i18next": "^0.15.2",
     "@sendgrid/mail": "^7.6.0",

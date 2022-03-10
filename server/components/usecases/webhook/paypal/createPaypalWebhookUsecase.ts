@@ -67,7 +67,7 @@ class CreatePaypalWebhookUsecase extends AbstractCreateUsecase<
       paymentId,
       paymentJson,
       (err: SDKError, payment: StringKeyObject) => {
-        console.log(err, payment);
+        return;
       }
     );
   };

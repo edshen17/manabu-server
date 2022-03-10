@@ -1,5 +1,4 @@
 // import { StringKeyObject } from '../../../../types/custom';
-// import { paypal } from '../../../payment/services/paypal';
 
 // const executePayment = async (props: {
 //   paymentId: string;
@@ -235,5 +234,30 @@
 // describe('should recover', () => {
 //   it('should recover', async () => {
 //     await recover();
+//   });
+// });
+
+// const vision = require('@google-cloud/vision')({
+//   projectId: 'my-project-ID',
+//   credentials: JSON.parse(GCS_KEYFILE),
+// });
+
+// describe('test', () => {
+//   it('should work', async () => {
+//     const vision = require('@google-cloud/vision');
+//     const gcsKeyfile = JSON.parse(GCS_KEYFILE);
+//     const { project_id, private_key, client_email } = gcsKeyfile;
+//     // Creates a client
+//     const client = new vision.ImageAnnotatorClient({
+//       projectId: project_id,
+//       credentials: {
+//         client_email,
+//         private_key,
+//       },
+//     });
+//     const fileName = `${__dirname}/test.png`;
+//     const [result] = await client.textDetection(fileName);
+//     const detections = result.textAnnotations;
+//     console.log(detections[0]);
 //   });
 // });
