@@ -60,10 +60,18 @@ class EndAppointmentScheduleTask extends AbstractScheduleTask<
       status: 'pending',
     });
     for (const appointment of confirmedAppointments.concat(cancelledAppointments)) {
-      await this._endAppointment({ appointment, now, dbServiceAccessOptions });
+      try {
+        await this._endAppointment({ appointment, now, dbServiceAccessOptions });
+      } catch (err) {
+        continue;
+      }
     }
     for (const appointment of overdueAppointments) {
-      await this._sendExpiredAppointmentAlert(appointment);
+      try {
+        await this._sendExpiredAppointmentAlert(appointment);
+      } catch (err) {
+        continue;
+      }
     }
   };
 

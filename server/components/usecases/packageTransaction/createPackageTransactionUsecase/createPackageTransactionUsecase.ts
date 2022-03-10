@@ -441,6 +441,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       });
     debitTeacherBalanceTransactionEntityBuildParams.status =
       BALANCE_TRANSACTION_ENTITY_STATUS.PENDING;
+    debitTeacherBalanceTransactionEntityBuildParams.type = BALANCE_TRANSACTION_ENTITY_TYPE.PAYOUT;
     return debitTeacherBalanceTransactionEntityBuildParams;
   };
 

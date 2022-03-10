@@ -45,7 +45,11 @@ class SendAppointmentReminderScheduleTask extends AbstractScheduleTask<
     startingAppointments: AppointmentDoc[]
   ): Promise<void> => {
     for (const appointment of startingAppointments) {
-      await this._sendAppointmentReminder(appointment);
+      try {
+        await this._sendAppointmentReminder(appointment);
+      } catch (err) {
+        continue;
+      }
     }
   };
 

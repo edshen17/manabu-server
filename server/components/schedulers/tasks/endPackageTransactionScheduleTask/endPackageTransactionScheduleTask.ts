@@ -1,6 +1,5 @@
 import { Dayjs } from 'dayjs';
-import { ClientSession } from 'mongoose';
-import { DEFAULT_CURRENCY, PAYOUT_RATE } from '../../../../constants';
+import { DEFAULT_CURRENCY, MANABU_ADMIN_ID, PAYOUT_RATE } from '../../../../constants';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
 import { IncomeReportDoc } from '../../../../models/IncomeReport';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
@@ -40,13 +39,11 @@ type OptionalEndPackageTransactionScheduleTaskInitParams = {
 type GetExpiredPackageTransactionsParams = {
   dbServiceAccessOptions: DbServiceAccessOptions;
   now: Dayjs;
-  session: ClientSession;
 };
 
 type EndTransactionParams = {
   packageTransaction: PackageTransactionDoc;
   dbServiceAccessOptions: DbServiceAccessOptions;
-  session: ClientSession;
 };
 
 type EndPackageTransactionScheduleTaskResponse = {
@@ -87,51 +84,39 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     const now = this._dayjs();
     const dbServiceAccessOptions =
       this._packageTransactionDbService.getOverrideDbServiceAccessOptions();
-    const session = await this._packageTransactionDbService.startSession();
-    let endPackageTransactionScheduleTaskRes!: EndPackageTransactionScheduleTaskResponse;
-    session.startTransaction();
-    try {
-      endPackageTransactionScheduleTaskRes = await this._endPackageTransactions({
-        now,
-        dbServiceAccessOptions,
-        session,
-      });
-      await session.commitTransaction();
-    } catch (err) {
-      await session.abortTransaction();
-      throw err;
-    } finally {
-      session.endSession();
-    }
+    const endPackageTransactionScheduleTaskRes = await this._endPackageTransactions({
+      now,
+      dbServiceAccessOptions,
+    });
     return endPackageTransactionScheduleTaskRes;
   };
 
   private _endPackageTransactions = async (props: {
     now: Dayjs;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<EndPackageTransactionScheduleTaskResponse> => {
-    const { now, dbServiceAccessOptions, session } = props;
+    const { now, dbServiceAccessOptions } = props;
     const expiredPackageTransactions = await this._getExpiredPackageTransactions({
       now,
       dbServiceAccessOptions,
-      session,
     });
     const endedPackageTransactions = [];
     const endedTeacherBalanceResponses = [];
     for (const packageTransaction of expiredPackageTransactions) {
-      const endedPackageTransaction = await this._endPackageTransaction({
-        packageTransaction,
-        dbServiceAccessOptions,
-        session,
-      });
-      const endedTeacherBalanceTransactionRes = await this._endTeacherBalanceTransaction({
-        packageTransaction,
-        dbServiceAccessOptions,
-        session,
-      });
-      endedTeacherBalanceResponses.push(endedTeacherBalanceTransactionRes);
-      endedPackageTransactions.push(endedPackageTransaction);
+      try {
+        const endedPackageTransaction = await this._endPackageTransaction({
+          packageTransaction,
+          dbServiceAccessOptions,
+        });
+        const endedTeacherBalanceTransactionRes = await this._endTeacherBalanceTransaction({
+          packageTransaction,
+          dbServiceAccessOptions,
+        });
+        endedTeacherBalanceResponses.push(endedTeacherBalanceTransactionRes);
+        endedPackageTransactions.push(endedPackageTransaction);
+      } catch (err) {
+        continue;
+      }
     }
     return { endedPackageTransactions, endedTeacherBalanceResponses };
   };
@@ -139,7 +124,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _getExpiredPackageTransactions = async (
     props: GetExpiredPackageTransactionsParams
   ): Promise<PackageTransactionDoc[]> => {
-    const { now, dbServiceAccessOptions, session } = props;
+    const { now, dbServiceAccessOptions } = props;
     const expiredPackageTransactions = await this._packageTransactionDbService.find({
       dbServiceAccessOptions,
       searchQuery: {
@@ -154,10 +139,9 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
               { status: 'completed' },
             ],
           },
-          { isTerminated: false },
+          { isTerminated: false, _id: { $ne: MANABU_ADMIN_ID } },
         ],
       },
-      session,
     });
     return expiredPackageTransactions;
   };
@@ -165,7 +149,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _endPackageTransaction = async (
     props: EndTransactionParams
   ): Promise<PackageTransactionDoc> => {
-    const { packageTransaction, dbServiceAccessOptions, session } = props;
+    const { packageTransaction, dbServiceAccessOptions } = props;
     const endedPackageTransaction = await this._packageTransactionDbService.findOneAndUpdate({
       dbServiceAccessOptions,
       searchQuery: {
@@ -175,7 +159,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         isTerminated: true,
         remainingAppointments: 0,
       },
-      session,
     });
     return endedPackageTransaction;
   };
@@ -183,35 +166,30 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _endTeacherBalanceTransaction = async (
     props: EndTransactionParams
   ): Promise<EndTeacherBalanceTransactionResponse> => {
-    const { packageTransaction, dbServiceAccessOptions, session } = props;
+    const { packageTransaction, dbServiceAccessOptions } = props;
     const debitTeacherBalanceTransaction = await this._closeDebitTeacherBalanceTransaction({
       packageTransaction,
       dbServiceAccessOptions,
-      session,
     });
     let teacher = await this._userDbService.findById({
       _id: packageTransaction.hostedById,
       dbServiceAccessOptions,
-      session,
     });
     const executePayoutRes = await this._executePayout({
       debitTeacherBalanceTransaction,
       teacher,
       dbServiceAccessOptions,
-      session,
     });
     const creditTeacherPayoutBalanceTransactions =
       await this._createCreditTeacherPayoutBalanceTransactions({
         debitTeacherBalanceTransaction,
         dbServiceAccessOptions,
-        session,
         executePayoutRes,
       });
     teacher = await this._editTeacherBalance({
       debitTeacherBalanceTransaction,
       creditTeacherPayoutBalanceTransactions,
       dbServiceAccessOptions,
-      session,
     });
     const endTeacherBalanceTransactionRes = {
       debitTeacherBalanceTransaction,
@@ -225,9 +203,8 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _closeDebitTeacherBalanceTransaction = async (props: {
     packageTransaction: PackageTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }) => {
-    const { packageTransaction, dbServiceAccessOptions, session } = props;
+    const { packageTransaction, dbServiceAccessOptions } = props;
     const debitTeacherBalanceTransaction = await this._balanceTransactionDbService.findOneAndUpdate(
       {
         searchQuery: {
@@ -239,7 +216,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
           status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
         },
         dbServiceAccessOptions,
-        session,
       }
     );
     return debitTeacherBalanceTransaction;
@@ -249,7 +225,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     teacher: JoinedUserDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<ExecutePayoutResponse> => {
     const { debitTeacherBalanceTransaction, teacher, dbServiceAccessOptions } = props;
     const { hasRemainingAppointments, balanceChange } = await this._getTeacherPayoutData(
@@ -362,11 +337,9 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
   private _createCreditTeacherPayoutBalanceTransactions = async (props: {
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
     executePayoutRes: ExecutePayoutResponse;
   }): Promise<BalanceTransactionDoc[]> => {
-    const { dbServiceAccessOptions, session, debitTeacherBalanceTransaction, executePayoutRes } =
-      props;
+    const { dbServiceAccessOptions, debitTeacherBalanceTransaction, executePayoutRes } = props;
     const creditTeacherPayoutBalanceTransactionEntity =
       await this._createCreditTeacherPayoutBalanceTransactionEntities({
         debitTeacherBalanceTransaction,
@@ -376,7 +349,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       await this._balanceTransactionDbService.insertMany({
         modelToInsert: creditTeacherPayoutBalanceTransactionEntity,
         dbServiceAccessOptions,
-        session,
       });
     return creditTeacherPayoutBalanceTransaction;
   };
@@ -472,13 +444,11 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     debitTeacherBalanceTransaction: BalanceTransactionDoc;
     creditTeacherPayoutBalanceTransactions: BalanceTransactionDoc[];
     dbServiceAccessOptions: DbServiceAccessOptions;
-    session: ClientSession;
   }): Promise<JoinedUserDoc> => {
     const {
       debitTeacherBalanceTransaction,
       creditTeacherPayoutBalanceTransactions,
       dbServiceAccessOptions,
-      session,
     } = props;
     const payoutBalanceTransaction = creditTeacherPayoutBalanceTransactions.find(
       (balanceTransaction) => {
@@ -499,7 +469,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         },
       },
       dbServiceAccessOptions,
-      session,
     });
     return updatedTeacher;
   };
