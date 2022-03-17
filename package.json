@@ -12,7 +12,7 @@
     "ngrok": "ngrok http 5000",
     "kill": "taskkill /F /IM node.exe",
     "postinstall": "npx patch-package && npm run cpy",
-    "cpy": "cpy --parents server/**/*.json server/dist",
+    "cpy": "cpy --parents server/**/*.json, !server/components/parsers/data/*.json server/dist",
     "client": "cd client && npm run serve"
   },
   "nodemonConfig": {
