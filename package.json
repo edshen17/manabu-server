@@ -7,12 +7,13 @@
     "build": "tsc",
     "server": "nodemon server/index.ts",
     "start": "node server/dist/server/index.js",
-    "test": "mocha --no-timeouts --parallel --exit -r ts-node/register --require fixtures.ts server/**/*.test.ts",
+    "test": "mocha --no-timeouts --parallel --exit -r ts-node/register --require fixtures.ts server/**/contentEntity.test.ts",
     "madge": "madge --circular --extensions ts ./",
     "ngrok": "ngrok http 5000",
     "kill": "taskkill /F /IM node.exe",
     "postinstall": "npx patch-package && npm run cpy",
-    "cpy": "cpy --parents server/**/*.json server/dist"
+    "cpy": "cpy --parents server/**/*.json server/dist",
+    "client": "cd client && npm run serve"
   },
   "nodemonConfig": {
     "ignore": [
@@ -21,6 +22,7 @@
   },
   "main": "server/index.ts",
   "dependencies": {
+    "@google-cloud/language": "^4.3.2",
     "@google-cloud/vision": "^2.4.2",
     "@node-redis/search": "^1.0.2",
     "@panter/vue-i18next": "^0.15.2",
@@ -91,7 +93,9 @@
     "ts-mongoose": "^0.0.24",
     "vue": "^2.6.14",
     "vue-server-renderer": "^2.6.14",
-    "wanakana": "^4.0.2"
+    "wanakana": "^4.0.2",
+    "wikijs": "^6.3.3",
+    "xml-stream": "^0.4.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

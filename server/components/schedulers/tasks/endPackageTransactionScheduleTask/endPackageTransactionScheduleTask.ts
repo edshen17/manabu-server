@@ -115,6 +115,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         endedTeacherBalanceResponses.push(endedTeacherBalanceTransactionRes);
         endedPackageTransactions.push(endedPackageTransaction);
       } catch (err) {
+        console.log(err);
         continue;
       }
     }
@@ -209,8 +210,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       {
         searchQuery: {
           packageTransactionId: packageTransaction._id,
-          userId: packageTransaction.hostedById,
-          status: BALANCE_TRANSACTION_ENTITY_STATUS.PENDING,
+          type: BALANCE_TRANSACTION_ENTITY_TYPE.PAYOUT,
         },
         updateQuery: {
           status: BALANCE_TRANSACTION_ENTITY_STATUS.COMPLETED,
@@ -470,6 +470,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       },
       dbServiceAccessOptions,
     });
+    console.log(updatedTeacher);
     return updatedTeacher;
   };
 

@@ -1,0 +1,35 @@
+import { expect } from 'chai';
+import faker from 'faker';
+import { makeContentEntity } from '.';
+import { ContentEntity, CONTENT_ENTITY_OWNERSHIP, CONTENT_ENTITY_TYPE } from './contentEntity';
+
+let contentEntity: ContentEntity;
+
+before(async () => {
+  contentEntity = await makeContentEntity;
+});
+
+describe('contentEntity', () => {
+  describe('build', () => {
+    context('given valid inputs', () => {
+      it('should create an contentEntity', async () => {
+        const content = await contentEntity.build({
+          postedById: '605bc5ad9db900001528f77c' as any,
+          collectionId: '605bc5ad9db900001528f77c' as any,
+          title: 'test',
+          rawContent: 'test',
+          coverImageUrl: faker.image.dataUri(),
+          sourceUrl: faker.image.dataUri(),
+          summary: 'summary',
+          keyEntities: [],
+          tokens: ['token'],
+          categories: ['science'],
+          ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,
+          author: 'wikipedia',
+          type: CONTENT_ENTITY_TYPE.WIKIPEDIA,
+        });
+        expect(content.author).to.equal('wikipedia');
+      });
+    });
+  });
+});
