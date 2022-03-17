@@ -17,7 +17,6 @@ describe('contentEntity', () => {
           postedById: '605bc5ad9db900001528f77c' as any,
           collectionId: '605bc5ad9db900001528f77c' as any,
           title: 'test',
-          rawContent: 'test',
           coverImageUrl: faker.image.dataUri(),
           sourceUrl: faker.image.dataUri(),
           summary: 'summary',

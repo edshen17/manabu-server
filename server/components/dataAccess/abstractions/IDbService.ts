@@ -77,7 +77,8 @@ enum DB_SERVICE_COLLECTION {
   PACKAGE_TRANSACTIONS = 'packagetransactions',
   TEACHERS = 'teachers',
   USERS = 'users',
-  INCOME_REPORT = 'incomereports',
+  INCOME_REPORTS = 'incomereports',
+  CONTENTS = 'contents',
 }
 
 type DbServiceFindByIdParams = BaseDbServiceParams & SearchIdDbServiceParams;

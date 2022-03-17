@@ -8,7 +8,7 @@ type OptionalContentEntityInitParams = {
 };
 
 type ContentEntityBuildParams = Omit<
-  ContentyEntityBuildResponse,
+  ContentEntityBuildResponse,
   'createdDate' | 'lastModifiedDate' | 'titleNGrams'
 >;
 
@@ -24,12 +24,11 @@ enum CONTENT_ENTITY_TYPE {
   VIDEO = 'video',
 }
 
-type ContentyEntityBuildResponse = {
+type ContentEntityBuildResponse = {
   postedById: ObjectId;
   collectionId?: ObjectId;
   title: string;
   titleNGrams: string;
-  rawContent: string;
   coverImageUrl: string;
   sourceUrl: string;
   summary?: string;
@@ -46,17 +45,16 @@ type ContentyEntityBuildResponse = {
 class ContentEntity extends AbstractEntity<
   OptionalContentEntityInitParams,
   ContentEntityBuildParams,
-  ContentyEntityBuildResponse
+  ContentEntityBuildResponse
 > {
   private _nGramHandler!: NGramHandler;
 
   protected _buildTemplate = (
     buildParams: ContentEntityBuildParams
-  ): ContentyEntityBuildResponse => {
+  ): ContentEntityBuildResponse => {
     const {
       postedById,
       title,
-      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
@@ -71,7 +69,6 @@ class ContentEntity extends AbstractEntity<
       postedById,
       title,
       titleNGrams: this._nGramHandler.createEdgeNGrams({ str: title, isPrefixOnly: false }),
-      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
@@ -98,6 +95,7 @@ class ContentEntity extends AbstractEntity<
 export {
   OptionalContentEntityInitParams,
   ContentEntityBuildParams,
+  ContentEntityBuildResponse,
   ContentEntity,
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
