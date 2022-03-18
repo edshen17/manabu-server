@@ -20,7 +20,7 @@ describe('contentEntity', () => {
           coverImageUrl: faker.image.dataUri(),
           sourceUrl: faker.image.dataUri(),
           summary: 'summary',
-          keyEntities: [],
+          entities: [],
           tokens: ['token'],
           categories: ['science'],
           ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,

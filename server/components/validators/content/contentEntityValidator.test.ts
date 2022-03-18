@@ -26,7 +26,7 @@ beforeEach(() => {
     coverImageUrl: faker.image.dataUri(),
     sourceUrl: faker.image.dataUri(),
     summary: 'summary',
-    keyEntities: [{ word: 'test', salience: 0.05 }],
+    entities: [{ word: 'test', salience: 0.05 }],
     tokens: ['token'],
     categories: ['science'],
     ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,

@@ -14,7 +14,7 @@ class ContentEntityValidator extends AbstractEntityValidator {
       coverImageUrl: this._joi.string().uri().allow('').max(2048),
       sourceUrl: this._joi.string().uri().allow('').max(2048),
       summary: this._joi.string().max(10000),
-      keyEntities: this._joi.array().items({
+      entities: this._joi.array().items({
         word: this._joi.string().max(500),
         salience: this._joi.number().min(0),
       }),

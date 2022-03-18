@@ -9,7 +9,7 @@ const ContentSchema = createSchema({
   coverImageUrl: Type.string({ required: true }),
   sourceUrl: Type.string({ required: true }),
   summary: Type.string({ required: false }),
-  keyEntities: Type.array({ required: true }).of({
+  entities: Type.array({ required: true }).of({
     word: Type.string({ required: true }),
     salience: Type.number({ required: true }),
   }),

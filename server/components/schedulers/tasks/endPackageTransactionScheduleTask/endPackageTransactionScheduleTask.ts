@@ -470,7 +470,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
       },
       dbServiceAccessOptions,
     });
-    console.log(updatedTeacher);
     return updatedTeacher;
   };
 

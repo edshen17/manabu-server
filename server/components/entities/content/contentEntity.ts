@@ -32,7 +32,7 @@ type ContentEntityBuildResponse = {
   coverImageUrl: string;
   sourceUrl: string;
   summary?: string;
-  keyEntities: StringKeyObject[];
+  entities: StringKeyObject[];
   tokens: string[];
   categories: string[];
   ownership: CONTENT_ENTITY_OWNERSHIP;
@@ -58,7 +58,7 @@ class ContentEntity extends AbstractEntity<
       coverImageUrl,
       sourceUrl,
       summary,
-      keyEntities,
+      entities,
       tokens,
       categories,
       ownership,
@@ -72,7 +72,7 @@ class ContentEntity extends AbstractEntity<
       coverImageUrl,
       sourceUrl,
       summary,
-      keyEntities,
+      entities,
       tokens,
       categories,
       ownership,
