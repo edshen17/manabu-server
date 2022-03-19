@@ -1,4 +1,4 @@
-import { AbstractEntityValidator } from '../abstractions/AbstractEntityValidator';
+import { AbstractEntityValidator } from '../../abstractions/AbstractEntityValidator';
 
 class ContentEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {

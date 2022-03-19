@@ -65,6 +65,7 @@ class WikipediaParser {
       title,
       coverImageUrl,
       sourceUrl,
+      language: 'ja',
       rawContent,
       summary,
       entities,

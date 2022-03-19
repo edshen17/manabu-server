@@ -4,11 +4,11 @@ import { makeContentEntityValidator } from '.';
 import {
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
-} from '../../entities/content/contentEntity';
+} from '../../../entities/content/contentEntity';
 import {
   ENTITY_VALIDATOR_VALIDATE_MODE,
   ENTITY_VALIDATOR_VALIDATE_USER_ROLE,
-} from '../abstractions/AbstractEntityValidator';
+} from '../../abstractions/AbstractEntityValidator';
 import { ContentEntityValidator } from './contentEntityValidator';
 
 let contentEntityValidator: ContentEntityValidator;

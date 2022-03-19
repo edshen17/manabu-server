@@ -1,4 +1,4 @@
-import { makeContentEntityValidator } from '../../validators/content';
+import { makeContentEntityValidator } from '../../validators/content/entity';
 import { makeNGramHandler } from '../utils/nGramHandler';
 import { ContentEntity } from './contentEntity';
 
