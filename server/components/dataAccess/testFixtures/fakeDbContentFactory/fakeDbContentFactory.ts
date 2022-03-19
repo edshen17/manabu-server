@@ -20,6 +20,7 @@ class FakeDbContentFactory extends AbstractFakeDbDataFactory<
       postedById: '605bc5ad9db900001528f77c' as any,
       collectionId: '605bc5ad9db900001528f77c' as any,
       title: 'test',
+      rawContent: 'something',
       coverImageUrl: 'https://google.com/',
       sourceUrl: 'https://google.com/',
       summary: 'summary',

@@ -29,6 +29,7 @@ type ContentEntityBuildResponse = {
   collectionId?: ObjectId;
   title: string;
   titleNGrams: string;
+  rawContent: string;
   coverImageUrl: string;
   sourceUrl: string;
   summary?: string;
@@ -55,6 +56,7 @@ class ContentEntity extends AbstractEntity<
     const {
       postedById,
       title,
+      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
@@ -69,6 +71,7 @@ class ContentEntity extends AbstractEntity<
       postedById,
       title,
       titleNGrams: this._nGramHandler.createEdgeNGrams({ str: title, isPrefixOnly: false }),
+      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,

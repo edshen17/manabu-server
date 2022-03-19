@@ -1,7 +1,24 @@
 // import { GCS_KEYFILE } from '../../../../constants';
 
+import { makeContentDbService } from '../../../dataAccess/services/content';
+import { ContentDbService } from '../../../dataAccess/services/content/contentDbService';
+
+let contentDbService: ContentDbService;
+
+before(async () => {
+  contentDbService = await makeContentDbService;
+});
+
 describe('test', () => {
   it('should run', async () => {
+    const dbServiceAccessOptions = contentDbService.getBaseDbServiceAccessOptions();
+    const t = await contentDbService.find({
+      searchQuery: {
+        title: '哲学',
+      },
+      dbServiceAccessOptions,
+    });
+    console.log('hi');
     // const text = await (
     //   await wiki({ apiUrl: 'https://ja.wikipedia.org/w/api.php' }).page('哲学')
     // ).langlinks();

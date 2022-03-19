@@ -42,28 +42,30 @@ class WikipediaParser {
   public populateDb = async (): Promise<void> => {
     const dataPath = `${__dirname}/../data/wikipedia`;
     const fileNames: string[] = await this._fsPromises.readdir(dataPath);
-    for (const fileName of fileNames) {
-      if (fileName.includes('1.xml')) {
-        const stream = this._fs.createReadStream(`${dataPath}/${fileName}`);
-        const xml = new this._xmlStream(stream);
-        xml.on('endElement: page', async (wikipediaArticle: WikipediaArticle) => {
-          if (wikipediaArticle.ns == '0') {
-            const { title } = wikipediaArticle;
-            await this._createContent(title);
-          }
-        });
-      }
-    }
+    // for (const fileName of fileNames) {
+    //   if (fileName.includes('1.xml')) {
+    //     const stream = this._fs.createReadStream(`${dataPath}/${fileName}`);
+    //     const xml = new this._xmlStream(stream);
+    //     xml.on('endElement: page', async (wikipediaArticle: WikipediaArticle) => {
+    //       if (wikipediaArticle.ns == '0') {
+    //         const { title } = wikipediaArticle;
+    //         await this._createContent(title);
+    //       }
+    //     });
+    //   }
+    // }
+    await this._createContent('哲学');
   };
 
   private _createContent = async (title: string): Promise<ContentDoc> => {
-    const { coverImageUrl, sourceUrl, summary, entities, tokens, categories } =
+    const { coverImageUrl, sourceUrl, summary, entities, tokens, categories, rawContent } =
       await this._getWikiArticleData(title);
     const contentEntity = await this._contentEntity.build({
       postedById: MANABU_ADMIN_ID as any,
       title,
       coverImageUrl,
       sourceUrl,
+      rawContent,
       summary,
       entities,
       tokens,
@@ -72,6 +74,7 @@ class WikipediaParser {
       author: 'Wikipedia',
       type: CONTENT_ENTITY_TYPE.WIKIPEDIA,
     });
+
     const dbServiceAccessOptions = this._contentDbService.getBaseDbServiceAccessOptions();
     const savedDbContent = await this._contentDbService.insert({
       modelToInsert: contentEntity,
@@ -101,6 +104,7 @@ class WikipediaParser {
       sourceUrl,
       summary,
       tokens,
+      rawContent,
       entities,
       categories,
     };
@@ -117,16 +121,29 @@ class WikipediaParser {
   };
 
   private _getEntities = async (document: GoogleLangClientParams): Promise<StringKeyObject[]> => {
-    const [entities] = await this._googleLangClient.analyzeEntities({ document });
+    const [result] = await this._googleLangClient.analyzeEntities({ document });
+    const entities = result.entities.map((entity: StringKeyObject) => {
+      const { name, salience } = entity;
+      return {
+        word: name,
+        salience,
+      };
+    });
     return entities;
   };
 
   private _getCategories = async (langLinks: Link[]): Promise<string[]> => {
     const document = await this._getEnglishDocument(langLinks);
     const [classification] = await this._googleLangClient.classifyText({ document });
-    const categories = classification.filter((category: StringKeyObject) => {
-      return category.confidence >= 0.5;
-    });
+    let { categories } = classification;
+    categories = categories
+      .filter((category: StringKeyObject) => {
+        return category.confidence >= 0.5;
+      })
+      .map((category: StringKeyObject) => {
+        const { name } = category;
+        return name;
+      });
     return categories;
   };
 

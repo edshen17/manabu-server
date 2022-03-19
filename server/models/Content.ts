@@ -4,8 +4,9 @@ import { UserSchema } from './User';
 const ContentSchema = createSchema({
   postedById: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   //   collectionId: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
-  title: Type.string({ required: true }),
+  title: Type.string({ required: true, index: true }),
   titleNGrams: Type.string({ required: true }),
+  rawContent: Type.string({ required: true }),
   coverImageUrl: Type.string({ required: true }),
   sourceUrl: Type.string({ required: true }),
   summary: Type.string({ required: false }),
