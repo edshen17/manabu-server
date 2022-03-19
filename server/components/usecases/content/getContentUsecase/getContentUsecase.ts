@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongoose';
 import { ContentDoc } from '../../../../models/Content';
-import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { ContentDbServiceResponse } from '../../../dataAccess/services/content/contentDbService';
 import { AbstractGetUsecase } from '../../abstractions/AbstractGetUsecase';
@@ -15,13 +14,6 @@ class GetContentUsecase extends AbstractGetUsecase<
   GetContentUsecaseResponse,
   ContentDbServiceResponse
 > {
-  protected _getResourceAccessData = (): StringKeyObject => {
-    return {
-      hasResourceAccessCheck: true,
-      paramIdName: 'packageTransactionId',
-    };
-  };
-
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<GetContentUsecaseResponse> => {
@@ -32,7 +24,7 @@ class GetContentUsecase extends AbstractGetUsecase<
       dbServiceAccessOptions,
     });
     if (!content) {
-      throw new Error('Package transaction not found.');
+      throw new Error('Content not found.');
     }
     return { content };
   };
