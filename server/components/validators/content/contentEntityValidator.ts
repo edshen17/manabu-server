@@ -19,6 +19,7 @@ class ContentEntityValidator extends AbstractEntityValidator {
         word: this._joi.string().max(500),
         salience: this._joi.number().min(0),
       }),
+      language: this._joi.string().max(5),
       tokens: this._joi.array().items(this._joi.string()),
       categories: this._joi.array().items(this._joi.string()),
       ownership: this._joi.string().valid('public', 'private'),

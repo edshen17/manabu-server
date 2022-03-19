@@ -14,6 +14,7 @@ describe('contentEntity', () => {
     context('given valid inputs', () => {
       it('should create an contentEntity', async () => {
         const content = await contentEntity.build({
+          language: 'ja',
           postedById: '605bc5ad9db900001528f77c' as any,
           collectionId: '605bc5ad9db900001528f77c' as any,
           title: 'test',

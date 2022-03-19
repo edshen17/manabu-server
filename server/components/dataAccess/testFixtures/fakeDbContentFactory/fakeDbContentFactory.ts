@@ -24,6 +24,7 @@ class FakeDbContentFactory extends AbstractFakeDbDataFactory<
       coverImageUrl: 'https://google.com/',
       sourceUrl: 'https://google.com/',
       summary: 'summary',
+      language: 'ja',
       entities: [],
       tokens: ['token'],
       categories: ['science'],

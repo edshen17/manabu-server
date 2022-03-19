@@ -29,6 +29,7 @@ type ContentEntityBuildResponse = {
   collectionId?: ObjectId;
   title: string;
   titleNGrams: string;
+  language: string;
   rawContent: string;
   coverImageUrl: string;
   sourceUrl: string;
@@ -63,6 +64,7 @@ class ContentEntity extends AbstractEntity<
       entities,
       tokens,
       categories,
+      language,
       ownership,
       author,
       type,
@@ -78,6 +80,7 @@ class ContentEntity extends AbstractEntity<
       entities,
       tokens,
       categories,
+      language,
       ownership,
       author,
       type,
