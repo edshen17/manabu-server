@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { makeCreateStripeWebhookUsecase } from '.';
-import { STRIPE_WEBHOOK_SECREY_KEY_DEV } from '../../../../constants';
+import { STRIPE_WEBHOOK_SECRET_KEY_DEV } from '../../../../constants';
 import { stripe } from '../../../payment/services/stripe';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
@@ -49,7 +49,7 @@ beforeEach(async () => {
     },
   };
   const payloadString = JSON.stringify(payload, null, 2);
-  const secret = STRIPE_WEBHOOK_SECREY_KEY_DEV;
+  const secret = STRIPE_WEBHOOK_SECRET_KEY_DEV;
   const stripeHeader = stripe.webhooks.generateTestHeaderString({
     payload: payloadString,
     secret,

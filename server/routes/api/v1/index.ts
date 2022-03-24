@@ -3,6 +3,7 @@ import { admin } from './admin';
 import { appointments } from './appointments';
 import { availableTimes } from './availableTimes';
 import { checkout } from './checkout';
+import { contents } from './contents';
 import { exchangeRates } from './exchangeRates';
 import { packages } from './packages';
 import { packageTransactions } from './packageTransactions';
@@ -23,5 +24,6 @@ api.use('/checkout', checkout);
 api.use('/webhooks', webhooks);
 api.use('/words', words);
 api.use('/admin', admin);
+api.use('/contents', contents);
 
 export { api };

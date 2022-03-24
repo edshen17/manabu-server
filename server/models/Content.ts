@@ -11,11 +11,14 @@ const ContentSchema = createSchema({
   coverImageUrl: Type.string({ required: true }),
   sourceUrl: Type.string({ required: true }),
   summary: Type.string({ required: false }),
-  entities: Type.array({ required: true }).of({
+  entities: Type.array({ required: true, _id: false }).of({
     word: Type.string({ required: true }),
     salience: Type.number({ required: true }),
   }),
-  tokens: Type.array({ required: true }).of(Type.string({ required: true })),
+  tokens: Type.array({ required: true }).of({
+    partOfSpeech: Type.string({ required: true, _id: false }),
+    text: Type.string({ required: true }),
+  }),
   categories: Type.array({ required: true }).of(Type.string({ required: true })),
   ownership: Type.string({ required: true, enum: ['public', 'private'] }),
   author: Type.string({ required: true }),

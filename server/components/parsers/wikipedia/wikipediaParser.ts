@@ -112,16 +112,29 @@ class WikipediaParser {
     return wikiData;
   };
 
-  private _getTokens = async (document: GoogleLangClientParams): Promise<string[]> => {
+  private _getTokens = async (document: GoogleLangClientParams): Promise<any[]> => {
     const encodingType = 'UTF8';
     const [syntax] = await this._googleLangClient.analyzeSyntax({ document, encodingType });
-    const tokens = syntax.tokens.map((token: StringKeyObject) => {
-      return token.text.content;
-    });
+    const tokens = syntax.tokens
+      .filter((token: any) => {
+        const { partOfSpeech } = token;
+        const { tag } = partOfSpeech;
+        return tag != 'PUNCT';
+      })
+      .map((token: any) => {
+        const { partOfSpeech, text } = token;
+        const { tag } = partOfSpeech;
+        const { content } = text;
+        const processedToken = {
+          partOfSpeech: tag,
+          text: content,
+        };
+        return processedToken;
+      });
     return tokens;
   };
 
-  private _getEntities = async (document: GoogleLangClientParams): Promise<StringKeyObject[]> => {
+  private _getEntities = async (document: GoogleLangClientParams): Promise<any[]> => {
     const [result] = await this._googleLangClient.analyzeEntities({ document });
     const entities = result.entities.map((entity: StringKeyObject) => {
       const { name, salience } = entity;
@@ -133,7 +146,7 @@ class WikipediaParser {
     return entities;
   };
 
-  private _getCategories = async (langLinks: Link[]): Promise<string[]> => {
+  private _getCategories = async (langLinks: Link[]): Promise<any[]> => {
     const document = await this._getEnglishDocument(langLinks);
     const [classification] = await this._googleLangClient.classifyText({ document });
     let { categories } = classification;

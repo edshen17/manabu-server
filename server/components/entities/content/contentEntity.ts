@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongoose';
-import { StringKeyObject } from '../../../types/custom';
 import { AbstractEntity } from '../abstractions/AbstractEntity';
 import { NGramHandler } from '../utils/nGramHandler/nGramHandler';
 
@@ -34,8 +33,11 @@ type ContentEntityBuildResponse = {
   coverImageUrl: string;
   sourceUrl: string;
   summary?: string;
-  entities: StringKeyObject[];
-  tokens: string[];
+  entities: {
+    word: string;
+    salience: number;
+  }[];
+  tokens: { partOfSpeech: string; text: string }[];
   categories: string[];
   ownership: CONTENT_ENTITY_OWNERSHIP;
   author: string;

@@ -27,7 +27,7 @@ beforeEach(async () => {
 
 describe('fakeDbContentFactory', () => {
   describe('createFakeDbData', () => {
-    it('should create a fake incomeReport', async () => {
+    it('should create a fake content', async () => {
       expect(fakeContent.tokens.length > 0).to.equal(true);
     });
   });

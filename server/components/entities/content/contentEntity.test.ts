@@ -23,7 +23,12 @@ describe('contentEntity', () => {
           sourceUrl: faker.image.dataUri(),
           summary: 'summary',
           entities: [],
-          tokens: ['token'],
+          tokens: [
+            {
+              text: 'token',
+              partOfSpeech: 'PUNCT',
+            },
+          ],
           categories: ['science'],
           ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,
           author: 'wikipedia',

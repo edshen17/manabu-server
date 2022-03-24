@@ -35,7 +35,7 @@ class FakeDbPackageTransactionFactory extends AbstractFakeDbDataFactory<
 
   protected _initTemplate = async (
     optionalInitParams: OptionalFakeDbPackageTransactionFactoryInitParams
-  ) => {
+  ): Promise<void> => {
     const { makeFakeDbUserFactory } = optionalInitParams;
     this._fakeDbUserFactory = await makeFakeDbUserFactory;
   };

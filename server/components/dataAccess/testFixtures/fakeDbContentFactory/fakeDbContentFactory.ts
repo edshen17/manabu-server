@@ -17,16 +17,21 @@ class FakeDbContentFactory extends AbstractFakeDbDataFactory<
 > {
   protected _createFakeBuildParams = async (): Promise<ContentEntityBuildParams> => {
     const fakeBuildParams = {
+      language: 'ja',
       postedById: '605bc5ad9db900001528f77c' as any,
       collectionId: '605bc5ad9db900001528f77c' as any,
       title: 'test',
       rawContent: 'something',
-      coverImageUrl: 'https://google.com/',
-      sourceUrl: 'https://google.com/',
+      coverImageUrl: 'https://google.com',
+      sourceUrl: 'https://google.com',
       summary: 'summary',
-      language: 'ja',
       entities: [],
-      tokens: ['token'],
+      tokens: [
+        {
+          text: 'token',
+          partOfSpeech: 'PUNCT',
+        },
+      ],
       categories: ['science'],
       ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,
       author: 'wikipedia',

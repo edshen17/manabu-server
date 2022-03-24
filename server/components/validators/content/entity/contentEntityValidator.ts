@@ -20,7 +20,13 @@ class ContentEntityValidator extends AbstractEntityValidator {
         salience: this._joi.number().min(0),
       }),
       language: this._joi.string().max(5),
-      tokens: this._joi.array().items(this._joi.string()),
+      tokens: this._joi.array().items({
+        _id: this._joi
+          .alternatives()
+          .try(this._joi.string().alphanum().min(24).max(24), this._joi.objectId()),
+        partOfSpeech: this._joi.string().max(10),
+        text: this._joi.string(),
+      }),
       categories: this._joi.array().items(this._joi.string()),
       ownership: this._joi.string().valid('public', 'private'),
       author: this._joi.string().max(256),
