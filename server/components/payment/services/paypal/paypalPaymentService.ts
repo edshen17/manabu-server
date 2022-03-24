@@ -90,15 +90,23 @@ class PaypalPaymentService extends AbstractPaymentService<
     createPayoutJson: ReturnType<PaypalPaymentService['_createPayoutJson']>
   ): Promise<PaymentServiceExecutePayoutResponse> => {
     return new Promise((resolve, reject) => {
-      this._paymentLib.payout.create(createPayoutJson, (err: SDKError, payout: StringKeyObject) => {
-        if (err) {
-          reject(err);
+      this._paymentLib.payout.create(
+        createPayoutJson,
+        (err: SDKError, payout?: StringKeyObject) => {
+          if (err || !payout) {
+            reject(err || payout);
+          }
+          if (payout) {
+            const { batch_header } = payout;
+            const { payout_batch_id } = batch_header;
+            const executePayoutRes = { id: payout_batch_id };
+            resolve(executePayoutRes);
+          } else {
+            const paypalErr = new Error();
+            reject(paypalErr);
+          }
         }
-        const { batch_header } = payout;
-        const { payout_batch_id } = batch_header;
-        const executePayoutRes = { id: payout_batch_id };
-        resolve(executePayoutRes);
-      });
+      );
     });
   };
 }

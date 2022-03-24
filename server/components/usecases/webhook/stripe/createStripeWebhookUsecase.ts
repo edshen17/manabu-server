@@ -1,8 +1,8 @@
 import Stripe from 'stripe';
 import {
   IS_PRODUCTION,
-  STRIPE_WEBHOOK_SECREY_KEY,
-  STRIPE_WEBHOOK_SECREY_KEY_DEV,
+  STRIPE_WEBHOOK_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET_KEY_DEV,
 } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
 import { AbstractCreateUsecase } from '../../abstractions/AbstractCreateUsecase';
@@ -62,10 +62,10 @@ class CreateStripeWebhookUsecase extends AbstractCreateUsecase<
     const { headers, rawBody } = props;
     const { payloadString } = rawBody || {};
     const sig = headers['stripe-signature'];
-    let webhookSecret = STRIPE_WEBHOOK_SECREY_KEY_DEV;
+    let webhookSecret = STRIPE_WEBHOOK_SECRET_KEY_DEV;
     let constructEventBody = payloadString || rawBody;
     if (IS_PRODUCTION) {
-      webhookSecret = STRIPE_WEBHOOK_SECREY_KEY;
+      webhookSecret = STRIPE_WEBHOOK_SECRET_KEY;
       constructEventBody = rawBody;
     }
     const event = this._stripe.webhooks.constructEvent(constructEventBody, sig, webhookSecret);

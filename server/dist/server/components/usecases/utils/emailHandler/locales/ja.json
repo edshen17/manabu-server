@@ -1,0 +1,73 @@
+{
+  "common": {
+    "header": {
+      "dear": "Dear {{name}},"
+    },
+    "footer": {
+      "contact": "If you have any questions, please feel free to contact us at {{0}} or on social media. We would be happy to help!",
+      "sincerely": "Sincerely,",
+      "manabuTeam": "The Manabu Team."
+    },
+    "button": {
+      "viewLesson": "View Lesson",
+      "confirmLesson": "Confirm Lesson",
+      "viewLessonPlan": "View Lesson Plan",
+      "verifyNow": "Verify Now",
+      "viewUserProfile": "View User Profile"
+    },
+    "table": {
+      "teacherName": "Teacher Name",
+      "studentName": "Student Name",
+      "lessonPlan": "Lesson Plan",
+      "lessonDetails": "Lesson Details",
+      "lessonDate": "Lesson Date/Time",
+      "lessonStatus": "Lesson Status",
+      "terminationDate": "Termination Date",
+      "totalPrice": "Total Price",
+      "name": "Name",
+      "userType": "User Type",
+      "email": "Email",
+      "colon": ":"
+    }
+  },
+  "studentAppointmentUpdate": {
+    "subject": "Your lesson has been updated",
+    "body": "Your lesson with {{teacherName}} has been updated."
+  },
+  "teacherAppointmentCreation": {
+    "subject": "You have a new lesson",
+    "body": "{{studentName}} reserved a lesson with you."
+  },
+  "internalExpiredAppointment": {
+    "subject": "Overdue lesson alert",
+    "body": "{{teacherName}} had an overdue and unconfirmed lesson with {{studentName}}."
+  },
+  "studentPackageTransactionCreation": {
+    "subject": "Thank you for your purchase",
+    "body": "Thank you for your purchase! Below are your lesson plan details."
+  },
+  "teacherAppointmentReminder": {
+    "subject": "You have a lesson soon",
+    "body": "This is a friendly reminder that you have an lesson with {{studentName}} soon."
+  },
+  "studentAppointmentReminder": {
+    "subject": "You have a lesson soon",
+    "body": "This is a friendly reminder that you have an lesson with {{teacherName}} soon."
+  },
+  "teacherAppointmentUpdate": {
+    "subject": "Your lesson has been updated",
+    "body": "Your lesson with {{studentName}} has been updated."
+  },
+  "emailVerification": {
+    "subject": "Please verify your email",
+    "body": "Thank you for signing up to Manabu! To complete your registration, please verify your email address."
+  },
+  "internalNewUser": {
+    "subject": "New user alert",
+    "body": "A new {{userType}} signed up!"
+  },
+  "teacherPackageTransactionCreation": {
+    "subject": "A student purchased a lesson plan from you",
+    "body": "{{studentName}} purchased a lesson plan from you. Below are the lesson plan details."
+  }
+}

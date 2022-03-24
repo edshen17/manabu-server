@@ -8,9 +8,9 @@ type CacheDbServiceInitParams = {
 };
 
 enum TTL_MS {
-  WEEK = 24 * 60 * 60 * 7 * 1000,
-  DAY = 24 * 60 * 60 * 1000,
-  HOUR = 60 * 60 * 1000,
+  WEEK = 24 * 60 * 60 * 7,
+  DAY = 24 * 60 * 60,
+  HOUR = 60 * 60,
 }
 
 class CacheDbService {
