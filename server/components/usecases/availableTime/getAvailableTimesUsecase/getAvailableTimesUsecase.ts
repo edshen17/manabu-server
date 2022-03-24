@@ -42,7 +42,7 @@ class GetAvailableTimesUsecase extends AbstractGetUsecase<
   }): Promise<AvailableTimeDoc[]> => {
     const { userId, query, dbServiceAccessOptions } = props;
     const searchQuery = this._processQuery({ query, userId });
-    const fallbackQuery = { page: 0, limit: 50 };
+    const fallbackQuery = { page: 0, limit: 500 };
     const sort = { startDate: 1 };
     const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
     const availableTimes = await this._dbService.find({
