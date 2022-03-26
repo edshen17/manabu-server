@@ -7,6 +7,7 @@ import {
   ContentEntity,
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
+  TokenCount,
 } from '../../entities/content/contentEntity';
 
 type WikipediaArticle = {
@@ -29,6 +30,11 @@ type WikipediaArticle = {
 };
 
 type GoogleLangClientParams = { content: string; type: string };
+
+type Token = {
+  partOfSpeech: string;
+  text: string;
+};
 
 class WikipediaParser {
   private _fs!: any;
@@ -58,7 +64,7 @@ class WikipediaParser {
   };
 
   private _createContent = async (title: string): Promise<ContentDoc> => {
-    const { coverImageUrl, sourceUrl, summary, entities, tokens, categories, rawContent } =
+    const { coverImageUrl, sourceUrl, summary, tokenizedContent, categories, tokenCounts } =
       await this._getWikiArticleData(title);
     const contentEntity = await this._contentEntity.build({
       postedById: MANABU_ADMIN_ID as any,
@@ -66,10 +72,9 @@ class WikipediaParser {
       coverImageUrl,
       sourceUrl,
       language: 'ja',
-      rawContent,
       summary,
-      entities,
-      tokens,
+      tokenCounts,
+      tokenizedContent,
       categories,
       ownership: CONTENT_ENTITY_OWNERSHIP.PUBLIC,
       author: 'Wikipedia',
@@ -97,53 +102,62 @@ class WikipediaParser {
       content: rawContent,
       type: 'PLAIN_TEXT',
     };
-    const tokens = await this._getTokens(document);
-    const entities = await this._getEntities(document);
+    const { tokens, tokenizedContent } = await this._getTokenData(document);
+    const tokenCounts = await this._getTokenCounts(tokens);
     const categories = await this._getCategories(langLinks);
     const wikiData = {
       coverImageUrl,
       sourceUrl,
       summary,
       tokens,
-      rawContent,
-      entities,
+      tokenizedContent,
+      tokenCounts,
       categories,
     };
     return wikiData;
   };
 
-  private _getTokens = async (document: GoogleLangClientParams): Promise<any[]> => {
+  private _getTokenData = async (document: GoogleLangClientParams) => {
     const encodingType = 'UTF8';
     const [syntax] = await this._googleLangClient.analyzeSyntax({ document, encodingType });
-    const tokens = syntax.tokens
-      .filter((token: any) => {
-        const { partOfSpeech } = token;
-        const { tag } = partOfSpeech;
-        return tag != 'PUNCT';
-      })
-      .map((token: any) => {
-        const { partOfSpeech, text } = token;
-        const { tag } = partOfSpeech;
-        const { content } = text;
-        const processedToken = {
-          partOfSpeech: tag,
-          text: content,
-        };
-        return processedToken;
-      });
-    return tokens;
+    let tokenizedContent = '';
+    const tokens = syntax.tokens.map((token: any) => {
+      const { partOfSpeech, text } = token;
+      const { tag } = partOfSpeech;
+      const { content } = text;
+      const processedToken = {
+        partOfSpeech: tag,
+        text: content,
+      };
+      tokenizedContent += `${content}\\${tag}`;
+      return processedToken;
+    });
+    return {
+      tokens,
+      tokenizedContent,
+    };
   };
 
-  private _getEntities = async (document: GoogleLangClientParams): Promise<any[]> => {
-    const [result] = await this._googleLangClient.analyzeEntities({ document });
-    const entities = result.entities.map((entity: StringKeyObject) => {
-      const { name, salience } = entity;
-      return {
-        word: name,
-        salience,
-      };
-    });
-    return entities;
+  private _getTokenCounts = async (tokens: Token[]): Promise<TokenCount[]> => {
+    const tokenSaliences: TokenCount[] = [];
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      if (token.partOfSpeech == 'PUNCT') {
+        continue;
+      }
+      const tokenSalience = tokenSaliences.find((tk) => {
+        return tk.token == token.text;
+      });
+      if (!tokenSalience) {
+        tokenSaliences.push({
+          token: token.text,
+          count: 1,
+        });
+      } else {
+        tokenSalience.count++;
+      }
+    }
+    return tokenSaliences;
   };
 
   private _getCategories = async (langLinks: Link[]): Promise<any[]> => {

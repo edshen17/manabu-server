@@ -28,22 +28,23 @@ type ContentEntityBuildResponse = {
   collectionId?: ObjectId;
   title: string;
   titleNGrams: string;
-  language: string;
-  rawContent: string;
   coverImageUrl: string;
   sourceUrl: string;
   summary?: string;
-  entities: {
-    word: string;
-    salience: number;
-  }[];
-  tokens: { partOfSpeech: string; text: string }[];
+  tokens: string;
+  tokenSaliences: string;
   categories: string[];
   ownership: CONTENT_ENTITY_OWNERSHIP;
   author: string;
   type: CONTENT_ENTITY_TYPE;
+  language: string;
   createdDate: Date;
   lastModifiedDate: Date;
+};
+
+type TokenCount = {
+  token: string;
+  count: number;
 };
 
 class ContentEntity extends AbstractEntity<
@@ -59,12 +60,11 @@ class ContentEntity extends AbstractEntity<
     const {
       postedById,
       title,
-      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
-      entities,
       tokens,
+      tokenSaliences,
       categories,
       language,
       ownership,
@@ -75,12 +75,11 @@ class ContentEntity extends AbstractEntity<
       postedById,
       title,
       titleNGrams: this._nGramHandler.createEdgeNGrams({ str: title, isPrefixOnly: false }),
-      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
-      entities,
       tokens,
+      tokenSaliences,
       categories,
       language,
       ownership,
@@ -107,4 +106,5 @@ export {
   ContentEntity,
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
+  TokenCount,
 };
