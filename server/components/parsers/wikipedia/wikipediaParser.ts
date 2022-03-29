@@ -56,12 +56,12 @@ class WikipediaParser {
       if (fileName.includes('1.xml')) {
         const promiseArr: Promise<ContentDoc>[] = [];
         const self = this;
-        const end = new Promise(function (resolve) {
+        const xmlStream = new Promise(function (resolve) {
           const stream = self._fs.createReadStream(`${dataPath}/${fileName}`);
           const xml = new self._xmlStream(stream);
           xml.preserve('page', true);
           xml.on('endElement: page', async (wikipediaArticle: WikipediaArticle) => {
-            if (wikipediaArticle.ns.$text == '0' && count < 100) {
+            if (wikipediaArticle.ns.$text == '0' && count < 200) {
               count++;
               const { revision } = wikipediaArticle;
               const title = wikipediaArticle.title.$text;
@@ -80,7 +80,7 @@ class WikipediaParser {
             resolve(undefined);
           });
         });
-        await end;
+        await xmlStream;
         await bluebird.Promise.map(
           promiseArr,
           () => {
@@ -94,40 +94,56 @@ class WikipediaParser {
 
   private _createContent = async (props: CreateContentParams): Promise<ContentDoc> => {
     const { title } = props;
-    const { tokens, tokenSaliences } = await this._getWikiArticleData(props);
-    const contentEntity = await this._contentEntity.build({
-      postedById: MANABU_ADMIN_ID as any,
-      title,
-      coverImageUrl: '',
-      sourceUrl: `https://ja.wikipedia.org/wiki/${encodeURIComponent(title)}`,
-      language: 'ja',
-      summary: '',
-      tokens,
-      tokenSaliences,
-      categories: [],
-      ownership: CONTENT_ENTITY_OWNERSHIP.PUBLIC,
-      author: 'Wikipedia',
-      type: CONTENT_ENTITY_TYPE.WIKIPEDIA,
-    });
-
     const dbServiceAccessOptions = this._contentDbService.getBaseDbServiceAccessOptions();
-    const savedDbContent = await this._contentDbService.insert({
-      modelToInsert: contentEntity,
+    const content = await this._contentDbService.findOne({
+      searchQuery: {
+        title,
+      },
       dbServiceAccessOptions,
     });
-    console.log('insert');
-    return savedDbContent;
+    if (!content) {
+      const { tokens, tokenSaliences, summary, coverImageUrl, categories } =
+        await this._getWikiArticleData(props);
+      const contentEntity = await this._contentEntity.build({
+        postedById: MANABU_ADMIN_ID as any,
+        title,
+        coverImageUrl,
+        sourceUrl: `https://ja.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+        language: 'ja',
+        summary,
+        tokens,
+        tokenSaliences,
+        categories,
+        ownership: CONTENT_ENTITY_OWNERSHIP.PUBLIC,
+        author: 'Wikipedia',
+        type: CONTENT_ENTITY_TYPE.WIKIPEDIA,
+      });
+      const savedDbContent = await this._contentDbService.insert({
+        modelToInsert: contentEntity,
+        dbServiceAccessOptions,
+      });
+      console.log('insert');
+      return savedDbContent;
+    } else {
+      console.log('inserted');
+      return content;
+    }
   };
 
   private _getWikiArticleData = async (props: CreateContentParams) => {
     const { title, strippedWikiText } = props;
-    // const wiki = await this._wiki({
-    //   apiUrl: 'https://ja.wikipedia.org/w/api.php',
-    // }).page(title);
-    // const coverImageUrl = await wiki.mainImage();
-    // const sourceUrl = wiki.url();
-    // const summary = await wiki.summary();
-    // const langLinks = await wiki.langlinks();
+    const wiki = await this._wiki({
+      apiUrl: 'https://ja.wikipedia.org/w/api.php',
+    }).page(title);
+    const coverImageUrl = await wiki.mainImage();
+    const sourceUrl = wiki.url();
+    const summary = await wiki.summary();
+    let langLinks: Link[] = [];
+    try {
+      langLinks = await wiki.langlinks();
+    } catch (err) {
+      langLinks = [];
+    }
     const document = {
       content: strippedWikiText,
       type: 'PLAIN_TEXT',
@@ -135,14 +151,14 @@ class WikipediaParser {
     const tokens = await this._getTokens(document);
     const decompressedTokens = this._lzString.decompress(tokens);
     const tokenSaliences = await this._getTokenSaliences(JSON.parse(decompressedTokens));
-    // const categories = await this._getCategories(langLinks);
+    const categories = await this._getCategories(langLinks);
     const wikiData = {
-      // coverImageUrl,
-      // sourceUrl,
-      // summary,
+      coverImageUrl,
+      sourceUrl,
+      summary,
       tokens,
       tokenSaliences,
-      // categories,
+      categories,
     };
     return wikiData;
   };
@@ -188,29 +204,39 @@ class WikipediaParser {
 
   private _getCategories = async (langLinks: Link[]): Promise<any[]> => {
     const document = await this._getEnglishDocument(langLinks);
-    const [classification] = await this._googleLangClient.classifyText({ document });
-    let { categories } = classification;
-    categories = categories
-      .filter((category: StringKeyObject) => {
-        return category.confidence >= 0.5;
-      })
-      .map((category: StringKeyObject) => {
-        const { name } = category;
-        return name;
-      });
-    return categories;
+    if (document) {
+      try {
+        const [classification] = await this._googleLangClient.classifyText({ document });
+        let { categories } = classification;
+        categories = categories
+          .filter((category: StringKeyObject) => {
+            return category.confidence >= 0.5;
+          })
+          .map((category: StringKeyObject) => {
+            const { name } = category;
+            return name;
+          });
+        return categories;
+      } catch (err) {
+        return [];
+      }
+    } else {
+      return [];
+    }
   };
 
   private _getEnglishDocument = async (langLinks: Link[]) => {
     const enLink = langLinks.find((langLink) => {
       return langLink.lang == 'en';
     });
-    const enContent = await (await wiki().page(enLink!.title)).rawContent();
-    const document = {
-      content: enContent,
-      type: 'PLAIN_TEXT',
-    };
-    return document;
+    if (enLink) {
+      const enContent = await (await wiki().page(enLink!.title)).rawContent();
+      const document = {
+        content: enContent,
+        type: 'PLAIN_TEXT',
+      };
+      return document;
+    }
   };
 
   public init = async (initParams: {
