@@ -1,3 +1,4 @@
+import bluebird from 'bluebird';
 import striptags from 'striptags';
 import wiki, { Link } from 'wikijs';
 import { MANABU_ADMIN_ID } from '../../../constants';
@@ -9,27 +10,30 @@ import {
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
 } from '../../entities/content/contentEntity';
-
-const wtf = require('wtf_wikipedia');
 const WT2PT = require('wikitext2plaintext');
 
 type WikipediaArticle = {
-  title: string;
+  title: StringKeyObject;
   ns: StringKeyObject;
-  id: string;
+  id: StringKeyObject;
   revision: {
-    id: string;
-    parentId: string;
-    timestamp: string;
+    id: StringKeyObject;
+    parentId: StringKeyObject;
+    timestamp: StringKeyObject;
     constributor: { username: string; id: string };
-    model: string;
-    format: string;
+    model: StringKeyObject;
+    format: StringKeyObject;
     text: {
       $: StringKeyObject;
       $text: string;
     };
-    sha1: string;
+    sha1: StringKeyObject;
   };
+};
+
+type CreateContentParams = {
+  title: string;
+  strippedWikiText: string;
 };
 
 type GoogleLangClientParams = { content: string; type: string };
@@ -50,16 +54,18 @@ class WikipediaParser {
     let count = 0;
     for (const fileName of fileNames) {
       if (fileName.includes('1.xml')) {
+        const promiseArr: Promise<ContentDoc>[] = [];
         const self = this;
         const end = new Promise(function (resolve) {
           const stream = self._fs.createReadStream(`${dataPath}/${fileName}`);
           const xml = new self._xmlStream(stream);
           xml.preserve('page', true);
           xml.on('endElement: page', async (wikipediaArticle: WikipediaArticle) => {
-            if (wikipediaArticle.ns.$text == '0' && count <= 1) {
-              const { title, revision } = wikipediaArticle;
-              const wikiText = wikipediaArticle.revision.text.$text;
+            if (wikipediaArticle.ns.$text == '0' && count < 100) {
               count++;
+              const { revision } = wikipediaArticle;
+              const title = wikipediaArticle.title.$text;
+              const wikiText = revision.text.$text;
               const wt = new WT2PT();
               wt.exclude_rule('HEADER_TAGS');
               wt.exclude_rule('FILE_LINKS');
@@ -67,20 +73,7 @@ class WikipediaParser {
               const strippedWikiText = striptags(parsedWikiText, '<gallery>')
                 .replace(/\[\[(.*?)\]\]/gms, '')
                 .replace(/<gallery>(.*?)<\/gallery>/gms, '');
-              // const dbServiceAccessOptions = self._contentDbService.getBaseDbServiceAccessOptions();
-              // const content = await self._contentDbService.findOne({
-              //   searchQuery: {
-              //     title,
-              //   },
-              //   dbServiceAccessOptions,
-              // });
-              // if (!content) {
-              //   await self._createContent(title);
-              //   console.log('created');
-              // }
-              // setTimeout(async () => {
-              //   await self._createContent(title);
-              // }, 5000);
+              promiseArr.push(self._createContent({ title, strippedWikiText }));
             }
           });
           xml.on('end', () => {
@@ -88,23 +81,30 @@ class WikipediaParser {
           });
         });
         await end;
+        await bluebird.Promise.map(
+          promiseArr,
+          () => {
+            console.log('done');
+          },
+          { concurrency: 1 }
+        );
       }
     }
   };
 
-  private _createContent = async (title: string): Promise<ContentDoc> => {
-    const { coverImageUrl, sourceUrl, summary, tokens, categories, tokenSaliences } =
-      await this._getWikiArticleData(title);
+  private _createContent = async (props: CreateContentParams): Promise<ContentDoc> => {
+    const { title } = props;
+    const { tokens, tokenSaliences } = await this._getWikiArticleData(props);
     const contentEntity = await this._contentEntity.build({
       postedById: MANABU_ADMIN_ID as any,
       title,
-      coverImageUrl,
-      sourceUrl,
+      coverImageUrl: '',
+      sourceUrl: `https://ja.wikipedia.org/wiki/${encodeURIComponent(title)}`,
       language: 'ja',
-      summary,
+      summary: '',
       tokens,
       tokenSaliences,
-      categories,
+      categories: [],
       ownership: CONTENT_ENTITY_OWNERSHIP.PUBLIC,
       author: 'Wikipedia',
       type: CONTENT_ENTITY_TYPE.WIKIPEDIA,
@@ -119,30 +119,30 @@ class WikipediaParser {
     return savedDbContent;
   };
 
-  private _getWikiArticleData = async (title: string) => {
-    const wiki = await this._wiki({
-      apiUrl: 'https://ja.wikipedia.org/w/api.php',
-    }).page(title);
-    const rawContent = await wiki.rawContent();
-    const coverImageUrl = await wiki.mainImage();
-    const sourceUrl = wiki.url();
-    const summary = await wiki.summary();
-    const langLinks = await wiki.langlinks();
+  private _getWikiArticleData = async (props: CreateContentParams) => {
+    const { title, strippedWikiText } = props;
+    // const wiki = await this._wiki({
+    //   apiUrl: 'https://ja.wikipedia.org/w/api.php',
+    // }).page(title);
+    // const coverImageUrl = await wiki.mainImage();
+    // const sourceUrl = wiki.url();
+    // const summary = await wiki.summary();
+    // const langLinks = await wiki.langlinks();
     const document = {
-      content: rawContent,
+      content: strippedWikiText,
       type: 'PLAIN_TEXT',
     };
     const tokens = await this._getTokens(document);
     const decompressedTokens = this._lzString.decompress(tokens);
     const tokenSaliences = await this._getTokenSaliences(JSON.parse(decompressedTokens));
-    const categories = await this._getCategories(langLinks);
+    // const categories = await this._getCategories(langLinks);
     const wikiData = {
-      coverImageUrl,
-      sourceUrl,
-      summary,
+      // coverImageUrl,
+      // sourceUrl,
+      // summary,
       tokens,
       tokenSaliences,
-      categories,
+      // categories,
     };
     return wikiData;
   };

@@ -6,7 +6,7 @@ const ContentSchema = createSchema({
   //   collectionId: Type.ref(Type.objectId({ required: true, index: true })).to('User', UserSchema),
   title: Type.string({ required: true, index: true }),
   titleNGrams: Type.string({ required: true }),
-  coverImageUrl: Type.string({ required: true }),
+  coverImageUrl: Type.string({ required: false }),
   sourceUrl: Type.string({ required: true }),
   summary: Type.string({ required: false }),
   tokens: Type.string({ required: true }),

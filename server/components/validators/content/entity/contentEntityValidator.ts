@@ -13,7 +13,7 @@ class ContentEntityValidator extends AbstractEntityValidator {
       titleNGrams: this._joi.string().max(4096),
       coverImageUrl: this._joi.string().uri().allow('').max(2048),
       sourceUrl: this._joi.string().uri().allow('').max(2048),
-      summary: this._joi.string(),
+      summary: this._joi.string().allow(''),
       tokens: this._joi.string(),
       tokenSaliences: this._joi.string(),
       categories: this._joi.array().items(this._joi.string()),
