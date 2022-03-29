@@ -1,9 +1,11 @@
 import fs from 'fs';
+import lzString from 'lz-string';
 import wiki from 'wikijs';
 import { GCS_KEYFILE } from '../../../constants';
 import { makeContentDbService } from '../../dataAccess/services/content';
 import { makeContentEntity } from '../../entities/content';
 import { WikipediaParser } from './wikipediaParser';
+
 const xmlStream = require('xml-stream');
 
 const language = require('@google-cloud/language');
@@ -24,6 +26,7 @@ const makeWikipediaParser = new WikipediaParser().init({
   makeContentEntity,
   googleLangClient,
   makeContentDbService,
+  lzString,
 });
 
 export { makeWikipediaParser, googleLangClient };

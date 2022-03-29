@@ -42,11 +42,6 @@ type ContentEntityBuildResponse = {
   lastModifiedDate: Date;
 };
 
-type TokenCount = {
-  token: string;
-  count: number;
-};
-
 class ContentEntity extends AbstractEntity<
   OptionalContentEntityInitParams,
   ContentEntityBuildParams,
@@ -106,5 +101,4 @@ export {
   ContentEntity,
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
-  TokenCount,
 };

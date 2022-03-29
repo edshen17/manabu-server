@@ -1,3 +1,4 @@
+import striptags from 'striptags';
 import wiki, { Link } from 'wikijs';
 import { MANABU_ADMIN_ID } from '../../../constants';
 import { ContentDoc } from '../../../models/Content';
@@ -7,12 +8,14 @@ import {
   ContentEntity,
   CONTENT_ENTITY_OWNERSHIP,
   CONTENT_ENTITY_TYPE,
-  TokenCount,
 } from '../../entities/content/contentEntity';
+
+const wtf = require('wtf_wikipedia');
+const WT2PT = require('wikitext2plaintext');
 
 type WikipediaArticle = {
   title: string;
-  ns: string;
+  ns: StringKeyObject;
   id: string;
   revision: {
     id: string;
@@ -31,15 +34,11 @@ type WikipediaArticle = {
 
 type GoogleLangClientParams = { content: string; type: string };
 
-type Token = {
-  partOfSpeech: string;
-  text: string;
-};
-
 class WikipediaParser {
   private _fs!: any;
   private _fsPromises!: any;
   private _xmlStream!: any;
+  private _lzString!: any;
   private _wiki!: typeof wiki;
   private _contentEntity!: ContentEntity;
   private _contentDbService!: ContentDbService;
@@ -48,23 +47,53 @@ class WikipediaParser {
   public populateDb = async (): Promise<void> => {
     const dataPath = `${__dirname}/../data/wikipedia`;
     const fileNames: string[] = await this._fsPromises.readdir(dataPath);
-    // for (const fileName of fileNames) {
-    //   if (fileName.includes('1.xml')) {
-    //     const stream = this._fs.createReadStream(`${dataPath}/${fileName}`);
-    //     const xml = new this._xmlStream(stream);
-    //     xml.on('endElement: page', async (wikipediaArticle: WikipediaArticle) => {
-    //       if (wikipediaArticle.ns == '0') {
-    //         const { title } = wikipediaArticle;
-    //         await this._createContent(title);
-    //       }
-    //     });
-    //   }
-    // }
-    await this._createContent('哲学');
+    let count = 0;
+    for (const fileName of fileNames) {
+      if (fileName.includes('1.xml')) {
+        const self = this;
+        const end = new Promise(function (resolve) {
+          const stream = self._fs.createReadStream(`${dataPath}/${fileName}`);
+          const xml = new self._xmlStream(stream);
+          xml.preserve('page', true);
+          xml.on('endElement: page', async (wikipediaArticle: WikipediaArticle) => {
+            if (wikipediaArticle.ns.$text == '0' && count <= 1) {
+              const { title, revision } = wikipediaArticle;
+              const wikiText = wikipediaArticle.revision.text.$text;
+              count++;
+              const wt = new WT2PT();
+              wt.exclude_rule('HEADER_TAGS');
+              wt.exclude_rule('FILE_LINKS');
+              const parsedWikiText = wt.parse(wikiText);
+              const strippedWikiText = striptags(parsedWikiText, '<gallery>')
+                .replace(/\[\[(.*?)\]\]/gms, '')
+                .replace(/<gallery>(.*?)<\/gallery>/gms, '');
+              // const dbServiceAccessOptions = self._contentDbService.getBaseDbServiceAccessOptions();
+              // const content = await self._contentDbService.findOne({
+              //   searchQuery: {
+              //     title,
+              //   },
+              //   dbServiceAccessOptions,
+              // });
+              // if (!content) {
+              //   await self._createContent(title);
+              //   console.log('created');
+              // }
+              // setTimeout(async () => {
+              //   await self._createContent(title);
+              // }, 5000);
+            }
+          });
+          xml.on('end', () => {
+            resolve(undefined);
+          });
+        });
+        await end;
+      }
+    }
   };
 
   private _createContent = async (title: string): Promise<ContentDoc> => {
-    const { coverImageUrl, sourceUrl, summary, tokenizedContent, categories, tokenCounts } =
+    const { coverImageUrl, sourceUrl, summary, tokens, categories, tokenSaliences } =
       await this._getWikiArticleData(title);
     const contentEntity = await this._contentEntity.build({
       postedById: MANABU_ADMIN_ID as any,
@@ -73,8 +102,8 @@ class WikipediaParser {
       sourceUrl,
       language: 'ja',
       summary,
-      tokenCounts,
-      tokenizedContent,
+      tokens,
+      tokenSaliences,
       categories,
       ownership: CONTENT_ENTITY_OWNERSHIP.PUBLIC,
       author: 'Wikipedia',
@@ -86,6 +115,7 @@ class WikipediaParser {
       modelToInsert: contentEntity,
       dbServiceAccessOptions,
     });
+    console.log('insert');
     return savedDbContent;
   };
 
@@ -102,62 +132,58 @@ class WikipediaParser {
       content: rawContent,
       type: 'PLAIN_TEXT',
     };
-    const { tokens, tokenizedContent } = await this._getTokenData(document);
-    const tokenCounts = await this._getTokenCounts(tokens);
+    const tokens = await this._getTokens(document);
+    const decompressedTokens = this._lzString.decompress(tokens);
+    const tokenSaliences = await this._getTokenSaliences(JSON.parse(decompressedTokens));
     const categories = await this._getCategories(langLinks);
     const wikiData = {
       coverImageUrl,
       sourceUrl,
       summary,
       tokens,
-      tokenizedContent,
-      tokenCounts,
+      tokenSaliences,
       categories,
     };
     return wikiData;
   };
 
-  private _getTokenData = async (document: GoogleLangClientParams) => {
+  // p = partOfSpeech, t = text/token, c = count to save space in db
+  private _getTokens = async (document: GoogleLangClientParams): Promise<string> => {
     const encodingType = 'UTF8';
     const [syntax] = await this._googleLangClient.analyzeSyntax({ document, encodingType });
-    let tokenizedContent = '';
     const tokens = syntax.tokens.map((token: any) => {
       const { partOfSpeech, text } = token;
       const { tag } = partOfSpeech;
       const { content } = text;
       const processedToken = {
-        partOfSpeech: tag,
-        text: content,
+        p: tag,
+        t: content,
       };
-      tokenizedContent += `${content}\\${tag}`;
       return processedToken;
     });
-    return {
-      tokens,
-      tokenizedContent,
-    };
+    return this._lzString.compress(JSON.stringify(tokens));
   };
 
-  private _getTokenCounts = async (tokens: Token[]): Promise<TokenCount[]> => {
-    const tokenSaliences: TokenCount[] = [];
+  private _getTokenSaliences = async (tokens: StringKeyObject[]): Promise<string> => {
+    const tokenSaliences: StringKeyObject[] = [];
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
-      if (token.partOfSpeech == 'PUNCT') {
+      if (token.p == 'PUNCT') {
         continue;
       }
       const tokenSalience = tokenSaliences.find((tk) => {
-        return tk.token == token.text;
+        return tk.t == token.t;
       });
       if (!tokenSalience) {
         tokenSaliences.push({
-          token: token.text,
-          count: 1,
+          t: token.t,
+          c: 1,
         });
       } else {
-        tokenSalience.count++;
+        tokenSalience.c++;
       }
     }
-    return tokenSaliences;
+    return this._lzString.compress(JSON.stringify(tokenSaliences));
   };
 
   private _getCategories = async (langLinks: Link[]): Promise<any[]> => {
@@ -194,9 +220,17 @@ class WikipediaParser {
     makeContentEntity: Promise<ContentEntity>;
     makeContentDbService: Promise<ContentDbService>;
     googleLangClient: any;
+    lzString: any;
   }): Promise<this> => {
-    const { fs, xmlStream, wiki, makeContentEntity, makeContentDbService, googleLangClient } =
-      initParams;
+    const {
+      fs,
+      xmlStream,
+      wiki,
+      makeContentEntity,
+      makeContentDbService,
+      googleLangClient,
+      lzString,
+    } = initParams;
     this._fs = fs;
     this._fsPromises = fs.promises;
     this._xmlStream = xmlStream;
@@ -204,6 +238,7 @@ class WikipediaParser {
     this._contentEntity = await makeContentEntity;
     this._contentDbService = await makeContentDbService;
     this._googleLangClient = googleLangClient;
+    this._lzString = lzString;
     return this;
   };
 }
