@@ -1,5 +1,7 @@
+import bluebird from 'bluebird';
 import fs from 'fs';
 import lzString from 'lz-string';
+import striptags from 'striptags';
 import wiki from 'wikijs';
 import { GCS_KEYFILE } from '../../../constants';
 import { makeContentDbService } from '../../dataAccess/services/content';
@@ -27,6 +29,8 @@ const makeWikipediaParser = new WikipediaParser().init({
   googleLangClient,
   makeContentDbService,
   lzString,
+  striptags,
+  bluebird,
 });
 
 export { makeWikipediaParser, googleLangClient };

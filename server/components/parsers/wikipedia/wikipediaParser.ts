@@ -47,6 +47,8 @@ class WikipediaParser {
   private _contentEntity!: ContentEntity;
   private _contentDbService!: ContentDbService;
   private _googleLangClient!: any;
+  private _bluebird!: typeof bluebird;
+  private _striptags!: typeof striptags;
 
   public populateDb = async (): Promise<void> => {
     const dataPath = `${__dirname}/../data/wikipedia`;
@@ -70,7 +72,8 @@ class WikipediaParser {
               wt.exclude_rule('HEADER_TAGS');
               wt.exclude_rule('FILE_LINKS');
               const parsedWikiText = wt.parse(wikiText);
-              const strippedWikiText = striptags(parsedWikiText, '<gallery>')
+              const strippedWikiText = self
+                ._striptags(parsedWikiText, '<gallery>')
                 .replace(/\[\[(.*?)\]\]/gms, '')
                 .replace(/<gallery>(.*?)<\/gallery>/gms, '');
               promiseArr.push(self._createContent({ title, strippedWikiText }));
@@ -81,7 +84,7 @@ class WikipediaParser {
           });
         });
         await xmlStream;
-        await bluebird.Promise.map(
+        await this._bluebird.Promise.map(
           promiseArr,
           () => {
             console.log('done');
@@ -230,7 +233,7 @@ class WikipediaParser {
       return langLink.lang == 'en';
     });
     if (enLink) {
-      const enContent = await (await wiki().page(enLink!.title)).rawContent();
+      const enContent = await (await this._wiki().page(enLink!.title)).rawContent();
       const document = {
         content: enContent,
         type: 'PLAIN_TEXT',
@@ -247,6 +250,8 @@ class WikipediaParser {
     makeContentDbService: Promise<ContentDbService>;
     googleLangClient: any;
     lzString: any;
+    bluebird: typeof bluebird;
+    striptags: typeof striptags;
   }): Promise<this> => {
     const {
       fs,
@@ -256,6 +261,8 @@ class WikipediaParser {
       makeContentDbService,
       googleLangClient,
       lzString,
+      bluebird,
+      striptags,
     } = initParams;
     this._fs = fs;
     this._fsPromises = fs.promises;
@@ -265,6 +272,8 @@ class WikipediaParser {
     this._contentDbService = await makeContentDbService;
     this._googleLangClient = googleLangClient;
     this._lzString = lzString;
+    this._bluebird = bluebird;
+    this._striptags = striptags;
     return this;
   };
 }
