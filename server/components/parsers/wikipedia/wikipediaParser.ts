@@ -1,10 +1,12 @@
 import bluebird from 'bluebird';
+import jsStringEscape from 'js-string-escape';
 import striptags from 'striptags';
 import wiki, { Link } from 'wikijs';
 import { MANABU_ADMIN_ID } from '../../../constants';
 import { ContentDoc } from '../../../models/Content';
 import { StringKeyObject } from '../../../types/custom';
 import { ContentDbService } from '../../dataAccess/services/content/contentDbService';
+import { GraphDbService } from '../../dataAccess/services/graph/graphDbService';
 import {
   ContentEntity,
   CONTENT_ENTITY_OWNERSHIP,
@@ -49,6 +51,8 @@ class WikipediaParser {
   private _googleLangClient!: any;
   private _bluebird!: typeof bluebird;
   private _striptags!: typeof striptags;
+  private _graphDbService!: GraphDbService;
+  private _jsStringEscape!: typeof jsStringEscape;
 
   public populateDb = async (): Promise<void> => {
     const dataPath = `${__dirname}/../data/wikipedia`;
@@ -84,13 +88,14 @@ class WikipediaParser {
           });
         });
         await xmlStream;
-        await this._bluebird.Promise.map(
-          promiseArr,
-          () => {
-            console.log('done');
-          },
-          { concurrency: 1 }
-        );
+        // await this._bluebird.Promise.map(
+        //   promiseArr,
+        //   () => {
+        //     console.log('done');
+        //   },
+        //   { concurrency: 100 }
+        // );
+        await Promise.all(promiseArr);
       }
     }
   };
@@ -125,10 +130,10 @@ class WikipediaParser {
         modelToInsert: contentEntity,
         dbServiceAccessOptions,
       });
-      console.log('insert');
+      await this._createContentGraph(savedDbContent);
       return savedDbContent;
     } else {
-      console.log('inserted');
+      await this._createContentGraph(content);
       return content;
     }
   };
@@ -148,12 +153,12 @@ class WikipediaParser {
       langLinks = [];
     }
     const document = {
-      content: strippedWikiText,
+      content: strippedWikiText.replace(/[\r\n]+/gms, ''),
       type: 'PLAIN_TEXT',
     };
     const tokens = await this._getTokens(document);
-    const decompressedTokens = this._lzString.decompress(tokens);
-    const tokenSaliences = await this._getTokenSaliences(JSON.parse(decompressedTokens));
+    const decompressFromUTF16edTokens = this._lzString.decompressFromUTF16(tokens);
+    const tokenSaliences = await this._getTokenSaliences(JSON.parse(decompressFromUTF16edTokens));
     const categories = await this._getCategories(langLinks);
     const wikiData = {
       coverImageUrl,
@@ -168,7 +173,7 @@ class WikipediaParser {
 
   // p = partOfSpeech, t = text/token, c = count to save space in db
   private _getTokens = async (document: GoogleLangClientParams): Promise<string> => {
-    const encodingType = 'UTF8';
+    const encodingType = 'NONE';
     const [syntax] = await this._googleLangClient.analyzeSyntax({ document, encodingType });
     const tokens = syntax.tokens.map((token: any) => {
       const { partOfSpeech, text } = token;
@@ -180,7 +185,7 @@ class WikipediaParser {
       };
       return processedToken;
     });
-    return this._lzString.compress(JSON.stringify(tokens));
+    return this._lzString.compressToUTF16(JSON.stringify(tokens));
   };
 
   private _getTokenSaliences = async (tokens: StringKeyObject[]): Promise<string> => {
@@ -202,7 +207,7 @@ class WikipediaParser {
         tokenSalience.c++;
       }
     }
-    return this._lzString.compress(JSON.stringify(tokenSaliences));
+    return this._lzString.compressToUTF16(JSON.stringify(tokenSaliences));
   };
 
   private _getCategories = async (langLinks: Link[]): Promise<any[]> => {
@@ -242,6 +247,36 @@ class WikipediaParser {
     }
   };
 
+  private _createContentGraph = async (content: ContentDoc): Promise<void> => {
+    const decompressFromUTF16edTokens = this._lzString.decompressFromUTF16(content.tokens);
+    const tokens = JSON.parse(decompressFromUTF16edTokens);
+    const categories = content.categories;
+    const dbServiceAccessOptions = this._contentDbService.getBaseDbServiceAccessOptions();
+    await this._graphDbService.graphQuery({
+      query: `MERGE (content: Content { _id: "${content._id}", language: "ja" })`,
+      dbServiceAccessOptions,
+    });
+    const promiseArr = [];
+    for (const token of tokens) {
+      const escapedToken = this._jsStringEscape(token.t);
+      if (token.p != 'PUNCT' && escapedToken == token.t) {
+        const promise = this._graphDbService.graphQuery({
+          query: `MATCH (content: Content {_id: "${content._id}"}) MERGE (word: Word { text: "${token.t}", partOfSpeech: "${token.p}" }) MERGE (word)-[r:in]->(content)`,
+          dbServiceAccessOptions,
+        });
+        promiseArr.push(promise);
+      }
+    }
+    for (const category of categories) {
+      const promise = this._graphDbService.graphQuery({
+        query: `MATCH (content: Content {_id: "${content._id}"}) MERGE (category: Category { name: "${category}" }) MERGE (content)-[r:is]->(category)`,
+        dbServiceAccessOptions,
+      });
+      promiseArr.push(promise);
+    }
+    await Promise.all(promiseArr);
+  };
+
   public init = async (initParams: {
     fs: any;
     xmlStream: any;
@@ -252,6 +287,8 @@ class WikipediaParser {
     lzString: any;
     bluebird: typeof bluebird;
     striptags: typeof striptags;
+    makeGraphDbService: Promise<GraphDbService>;
+    jsStringEscape: typeof jsStringEscape;
   }): Promise<this> => {
     const {
       fs,
@@ -263,6 +300,8 @@ class WikipediaParser {
       lzString,
       bluebird,
       striptags,
+      makeGraphDbService,
+      jsStringEscape,
     } = initParams;
     this._fs = fs;
     this._fsPromises = fs.promises;
@@ -274,6 +313,8 @@ class WikipediaParser {
     this._lzString = lzString;
     this._bluebird = bluebird;
     this._striptags = striptags;
+    this._graphDbService = await makeGraphDbService;
+    this._jsStringEscape = jsStringEscape;
     return this;
   };
 }
