@@ -21,6 +21,8 @@ class ContentEntityValidator extends AbstractEntityValidator {
       author: this._joi.string().max(256),
       type: this._joi.string().valid('article', 'book', 'video', 'wikipedia'),
       language: this._joi.string().max(5),
+      likes: this._joi.number().min(0),
+      views: this._joi.number().min(0),
       createdDate: this._joi.date(),
       lastModifiedDate: this._joi.date(),
     });

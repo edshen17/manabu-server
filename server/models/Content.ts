@@ -16,6 +16,8 @@ const ContentSchema = createSchema({
   author: Type.string({ required: true }),
   type: Type.string({ required: true, enum: ['article', 'book', 'video', 'wikipedia'] }),
   language: Type.string({ required: true, index: true }),
+  likes: Type.number({ required: true }),
+  views: Type.number({ required: true }),
   createdDate: Type.date({ required: true }),
   lastModifiedDate: Type.date({ required: true }),
 });

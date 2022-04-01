@@ -1,13 +1,13 @@
 import {
   ContentEntityBuildParams,
   ContentEntityBuildResponse,
-  CONTENT_ENTITY_OWNERSHIP,
-  CONTENT_ENTITY_TYPE,
 } from '../../../entities/content/contentEntity';
 import { ContentDbServiceResponse } from '../../services/content/contentDbService';
 import { AbstractFakeDbDataFactory } from '../abstractions/AbstractFakeDbDataFactory';
 
-type OptionalFakeDbContentFactoryInitParams = {};
+type OptionalFakeDbContentFactoryInitParams = {
+  fs: any;
+};
 
 class FakeDbContentFactory extends AbstractFakeDbDataFactory<
   OptionalFakeDbContentFactoryInitParams,
@@ -15,23 +15,20 @@ class FakeDbContentFactory extends AbstractFakeDbDataFactory<
   ContentEntityBuildResponse,
   ContentDbServiceResponse
 > {
+  private _fsPromises!: any;
+
   protected _createFakeBuildParams = async (): Promise<ContentEntityBuildParams> => {
-    const fakeBuildParams = {
-      language: 'ja',
-      postedById: '605bc5ad9db900001528f77c' as any,
-      collectionId: '605bc5ad9db900001528f77c' as any,
-      title: 'test',
-      coverImageUrl: 'https://google.com',
-      sourceUrl: 'https://google.com',
-      summary: 'summary',
-      tokens: 'some token',
-      tokenSaliences: 'some text',
-      categories: ['science'],
-      ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,
-      author: 'wikipedia',
-      type: CONTENT_ENTITY_TYPE.WIKIPEDIA,
-    };
+    const bufferJson = await this._fsPromises.readFile(`${__dirname}/content.json`);
+    const contentArr = JSON.parse(bufferJson);
+    const { _id, createdDate, lastModifiedDate, __v, ...fakeBuildParams } = contentArr[30];
     return fakeBuildParams;
+  };
+
+  protected _initTemplate = async (
+    optionalInitParams: OptionalFakeDbContentFactoryInitParams
+  ): Promise<void> => {
+    const { fs } = optionalInitParams;
+    this._fsPromises = fs.promises;
   };
 }
 

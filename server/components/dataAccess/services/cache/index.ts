@@ -4,8 +4,11 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import Redis from 'ioredis';
 import {
   IS_PRODUCTION,
+  REDIS_HOST,
   REDIS_HOST_DEV,
+  REDIS_PASS,
   REDIS_PASS_DEV,
+  REDIS_PORT,
   REDIS_PORT_DEV,
 } from '../../../../constants';
 import { StringKeyObject } from '../../../../types/custom';
@@ -15,9 +18,9 @@ dayjs.extend(customParseFormat);
 
 const clientOptions: StringKeyObject = IS_PRODUCTION
   ? {
-      host: REDIS_HOST_DEV,
-      port: REDIS_PORT_DEV,
-      password: REDIS_PASS_DEV,
+      host: REDIS_HOST,
+      port: REDIS_PORT,
+      password: REDIS_PASS,
     }
   : {
       host: REDIS_HOST_DEV,
