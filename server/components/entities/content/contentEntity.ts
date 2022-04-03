@@ -8,7 +8,7 @@ type OptionalContentEntityInitParams = {
 
 type ContentEntityBuildParams = Omit<
   ContentEntityBuildResponse,
-  'createdDate' | 'lastModifiedDate' | 'titleNGrams'
+  'createdDate' | 'lastModifiedDate' | 'titleNGrams' | 'likes' | 'views'
 >;
 
 enum CONTENT_ENTITY_OWNERSHIP {
@@ -28,20 +28,18 @@ type ContentEntityBuildResponse = {
   collectionId?: ObjectId;
   title: string;
   titleNGrams: string;
-  language: string;
-  rawContent: string;
   coverImageUrl: string;
   sourceUrl: string;
   summary?: string;
-  entities: {
-    word: string;
-    salience: number;
-  }[];
-  tokens: { partOfSpeech: string; text: string }[];
+  tokens: string;
+  tokenSaliences: string;
   categories: string[];
   ownership: CONTENT_ENTITY_OWNERSHIP;
   author: string;
   type: CONTENT_ENTITY_TYPE;
+  language: string;
+  likes: number;
+  views: number;
   createdDate: Date;
   lastModifiedDate: Date;
 };
@@ -59,12 +57,11 @@ class ContentEntity extends AbstractEntity<
     const {
       postedById,
       title,
-      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
-      entities,
       tokens,
+      tokenSaliences,
       categories,
       language,
       ownership,
@@ -75,17 +72,18 @@ class ContentEntity extends AbstractEntity<
       postedById,
       title,
       titleNGrams: this._nGramHandler.createEdgeNGrams({ str: title, isPrefixOnly: false }),
-      rawContent,
       coverImageUrl,
       sourceUrl,
       summary,
-      entities,
       tokens,
+      tokenSaliences,
       categories,
       language,
       ownership,
       author,
       type,
+      likes: 0,
+      views: 1,
       createdDate: new Date(),
       lastModifiedDate: new Date(),
     };

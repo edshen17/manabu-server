@@ -1,14 +1,14 @@
-// import { makeWikipediaParser } from '.';
-// import { WikipediaParser } from './wikipediaParser';
+import { makeWikipediaParser } from '.';
+import { WikipediaParser } from './wikipediaParser';
 
-// let wikipediaParser: WikipediaParser;
+let wikipediaParser: WikipediaParser;
 
-// before(async () => {
-//   wikipediaParser = await makeWikipediaParser;
-// });
+before(async () => {
+  wikipediaParser = await makeWikipediaParser;
+});
 
-// describe('wikipediaParser', () => {
-//   it('should create correspoding databases from wikipedia xml', async () => {
-//     await wikipediaParser.populateDb();
-//   });
-// });
+describe('wikipediaParser', () => {
+  it('should create correspoding databases from wikipedia xml', async () => {
+    // await wikipediaParser.populateDb();
+  });
+});

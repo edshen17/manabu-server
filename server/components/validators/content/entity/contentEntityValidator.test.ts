@@ -26,13 +26,8 @@ beforeEach(() => {
     coverImageUrl: faker.image.dataUri(),
     sourceUrl: faker.image.dataUri(),
     summary: 'summary',
-    entities: [{ word: 'test', salience: 0.05 }],
-    tokens: [
-      {
-        text: 'token',
-        partOfSpeech: 'PUNCT',
-      },
-    ],
+    tokens: 'some token',
+    tokenSaliences: 'some text',
     categories: ['science'],
     ownership: CONTENT_ENTITY_OWNERSHIP.PRIVATE,
     author: 'wikipedia',

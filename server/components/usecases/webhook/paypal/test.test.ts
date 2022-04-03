@@ -18,13 +18,16 @@ before(async () => {
 
 describe('test', () => {
   it('should run', async () => {
-    // const wikiContent = await contentDbService.findOne({
-    //   searchQuery: {
-    //     title: '哲学',
-    //   },
+    // const wikiContent = await contentDbService.find({
+    //   searchQuery: {},
     //   dbServiceAccessOptions,
+    //   paginationOptions: {
+    //     page: 0,
+    //     limit: 50,
+    //     sort: {},
+    //   },
     // });
-    // fs.writeFile('./tetsugaku.json', JSON.stringify(wikiContent, null, 4), () => {
+    // fs.writeFile('./content.json', JSON.stringify(wikiContent, null, 4), () => {
     //   console.log('File has been created');
     // });
     // const text = await (
