@@ -40,7 +40,7 @@ class GetUserTeacherEdgesUsecase extends AbstractGetUsecase<
         if (user) {
           const promise = this._dbService.findById({
             _id: user._id,
-            dbServiceAccessOptions: this._dbService.getBaseDbServiceAccessOptions(),
+            dbServiceAccessOptions,
           });
           promiseArr.push(promise);
         } else {

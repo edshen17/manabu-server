@@ -37,9 +37,6 @@ class DbConnectionHandler {
       ignoreUndefined: true,
       readPreference: 'primary',
     };
-    // if (IS_PRODUCTION) {
-    //   mongoDbOptions.readPreference = 'nearest';
-    // }
     return mongoDbOptions;
   };
 
