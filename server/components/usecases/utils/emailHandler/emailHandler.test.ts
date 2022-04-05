@@ -37,8 +37,8 @@ describe('emailHandler', () => {
     it('should send the email', async () => {
       await emailHandler.send({
         to: 'greencopter4444@gmail.com',
-        from: EMAIL_HANDLER_SENDER_ADDRESS.NOREPLY,
-        templateName: EMAIL_HANDLER_TEMPLATE.INTERNAL_NEW_USER,
+        from: EMAIL_HANDLER_SENDER_ADDRESS.SUPPORT,
+        templateName: EMAIL_HANDLER_TEMPLATE.ADMIN_INTRODUCTION,
         data: {
           name: 'test',
           appointment: fakeAppointment,

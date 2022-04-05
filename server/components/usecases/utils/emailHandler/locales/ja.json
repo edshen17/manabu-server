@@ -69,5 +69,8 @@
   "teacherPackageTransactionCreation": {
     "subject": "A student purchased a lesson plan from you",
     "body": "{{studentName}} purchased a lesson plan from you. Below are the lesson plan details."
+  },
+  "adminIntroduction": {
+    "subject": "Manabu Japanese lessons"
   }
 }
