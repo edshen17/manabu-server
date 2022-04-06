@@ -36,6 +36,7 @@ enum EMAIL_HANDLER_TEMPLATE {
   EMAIL_VERIFICATION = 'EmailVerification',
   INTERNAL_NEW_USER = 'InternalNewUser',
   TEACHER_PACKAGE_TRANSACTION_CREATION = 'TeacherPackageTransactionCreation',
+  ADMIN_INTRODUCTION = 'AdminIntroduction',
 }
 
 class EmailHandler {
@@ -46,6 +47,7 @@ class EmailHandler {
   private _createRenderer!: any;
   private _mjml!: any;
   private _join!: any;
+  private _convertToTitlecase!: any;
 
   public sendAlertFromUserId = async (
     props: EmailHandlerSendAlertFromUserIdParams
@@ -66,7 +68,7 @@ class EmailHandler {
     if (shouldSendEmail) {
       this.send({
         to: user.email,
-        data: { name: user.name, ...data },
+        data: { name: this._convertToTitlecase(user.name), ...data },
         from,
         subject,
         templateName,
@@ -167,12 +169,14 @@ class EmailHandler {
     sendgrid: any;
     fs: any;
     makeUserDbService: Promise<UserDbService>;
+    convertToTitlecase: any;
     vue: any;
     createRenderer: any;
     mjml: any;
     join: any;
   }): Promise<this> => {
-    const { sendgrid, fs, makeUserDbService, vue, createRenderer, mjml, join } = props;
+    const { sendgrid, fs, makeUserDbService, vue, createRenderer, mjml, join, convertToTitlecase } =
+      props;
     this._sendgrid = sendgrid;
     this._fs = fs;
     this._userDbService = await makeUserDbService;
@@ -180,6 +184,7 @@ class EmailHandler {
     this._createRenderer = await createRenderer;
     this._mjml = mjml;
     this._join = join;
+    this._convertToTitlecase = convertToTitlecase;
     return this;
   };
 }

@@ -2,12 +2,14 @@ import { AbstractScheduler } from './abstractions/AbstractScheduler';
 import { SchedulerInitParams } from './abstractions/IScheduler';
 import { EndAppointmentScheduleTask } from './tasks/endAppointmentScheduleTask/endAppointmentScheduleTask';
 import { EndPackageTransactionScheduleTask } from './tasks/endPackageTransactionScheduleTask/endPackageTransactionScheduleTask';
+import { SendAdminIntroductionScheduleTask } from './tasks/sendAdminIntroductionScheduleTask/sendAdminIntroductionScheduleTask';
 import { SendAppointmentReminderScheduleTask } from './tasks/sendAppointmentReminderScheduleTask/sendAppointmentReminderScheduleTask';
 
 type OptionalSchedulerInitParams = {
   makeEndAppointmentScheduleTask: Promise<EndAppointmentScheduleTask>;
   makeEndPackageTransactionScheduleTask: Promise<EndPackageTransactionScheduleTask>;
   makeSendAppointmentReminderScheduleTask: Promise<SendAppointmentReminderScheduleTask>;
+  makeSendAdminIntroductionScheduleTask: Promise<SendAdminIntroductionScheduleTask>;
 };
 
 enum SCHEDULER_INTERVAL {
@@ -19,22 +21,34 @@ class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {
   private _endAppointmentScheduleTask!: EndAppointmentScheduleTask;
   private _endPackageTransactionScheduleTask!: EndPackageTransactionScheduleTask;
   private _sendAppointmentReminderScheduleTask!: SendAppointmentReminderScheduleTask;
+  private _sendAdminIntroductionScheduleTask!: SendAdminIntroductionScheduleTask;
 
   public start = async (): Promise<void> => {
     const self = this;
-    const cronJob = new this._cron(
+    const FIVE_MINUTE_JOBS = new this._cron(
       SCHEDULER_INTERVAL.FIVE_MINUTES,
       async function () {
         await self._endAppointmentScheduleTask.execute();
         await self._endPackageTransactionScheduleTask.execute();
         await self._sendAppointmentReminderScheduleTask.execute();
-        self._cronJobs.push(cronJob);
+        self._cronJobs.push(FIVE_MINUTE_JOBS);
       },
       null,
       true,
       'America/New_York'
     );
-    cronJob.start();
+    const HOURLY_JOBS = new this._cron(
+      SCHEDULER_INTERVAL.ONE_HOUR,
+      async function () {
+        await self._sendAdminIntroductionScheduleTask.execute();
+        self._cronJobs.push(HOURLY_JOBS);
+      },
+      null,
+      true,
+      'America/New_York'
+    );
+    FIVE_MINUTE_JOBS.start();
+    HOURLY_JOBS.start();
   };
 
   protected _initTemplate = async (
@@ -44,10 +58,12 @@ class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {
       makeEndAppointmentScheduleTask,
       makeEndPackageTransactionScheduleTask,
       makeSendAppointmentReminderScheduleTask,
+      makeSendAdminIntroductionScheduleTask,
     } = optionalSchedulerInitParams;
     this._endAppointmentScheduleTask = await makeEndAppointmentScheduleTask;
     this._endPackageTransactionScheduleTask = await makeEndPackageTransactionScheduleTask;
     this._sendAppointmentReminderScheduleTask = await makeSendAppointmentReminderScheduleTask;
+    this._sendAdminIntroductionScheduleTask = await makeSendAdminIntroductionScheduleTask;
   };
 }
 
