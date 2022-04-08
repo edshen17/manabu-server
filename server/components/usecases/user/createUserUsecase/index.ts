@@ -1,5 +1,6 @@
 import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
+import { MIX_PANEL_TOKEN } from '../../../../constants';
 import { makeGraphDbService } from '../../../dataAccess/services/graph';
 import { makePackageDbService } from '../../../dataAccess/services/package';
 import { makePackageTransactionDbService } from '../../../dataAccess/services/packageTransaction';
@@ -16,6 +17,9 @@ import { makeCookieHandler } from '../../utils/cookieHandler';
 import { makeEmailHandler } from '../../utils/emailHandler';
 import { makeRedirectUrlBuilder } from '../../utils/redirectUrlBuilder';
 import { CreateUserUsecase } from './createUserUsecase';
+const Mixpanel = require('mixpanel');
+
+const mixpanel = Mixpanel.init(MIX_PANEL_TOKEN);
 
 const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeUserEntity,
@@ -37,4 +41,4 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   makeCookieHandler,
 });
 
-export { makeCreateUserUsecase };
+export { makeCreateUserUsecase, mixpanel };
