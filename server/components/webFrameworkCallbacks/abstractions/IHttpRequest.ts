@@ -8,6 +8,7 @@ interface IHttpRequest {
   query: Request['query'];
   params: Request['params'];
   headers: Request['headers'];
+  cookies: Request['cookies'];
   rawBody: StringKeyObject;
   currentAPIUser: CurrentAPIUser;
 }

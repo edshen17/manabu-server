@@ -77,6 +77,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     headers: {},
+    cookies: {},
   };
   firstAppointment = routeData.body.appointments[0];
   secondAppointment = routeData.body.appointments[1];

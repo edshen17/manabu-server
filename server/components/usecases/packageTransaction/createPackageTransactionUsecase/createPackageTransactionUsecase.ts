@@ -255,6 +255,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       },
       query: {},
       endpointPath: '',
+      cookies: {},
     };
     const createAppointmentsControllerData = this._controllerDataBuilder
       .routeData(createAppointmentsRouteData)
@@ -334,6 +335,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       },
       query: {},
       endpointPath: '',
+      cookies: {},
     };
     const createBalanceTransactionsControllerData = this._controllerDataBuilder
       .routeData(createBalanceTransactionsRouteData)
@@ -607,6 +609,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       },
       query: {},
       endpointPath: '',
+      cookies: {},
     };
     const createIncomeReportControllerData = this._controllerDataBuilder
       .routeData(createIncomeReportRouteData)

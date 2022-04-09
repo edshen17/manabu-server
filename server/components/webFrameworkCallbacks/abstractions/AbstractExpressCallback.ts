@@ -42,6 +42,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
       headers,
       rawBody,
       token,
+      cookies,
     } = req;
     const httpRequest = {
       body,
@@ -58,6 +59,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
         token,
       },
       headers,
+      cookies,
     };
     return httpRequest;
   };

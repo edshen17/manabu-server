@@ -67,6 +67,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     headers: {},
+    cookies: {},
   };
 });
 

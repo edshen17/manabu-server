@@ -64,6 +64,7 @@ beforeEach(async () => {
       paymentGateway: 'stripe',
     },
     endpointPath: '',
+    cookies: {},
   };
   currentAPIUser = {
     userId: fakeUser._id,
