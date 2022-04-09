@@ -57,6 +57,7 @@ beforeEach(async () => {
       // contactMethodType: ['online', 'offline'],
     },
     endpointPath: '',
+    cookies: {},
   };
   currentAPIUser = {
     userId: fakeTeacher._id,

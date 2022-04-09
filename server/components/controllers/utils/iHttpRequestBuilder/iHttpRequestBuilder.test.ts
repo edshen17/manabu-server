@@ -30,6 +30,7 @@ describe('IHttpRequestBuilder', () => {
         },
         headers: {},
         rawBody: {},
+        cookies: {},
       });
     });
     it('should build a valid httpRequest from the given inputs', () => {
@@ -44,6 +45,7 @@ describe('IHttpRequestBuilder', () => {
           userId: fakeUser._id,
           role: 'some role',
         })
+        .cookies({})
         .build();
 
       expect(httpRequest).to.deep.equal({
@@ -59,6 +61,7 @@ describe('IHttpRequestBuilder', () => {
         },
         headers: {},
         rawBody: {},
+        cookies: {},
       });
     });
   });

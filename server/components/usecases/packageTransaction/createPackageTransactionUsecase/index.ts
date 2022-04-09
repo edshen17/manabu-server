@@ -11,6 +11,7 @@ import { makePackageTransactionQueryValidator } from '../../../validators/packag
 import { makeCreateAppointmentsUsecase } from '../../appointment/createAppointmentsUsecase';
 import { makeCreateBalanceTransactionsUsecase } from '../../balanceTransaction/createBalanceTransactionsUsecase';
 import { makeCreateIncomeReportUsecase } from '../../incomeReport/createIncomeReportUsecase';
+import { mixpanel } from '../../user/createUserUsecase';
 import { makeControllerDataBuilder } from '../../utils/controllerDataBuilder';
 import { makeEmailHandler } from '../../utils/emailHandler';
 import { makeExchangeRateHandler } from '../../utils/exchangeRateHandler';
@@ -35,6 +36,7 @@ const makeCreatePackageTransactionUsecase = new CreatePackageTransactionUsecase(
   makeCreateAppointmentsUsecase,
   makeGraphDbService,
   makeTeacherDbService,
+  mixpanel,
 });
 
 export { makeCreatePackageTransactionUsecase };

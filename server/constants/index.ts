@@ -54,6 +54,9 @@ const MANABU_ADMIN_ID = process.env.MANABU_ADMIN_ID!;
 const MANABU_ADMIN_PKG_ID = process.env.MANABU_ADMIN_PKG_ID!;
 const REDIS_JSON_URL = process.env.REDIS_JSON_URL!;
 const GCS_KEYFILE = process.env.GCS_KEYFILE!;
+const MIX_PANEL_TOKEN = IS_PRODUCTION
+  ? process.env.MIX_PANEL_TOKEN!
+  : process.env.MIX_PANEL_TOKEN_DEV!;
 
 // DEV
 const OPEN_EXCHANGE_RATE_API_KEY_DEV = process.env.OPEN_EXCHANGE_RATE_API_KEY_DEV!;
@@ -108,4 +111,5 @@ export {
   REDIS_HOST_DEV,
   REDIS_PASS_DEV,
   REDIS_PORT_DEV,
+  MIX_PANEL_TOKEN,
 };

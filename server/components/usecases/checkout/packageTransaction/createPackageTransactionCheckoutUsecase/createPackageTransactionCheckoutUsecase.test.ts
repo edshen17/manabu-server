@@ -44,6 +44,7 @@ beforeEach(async () => {
       paymentGateway: 'paypal',
     },
     endpointPath: '',
+    cookies: {},
   };
 });
 

@@ -12,6 +12,7 @@ class IHttpRequestBuilder {
   private _currentAPIUser!: CurrentAPIUser;
   private _headers!: {};
   private _rawBody!: {};
+  private _cookies!: {};
 
   constructor() {
     this._setDefaultProperties();
@@ -28,6 +29,7 @@ class IHttpRequestBuilder {
     };
     this._headers = {};
     this._rawBody = {};
+    this._cookies = {};
   };
 
   public body = (body: {}): this => {
@@ -65,6 +67,11 @@ class IHttpRequestBuilder {
     return this;
   };
 
+  public cookies = (cookies: StringKeyObject): this => {
+    this._cookies = cookies;
+    return this;
+  };
+
   public build = (): IHttpRequest => {
     const iHttpRequest: IHttpRequest = {
       body: this._body,
@@ -74,6 +81,7 @@ class IHttpRequestBuilder {
       currentAPIUser: this._currentAPIUser,
       headers: this._headers,
       rawBody: this._rawBody,
+      cookies: this._cookies,
     };
     this._setDefaultProperties();
     return iHttpRequest;

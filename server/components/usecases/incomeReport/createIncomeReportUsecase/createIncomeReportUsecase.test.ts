@@ -41,6 +41,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '/admin/incomeReport',
     headers: {},
+    cookies: {},
   };
 });
 

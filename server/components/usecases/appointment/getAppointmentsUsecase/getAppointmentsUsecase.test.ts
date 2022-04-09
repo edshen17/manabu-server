@@ -49,6 +49,7 @@ beforeEach(async () => {
     endpointPath: '',
     headers: {},
     rawBody: {},
+    cookies: {},
   };
   currentAPIUser = {
     userId: fakePackageTransaction.reservedById,

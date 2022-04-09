@@ -35,6 +35,7 @@ beforeEach(async () => {
     body: {},
     query: {},
     endpointPath: '',
+    cookies: {},
   };
   currentAPIUser = {
     userId: fakeTeacher._id,

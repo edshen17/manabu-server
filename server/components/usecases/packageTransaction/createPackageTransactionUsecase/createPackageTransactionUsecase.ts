@@ -1,3 +1,4 @@
+import mixpanel from 'mixpanel';
 import { DEFAULT_CURRENCY, MANABU_PROCESSING_RATE } from '../../../../constants';
 import { AppointmentDoc } from '../../../../models/Appointment';
 import { BalanceTransactionDoc } from '../../../../models/BalanceTransaction';
@@ -61,6 +62,7 @@ type OptionalCreatePackageTransactionUsecaseInitParams = {
   makeCreateAppointmentsUsecase: Promise<CreateAppointmentsUsecase>;
   makeGraphDbService: Promise<GraphDbService>;
   makeTeacherDbService: Promise<TeacherDbService>;
+  mixpanel: typeof mixpanel;
 };
 
 type CreatePackageTransactionUsecaseResponse = {
@@ -102,6 +104,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
   private _createAppointmentsUsecase!: CreateAppointmentsUsecase;
   private _graphDbService!: GraphDbService;
   private _teacherDbService!: TeacherDbService;
+  private _mixpanel!: typeof mixpanel;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
@@ -252,6 +255,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       },
       query: {},
       endpointPath: '',
+      cookies: {},
     };
     const createAppointmentsControllerData = this._controllerDataBuilder
       .routeData(createAppointmentsRouteData)
@@ -331,6 +335,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       },
       query: {},
       endpointPath: '',
+      cookies: {},
     };
     const createBalanceTransactionsControllerData = this._controllerDataBuilder
       .routeData(createBalanceTransactionsRouteData)
@@ -388,6 +393,10 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
         },
         targetCurrency: DEFAULT_CURRENCY,
       });
+    this._mixpanel.people.track_charge(
+      user._id,
+      debitBalanceTransactionEntityBuildParams.balanceChange
+    );
     return debitBalanceTransactionEntityBuildParams;
   };
 
@@ -600,6 +609,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       },
       query: {},
       endpointPath: '',
+      cookies: {},
     };
     const createIncomeReportControllerData = this._controllerDataBuilder
       .routeData(createIncomeReportRouteData)
@@ -624,6 +634,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
       makeCreateAppointmentsUsecase,
       makeGraphDbService,
       makeTeacherDbService,
+      mixpanel,
     } = optionalInitParams;
     this._jwtHandler = await makeJwtHandler;
     this._cacheDbService = await makeCacheDbService;
@@ -637,6 +648,7 @@ class CreatePackageTransactionUsecase extends AbstractCreateUsecase<
     this._createAppointmentsUsecase = await makeCreateAppointmentsUsecase;
     this._graphDbService = await makeGraphDbService;
     this._teacherDbService = await makeTeacherDbService;
+    this._mixpanel = mixpanel;
   };
 }
 

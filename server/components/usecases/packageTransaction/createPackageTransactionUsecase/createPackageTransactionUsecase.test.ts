@@ -72,6 +72,7 @@ beforeEach(async () => {
       paymentGateway: 'paypal',
     },
     endpointPath: '',
+    cookies: {},
   };
   createPackageTransactionUsecaseRouteData = {
     rawBody: {},
@@ -80,6 +81,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     headers: {},
+    cookies: {},
   };
 });
 

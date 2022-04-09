@@ -60,6 +60,7 @@ beforeEach(async () => {
     },
     query: {},
     endpointPath: '',
+    cookies: {},
   };
 });
 

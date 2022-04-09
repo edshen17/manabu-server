@@ -20,6 +20,7 @@ class ControllerDataBuilder {
       endpointPath: '',
       headers: {},
       rawBody: {},
+      cookies: {},
     };
   };
 

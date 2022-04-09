@@ -41,6 +41,7 @@ beforeEach(async () => {
     body: {},
     query: {},
     endpointPath: '/admin/getPendingTeachers',
+    cookies: {},
   };
   currentAPIUser = {
     userId: fakeTeacher._id,

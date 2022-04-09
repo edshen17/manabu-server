@@ -59,6 +59,7 @@ class FakePackageTransactionCheckoutTokenHandler {
         paymentGateway: 'paynow',
       },
       endpointPath: '',
+      cookies: {},
     };
     return createPackageTransactionCheckoutRouteData;
   };

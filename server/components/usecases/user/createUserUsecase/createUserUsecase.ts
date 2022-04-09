@@ -1,6 +1,8 @@
+import mixpanel from 'mixpanel';
 import { MANABU_ADMIN_EMAIL, MANABU_ADMIN_ID, MANABU_ADMIN_PKG_ID } from '../../../../constants';
 import { PackageTransactionDoc } from '../../../../models/PackageTransaction';
 import { JoinedUserDoc } from '../../../../models/User';
+import { StringKeyObject } from '../../../../types/custom';
 import { DbServiceAccessOptions } from '../../../dataAccess/abstractions/IDbService';
 import { GraphDbService } from '../../../dataAccess/services/graph/graphDbService';
 import { PackageDbService } from '../../../dataAccess/services/package/packageDbService';
@@ -36,6 +38,7 @@ type OptionalCreateUserUsecaseInitParams = {
   makeEmailHandler: Promise<EmailHandler>;
   makeRedirectUrlBuilder: RedirectUrlBuilder;
   convertStringToObjectId: ConvertStringToObjectId;
+  mixpanel: typeof mixpanel;
 };
 
 type CreateUserUsecaseResponse = {
@@ -58,6 +61,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _convertStringToObjectId!: any;
   private _graphDbService!: GraphDbService;
   private _cookieHandler!: CookieHandler;
+  private _mixpanel!: typeof mixpanel;
 
   protected _isSelf = async (props: {
     params: any;
@@ -70,11 +74,11 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateUserUsecaseResponse> => {
-    const { body, dbServiceAccessOptions, query } = props;
+    const { body, dbServiceAccessOptions, query, cookies } = props;
     const { state } = query || {};
     const { isTeacherApp } = state || {};
     const userEntity = await this._userEntity.build(body);
-    let user = await this._createDbUser({ userEntity, dbServiceAccessOptions });
+    let user = await this._createDbUser({ userEntity, cookies, dbServiceAccessOptions });
     if (isTeacherApp) {
       user = await this.handleTeacherCreation({ user, dbServiceAccessOptions });
     }
@@ -82,7 +86,6 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       this._sendVerificationEmail(userEntity);
       this._sendInternalEmail({ user, isTeacherApp });
     }
-    const cookies = this._cookieHandler.splitLoginCookies(user);
     const redirectUrl = this._redirectUrlBuilder
       .host('client')
       .endpoint('/dashboard')
@@ -90,7 +93,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       .build();
     const usecaseRes = {
       user,
-      cookies,
+      cookies: this._cookieHandler.splitLoginCookies(user),
       redirectUrl,
     };
     return usecaseRes;
@@ -99,14 +102,31 @@ class CreateUserUsecase extends AbstractCreateUsecase<
   private _createDbUser = async (props: {
     userEntity: UserEntityBuildResponse;
     dbServiceAccessOptions: DbServiceAccessOptions;
+    cookies: StringKeyObject;
   }): Promise<JoinedUserDoc> => {
-    const { userEntity, dbServiceAccessOptions } = props;
+    const { userEntity, cookies, dbServiceAccessOptions } = props;
     const user = await this._dbService.insert({
       modelToInsert: userEntity,
       dbServiceAccessOptions,
     });
     await this._graphDbService.createUserNode({ user, dbServiceAccessOptions });
+    this._createMixpanelUser({ user, cookies });
     return user;
+  };
+
+  private _createMixpanelUser = (props: {
+    cookies: StringKeyObject;
+    user: JoinedUserDoc;
+  }): void => {
+    const { cookies, user } = props;
+    for (const cookieName in cookies) {
+      if (cookieName.includes('mixpanel')) {
+        const cookie = JSON.parse(cookies[cookieName]);
+        const { distinct_id, ...rest } = cookie;
+        this._mixpanel.people.set(user._id, rest);
+        this._mixpanel.track('Sign Up', { distinct_id: user._id });
+      }
+    }
   };
 
   public handleTeacherCreation = async (props: {
@@ -213,6 +233,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
       makeRedirectUrlBuilder,
       makeCookieHandler,
       convertStringToObjectId,
+      mixpanel,
     } = optionalInitParams;
     this._userEntity = await makeUserEntity;
     this._packageTransactionEntity = await makePackageTransactionEntity;
@@ -223,6 +244,7 @@ class CreateUserUsecase extends AbstractCreateUsecase<
     this._redirectUrlBuilder = makeRedirectUrlBuilder;
     this._convertStringToObjectId = convertStringToObjectId;
     this._cookieHandler = await makeCookieHandler;
+    this._mixpanel = mixpanel;
   };
 }
 

@@ -90,10 +90,6 @@ class CacheDbService {
     await this._redisClient.del(hashKey.toLowerCase());
   };
 
-  public graphQuery = () => {
-    return;
-  };
-
   public init = async (initParams: CacheDbServiceInitParams): Promise<this> => {
     const { redisClient, convertStringToObjectId, cloneDeep, dayjs } = initParams;
     this._redisClient = redisClient;
