@@ -39,6 +39,7 @@ const makeCreateUserUsecase = new CreateUserUsecase().init({
   convertStringToObjectId,
   deepEqual,
   makeCookieHandler,
+  mixpanel,
 });
 
 export { makeCreateUserUsecase, mixpanel };
