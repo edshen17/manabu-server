@@ -36,6 +36,7 @@ describe('loginUserUsecase', () => {
             headers: {},
             endpointPath: '/base/login',
             cookies: {},
+            req: {},
           })
           .build();
         const loginUserRes = await loginUserUsecase.makeRequest(buildLoginUserControllerData);

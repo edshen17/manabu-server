@@ -21,6 +21,7 @@ class ControllerDataBuilder {
       headers: {},
       rawBody: {},
       cookies: {},
+      req: {},
     };
   };
 

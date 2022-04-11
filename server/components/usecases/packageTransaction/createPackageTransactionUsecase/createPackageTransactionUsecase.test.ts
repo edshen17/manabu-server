@@ -73,6 +73,7 @@ beforeEach(async () => {
     },
     endpointPath: '',
     cookies: {},
+    req: {},
   };
   createPackageTransactionUsecaseRouteData = {
     rawBody: {},
@@ -82,6 +83,7 @@ beforeEach(async () => {
     endpointPath: '',
     headers: {},
     cookies: {},
+    req: {},
   };
 });
 

@@ -34,6 +34,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     userId: fakeAvailableTime.hostedById,

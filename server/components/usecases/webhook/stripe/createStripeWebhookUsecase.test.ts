@@ -66,6 +66,7 @@ beforeEach(async () => {
       'stripe-signature': stripeHeader,
     },
     cookies: {},
+    req: {},
   };
 });
 

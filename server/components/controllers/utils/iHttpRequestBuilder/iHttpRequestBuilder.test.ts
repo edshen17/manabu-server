@@ -31,6 +31,7 @@ describe('IHttpRequestBuilder', () => {
         headers: {},
         rawBody: {},
         cookies: {},
+        req: {},
       });
     });
     it('should build a valid httpRequest from the given inputs', () => {
@@ -62,6 +63,7 @@ describe('IHttpRequestBuilder', () => {
         headers: {},
         rawBody: {},
         cookies: {},
+        req: {},
       });
     });
   });

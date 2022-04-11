@@ -50,6 +50,7 @@ beforeEach(async () => {
     headers: {},
     rawBody: {},
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     userId: fakePackageTransaction.reservedById,

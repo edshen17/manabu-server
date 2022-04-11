@@ -32,6 +32,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '/self',
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     userId: fakePackageTransaction.reservedById,
