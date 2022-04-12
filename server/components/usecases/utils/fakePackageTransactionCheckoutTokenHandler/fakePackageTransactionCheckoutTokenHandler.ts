@@ -60,6 +60,7 @@ class FakePackageTransactionCheckoutTokenHandler {
       },
       endpointPath: '',
       cookies: {},
+      req: {},
     };
     return createPackageTransactionCheckoutRouteData;
   };

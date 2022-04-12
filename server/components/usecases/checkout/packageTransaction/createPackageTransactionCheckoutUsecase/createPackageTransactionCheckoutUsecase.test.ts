@@ -45,6 +45,7 @@ beforeEach(async () => {
     },
     endpointPath: '',
     cookies: {},
+    req: {},
   };
 });
 

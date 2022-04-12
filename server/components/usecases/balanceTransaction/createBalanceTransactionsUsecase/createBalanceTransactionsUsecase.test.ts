@@ -61,6 +61,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     cookies: {},
+    req: {},
   };
 });
 

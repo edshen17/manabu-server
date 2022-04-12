@@ -32,6 +32,7 @@ beforeEach(() => {
     },
     endpointPath: '',
     cookies: {},
+    req: {},
   };
 });
 

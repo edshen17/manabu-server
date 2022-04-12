@@ -11,6 +11,7 @@ interface IHttpRequest {
   cookies: Request['cookies'];
   rawBody: StringKeyObject;
   currentAPIUser: CurrentAPIUser;
+  req: StringKeyObject;
 }
 
 type CurrentAPIUser = {

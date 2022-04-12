@@ -115,7 +115,6 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
         endedTeacherBalanceResponses.push(endedTeacherBalanceTransactionRes);
         endedPackageTransactions.push(endedPackageTransaction);
       } catch (err) {
-        console.log(err);
         continue;
       }
     }
@@ -241,7 +240,7 @@ class EndPackageTransactionScheduleTask extends AbstractScheduleTask<
     const executePayoutRes = await this._paypalPaymentService.executePayout({
       type: 'email',
       emailData: {
-        subject: `${payoutAmount} Lesson Payout - Minato Manabu`,
+        subject: `$${payoutAmount} SGD Lesson Payout - Minato Manabu`,
         message: payoutMessage,
       },
       id: debitTeacherBalanceTransaction._id,

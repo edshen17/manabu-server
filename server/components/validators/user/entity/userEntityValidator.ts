@@ -18,6 +18,8 @@ class UserEntityValidator extends AbstractEntityValidator {
       region: this._joi.string().max(256),
       timezone: this._joi.string().max(256),
       role: this._joi.string().valid('user', 'teacher'),
+      currency: this._joi.string().max(5),
+      locale: this._joi.string().max(5),
       settings: this._joi.object({
         currency: this._joi.string().max(5),
         locale: this._joi.string().max(5),

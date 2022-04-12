@@ -60,6 +60,7 @@ abstract class AbstractExpressCallback implements IExpressCallback {
       },
       headers,
       cookies,
+      req,
     };
     return httpRequest;
   };

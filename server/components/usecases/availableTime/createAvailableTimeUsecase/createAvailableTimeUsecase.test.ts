@@ -43,6 +43,7 @@ beforeEach(async () => {
     headers: {},
     rawBody: {},
     cookies: {},
+    req: {},
   };
 });
 

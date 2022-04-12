@@ -43,6 +43,7 @@ beforeEach(async () => {
     query: {},
     endpointPath: '',
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     userId: fakeUser._id,

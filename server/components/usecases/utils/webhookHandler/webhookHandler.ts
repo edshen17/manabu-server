@@ -59,6 +59,7 @@ class WebhookHandler {
         endpointPath: '',
         rawBody: {},
         cookies: {},
+        req: {},
       })
       .build();
     const createPackageTransactionUsecaseRes =

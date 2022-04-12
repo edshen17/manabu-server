@@ -19,6 +19,7 @@ type MakeRequestTemplateParams = {
   controllerData: ControllerData;
   headers: any;
   cookies: any;
+  req: any;
 };
 
 type IsCurrentAPIUserPermittedParams = {
@@ -46,7 +47,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
     controllerData: ControllerData
   ): Promise<MakeRequestTemplateParams> => {
     const { routeData, currentAPIUser } = controllerData;
-    const { body, params, query, endpointPath, headers, rawBody, cookies } = routeData;
+    const { body, params, query, endpointPath, headers, rawBody, cookies, req } = routeData;
     const isSelf = await this._isSelf({ params, currentAPIUser, endpointPath });
     const isCurrentAPIUserPermitted = this._isCurrentAPIUserPermitted({
       isSelf,
@@ -73,6 +74,7 @@ abstract class AbstractUsecase<OptionalUsecaseInitParams, UsecaseResponse, DbSer
       isSelf,
       headers,
       cookies,
+      req,
     };
     return makeRequestTemplateParams;
   };

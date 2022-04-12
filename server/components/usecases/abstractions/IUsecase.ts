@@ -17,6 +17,7 @@ type RouteData = {
   headers: StringKeyObject;
   rawBody: StringKeyObject;
   cookies: StringKeyObject;
+  req: StringKeyObject;
 };
 
 type UsecaseInitParams<OptionalUsecaseInitParams, DbServiceResponse> =

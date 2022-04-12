@@ -49,6 +49,7 @@ beforeEach(async () => {
     headers: {},
     rawBody: {},
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     role: 'teacher',

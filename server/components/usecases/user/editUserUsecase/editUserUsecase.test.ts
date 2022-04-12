@@ -34,6 +34,7 @@ beforeEach(() => {
     query: {},
     endpointPath: '',
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     userId: fakeTeacher._id,

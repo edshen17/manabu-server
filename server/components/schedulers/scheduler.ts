@@ -13,7 +13,7 @@ type OptionalSchedulerInitParams = {
 };
 
 enum SCHEDULER_INTERVAL {
-  FIVE_MINUTES = '0 */5 * * * *',
+  ONE_MINUTE = '0 */1 * * * *',
   ONE_HOUR = '0 */60 * * * *',
 }
 
@@ -25,13 +25,13 @@ class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {
 
   public start = async (): Promise<void> => {
     const self = this;
-    const FIVE_MINUTE_JOBS = new this._cron(
-      SCHEDULER_INTERVAL.FIVE_MINUTES,
+    const MINUTELY_JOBS = new this._cron(
+      SCHEDULER_INTERVAL.ONE_MINUTE,
       async function () {
         await self._endAppointmentScheduleTask.execute();
         await self._endPackageTransactionScheduleTask.execute();
         await self._sendAppointmentReminderScheduleTask.execute();
-        self._cronJobs.push(FIVE_MINUTE_JOBS);
+        self._cronJobs.push(MINUTELY_JOBS);
       },
       null,
       true,
@@ -47,7 +47,7 @@ class Scheduler extends AbstractScheduler<OptionalSchedulerInitParams> {
       true,
       'America/New_York'
     );
-    FIVE_MINUTE_JOBS.start();
+    MINUTELY_JOBS.start();
     HOURLY_JOBS.start();
   };
 

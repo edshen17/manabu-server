@@ -37,6 +37,7 @@ beforeEach(async () => {
     endpointPath: '',
     rawBody: {},
     cookies: {},
+    req: {},
   };
   currentAPIUser = {
     role: 'user',

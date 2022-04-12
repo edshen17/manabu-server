@@ -43,7 +43,8 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
   };
 
   private _getUsecaseRes = async (httpRequest: IHttpRequest): Promise<UsecaseResponse> => {
-    const { currentAPIUser, path, params, body, query, headers, rawBody, cookies } = httpRequest;
+    const { currentAPIUser, path, params, body, query, headers, rawBody, cookies, req } =
+      httpRequest;
     const decodedQuery = this._queryStringHandler.decodeQueryStringObj(query);
     this._convertParamsToObjectId(params);
     const controllerData = {
@@ -56,6 +57,7 @@ abstract class AbstractController<UsecaseResponse> implements IController<Usecas
         headers,
         rawBody,
         cookies,
+        req,
       },
     };
     const usecaseRes = await this._usecase.makeRequest(controllerData);

@@ -41,6 +41,7 @@ beforeEach(() => {
     query: {},
     endpointPath: '',
     cookies: {},
+    req: {},
   };
 });
 
