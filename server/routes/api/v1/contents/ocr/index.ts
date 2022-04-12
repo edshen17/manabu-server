@@ -3,13 +3,13 @@ import multer from 'multer';
 import { makeCreateOcrContentsController } from '../../../../../components/controllers/content/createOcrContentsController';
 import { makeJSONExpressCallback } from '../../../../../components/webFrameworkCallbacks/callbacks/expressCallback';
 
-const upload = multer({ dest: './uploads' });
+const upload = multer();
 
 const ocr = express.Router();
 
 ocr.post(
   '/',
-  upload.single('file'),
+  upload.array('uploadedImages'),
   makeJSONExpressCallback.consume(makeCreateOcrContentsController)
 );
 

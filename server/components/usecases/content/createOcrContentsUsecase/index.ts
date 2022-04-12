@@ -2,7 +2,6 @@ import cloneDeep from 'clone-deep';
 import deepEqual from 'deep-equal';
 import { GCS_KEYFILE } from '../../../../constants';
 import { makeStubDbService } from '../../../dataAccess/services/stub';
-import { joi } from '../../../entities/utils/joi';
 import { makeBaseParamsValidator } from '../../../validators/base/params';
 import { makeBaseQueryValidator } from '../../../validators/base/query';
 import { CreateOcrContentsUsecase } from './createOcrContentsUsecase';
@@ -25,7 +24,6 @@ const makeCreateOcrContentsUsecase = new CreateOcrContentsUsecase().init({
   cloneDeep,
   deepEqual,
   visionClient,
-  joi,
 });
 
 export { makeCreateOcrContentsUsecase };

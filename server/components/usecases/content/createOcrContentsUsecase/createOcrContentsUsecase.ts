@@ -5,7 +5,6 @@ import { MakeRequestTemplateParams } from '../../abstractions/AbstractUsecase';
 
 type OptionalCreateOcrContentsUsecaseInitParams = {
   visionClient: any;
-  joi: any;
 };
 
 type CreateOcrContentsUsecaseResponse = any;
@@ -16,44 +15,44 @@ class CreateOcrContentsUsecase extends AbstractCreateUsecase<
   StubDbServiceResponse
 > {
   private _visionClient!: any;
-  private _joi: any;
 
   protected _makeRequestTemplate = async (
     props: MakeRequestTemplateParams
   ): Promise<CreateOcrContentsUsecaseResponse> => {
-    const { body } = props;
-    const { files } = await this._testBody(body);
+    const { req } = props;
+    const { files } = req;
     const createOcrContentsUsecaseRes = await this._createOcrContents(files);
     return createOcrContentsUsecaseRes;
   };
-
-  private _testBody = async (body: StringKeyObject): Promise<StringKeyObject> => {
-    console.log(body);
-    const schema = this._joi.object({
-      files: this._joi.array(),
-    });
-    const { value } = schema.validate(body);
-    return value;
-  };
-
   private _createOcrContents = async (
     files: StringKeyObject[]
   ): Promise<CreateOcrContentsUsecaseResponse> => {
     const promises = [];
-    console.log(files);
-    // const fileName = `${__dirname}/test.png`;
-    // const [result] = await this._visionClient.textDetection(fileName);
-    // const detections = result.textAnnotations;
-    // console.log(detections[0]);
+    for (const file of files) {
+      const request = {
+        image: {
+          content: file.buffer,
+        },
+        imageContext: {
+          languageHints: ['ja'],
+        },
+      };
+      const promise = this._visionClient.textDetection(request);
+      promises.push(promise);
+    }
+    const results = await Promise.all(promises);
+    console.log(results[0][0]);
+    // const annotations = result.textAnnotations.map((annotation: StringKeyObject) => {
+    //   return annotation.description;
+    // });
     return [];
   };
 
   protected _initTemplate = async (
     optionalInitParams: OptionalCreateOcrContentsUsecaseInitParams
   ): Promise<void> => {
-    const { visionClient, joi } = optionalInitParams;
+    const { visionClient } = optionalInitParams;
     this._visionClient = visionClient;
-    this._joi = joi;
   };
 }
 
