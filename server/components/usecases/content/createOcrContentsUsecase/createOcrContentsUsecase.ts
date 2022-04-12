@@ -7,7 +7,9 @@ type OptionalCreateOcrContentsUsecaseInitParams = {
   visionClient: any;
 };
 
-type CreateOcrContentsUsecaseResponse = any;
+type CreateOcrContentsUsecaseResponse = {
+  ocrContents: StringKeyObject[];
+};
 
 class CreateOcrContentsUsecase extends AbstractCreateUsecase<
   OptionalCreateOcrContentsUsecaseInitParams,
@@ -21,8 +23,8 @@ class CreateOcrContentsUsecase extends AbstractCreateUsecase<
   ): Promise<CreateOcrContentsUsecaseResponse> => {
     const { req } = props;
     const { files } = req;
-    const createOcrContentsUsecaseRes = await this._createOcrContents(files);
-    return { createOcrContentsUsecaseRes };
+    const { ocrContents } = await this._createOcrContents(files);
+    return { ocrContents };
   };
   private _createOcrContents = async (
     files: StringKeyObject[]
@@ -38,12 +40,12 @@ class CreateOcrContentsUsecase extends AbstractCreateUsecase<
       promises.push(promise);
     }
     const annotatedBatch = await Promise.all(promises);
-    const textAnnotations = annotatedBatch.map((results: StringKeyObject[]) => {
+    const ocrContents = annotatedBatch.map((results: StringKeyObject[]) => {
       return results.map((result) => {
         return result.textAnnotations;
       });
     });
-    return { textAnnotations };
+    return { ocrContents };
   };
 
   protected _initTemplate = async (
