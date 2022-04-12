@@ -22,7 +22,7 @@ class CreateOcrContentsUsecase extends AbstractCreateUsecase<
     const { req } = props;
     const { files } = req;
     const createOcrContentsUsecaseRes = await this._createOcrContents(files);
-    return createOcrContentsUsecaseRes;
+    return { createOcrContentsUsecaseRes };
   };
   private _createOcrContents = async (
     files: StringKeyObject[]
@@ -33,19 +33,17 @@ class CreateOcrContentsUsecase extends AbstractCreateUsecase<
         image: {
           content: file.buffer,
         },
-        imageContext: {
-          languageHints: ['ja'],
-        },
       };
       const promise = this._visionClient.textDetection(request);
       promises.push(promise);
     }
-    const results = await Promise.all(promises);
-    console.log(results[0][0]);
-    // const annotations = result.textAnnotations.map((annotation: StringKeyObject) => {
-    //   return annotation.description;
-    // });
-    return [];
+    const annotatedBatch = await Promise.all(promises);
+    const textAnnotations = annotatedBatch.map((results: StringKeyObject[]) => {
+      return results.map((result) => {
+        return result.textAnnotations;
+      });
+    });
+    return { textAnnotations };
   };
 
   protected _initTemplate = async (
