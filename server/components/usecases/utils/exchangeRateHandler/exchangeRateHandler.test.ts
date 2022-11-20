@@ -62,7 +62,7 @@ describe('exchangeRateHandler', () => {
       const currencyProduct = await exchangeRateHandler.multiply({
         multiplicand: {
           amount: 1000,
-          sourceCurrency: 'JPY',
+          sourceCurrency: 'SGD',
         },
         multiplier: {
           amount: 1000,
@@ -70,7 +70,7 @@ describe('exchangeRateHandler', () => {
         },
         targetCurrency: 'SGD',
       });
-      expect(currencyProduct > 10000).to.equal(true);
+      expect(currencyProduct).to.equal(1000000);
     });
     it('should multiply the currencies', async () => {
       const currencyProduct = await exchangeRateHandler.multiply({
