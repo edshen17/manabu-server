@@ -13,7 +13,7 @@
     "kill": "taskkill /F /IM node.exe",
     "postinstall": "npx patch-package && npm run cpy",
     "cpy": "cpy --parents server/**/*.json, !server/components/parsers/data/*.json, !server/**/content.json server/dist",
-    "client": "cd client && npm run serve"
+    "client": "cd client && npm run dev"
   },
   "nodemonConfig": {
     "ignore": [

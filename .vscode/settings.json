@@ -1,32 +1,15 @@
 {
-    "editor.defaultFormatter": "octref.vetur",
-    "vetur.format.defaultFormatter.html": "prettier",
-    "vetur.format.defaultFormatter.css": "prettier",
-    "vetur.format.defaultFormatter.postcss": "prettier",
-    "vetur.format.defaultFormatter.scss": "prettier",
-    "vetur.format.defaultFormatter.less": "prettier",
-    "vetur.format.defaultFormatter.stylus": "stylus-supremacy",
-    "vetur.format.defaultFormatter.js": "prettier",
-    "vetur.format.defaultFormatter.ts": "prettier",
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "editor.codeActionsOnSave": [
-        "source.organizeImports",
-        "source.fixAll"
-    ],
-    "editor.formatOnSave": false,
-    "javascript.format.enable": false,
-    "eslint.alwaysShowStatus": true,
-    "eslint.options": {
-    "extensions": [ ".html", ".js", ".vue", ".jsx", ".ts" ]
-    },
-    "eslint.validate": [ "javascript", "vue", "html", "typescriptvue", "typescript" ],
-    "eslint.workingDirectories": [
-        "./client"
-    ],
-    "files.eol": "\n",
-    "i18n-ally.localesPaths": [
-      "server/components/usecases/utils/emailHandler/locales"
-    ]
+  "cSpell.words": ["Vitesse", "Vite", "unocss", "vitest", "vueuse", "pinia", "demi", "antfu", "iconify", "intlify", "vitejs", "unplugin", "pnpm"],
+  "i18n-ally.sourceLanguage": "en",
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.localesPaths": "locales",
+  "i18n-ally.sortKeys": true,
+  "prettier.enable": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "files.associations": {
+    "*.css": "postcss"
+  },
+  "editor.formatOnSave": false
 }

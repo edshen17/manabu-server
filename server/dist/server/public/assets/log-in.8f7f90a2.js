@@ -1,0 +1,1 @@
+import{_ as t}from"./UserAuthForm.vue_vue_type_script_setup_true_lang.aac14157.js";import{g as e,o as r,h as s,i as o}from"./app.859ecf88.js";const c={};function _(a,f){const n=t;return r(),s(n)}typeof o=="function"&&o(c);const p=e(c,[["render",_]]);export{p as default};
