@@ -55,7 +55,7 @@ class GetPackageTransactionsUsecase extends AbstractGetUsecase<
   }): Promise<PackageTransactionDoc[]> => {
     const { userId, query, dbServiceAccessOptions } = props;
     const searchQuery = this._processQuery({ query, userId });
-    const fallbackQuery = { page: 0, limit: 15 };
+    const fallbackQuery = { page: 0, limit: 100 };
     const sort = { createdDate: 1 };
     const paginationOptions = this._getPaginationOptions({ query, fallbackQuery, sort });
     const packageTransactions = await this._dbService.find({
