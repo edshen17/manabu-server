@@ -1,4 +1,3 @@
-import mongooseUniqueValidator from 'mongoose-unique-validator';
 import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
 import { TeacherSchema } from './Teacher';
 
@@ -18,7 +17,7 @@ const UserEmailAlertsEmbed = {
 
 const UserSchema = createSchema({
   name: Type.string({ required: true, index: true }),
-  email: Type.string({ required: true, index: true, unique: true }),
+  email: Type.string({ required: true, index: true, unique: true, dropDups: true }),
   password: Type.string({ required: false }),
   profileImageUrl: Type.string({ required: false }),
   profileBio: Type.string({ required: false }),
@@ -59,7 +58,6 @@ const UserSchema = createSchema({
   }),
 });
 
-UserSchema.plugin(mongooseUniqueValidator);
 UserSchema.index(
   { nameNGrams: 'text', namePrefixNGrams: 'text' },
   { weights: { nameNGrams: 100, namePrefixNGrams: 200 } }
