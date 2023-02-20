@@ -1,4 +1,4 @@
-import { createSchema, ExtractDoc, Type, typedModel } from 'ts-mongoose';
+import { createSchema, ExtractDoc, ExtractProps, Type, typedModel } from 'ts-mongoose';
 import { TeacherSchema } from './Teacher';
 
 const UserContactMethodEmbed = {
@@ -65,5 +65,13 @@ UserSchema.index(
 
 const User = typedModel('User', UserSchema);
 type JoinedUserDoc = ExtractDoc<typeof UserSchema>;
+type JoinedUserProps = ExtractProps<typeof UserSchema>;
 
-export { User, UserSchema, JoinedUserDoc, UserContactMethodEmbed, UserEmailAlertsEmbed };
+export {
+  User,
+  UserSchema,
+  JoinedUserDoc,
+  JoinedUserProps,
+  UserContactMethodEmbed,
+  UserEmailAlertsEmbed,
+};
