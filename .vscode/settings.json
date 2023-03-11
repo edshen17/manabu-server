@@ -27,8 +27,9 @@
     ],
     "files.eol": "\n",
     "i18n-ally.localesPaths": [
-      "client/src/locales",
+      "client/locales",
       "client/src/plugins/i18n",
       "server/components/usecases/utils/emailHandler/locales"
-    ]
+    ],
+    "i18n-ally.keystyle": "nested"
 }
