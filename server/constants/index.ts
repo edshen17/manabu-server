@@ -16,7 +16,7 @@ const PAYMENT_GATEWAY_FEE: StringKeyObject = {
 };
 enum MANABU_PROCESSING_RATE {
   UNLICENSED = 0.5,
-  LICENSED = 0.16,
+  LICENSED = 0.3,
 }
 
 const PACKAGE_DISCOUNT_RATE = (lessonAmount: number) => {
