@@ -21,6 +21,9 @@
       "client/*"
     ]
   },
+  "engines": {
+    "node": "18.x"
+  },
   "main": "server/index.ts",
   "dependencies": {
     "@google-cloud/language": "^4.3.2",
