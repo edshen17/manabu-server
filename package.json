@@ -2,7 +2,7 @@
   "name": "manabu",
   "version": "1.0.0",
   "description": "",
-  "author": "",
+  "author": "Edwin Shen",
   "scripts": {
     "build": "tsc",
     "server": "nodemon ./server/index.ts",
