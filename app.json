@@ -1,0 +1,13 @@
+{
+  "name": "Manabu staging",
+  "description": "",
+  "website": "https://manabu.sg/",
+  "repository": "https://github.com/edshen17/manabu-server",
+  "success_url": "/welcome",
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  }
+}
