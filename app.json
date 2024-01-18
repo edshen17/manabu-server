@@ -1,6 +1,6 @@
 {
   "name": "Manabu staging",
-  "description": "",
+  "description": "test",
   "website": "https://manabu.sg/",
   "repository": "https://github.com/edshen17/manabu-server",
   "success_url": "/welcome",
