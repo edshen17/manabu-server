@@ -9,6 +9,8 @@ const formatDate = (date: Date) => {
   return dayjs(date).format('MM-DD-YYYY');
 };
 
+// NOTE: make sure to update NODE_ENV to production when running this
+
 (async () => {
   try {
     const dbConnectionHandler = await makeDbConnectionHandler;
