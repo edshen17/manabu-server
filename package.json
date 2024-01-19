@@ -110,6 +110,7 @@
     "wanakana": "^4.0.2",
     "wikijs": "^6.3.3",
     "wikitext2plaintext": "^0.1.0",
+    "xlsx": "^0.18.5",
     "xml-stream": "^0.4.5"
   },
   "devDependencies": {
