@@ -6,6 +6,7 @@ import {
   PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
   PaymentServiceExecutePayoutResponse,
+  StripeItems,
 } from '../../abstractions/IPaymentService';
 
 type OptionalStripePaymentServiceInitParams = {};
@@ -14,14 +15,17 @@ class StripePaymentService extends AbstractPaymentService<
   Stripe,
   OptionalStripePaymentServiceInitParams
 > {
-  protected _createPaymentJson = (
-    props: PaymentServiceExecutePaymentParams
-  ): Stripe.Checkout.SessionCreateParams => {
-    const { successRedirectUrl, cancelRedirectUrl, items, token } = props;
-    const createPaymentJson = {
-      line_items: items,
+  protected _createPaymentJson = ({
+    successRedirectUrl,
+    cancelRedirectUrl,
+    items,
+    token,
+    type,
+  }: PaymentServiceExecutePaymentParams): Stripe.Checkout.SessionCreateParams => {
+    const createPaymentJson: Stripe.Checkout.SessionCreateParams = {
+      line_items: items as StripeItems,
       payment_method_types: ['card', 'wechat_pay', 'grabpay', 'alipay'],
-      mode: 'payment',
+      mode: type,
       success_url: successRedirectUrl,
       cancel_url: cancelRedirectUrl,
       payment_method_options: {
@@ -32,7 +36,7 @@ class StripePaymentService extends AbstractPaymentService<
       payment_intent_data: {
         metadata: { token },
       },
-    } as Stripe.Checkout.SessionCreateParams;
+    };
     return createPaymentJson;
   };
 

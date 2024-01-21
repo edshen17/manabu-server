@@ -1,6 +1,9 @@
 import { expect } from 'chai';
 import { makePaypalPaymentService } from '.';
-import { PaymentServiceExecutePaymentParams } from '../../abstractions/IPaymentService';
+import {
+  PAYMENT_TYPE,
+  PaymentServiceExecutePaymentParams,
+} from '../../abstractions/IPaymentService';
 import { PaypalPaymentService } from './paypalPaymentService';
 
 let paypalPaymentService: PaypalPaymentService;
@@ -14,6 +17,7 @@ beforeEach(async () => {
   paymentHandlerExecuteParams = {
     successRedirectUrl: 'https://manabu.sg/success',
     cancelRedirectUrl: 'https://manabu.sg/cancel',
+    type: PAYMENT_TYPE.PAYMENT,
     items: [
       {
         name: 'test item',

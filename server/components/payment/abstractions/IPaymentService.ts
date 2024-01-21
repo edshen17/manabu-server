@@ -23,14 +23,19 @@ enum PAYMENT_GATEWAY_NAME {
   PAYNOW = 'paynow',
 }
 
+export enum PAYMENT_TYPE {
+  SUBSCRIPTION = 'subscription',
+  PAYMENT = 'payment',
+}
+
 type PaymentServiceExecutePaymentParams = {
   successRedirectUrl: string;
   cancelRedirectUrl: string;
   items: PaypalItems | StripeItems | OmiseItems;
+  type: PAYMENT_TYPE;
   currency?: string;
   description?: string;
   total: string | number;
-  subscription?: boolean;
   token: string;
 };
 
@@ -56,9 +61,6 @@ interface IPaymentService<PaymentLibType, OptionalPaymentServiceInitParams> {
   executePayment: (
     props: PaymentServiceExecutePaymentParams
   ) => Promise<PaymentServiceExecutePaymentResponse>;
-  executeSubscription: (
-    props: PaymentServiceExecutePaymentParams
-  ) => Promise<PaymentServiceExecutePaymentResponse>;
   executePayout: (
     props: PaymentServiceExecutePayoutParams
   ) => Promise<PaymentServiceExecutePayoutResponse>;
@@ -69,13 +71,13 @@ interface IPaymentService<PaymentLibType, OptionalPaymentServiceInitParams> {
 
 export {
   IPaymentService,
-  PaymentServiceInitParams,
+  OmiseItems,
+  PAYMENT_GATEWAY_NAME,
   PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
   PaymentServiceExecutePayoutResponse,
+  PaymentServiceInitParams,
   PaypalItems,
   StripeItems,
-  OmiseItems,
-  PAYMENT_GATEWAY_NAME,
 };

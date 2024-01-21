@@ -4,6 +4,7 @@
   "description": "",
   "author": "Edwin Shen",
   "scripts": {
+    "typecheck": "node_modules/.bin/tsc --noEmit",
     "build": "tsc",
     "server": "nodemon ./server/index.ts",
     "start": "node server/dist/server/index.js",

@@ -1,6 +1,9 @@
 import { expect } from 'chai';
 import { makeStripePaymentService } from '.';
-import { PaymentServiceExecutePaymentParams } from '../../abstractions/IPaymentService';
+import {
+  PAYMENT_TYPE,
+  PaymentServiceExecutePaymentParams,
+} from '../../abstractions/IPaymentService';
 import { StripePaymentService } from './stripePaymentService';
 let stripePaymentService: StripePaymentService;
 let paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams;
@@ -13,6 +16,7 @@ beforeEach(async () => {
   paymentHandlerExecuteParams = {
     successRedirectUrl: 'https://manabu.sg/success',
     cancelRedirectUrl: 'https://manabu.sg/cancel',
+    type: PAYMENT_TYPE.PAYMENT,
     items: [
       {
         price_data: {
