@@ -278,7 +278,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _createPackageTransactionEntityBuildParams = (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): PackageTransactionEntityBuildParams => {
-    const { body, userId, teacher, teacherPackage } = setPackageTransactionJwtParams;
+    const { body, userId, teacher, teacherPackage, type } = setPackageTransactionJwtParams;
     const { packageId, lessonLanguage, lessonDuration } = body;
     const { lessonAmount } = teacherPackage;
     const packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams = {
@@ -288,7 +288,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       lessonDuration,
       lessonLanguage,
       remainingAppointments: lessonAmount,
-      isSubscription: false,
+      isSubscription: type === PAYMENT_TYPE.SUBSCRIPTION,
     };
     return packageTransactionEntityBuildParams;
   };
@@ -378,6 +378,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
               name,
             },
             unit_amount: stripePrice,
+            ...(type === PAYMENT_TYPE.SUBSCRIPTION && { recurring: { interval: 'month' } }),
           },
           quantity: quantity,
         },

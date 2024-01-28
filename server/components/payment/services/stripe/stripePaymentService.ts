@@ -2,6 +2,7 @@ import { Stripe } from 'stripe';
 import { StringKeyObject } from '../../../../types/custom';
 import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
+  PAYMENT_TYPE,
   PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
@@ -22,9 +23,11 @@ class StripePaymentService extends AbstractPaymentService<
     token,
     type,
   }: PaymentServiceExecutePaymentParams): Stripe.Checkout.SessionCreateParams => {
+    const isSubscription = type === PAYMENT_TYPE.SUBSCRIPTION;
+    const metadata = { token };
     const createPaymentJson: Stripe.Checkout.SessionCreateParams = {
       line_items: items as StripeItems,
-      payment_method_types: ['card', 'wechat_pay', 'grabpay', 'alipay'],
+      payment_method_types: isSubscription ? ['card'] : ['card', 'wechat_pay', 'grabpay', 'alipay'],
       mode: type,
       success_url: successRedirectUrl,
       cancel_url: cancelRedirectUrl,
@@ -33,9 +36,17 @@ class StripePaymentService extends AbstractPaymentService<
           client: 'web',
         },
       },
-      payment_intent_data: {
-        metadata: { token },
-      },
+      ...(isSubscription
+        ? {
+            subscription_data: {
+              metadata,
+            },
+          }
+        : {
+            payment_intent_data: {
+              metadata,
+            },
+          }),
     };
     return createPaymentJson;
   };
