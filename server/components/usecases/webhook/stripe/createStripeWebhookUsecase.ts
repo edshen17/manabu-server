@@ -31,10 +31,11 @@ class CreateStripeWebhookUsecase extends AbstractCreateUsecase<
     return false;
   };
 
-  protected _makeRequestTemplate = async (
-    props: MakeRequestTemplateParams
-  ): Promise<CreateStripeWebhookUsecaseResponse> => {
-    const { rawBody, headers, currentAPIUser } = props;
+  protected _makeRequestTemplate = async ({
+    rawBody,
+    headers,
+    currentAPIUser,
+  }: MakeRequestTemplateParams): Promise<CreateStripeWebhookUsecaseResponse> => {
     const stripeEvent = this._getStripeEvent({ rawBody, headers });
     const stripeEventType = stripeEvent.type;
     const stripeEventObj = (stripeEvent as StringKeyObject).data.object;
