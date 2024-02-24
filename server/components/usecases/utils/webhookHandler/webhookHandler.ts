@@ -41,7 +41,6 @@ class WebhookHandler {
   private _createPackageTransaction = async (
     props: WebhookHandlerCreateResourceParams & {
       userId: CurrentAPIUser['userId'];
-      paymentId: string;
     }
   ): Promise<WebhookHandlerCreateResourceResponse> => {
     const { currentAPIUser, token, userId, paymentId } = props;
