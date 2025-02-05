@@ -4,6 +4,7 @@ import { JoinedUserDoc } from '../../../../../models/User';
 import { StringKeyObject } from '../../../../../types/custom';
 import { makeFakeDbUserFactory } from '../../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { PAYMENT_TYPE } from '../../../../payment/abstractions/IPaymentService';
 import { makeQueryStringHandler } from '../../../../usecases/utils/queryStringHandler';
 import { QueryStringHandler } from '../../../../usecases/utils/queryStringHandler/queryStringHandler';
 import { CurrentAPIUser } from '../../../../webFrameworkCallbacks/abstractions/IHttpRequest';
@@ -37,6 +38,7 @@ beforeEach(async () => {
     packageId: fakeTeacher.teacherData!.packages[0]._id,
     lessonDuration: 60,
     lessonLanguage: 'ja',
+    type: PAYMENT_TYPE.PAYMENT,
   };
   queryToEncode = {
     paymentGateway: 'paypal',

@@ -3,6 +3,7 @@ import { makeCreatePackageTransactionCheckoutUsecase } from '.';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { makeFakeDbUserFactory } from '../../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { PAYMENT_TYPE } from '../../../../payment/abstractions/IPaymentService';
 import { CurrentAPIUser } from '../../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../../abstractions/IUsecase';
 import { makeControllerDataBuilder } from '../../../utils/controllerDataBuilder';
@@ -39,6 +40,7 @@ beforeEach(async () => {
       packageId: fakeTeacher.teacherData!.packages[0]._id,
       lessonDuration: 60,
       lessonLanguage: 'ja',
+      type: PAYMENT_TYPE.SUBSCRIPTION,
     },
     query: {
       paymentGateway: 'paypal',

@@ -1,8 +1,9 @@
 import { expect } from 'chai';
 import { makePaynowPaymentService } from '.';
 import {
-  PaymentServiceExecutePaymentParams,
   PAYMENT_GATEWAY_NAME,
+  PAYMENT_TYPE,
+  PaymentServiceExecutePaymentParams,
 } from '../../abstractions/IPaymentService';
 import { PaynowPaymentService } from './paynowPaymentService';
 
@@ -17,6 +18,7 @@ beforeEach(async () => {
   paymentHandlerExecuteParams = {
     successRedirectUrl: 'https://manabu.sg/success',
     cancelRedirectUrl: 'https://manabu.sg/cancel',
+    type: PAYMENT_TYPE.PAYMENT,
     items: {
       source: {
         type: PAYMENT_GATEWAY_NAME.PAYNOW,

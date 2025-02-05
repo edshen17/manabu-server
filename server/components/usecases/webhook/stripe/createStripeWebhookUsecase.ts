@@ -31,22 +31,28 @@ class CreateStripeWebhookUsecase extends AbstractCreateUsecase<
     return false;
   };
 
-  protected _makeRequestTemplate = async (
-    props: MakeRequestTemplateParams
-  ): Promise<CreateStripeWebhookUsecaseResponse> => {
-    const { rawBody, headers, currentAPIUser } = props;
+  protected _makeRequestTemplate = async ({
+    rawBody,
+    headers,
+    currentAPIUser,
+  }: MakeRequestTemplateParams): Promise<CreateStripeWebhookUsecaseResponse> => {
     const stripeEvent = this._getStripeEvent({ rawBody, headers });
     const stripeEventType = stripeEvent.type;
     const stripeEventObj = (stripeEvent as StringKeyObject).data.object;
-    const token: string = stripeEventObj.charges.data[0].metadata.token;
-    const paymentId: string = stripeEventObj.id;
     let usecaseRes: CreateStripeWebhookUsecaseResponse = {};
     switch (stripeEventType) {
       case 'payment_intent.succeeded':
         usecaseRes = await this._webhookHandler.createResource({
           currentAPIUser,
-          token,
-          paymentId,
+          token: stripeEventObj.charges.data[0].metadata.token,
+          paymentId: stripeEventObj.id,
+        });
+        break;
+      case 'invoice.payment_succeeded':
+        usecaseRes = await this._webhookHandler.createResource({
+          currentAPIUser,
+          token: stripeEventObj.metadata.token,
+          paymentId: stripeEventObj.id,
         });
         break;
       default:

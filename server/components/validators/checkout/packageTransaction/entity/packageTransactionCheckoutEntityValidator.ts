@@ -1,7 +1,10 @@
+import { PAYMENT_TYPE } from '../../../../payment/abstractions/IPaymentService';
 import { AbstractEntityValidator } from '../../../abstractions/AbstractEntityValidator';
 
 class PackageTransactionCheckoutEntityValidator extends AbstractEntityValidator {
   protected _initValidationSchemas = (): void => {
+    const paymentTypes = Object.values(PAYMENT_TYPE);
+
     this._createValidationSchema = this._joi.object().keys({
       teacherId: this._joi
         .alternatives()
@@ -18,6 +21,7 @@ class PackageTransactionCheckoutEntityValidator extends AbstractEntityValidator 
           endDate: this._joi.date(),
         })
         .max(60),
+      type: this._joi.string().valid(...paymentTypes),
     });
     this._editValidationSchema = this._createValidationSchema;
     this._deleteValidationSchema = this._createValidationSchema;

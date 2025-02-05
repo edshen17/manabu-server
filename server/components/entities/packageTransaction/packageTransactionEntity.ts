@@ -51,13 +51,14 @@ class PackageTransactionEntity extends AbstractEntity<
       lessonLanguage,
       isSubscription,
     } = buildParams;
+    const expiryMonths = isSubscription ? 1 : 3;
     const packageTransactionEntity = {
       hostedById,
       reservedById,
       packageId,
       transactionDate: new Date(),
       lessonDuration,
-      terminationDate: this._dayjs().add(3, 'month').toDate(),
+      terminationDate: this._dayjs().add(expiryMonths, 'month').toDate(),
       isTerminated: false,
       remainingAppointments,
       lessonLanguage,

@@ -2,10 +2,12 @@ import { Stripe } from 'stripe';
 import { StringKeyObject } from '../../../../types/custom';
 import { AbstractPaymentService } from '../../abstractions/AbstractPaymentService';
 import {
+  PAYMENT_TYPE,
   PaymentServiceExecutePaymentParams,
   PaymentServiceExecutePaymentResponse,
   PaymentServiceExecutePayoutParams,
   PaymentServiceExecutePayoutResponse,
+  StripeItems,
 } from '../../abstractions/IPaymentService';
 
 type OptionalStripePaymentServiceInitParams = {};
@@ -14,14 +16,19 @@ class StripePaymentService extends AbstractPaymentService<
   Stripe,
   OptionalStripePaymentServiceInitParams
 > {
-  protected _createPaymentJson = (
-    props: PaymentServiceExecutePaymentParams
-  ): Stripe.Checkout.SessionCreateParams => {
-    const { successRedirectUrl, cancelRedirectUrl, items, token } = props;
-    const createPaymentJson = {
-      line_items: items,
-      payment_method_types: ['card', 'wechat_pay', 'grabpay', 'alipay'],
-      mode: 'payment',
+  protected _createPaymentJson = ({
+    successRedirectUrl,
+    cancelRedirectUrl,
+    items,
+    token,
+    type,
+  }: PaymentServiceExecutePaymentParams): Stripe.Checkout.SessionCreateParams => {
+    const isSubscription = type === PAYMENT_TYPE.SUBSCRIPTION;
+    const metadata = { token };
+    const createPaymentJson: Stripe.Checkout.SessionCreateParams = {
+      line_items: items as StripeItems,
+      payment_method_types: isSubscription ? ['card'] : ['card', 'wechat_pay', 'grabpay', 'alipay'],
+      mode: type,
       success_url: successRedirectUrl,
       cancel_url: cancelRedirectUrl,
       payment_method_options: {
@@ -29,10 +36,18 @@ class StripePaymentService extends AbstractPaymentService<
           client: 'web',
         },
       },
-      payment_intent_data: {
-        metadata: { token },
-      },
-    } as Stripe.Checkout.SessionCreateParams;
+      ...(isSubscription
+        ? {
+            subscription_data: {
+              metadata,
+            },
+          }
+        : {
+            payment_intent_data: {
+              metadata,
+            },
+          }),
+    };
     return createPaymentJson;
   };
 

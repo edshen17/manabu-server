@@ -7,6 +7,7 @@ import { makeFakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures
 import { FakeDbAvailableTimeFactory } from '../../../dataAccess/testFixtures/fakeDbAvailableTimeFactory/fakeDbAvailableTimeFactory';
 import { makeFakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory';
 import { FakeDbUserFactory } from '../../../dataAccess/testFixtures/fakeDbUserFactory/fakeDbUserFactory';
+import { PAYMENT_TYPE } from '../../../payment/abstractions/IPaymentService';
 import { CurrentAPIUser } from '../../../webFrameworkCallbacks/abstractions/IHttpRequest';
 import { RouteData } from '../../abstractions/IUsecase';
 import { makeCreatePackageTransactionCheckoutUsecase } from '../../checkout/packageTransaction/createPackageTransactionCheckoutUsecase';
@@ -59,6 +60,7 @@ beforeEach(async () => {
       lessonDuration: 60,
       lessonLanguage: 'ja',
       timeslots: [{ startDate, endDate }],
+      type: PAYMENT_TYPE.PAYMENT,
     },
     query: {
       paymentGateway: 'stripe',

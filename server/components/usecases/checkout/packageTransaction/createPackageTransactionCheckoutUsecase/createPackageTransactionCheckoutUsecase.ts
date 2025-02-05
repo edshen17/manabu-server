@@ -8,21 +8,22 @@ import { PackageDoc } from '../../../../../models/Package';
 import { JoinedUserDoc } from '../../../../../models/User';
 import { Await, StringKeyObject } from '../../../../../types/custom';
 import {
-  DbServiceAccessOptions,
   DB_SERVICE_COLLECTION,
+  DbServiceAccessOptions,
 } from '../../../../dataAccess/abstractions/IDbService';
 import { CacheDbService, TTL_MS } from '../../../../dataAccess/services/cache/cacheDbService';
 import { TeacherDbServiceResponse } from '../../../../dataAccess/services/teacher/teacherDbService';
 import {
-  BalanceTransactionEntityBuildParams,
   BALANCE_TRANSACTION_ENTITY_STATUS,
   BALANCE_TRANSACTION_ENTITY_TYPE,
+  BalanceTransactionEntityBuildParams,
 } from '../../../../entities/balanceTransaction/balanceTransactionEntity';
 import { PackageTransactionEntityBuildParams } from '../../../../entities/packageTransaction/packageTransactionEntity';
 import { ConvertStringToObjectId } from '../../../../entities/utils/convertStringToObjectId';
 import {
-  PaymentServiceExecutePaymentParams,
   PAYMENT_GATEWAY_NAME,
+  PAYMENT_TYPE,
+  PaymentServiceExecutePaymentParams,
 } from '../../../../payment/abstractions/IPaymentService';
 import { PaynowPaymentService } from '../../../../payment/services/paynow/paynowPaymentService';
 import { PaypalPaymentService } from '../../../../payment/services/paypal/paypalPaymentService';
@@ -67,6 +68,7 @@ type TestBodyResponse = {
   teacherData: JoinedUserDoc['teacherData'];
   teacherPackage: PackageDoc;
   timeslots: Timeslot[];
+  type: PAYMENT_TYPE;
 };
 
 type GetPaymentServiceRedirectUrlParams = Await<
@@ -78,6 +80,7 @@ type SetPackageTransactionJwtParams = {
   body: StringKeyObject;
   userId?: ObjectId;
   token: string;
+  type: PAYMENT_TYPE;
   teacher: JoinedUserDoc;
   processedPaymentServiceData: ProcessedPaymentServiceData;
   timeslots: Timeslot[];
@@ -117,17 +120,19 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return packageTransactionCheckoutRes;
   };
 
-  private _testBody = async (props: {
+  private _testBody = async ({
+    body,
+    dbServiceAccessOptions,
+  }: {
     body: StringKeyObject;
     dbServiceAccessOptions: DbServiceAccessOptions;
   }): Promise<TestBodyResponse> => {
-    const { body, dbServiceAccessOptions } = props;
     const validatedBody = this._packageTransactionCheckoutEntityValidator.validate({
       buildParams: body,
       validationMode: ENTITY_VALIDATOR_VALIDATE_MODE.CREATE,
       userRole: ENTITY_VALIDATOR_VALIDATE_USER_ROLE.USER,
     });
-    const { teacherId, packageId, lessonDuration, lessonLanguage, timeslots } = validatedBody;
+    const { teacherId, packageId, lessonDuration, lessonLanguage, timeslots, type } = validatedBody;
     const teacher = <JoinedUserDoc>await this._dbService.findById({
       _id: this._convertStringToObjectId(teacherId),
       dbServiceAccessOptions: { ...dbServiceAccessOptions, isReturningParent: true },
@@ -146,7 +151,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     if (!isValidBody) {
       throw new Error('Invalid body.');
     }
-    return { teacher, teacherData, teacherPackage, timeslots };
+    return { teacher, teacherData, teacherPackage, timeslots, type };
   };
 
   private _getPackageTransactionCheckoutResponse = async (
@@ -175,7 +180,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   };
 
   private _getProcessedPaymentServiceParams = async (props: GetRedirectUrlParams) => {
-    const { body, currentAPIUser, teacher, teacherPackage, timeslots } = props;
+    const { body, currentAPIUser, teacher, teacherPackage, timeslots, type } = props;
     const { userId } = currentAPIUser;
     const token = `${userId}-${DB_SERVICE_COLLECTION.PACKAGE_TRANSACTIONS}`;
     const processedPaymentServiceData = await this._getProcessedPaymentServiceData(props);
@@ -187,6 +192,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       token,
       userId,
       timeslots,
+      type,
       processedPaymentServiceData,
     });
     const successRedirectUrl = this._redirectUrlBuilder
@@ -203,6 +209,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       cancelRedirectUrl,
       currency: DEFAULT_CURRENCY,
       token: token,
+      type,
     };
     return processedPaymentServiceParams;
   };
@@ -241,7 +248,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _setTransactionJwt = async (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): Promise<void> => {
-    const { token, processedPaymentServiceData, userId, timeslots } =
+    const { token, processedPaymentServiceData, userId, timeslots, type } =
       setPackageTransactionJwtParams;
     const packageTransactionEntityBuildParams = this._createPackageTransactionEntityBuildParams(
       setPackageTransactionJwtParams
@@ -256,6 +263,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
         packageTransactionEntityBuildParams,
         balanceTransactionEntityBuildParams: debitBalanceTransactionEntityBuildParams,
         timeslots,
+        type,
       },
       expiresIn: '1d',
     });
@@ -270,7 +278,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _createPackageTransactionEntityBuildParams = (
     setPackageTransactionJwtParams: SetPackageTransactionJwtParams
   ): PackageTransactionEntityBuildParams => {
-    const { body, userId, teacher, teacherPackage } = setPackageTransactionJwtParams;
+    const { body, userId, teacher, teacherPackage, type } = setPackageTransactionJwtParams;
     const { packageId, lessonLanguage, lessonDuration } = body;
     const { lessonAmount } = teacherPackage;
     const packageTransactionEntityBuildParams: PackageTransactionEntityBuildParams = {
@@ -280,7 +288,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
       lessonDuration,
       lessonLanguage,
       remainingAppointments: lessonAmount,
-      isSubscription: false,
+      isSubscription: type === PAYMENT_TYPE.SUBSCRIPTION,
     };
     return packageTransactionEntityBuildParams;
   };
@@ -311,21 +319,26 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return debitBalanceTransactionEntityBuildParams;
   };
 
-  private _getPaypalRedirectUrl = async (
-    props: GetPaymentServiceRedirectUrlParams
-  ): Promise<string> => {
-    const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
+  private _getPaypalRedirectUrl = async ({
+    item,
+    successRedirectUrl,
+    cancelRedirectUrl,
+    currency,
+    token,
+    type,
+  }: GetPaymentServiceRedirectUrlParams): Promise<string> => {
     const { price, name, id, quantity } = item;
     const paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams = {
       successRedirectUrl,
       cancelRedirectUrl,
+      type,
       items: [
         {
           name: name,
           sku: id,
           price: price.toString(),
           currency,
-          quantity: quantity,
+          quantity,
         },
       ],
       currency,
@@ -342,7 +355,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
   private _getStripeRedirectUrl = async (
     props: GetPaymentServiceRedirectUrlParams
   ): Promise<string> => {
-    const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
+    const { item, successRedirectUrl, cancelRedirectUrl, currency, token, type } = props;
     const { price, name, quantity } = item;
     const stripePrice = await this._exchangeRateHandler.multiply({
       multiplicand: {
@@ -356,6 +369,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams = {
       successRedirectUrl,
       cancelRedirectUrl,
+      type,
       items: [
         {
           price_data: {
@@ -364,6 +378,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
               name,
             },
             unit_amount: stripePrice,
+            ...(type === PAYMENT_TYPE.SUBSCRIPTION && { recurring: { interval: 'month' } }),
           },
           quantity: quantity,
         },
@@ -379,10 +394,14 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     return redirectUrl;
   };
 
-  private _getPaynowRedirectUrl = async (
-    props: GetPaymentServiceRedirectUrlParams
-  ): Promise<string> => {
-    const { item, successRedirectUrl, cancelRedirectUrl, currency, token } = props;
+  private _getPaynowRedirectUrl = async ({
+    item,
+    successRedirectUrl,
+    cancelRedirectUrl,
+    currency,
+    token,
+    type,
+  }: GetPaymentServiceRedirectUrlParams): Promise<string> => {
     const { price, name } = item;
     const paynowPrice = await this._exchangeRateHandler.multiply({
       multiplicand: {
@@ -396,6 +415,7 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
     const paymentHandlerExecuteParams: PaymentServiceExecutePaymentParams = {
       successRedirectUrl,
       cancelRedirectUrl,
+      type,
       items: {
         source: {
           type: 'paynow',
@@ -450,8 +470,8 @@ class CreatePackageTransactionCheckoutUsecase extends AbstractCreateUsecase<
 }
 
 export {
+  CHECKOUT_TOKEN_HASH_KEY,
   CreatePackageTransactionCheckoutUsecase,
   CreatePackageTransactionCheckoutUsecaseResponse,
-  CHECKOUT_TOKEN_HASH_KEY,
   Timeslot,
 };

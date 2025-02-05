@@ -27,12 +27,6 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
     createPaymentJson: StringKeyObject
   ): Promise<PaymentServiceExecutePaymentResponse>;
 
-  public executeSubscription = async (): Promise<PaymentServiceExecutePaymentResponse> => {
-    return {
-      redirectUrl: '',
-    };
-  };
-
   public executePayout = async (
     props: PaymentServiceExecutePayoutParams
   ): Promise<PaymentServiceExecutePayoutResponse> => {
@@ -47,10 +41,10 @@ abstract class AbstractPaymentService<PaymentLibType, OptionalPaymentServiceInit
     createPayoutJson: StringKeyObject
   ): Promise<PaymentServiceExecutePayoutResponse>;
 
-  public init = async (
-    initParams: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>
-  ): Promise<this> => {
-    const { paymentLib, ...optionalInitParams } = initParams;
+  public init = async ({
+    paymentLib,
+    ...optionalInitParams
+  }: PaymentServiceInitParams<PaymentLibType, OptionalPaymentServiceInitParams>): Promise<this> => {
     this._paymentLib = paymentLib;
     await this._initTemplate(optionalInitParams);
     return this;
